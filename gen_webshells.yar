@@ -41,7 +41,8 @@ rule php_webshell_base64_encoded_payloads {
 		author = "Arnim Rupp"
 		date = "2021/01/07"
 	strings:
-		$php = "<?"
+		$php1 = "<?="
+		$php2 = "<?php"
 		$decode = "base64" // avoid having a string at random in a crypto key
 		$payload1 = "exec" base64
 		$payload2 = "shell_exec" base64
@@ -53,7 +54,7 @@ rule php_webshell_base64_encoded_payloads {
 		$payload8 = "eval" base64
 		$payload9 = "assert" base64
 	condition:
-		filesize < 300000 and $php and $decode and any of ( $payload* )
+		filesize < 300000 and any of ( $php* ) and $decode and any of ( $payload* )
 }
 
 
@@ -96,9 +97,11 @@ rule webshell_php_double_eval_tiny {
 		hash = "aabfd179aaf716929c8b820eefa3c1f613f8dcac"
 		date = "2021/01/11"
 	strings:
+		$php1 = "<?="
+		$php2 = "<?php"
 		$payload = /(\beval[\t ]*\([^)]|\bassert[\t ]*\([^)])/ nocase
 	condition:
-		#payload >= 2 and filesize < 800
+		any of ( $php* ) and #payload >= 2 and filesize < 800
 }
 
 rule TODO_webshell_generic_php_backticks {
@@ -151,12 +154,13 @@ rule webshell_generic_asp_tiny {
 		author = "Arnim Rupp"
 		date = "2021/01/07"
 	strings:
+		$asp = "<%"
 		$input = "request." nocase
 		$payload0 = "eval_r" fullword nocase
 		$payload1 = "eval" fullword nocase
 		$payload2 = "execute" fullword nocase
 	condition:
-		filesize < 500 and $input and any of ($payload*)
+		$asp and filesize < 500 and $input and any of ($payload*)
 }
 
 rule webshell_generic_jsp_tiny {
