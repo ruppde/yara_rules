@@ -106,7 +106,6 @@ rule TODO_webshell_generic_php_backticks {
 		description = "Generic PHP webshell which uses backticks directly on user input"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
-		hash = "a61437a427062756e2221bfb6d58cd62439d09d9"
 		date = "2021/01/07"
 	strings:
 
@@ -306,9 +305,6 @@ rule webshell_regeorg_aspx_csharp {
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		reference = "https://github.com/sensepost/reGeorg"
 		hash = "c1f43b7cf46ba12cfc1357b17e4f5af408740af7ae70572c9cf988ac50260ce1"
-		hash = "8755d93498564f147763146bae31a04f"
-		hash = "e508a95f2b5182dc320cf997abdd9967"
-		hash = "9262f2c55a287fedd925b8566c4a2477"
 		author = "Arnim Rupp"
 		date = "2021/01/11"
 	strings:
