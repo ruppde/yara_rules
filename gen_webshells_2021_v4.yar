@@ -48,6 +48,7 @@ private rule capa_php {
 		author = "Arnim Rupp"
 		date = "2021/01/14"
 	strings:
+		// this will hit on a lot of non-php files, asp, scripting templates, ... but it works on older php versions
 		$ = "<?"
 	condition:
 		any of them
@@ -329,8 +330,8 @@ rule webshell_php_obfuscated {
 		author = "Arnim Rupp"
 		date = "2021/01/12"
 	condition:
-		filesize < 700KB 
-		and capa_php 
+		filesize < 200KB 
+		and capa_php_new
 		and capa_php_obfuscation_multi
 		and capa_php_payload
 }
@@ -624,6 +625,18 @@ rule webshell_func_in_get {
 ////    /_/   \_\____/|_|       |_|      \_/  |____/____/ \____|_| \_\___|_|    |_|  
                                                                              
 
+private rule capa_asp {
+	meta:
+		description = "ASP tag"
+		license = "https://creativecommons.org/licenses/by-nc/4.0/"
+		author = "Arnim Rupp"
+		date = "2021/01/26"
+	strings:
+		$ = "<%"
+	condition:
+		any of them
+}
+
 
 rule webshell_generic_asp_eval {
 	meta:
@@ -637,7 +650,7 @@ rule webshell_generic_asp_eval {
 		$payload_and_input2 = /execute[\t ]*request\(/ nocase
 		$payload_and_input4 = /ExecuteGlobal[\t ]*request\(/ nocase
 	condition:
-		any of them
+		filesize < 100KB and capa_asp and any of them
 }
 
 rule webshell_asp_nano {
@@ -647,7 +660,6 @@ rule webshell_asp_nano {
 		author = "Arnim Rupp"
 		date = "2021/01/13"
 	strings:
-		$asp = "<%"
 		$payload0 = "eval_r" fullword nocase
 		$payload1 = "eval" fullword nocase
 		$payload2 = "execute" fullword nocase
@@ -657,7 +669,7 @@ rule webshell_asp_nano {
 		$payload6 = "cmd /c" nocase
 		$payload7 = "cmd.exe" nocase
 	condition:
-		$asp and filesize < 200 and any of ($payload*)
+		filesize < 200 and capa_asp and any of ($payload*)
 }
 
 /*
@@ -797,14 +809,8 @@ rule webshell_jsp_writer_nano {
 	strings:
 		$payload1 = ".write"
 		$payload2 = "getBytes" fullword
-		// request.getParameter
-		$input1 = "getParameter" fullword
-		// request.getHeaders
-		$input2 = "getHeaders" fullword
-		// request.getInputStream
-		$input3 = "getInputStream" fullword
 	condition:
-		filesize < 200 and 2 of ( $payload* ) and 1 of ( $input* )
+		filesize < 200 and capa_jsp_input and 2 of ( $payload* )
 }
 
 
@@ -1007,13 +1013,8 @@ rule webshell_input_upload_write {
 		$upload = "upload" nocase
 		$write1 = "os.write" fullword
 		$write2 = "FileOutputStream" fullword
-		$input1 = "getParameter" fullword
-		// request.getHeaders
-		$input2 = "getHeaders" fullword
-		// request.getInputStream
-		$input3 = "getInputStream" fullword
 	condition:
-		filesize < 10000 and $upload and 1 of ( $write* ) and 1 of ( $input* ) 
+		filesize < 10000 and capa_jsp and capa_jsp_input and $upload and 1 of ( $write* )
 }
 
 /* hunting rule, probaly lots of FP
@@ -1037,22 +1038,17 @@ rule webshell_input_password_sql {
 */
 
 
-rule webshell_input_write_nano {
+rule webshell_jsp_input_write_nano {
 	meta:
-		description = "JSP uploader with which contains upload"
+		description = "JSP webshell input and write"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		date = "2021/01/24"
 	strings:
 		$write1 = "os.write" fullword
 		$write2 = "FileOutputStream" fullword
-		$input1 = "getParameter" fullword
-		// request.getHeaders
-		$input2 = "getHeaders" fullword
-		// request.getInputStream
-		$input3 = "getInputStream" fullword
 	condition:
-		filesize < 1500 and 1 of ( $write* ) and 1 of ( $input* ) 
+		filesize < 1500 and capa_jsp_input and 1 of ( $write* )
 }
 
 rule webshell_regeorg_aspx_csharp {
