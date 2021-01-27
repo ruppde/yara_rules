@@ -800,6 +800,7 @@ rule webshell_jsp_http_proxy {
 	condition:
 		filesize < 10KB and capa_jsp and all of them
 }
+
 rule webshell_jsp_writer_nano {
 	meta:
 		description = "JSP file writer"
@@ -810,9 +811,8 @@ rule webshell_jsp_writer_nano {
 		$payload1 = ".write"
 		$payload2 = "getBytes" fullword
 	condition:
-		filesize < 200 and capa_jsp_input and 2 of ( $payload* )
+		filesize < 200 and capa_jsp_input and capa_jsp and 2 of ( $payload* )
 }
-
 
 rule webshell_generic_jsp_tiny {
 	meta:
