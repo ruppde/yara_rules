@@ -124,6 +124,7 @@ private rule capa_php_old_safe {
 		// of course the new tags should also match
 		$php_new1 = "<?=" nocase
 		$php_new2 = "<?php" nocase
+		$php_new3 = "<script language=\"php" nocase
 		// yep, they might hit other script panguages, but still reduces false positives
 		$f1 = "echo" fullword nocase
 		$f2 = "fwrite" fullword nocase
@@ -145,10 +146,12 @@ private rule capa_php_old_safe {
 		$f18 = "strto" nocase
 		$f19 = "foreach" fullword nocase
 		$f20 = "array" nocase
+		$f21 = "strrev" fullword nocase
 		// prevent xml and asp from hitting
 		$no_xml1 = "<?xml version" nocase
 		$no_xml2 = "<?xml-stylesheet" nocase
-		$no_asp = "<script language" nocase
+		$no_asp1 = "<%@LANGUAGE" nocase
+		$no_asp2 = /<script language="(vb|jscript|c#)/ nocase
 	condition:
 		(
 			$php or
@@ -167,6 +170,7 @@ private rule capa_php_new {
 	strings:
 		$ = "<?="
 		$ = "<?php" nocase
+		$ = "<script language=\"php" nocase
 	condition:
 		any of them
 }
@@ -434,6 +438,7 @@ rule webshell_php_generic_eval {
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		hash = "a61437a427062756e2221bfb6d58cd62439d09d9"
+		hash = "90c5cc724ec9cf838e4229e5e08955eec4d7bf95"
 		date = "2021/01/07"
 	strings:
 		$s0 = /(exec|shell_exec|passthru|system|popen|proc_open|pcntl_exec|eval|assert)[\t ]*(stripslashes\()?[\t ]*(trim\()?[\t ]*\(\$(_POST|_GET|_REQUEST|_SERVER\[['"]HTTP_)/
@@ -715,14 +720,16 @@ rule webshell_php_includer {
 
 
 // yara says this rule slows the scanning but it's ok since it's limited to filesize < 200
-rule webshell_php_dynamix {
+rule webshell_php_dynamic {
 	meta:
 		description = "PHP webshell using $a($code) for eval"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		hash = "65dca1e652d09514e9c9b2e0004629d03ab3c3ef"
+		hash = "b8ab38dc75cec26ce3d3a91cb2951d7cdd004838"
+		hash = "c4765e81550b476976604d01c20e3dbd415366df"
 		date = "2021/01/13"
-		score = 50
+		score = 60
 	strings:
 		$dynamic = /\$[a-zA-Z0-9_]{1,10}\(/
 		$fp = "whoops_add_stack_frame"
@@ -842,6 +849,63 @@ private rule capa_asp {
 		any of them
 }
 
+private rule capa_asp_obfuscation_multi {
+	meta:
+		description = "ASP obfuscation functions which have to be used multiple times, e.g. for each character"
+		license = "https://creativecommons.org/licenses/by-nc/4.0/"
+		author = "Arnim Rupp"
+		date = "2021/02/06"
+		score = 50
+	strings:
+		$o1 = "ord" fullword nocase
+		$o2 = "chr" fullword nocase
+		// not excactly a string function but also often used in obfuscation
+		$o4 = "\\x1"
+		$o5 = "\\x2"
+		// just picking some random numbers because they should appear often enough in a long obfuscated blob and it's faster than a regex
+		$o6 = "\\61"
+		$o7 = "\\44"
+		$o8 = "\\112"
+		$o9 = "\\120"
+	condition:
+		(
+			( #o1+#o2 ) > 50 or
+			( #o4+#o5+#o6+#o7+#o8+#o9 ) > 20 
+		) 
+}
+
+private rule capa_asp_payload {
+	meta:
+		description = "ASP eval versions"
+		license = "https://creativecommons.org/licenses/by-nc/4.0/"
+		author = "Arnim Rupp"
+		date = "2021/02/06"
+	strings:
+		$payload0 = "eval_r" fullword nocase
+		$payload1 = "eval" fullword nocase
+		$payload2 = "execute" fullword nocase
+		$payload3 = "WSCRIPT.SHELL" fullword nocase
+		$payload4 = "Scripting.FileSystemObject" fullword nocase
+		$payload5 = /ExecuteGlobal/ fullword nocase
+	condition:
+		any of them
+}
+
+rule webshell_asp_obfuscated {
+	meta:
+		description = "ASP webshell obfuscated"
+		license = "https://creativecommons.org/licenses/by-nc/4.0/"
+		author = "Arnim Rupp"
+		date = "2021/01/12"
+		hash = "7466d1434870eb151dbb415191fef2884dfade52"
+		hash = "a6ab3695e46cd65610edb3c7780495d03a72c43d"
+	condition:
+		filesize < 200KB 
+		and capa_asp
+		and capa_asp_obfuscation_multi
+		and capa_asp_payload
+}
+
 
 rule webshell_asp_generic_eval {
 	meta:
@@ -858,7 +922,9 @@ rule webshell_asp_generic_eval {
 		$payload_and_input2 = /execute[\t ]*request\(/ nocase
 		$payload_and_input4 = /ExecuteGlobal[\t ]*request\(/ nocase
 	condition:
-		filesize < 100KB and capa_asp and any of them
+		filesize < 100KB and 
+		capa_asp and
+		any of them
 }
 
 rule webshell_asp_nano {
