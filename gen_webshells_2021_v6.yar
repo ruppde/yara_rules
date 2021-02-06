@@ -218,7 +218,6 @@ private rule capa_php_include {
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		date = "2021/01/14"
-		hash = "65473e5b071b9d7d4c1ef8adca0349d4ca2d5449f8f44e61a465e4655e9cfe44"
 	strings:
 		$ = /\binclude[_once]?[\t ]*[('"]/ nocase
 		$ = /\brequire[_once]?[\t ]*[('"]/ nocase
@@ -461,7 +460,8 @@ rule webshell_php_obfuscated {
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		date = "2021/01/12"
-		hash = "de5056b7ab754cff0459ca003d16ea69a89eb6d2"
+		hash = "15d337a54e42ed3f2f13d91a85297ab8ee158345"
+		hash = "eec9ac58a1e763f5ea0f7fa249f1fe752047fa60"
 	condition:
 		filesize < 200KB 
 		and capa_php_new
@@ -503,6 +503,7 @@ rule webshell_php_obfuscated_fopo {
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		hash = "fbcff8ea5ce04fc91c05384e847f2c316e013207"
+		hash = "6da57ad8be1c587bb5cc8a1413f07d10fb314b72"
 		hash = "a698441f817a9a72908a0d93a34133469f33a7b34972af3e351bdccae0737d99"
 		date = "2021/01/12"
 	strings:
