@@ -113,6 +113,40 @@ private rule capa_php {
 		any of them
 }
 
+private rule capa_php_old_safe {
+	meta:
+		description = "PHP tag plus some php functions because just looking for <? is error prone, that's quickly contained in any larger file."
+		license = "https://creativecommons.org/licenses/by-nc/4.0/"
+		author = "Arnim Rupp"
+		date = "2021/02/05"
+	strings:
+		$php = "<?"
+		// yep, they might hit other script panguages, but still reduces false positives
+		$f1 = "echo" fullword nocase
+		$f2 = "fwrite" fullword nocase
+		$f3 = "empty" fullword nocase
+		$f4 = "function" fullword nocase
+		$f5 = "exit" fullword nocase
+		$f6 = "eval" fullword nocase
+		$f7 = "assert" fullword nocase
+		$f8 = "_GET"
+		$f9 = "_POST"
+		$f10 = "_REQUEST"
+		$f11 = "_SERVER"
+		$f12 = "trim" fullword nocase
+		$f13 = "call_" nocase
+		$f14 = "substr" nocase
+		$f15 = "chr(" nocase
+		$f16 = "exec" fullword nocase
+		$f17 = "system" fullword nocase
+		$f18 = "strto" nocase
+		$f19 = "foreach" fullword nocase
+		$f20 = "array" nocase
+	condition:
+		$php and
+		any of ( $f* )
+}
+
 private rule capa_php_new {
 	meta:
 		description = "PHP tags, only <?= and <?php. Use only if needed to reduce false positives because it won't find includer shells anymore. (e.g. <? include 'webshell.txt'?> and the payload in webshell.txt without <? )"
@@ -275,7 +309,7 @@ rule webshell_php_generic_nano_payload_or_callback {
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		date = "2021/01/14"
-		hash = "61c1efc3855b922bd98e80325822223d49b4b9ef"
+		hash = "29c80a36f0919c39fb0de4732c506da5eee89783"
 		score = 50
 	strings:
 		$fp1 = "__DIR__"
@@ -359,7 +393,9 @@ rule webshell_php_base64_encoded_payloads {
 		$nine5 = "hAHMAcwBlAHIAdA"
 		$nine6 = "YQBzAHMAZQByAHQA"
 	condition:
-		filesize < 300KB and capa_php_new and $decode and (
+		filesize < 300KB and 
+		capa_php_old_safe and 
+		$decode and (
 			any of ( $one* ) or any of ( $two* ) or any of ( $three* ) or any of ( $four* ) or any of ( $five* ) or any of ( $six* ) or any of ( $seven* ) or any of ( $eight* ) or any of ( $nine* )
 		)
 }
@@ -706,13 +742,14 @@ rule webshell_php_generic_backticks_obfuscated {
 		description = "Generic PHP webshell which uses obfuscated backticks directly on user input"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
-		hash = "b2e234ee2906dd2ad0088b3b63901c28"
+		hash = "23dc299f941d98c72bd48659cdb4673f5ba93697"
 		date = "2021/01/07"
 	strings:
-		$s0 = "<?"
 		$s1 = /echo[\t ]*\(?`\$/
 	condition:
-		all of them
+		filesize < 10KB and 
+		capa_php and
+		$s1
 }
 
 rule webshell_php_by_string {
@@ -734,6 +771,8 @@ rule webshell_php_by_string {
 		$ = "My PHP Shell - A very simple web shell"
 		$ = "<title>My PHP Shell <?echo VERSION"
 		$ = "F4ckTeam" fullword
+		$ = "{\"_P\"./*-/*-*/\"OS\"./*-/*-*/\"T\"}"
+		$ = "/*-/*-*/\""
 	condition:
 		filesize < 100KB and capa_php and any of them
 }
@@ -1286,7 +1325,7 @@ rule webshell_jsp_input_write_nano {
 		$write1 = "os.write" fullword
 		$write2 = "FileOutputStream" fullword
 	condition:
-		filesize < 1000 and 
+		filesize < 1500 and 
 		capa_jsp and 
 		capa_jsp_input and 
 		1 of ( $write* )
@@ -1311,7 +1350,7 @@ rule webshell_generic_os_strings {
 		$fp1 = "http://evil.com/"
 		$fp2 = "denormalize('/etc/shadow"
 	condition:
-		filesize < 100KB and 
+		filesize < 140KB and 
 		( capa_asp or capa_php_new or capa_jsp ) and 
 		capa_os_strings and
 		not any of ( $fp* )
