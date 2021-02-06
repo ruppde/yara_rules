@@ -281,7 +281,7 @@ rule webshell_php_generic_nano_payload_or_callback {
 		$fp1 = "__DIR__"
 	condition:
 		filesize < 100 and 
-		capa_php
+		capa_php and
 		( capa_php_payload or capa_php_callback ) and not
 		any of ( $fp* )
 }
