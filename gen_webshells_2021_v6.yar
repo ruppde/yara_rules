@@ -472,8 +472,8 @@ private rule capa_php_obfuscation_multi {
 		date = "2021/01/14"
 		score = 50
 	strings:
-		$o1 = "ord" fullword nocase
-		$o2 = "chr" fullword nocase
+		$o1 = "chr(" nocase
+		$o2 = "chr (" nocase
 		// not excactly a string function but also often used in obfuscation
 		$o3 = "goto" fullword nocase
 		$o4 = "\\x1"
@@ -839,12 +839,13 @@ rule webshell_php_func_in_get {
 
 private rule capa_asp {
 	meta:
-		description = "ASP tag"
+		description = "ASP tag, short and false positive prone"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		date = "2021/01/26"
 	strings:
 		$ = "<%"
+		//$ = "<% @language"
 	condition:
 		any of them
 }
@@ -857,8 +858,8 @@ private rule capa_asp_obfuscation_multi {
 		date = "2021/02/06"
 		score = 50
 	strings:
-		$o1 = "ord" fullword nocase
-		$o2 = "chr" fullword nocase
+		$o1 = "chr(" nocase
+		$o2 = "chr (" nocase
 		// not excactly a string function but also often used in obfuscation
 		$o4 = "\\x1"
 		$o5 = "\\x2"
@@ -900,7 +901,7 @@ rule webshell_asp_obfuscated {
 		hash = "7466d1434870eb151dbb415191fef2884dfade52"
 		hash = "a6ab3695e46cd65610edb3c7780495d03a72c43d"
 	condition:
-		filesize < 200KB 
+		filesize < 100KB 
 		and capa_asp
 		and capa_asp_obfuscation_multi
 		and capa_asp_payload
