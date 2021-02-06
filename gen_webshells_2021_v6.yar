@@ -145,12 +145,16 @@ private rule capa_php_old_safe {
 		$f18 = "strto" nocase
 		$f19 = "foreach" fullword nocase
 		$f20 = "array" nocase
+		// prevent asp from hitting
+		$asp1 = "<?xml" nocase
+		$asp2 = "<script" nocase
 	condition:
 		(
 			$php or
 			any of ( $php_new* )
 		) and
-		any of ( $f* )
+		any of ( $f* ) and 
+		not all of ( $asp* )
 }
 
 private rule capa_php_new {
