@@ -21,7 +21,6 @@ The rules named "suspicous_" are commented by default. uncomment them to find mo
 
 Checked for false positives on 8gb of common webapps plus yara-ci.
 
-TODO: hitrate
 Rules tested on the following webshell repos and collections:
 	https://github.com/sensepost/reGeorg
 	https://github.com/WhiteWinterWolf/wwwolf-php-webshell
@@ -71,6 +70,10 @@ Rules tested on the following webshell repos and collections:
 	https://github.com/Smaash/quasibot
 	https://github.com/tennc/webshell
 
+webshells in these repos after fdupes run: 5440
+old signature-base found: 1315
+TODO
+this rules: 3269
 
 */
 
@@ -278,6 +281,7 @@ rule webshell_php_generic_nano_payload_or_callback {
 		$fp1 = "__DIR__"
 	condition:
 		filesize < 100 and 
+		capa_php
 		( capa_php_payload or capa_php_callback ) and not
 		any of ( $fp* )
 }
@@ -355,7 +359,7 @@ rule webshell_php_base64_encoded_payloads {
 		$nine5 = "hAHMAcwBlAHIAdA"
 		$nine6 = "YQBzAHMAZQByAHQA"
 	condition:
-		filesize < 300KB and capa_php and $decode and (
+		filesize < 300KB and capa_php_new and $decode and (
 			any of ( $one* ) or any of ( $two* ) or any of ( $three* ) or any of ( $four* ) or any of ( $five* ) or any of ( $six* ) or any of ( $seven* ) or any of ( $eight* ) or any of ( $nine* )
 		)
 }
@@ -460,7 +464,6 @@ rule webshell_php_obfuscated {
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		date = "2021/01/12"
-		hash = "15d337a54e42ed3f2f13d91a85297ab8ee158345"
 		hash = "eec9ac58a1e763f5ea0f7fa249f1fe752047fa60"
 	condition:
 		filesize < 200KB 
@@ -536,14 +539,17 @@ private rule capa_os_strings {
 		date = "2021/01/14"
 	strings:
 		// windows = nocase
-		$s1 = "net localgroup administrators" nocase
+		$w1 = "net localgroup administrators" nocase
+		$w2 = "net user" nocase
+		$w3 = "/add" nocase
 		// linux stuff, case sensitive:
-		$s2 = "/etc/shadow"
-		$s3 = "/etc/ssh/sshd_config"
+		$l1 = "/etc/shadow"
+		$l2 = "/etc/ssh/sshd_config"
 		$take_two1 = "net user" nocase
 		$take_two2 = "/add" nocase
 	condition:
-		any of ( $s* ) or
+		all of ( $w* ) or
+		all of ( $l* ) or
 		2 of ( $take_two* ) 
 }
 
@@ -1054,7 +1060,7 @@ rule webshell_jsp_generic_tiny {
 		$payload_rt2 = "getRuntime" fullword
 		$payload_rt3 = "exec" fullword
 	condition:
-		filesize < 2000 and 
+		filesize < 500 and 
 		capa_jsp_input and
 		( 
 			1 of ( $payload* ) or
@@ -1213,8 +1219,14 @@ rule webshell_jsp_netspy {
 		$write1 = "os.write" fullword
 		$write2 = "FileOutputStream" fullword
 		$write3 = "PrintWriter" fullword
+		$http = "java.net.HttpURLConnection" fullword
 	condition:
-		filesize < 30KB and 4 of ( $scan* ) and 1 of ( $write* ) and capa_jsp_input
+		filesize < 30KB and 
+		capa_jsp and
+		capa_jsp_input and
+		4 of ( $scan* ) and 
+		1 of ( $write* ) and 
+		$http
 }
 
 rule webshell_jsp_by_string {
@@ -1242,21 +1254,6 @@ rule webshell_jsp_by_string {
 		filesize < 100KB and capa_jsp and any of them
 }
 
-rule webshell_jsp_input_password_write {
-	meta:
-		description = "JSP uploader with password"
-		license = "https://creativecommons.org/licenses/by-nc/4.0/"
-		author = "Arnim Rupp"
-		date = "2021/01/24"
-	strings:
-		$pwd1 = "password" nocase
-		$pwd2 = "pwd" nocase
-		$write1 = "os.write" fullword
-		$write2 = "FileOutputStream" fullword
-		$write3 = "PrintWriter" fullword
-	condition:
-		filesize < 10KB and 1 of ( $pwd* ) and 1 of ( $write* ) and capa_jsp_input
-}
 
 rule webshell_jsp_input_upload_write {
 	meta:
@@ -1289,7 +1286,10 @@ rule webshell_jsp_input_write_nano {
 		$write1 = "os.write" fullword
 		$write2 = "FileOutputStream" fullword
 	condition:
-		filesize < 1500 and capa_jsp_input and 1 of ( $write* )
+		filesize < 1000 and 
+		capa_jsp and 
+		capa_jsp_input and 
+		1 of ( $write* )
 }
 
 //              _      
@@ -1311,8 +1311,8 @@ rule webshell_generic_os_strings {
 		$fp1 = "http://evil.com/"
 		$fp2 = "denormalize('/etc/shadow"
 	condition:
-		filesize < 300KB and 
-		( capa_asp or capa_php or capa_jsp ) and 
+		filesize < 100KB and 
+		( capa_asp or capa_php_new or capa_jsp ) and 
 		capa_os_strings and
 		not any of ( $fp* )
 }
