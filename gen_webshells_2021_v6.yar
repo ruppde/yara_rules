@@ -115,12 +115,15 @@ private rule capa_php {
 
 private rule capa_php_old_safe {
 	meta:
-		description = "PHP tag plus some php functions because just looking for <? is error prone, that's quickly contained in any larger file."
+		description = "PHP tag plus some php functions because just looking for <? is error prone, that's quickly contained in any larger file and hits on asp."
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		date = "2021/02/05"
 	strings:
 		$php = "<?"
+		// of course the new tags should also match
+		$php_new1 = "<?=" nocase
+		$php_new2 = "<?php" nocase
 		// yep, they might hit other script panguages, but still reduces false positives
 		$f1 = "echo" fullword nocase
 		$f2 = "fwrite" fullword nocase
@@ -143,7 +146,10 @@ private rule capa_php_old_safe {
 		$f19 = "foreach" fullword nocase
 		$f20 = "array" nocase
 	condition:
-		$php and
+		(
+			$php or
+			any of ( $php_new* )
+		) and
 		any of ( $f* )
 }
 
@@ -503,7 +509,7 @@ rule webshell_php_obfuscated {
 		hash = "eec9ac58a1e763f5ea0f7fa249f1fe752047fa60"
 	condition:
 		filesize < 200KB 
-		and capa_php_new
+		and capa_php_old_safe
 		and capa_php_obfuscation_multi
 		and capa_php_payload
 }
@@ -734,7 +740,9 @@ rule webshell_php_generic_backticks {
 		$s0 = /`[\t ]*\$(_POST\[|_GET\[|_REQUEST\[|_SERVER\['HTTP_)/
 	condition:
 		// arg, can't search everywhere because lots of people write comments like "the value of `$_POST['action']`. Default false." :(
-		filesize < 200 and any of them
+		filesize < 200 and 
+		capa_php and
+		any of them
 }
 
 rule webshell_php_generic_backticks_obfuscated {
@@ -748,7 +756,7 @@ rule webshell_php_generic_backticks_obfuscated {
 		$s1 = /echo[\t ]*\(?`\$/
 	condition:
 		filesize < 10KB and 
-		capa_php and
+		capa_php_old_safe and
 		$s1
 }
 
@@ -1351,7 +1359,7 @@ rule webshell_generic_os_strings {
 		$fp2 = "denormalize('/etc/shadow"
 	condition:
 		filesize < 140KB and 
-		( capa_asp or capa_php_new or capa_jsp ) and 
+		( capa_asp or capa_php_old_safe or capa_jsp ) and 
 		capa_os_strings and
 		not any of ( $fp* )
 }
