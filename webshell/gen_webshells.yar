@@ -314,6 +314,7 @@ rule webshell_php_generic_tiny {
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		date = "2021/01/14"
+		hash = "0a20f64dbb5f4175cd0bb0a81f60546e12aba0d0"
 		hash = "bee1b76b1455105d4bfe2f45191071cf05e83a309ae9defcf759248ca9bceddd"
 	condition:
 		filesize < 1000 
@@ -817,10 +818,12 @@ rule webshell_php_by_string {
 		$ = "{\"_P\"./*-/*-*/\"OS\"./*-/*-*/\"T\"}" wide ascii
 		$ = "/*-/*-*/\"" wide ascii
 		$ = "MulCiShell" fullword wide ascii
-		$ = "'ev'.'al'"  wide ascii
-		$ = "'e'.'val'"  wide ascii
+		$ = "'ev'.'al'" wide ascii
+		$ = "'e'.'val'" wide ascii
+		$ = "e'.'v'.'a'.'l" wide ascii
 		$ = "bas'.'e6'." wide ascii
 		$ = "ba'.'se6'." wide ascii
+		$ = "as'.'e'.'6'" wide ascii
 		$ = "gz'.'inf'." wide ascii
 		$ = "gz'.'un'.'c" wide ascii
 		$ = "e'.'co'.'d" wide ascii
@@ -923,6 +926,7 @@ private rule capa_asp {
 		date = "2021/01/26"
 	strings:
 		$ = "<%" wide ascii
+		//$ = "72C24DD5-D70A-438B-8A42-98424B88AFB8" wide ascii
 		//$ = "<% @language" wide ascii
 	condition:
 		any of them
@@ -1057,13 +1061,15 @@ rule webshell_asp_string {
 		date = "2021/01/13"
 		hash ="f72252b13d7ded46f0a206f63a1c19a66449f216"
 	strings:
-		$s1 = "tseuqer lave" wide ascii
-		$s2 = ":eval request(" wide ascii
-		$s3 = ":eval request(" wide ascii
+		$ = "tseuqer lave" wide ascii
+		$ = ":eval request(" wide ascii
+		$ = ":eval request(" wide ascii
+		$ = "SItEuRl=\"http://www.zjjv.com\"" wide ascii
+		$ = "ServerVariables(\"HTTP_HOST\"),\"gov.cn\"" wide ascii
 	condition:
 		filesize < 200KB and 
 		// not checking capa_asp
-		any of ($s*)
+		any of them
 }
 
 rule webshell_asp_generic_tiny {
@@ -1202,6 +1208,7 @@ private rule capa_jsp_input {
 		// request.getHeaders
 		$input2 = "getHeaders" fullword ascii wide
 		$input3 = "getInputStream" fullword ascii wide
+		$input4 = "getReader" fullword ascii wide
 		$req1 = "request" fullword ascii wide
 		$req2 = "HttpServletRequest" fullword ascii wide
 		$req3 = "getRequest" fullword ascii wide
@@ -1388,8 +1395,8 @@ rule webshell_jsp_generic_reflection {
 		description = "Generic JSP webshell which uses reflection to execute user input"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
-		hash = "0a20f64dbb5f4175cd0bb0a81f60546e12aba0d0"
 		date = "2021/01/07"
+		hash = "62e6c6065b5ca45819c1fc049518c81d7d165744"
 	strings:
 		$ws_exec = "invoke" fullword wide ascii
 		$ws_class = "Class" fullword wide ascii
