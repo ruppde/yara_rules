@@ -459,7 +459,7 @@ rule webshell_php_double_eval_tiny {
 		$payload = /(\beval[\t ]*\([^)]|\bassert[\t ]*\([^)])/ nocase
 		$fp1 = "clone" fullword
 	condition:
-		filesize > 80 and 
+		filesize > 70 and 
 		filesize < 300 and 
 		capa_php and 
 		#payload >= 2 and 
@@ -839,7 +839,7 @@ rule webshell_php_func_in_get {
 		$s4 = /\$_REQUEST\[.{1,30}\]\(\$_REQUEST\[/
 		$s5 = /\$_SERVER\[HTTP_.{1,30}\]\(\$_SERVER\[HTTP_/
 	condition:
-		filesize < 100KB and 
+		filesize < 500KB and 
 		any of them
 }
 
