@@ -314,7 +314,6 @@ rule webshell_php_generic_tiny {
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		date = "2021/01/14"
-		hash = "0a20f64dbb5f4175cd0bb0a81f60546e12aba0d0"
 		hash = "bee1b76b1455105d4bfe2f45191071cf05e83a309ae9defcf759248ca9bceddd"
 	condition:
 		filesize < 1000 
