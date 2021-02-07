@@ -324,7 +324,7 @@ rule webshell_php_generic_nano_payload_or_callback {
 		author = "Arnim Rupp"
 		date = "2021/01/14"
 		hash = "29c80a36f0919c39fb0de4732c506da5eee89783"
-		score = 50
+		score = 40
 	strings:
 		$fp1 = "__DIR__"
 	condition:
@@ -457,12 +457,13 @@ rule webshell_php_double_eval_tiny {
 		score = 50
 	strings:
 		$payload = /(\beval[\t ]*\([^)]|\bassert[\t ]*\([^)])/ nocase
-		$fp = "clone" fullword
+		$fp1 = "clone" fullword
 	condition:
-		filesize < 800 and 
+		filesize > 80 and 
+		filesize < 300 and 
 		capa_php and 
 		#payload >= 2 and 
-		not $fp
+		not any of ( $fp* )
 }
 
 private rule capa_php_obfuscation_multi {
@@ -579,7 +580,7 @@ rule webshell_php_obfuscated_fopo {
 		$two5 = "7AEAAYQBzAHMAZQByAHQAKA"
 		$two6 = "OwBAAGEAcwBzAGUAcgB0ACgA"
 	condition:
-		filesize < 300KB and
+		filesize < 3000KB and
 		capa_php and 
 		$payload and (
 			any of ( $one* ) or any of ( $two* )
@@ -679,7 +680,7 @@ rule webshell_php_gzinflated {
 		$payload7 = "eval(base64_decode("
 		$payload8 = "eval(pack("
 	condition:
-		filesize < 500KB and 
+		filesize < 700KB and 
 		$php and 1 of ( $payload* )
 }
 
