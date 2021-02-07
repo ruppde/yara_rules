@@ -68,13 +68,41 @@ Rules tested on the following webshell repos and collections:
 	https://github.com/Smaash/quasibot
 	https://github.com/tennc/webshell
 
-Webshells in these repos after fdupes run: 5440
+Webshells in these repos after fdupes run: 4722
 Old signature-base rules found: 1315
-This rules found: 2998
-False positives in 8gb of common webapps plus yara-ci: 0
+This rules found: 3174
+False positives in 8gb of common webapps plus yara-ci: 2
 
 */
 
+//                               _
+//     __ _  ___ _ __   ___ _ __(_) ___
+//    / _` |/ _ \ '_ \ / _ \ '__| |/ __|
+//   | (_| |  __/ | | |  __/ |  | | (__
+//    \__, |\___|_| |_|\___|_|  |_|\___|
+//    |___/
+
+
+import "math"
+
+private rule webshell_encoded_stats {
+	meta:
+		description = "Webshell having statistical signs of encoded code which gets dynamically executed"
+		license = "https://creativecommons.org/licenses/by-nc/4.0/"
+		author = "Arnim Rupp"
+		date = "2021/02/07"
+	condition:
+		// file shouldn't be too small to have big enough data for math.entropy
+		filesize > 2KB and 
+		// ignore first and last 500bytes because they usually contains code for decoding and executing
+		math.entropy(500, filesize-500) >= 5.7 and
+		// encoded text has a higher mean than text or code because it's missing the spaces and special chars with the low numbers
+		math.mean(500, filesize-500) > 80 and
+		// deviation of base64 is ~20 according to CyberChef_v9.21.0.html#recipe=Generate_Lorem_Ipsum(3,'Paragraphs')To_Base64('A-Za-z0-9%2B/%3D')To_Charcode('Space',10)Standard_Deviation('Space')
+		// lets take a bit more because it might not be pure base64 also include some xor, shift, replacement, ...
+		// 89 is the mean of the base64 chars
+		math.deviation(500, filesize-500, 89.0) < 23
+}
 
 
 //           _
@@ -214,7 +242,6 @@ private rule capa_php_payload {
 		$ = /\bcreate_function[\t ]*\([^)]/ nocase
 		$ = /\bReflectionFunction[\t ]*\([^)]/ nocase
 		// TODO: $_GET['func_name']($_GET['argument']);
-		// TODO: $a(
 		// TODO backticks
 	condition:
 		any of them
@@ -227,40 +254,42 @@ private rule capa_php_callback {
 		author = "Arnim Rupp"
 		date = "2021/01/14"
 	strings:
-		$ = /\bob_start[\t ]*\([^)]/ nocase
-		$ = /\barray_diff_uassoc[\t ]*\([^)]/ nocase
-		$ = /\barray_diff_ukey[\t ]*\([^)]/ nocase
-		$ = /\barray_filter[\t ]*\([^)]/ nocase
-		$ = /\barray_intersect_uassoc[\t ]*\([^)]/ nocase
-		$ = /\barray_intersect_ukey[\t ]*\([^)]/ nocase
-		$ = /\barray_map[\t ]*\([^)]/ nocase
-		$ = /\barray_reduce[\t ]*\([^)]/ nocase
-		$ = /\barray_udiff_assoc[\t ]*\([^)]/ nocase
-		$ = /\barray_udiff_uassoc[\t ]*\([^)]/ nocase
-		$ = /\barray_udiff[\t ]*\([^)]/ nocase
-		$ = /\barray_uintersect_assoc[\t ]*\([^)]/ nocase
-		$ = /\barray_uintersect_uassoc[\t ]*\([^)]/ nocase
-		$ = /\barray_uintersect[\t ]*\([^)]/ nocase
-		$ = /\barray_walk_recursive[\t ]*\([^)]/ nocase
-		$ = /\barray_walk[\t ]*\([^)]/ nocase
-		$ = /\bassert_options[\t ]*\([^)]/ nocase
-		$ = /\buasort[\t ]*\([^)]/ nocase
-		$ = /\buksort[\t ]*\([^)]/ nocase
-		$ = /\busort[\t ]*\([^)]/ nocase
-		$ = /\bpreg_replace_callback[\t ]*\([^)]/ nocase
-		$ = /\bspl_autoload_register[\t ]*\([^)]/ nocase
-		$ = /\biterator_apply[\t ]*\([^)]/ nocase
-		$ = /\bcall_user_func[\t ]*\([^)]/ nocase
-		$ = /\bcall_user_func_array[\t ]*\([^)]/ nocase
-		$ = /\bregister_shutdown_function[\t ]*\([^)]/ nocase
-		$ = /\bregister_tick_function[\t ]*\([^)]/ nocase
-		$ = /\bset_error_handler[\t ]*\([^)]/ nocase
-		$ = /\bset_exception_handler[\t ]*\([^)]/ nocase
-		$ = /\bsession_set_save_handler[\t ]*\([^)]/ nocase
-		$ = /\bsqlite_create_aggregate[\t ]*\([^)]/ nocase
-		$ = /\bsqlite_create_function[\t ]*\([^)]/ nocase
+		$c1 = /\bob_start[\t ]*\([^)]/ nocase
+		$c2 = /\barray_diff_uassoc[\t ]*\([^)]/ nocase
+		$c3 = /\barray_diff_ukey[\t ]*\([^)]/ nocase
+		$c4 = /\barray_filter[\t ]*\([^)]/ nocase
+		$c5 = /\barray_intersect_uassoc[\t ]*\([^)]/ nocase
+		$c6 = /\barray_intersect_ukey[\t ]*\([^)]/ nocase
+		$c7 = /\barray_map[\t ]*\([^)]/ nocase
+		$c8 = /\barray_reduce[\t ]*\([^)]/ nocase
+		$c9 = /\barray_udiff_assoc[\t ]*\([^)]/ nocase
+		$c10 = /\barray_udiff_uassoc[\t ]*\([^)]/ nocase
+		$c11 = /\barray_udiff[\t ]*\([^)]/ nocase
+		$c12 = /\barray_uintersect_assoc[\t ]*\([^)]/ nocase
+		$c13 = /\barray_uintersect_uassoc[\t ]*\([^)]/ nocase
+		$c14 = /\barray_uintersect[\t ]*\([^)]/ nocase
+		$c15 = /\barray_walk_recursive[\t ]*\([^)]/ nocase
+		$c16 = /\barray_walk[\t ]*\([^)]/ nocase
+		$c17 = /\bassert_options[\t ]*\([^)]/ nocase
+		$c18 = /\buasort[\t ]*\([^)]/ nocase
+		$c19 = /\buksort[\t ]*\([^)]/ nocase
+		$c20 = /\busort[\t ]*\([^)]/ nocase
+		$c21 = /\bpreg_replace_callback[\t ]*\([^)]/ nocase
+		$c22 = /\bspl_autoload_register[\t ]*\([^)]/ nocase
+		$c23 = /\biterator_apply[\t ]*\([^)]/ nocase
+		$c24 = /\bcall_user_func[\t ]*\([^)]/ nocase
+		$c25 = /\bcall_user_func_array[\t ]*\([^)]/ nocase
+		$c26 = /\bregister_shutdown_function[\t ]*\([^)]/ nocase
+		$c27 = /\bregister_tick_function[\t ]*\([^)]/ nocase
+		$c28 = /\bset_error_handler[\t ]*\([^)]/ nocase
+		$c29 = /\bset_exception_handler[\t ]*\([^)]/ nocase
+		$c30 = /\bsession_set_save_handler[\t ]*\([^)]/ nocase
+		$c31 = /\bsqlite_create_aggregate[\t ]*\([^)]/ nocase
+		$c32 = /\bsqlite_create_function[\t ]*\([^)]/ nocase
+		$fp1 = /ob_start\(['\"]ob_gzhandler/ nocase
 	condition:
-		any of them
+		any of ( $c* ) and
+		not any of ( $fp* )
 }
 
 private rule capa_php_include {
@@ -312,9 +341,13 @@ rule webshell_php_generic_nano_input {
 		author = "Arnim Rupp"
 		hash = "b492336ac5907684c1b922e1c25c113ffc303ffbef645b4e95d36bc50e932033"
 		date = "2021/01/13"
+	strings:
+		$fp1 = "echo $_POST['"
 	condition:
 		filesize < 90 and 
-		( capa_php_input )
+		capa_php and
+		capa_php_input and
+		not any of ( $fp* )
 }
 
 rule webshell_php_generic_nano_payload_or_callback {
@@ -324,6 +357,7 @@ rule webshell_php_generic_nano_payload_or_callback {
 		author = "Arnim Rupp"
 		date = "2021/01/14"
 		hash = "29c80a36f0919c39fb0de4732c506da5eee89783"
+		hash = "76e3491998b76f83b570a4bb66e65dd0de629e9a"
 		score = 40
 	strings:
 		$fp1 = "__DIR__"
@@ -487,12 +521,26 @@ private rule capa_php_obfuscation_multi {
 		$o9 = "\\120"
 		$fp1 = "$goto"
 	condition:
-		(
-			( #o1+#o2 ) > 50 or
-			#o3 > 10 or
-			( #o4+#o5+#o6+#o7+#o8+#o9 ) > 20 
-		) 
-		and not $fp1
+		// allow different amounts of potential obfuscation functions depending on filesize
+		not $fp1 and (
+			(
+				filesize < 20KB and 
+				(
+					( #o1+#o2 ) > 50 or
+					#o3 > 10 or
+					( #o4+#o5+#o6+#o7+#o8+#o9 ) > 20 
+				) 
+			) or (
+				filesize < 200KB and 
+				(
+					( #o1+#o2 ) > 200 or
+					#o3 > 10 or
+					( #o4+#o5+#o6+#o7+#o8+#o9 ) > 30 
+				) 
+
+			)
+		)
+
 
 }
 
@@ -520,10 +568,10 @@ rule webshell_php_obfuscated {
 		date = "2021/01/12"
 		hash = "eec9ac58a1e763f5ea0f7fa249f1fe752047fa60"
 	condition:
-		filesize < 200KB 
-		and capa_php_old_safe
-		and capa_php_obfuscation_multi
-		and capa_php_payload
+		// filesize checked in capa_php_obfuscation_multi
+		capa_php_old_safe and 
+		capa_php_obfuscation_multi and 
+		capa_php_payload
 }
 
 rule webshell_php_obfuscated_str_replace {
@@ -610,58 +658,6 @@ private rule capa_os_strings {
 		2 of ( $take_two* ) 
 }
 
-rule webshell_php_strings {
-	meta:
-		description = "typical webshell strings, clear hit"
-		license = "https://creativecommons.org/licenses/by-nc/4.0/"
-		author = "Arnim Rupp"
-		date = "2021/01/12"
-		hash = "10f4988a191774a2c6b85604344535ee610b844c1708602a355cf7e9c12c3605"
-		hash = "7b6471774d14510cf6fa312a496eed72b614f6fc"
-	strings:
-		$ = "\"ht\".\"tp\".\":/\""
-		$ = "\"ht\".\"tp\".\"s:"
-		// crawler avoid string
-		$ = "bot|spider|crawler|slurp|teoma|archive|track|snoopy|java|lwp|wget|curl|client|python|libwww"
-		$ = "'ev'.'al'" nocase
-		$ = "<?php eval(" nocase
-		$ = "eval/*" nocase
-		$ = "assert/*" nocase
-		// <?=($_=@$_GET[2]).@$_($_GET[1])?>
-		$ = /@\$_GET\[\d\]\)\.@\$_\(\$_GET\[\d\]\)/
-		$ = /@\$_GET\[\d\]\)\.@\$_\(\$_POST\[\d\]\)/
-		$ = /@\$_POST\[\d\]\)\.@\$_\(\$_GET\[\d\]\)/
-		$ = /@\$_POST\[\d\]\)\.@\$_\(\$_POST\[\d\]\)/
-		$ = /@\$_REQUEST\[\d\]\)\.@\$_\(\$_REQUEST\[\d\]\)/
-		$ = "'ass'.'ert'" nocase
-		$ = "${'_'.$_}['_'](${'_'.$_}['__'])"
-		$ = "array(\"find config.inc.php files\", \"find / -type f -name config.inc.php\")"
-		$ = "$_SERVER[\"\\x48\\x54\\x54\\x50"
-		$ = "'s'.'s'.'e'.'r'.'t'" nocase
-		$ = "'P'.'O'.'S'.'T'"
-		$ = "'G'.'E'.'T'"
-		$ = "'R'.'E'.'Q'.'U'"
-	condition:
-		filesize < 700KB 
-		and capa_php 
-		and any of them
-}
-
-rule webshell_php_strings_susp {
-	meta:
-		description = "typical webshell strings, suspicious"
-		license = "https://creativecommons.org/licenses/by-nc/4.0/"
-		author = "Arnim Rupp"
-		date = "2021/01/12"
-		hash = "0dd568dbe946b5aa4e1d33eab1decbd71903ea04"
-	strings:
-		$ = "eval(\"?>\"" nocase
-	condition:
-		filesize < 700KB 
-		and capa_php 
-		and ( 2 of them or ( 1 of them and capa_php_input ) )
-}
-
 rule webshell_php_gzinflated {
 	meta:
 		description = "PHP webshell which directly eval()s obfuscated string"
@@ -732,7 +728,7 @@ rule webshell_php_includer {
 // yara says this rule slows the scanning but it's ok since it's limited to filesize < 200
 rule webshell_php_dynamic {
 	meta:
-		description = "PHP webshell using $a($code) for eval"
+		description = "PHP webshell using $a($code) for kind of eval"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		hash = "65dca1e652d09514e9c9b2e0004629d03ab3c3ef"
@@ -748,6 +744,40 @@ rule webshell_php_dynamic {
 		capa_php and 
 		$dynamic and
 		not $fp
+}
+
+rule webshell_php_encoded_big {
+	meta:
+		description = "PHP webshell using some kind of eval with encoded blob to decode"
+		license = "https://creativecommons.org/licenses/by-nc/4.0/"
+		author = "Arnim Rupp"
+		date = "2021/02/07"
+		score = 50
+	condition:
+		filesize < 3000KB and 
+		capa_php_new and 
+		capa_php_payload and 
+		webshell_encoded_stats
+}
+
+rule webshell_php_dynamic_big {
+	meta:
+		description = "PHP webshell using $a($code) for kind of eval with encoded blob to decode, e.g. b374k"
+		license = "https://creativecommons.org/licenses/by-nc/4.0/"
+		author = "Arnim Rupp"
+		date = "2021/02/07"
+		score = 50
+	strings:
+		// b374k
+		//$b374k1 = "$GLOBALS"
+		//$b374k2 = "$s_pass = "
+		//$b374k3 = "shell password"
+		$dynamic = /\$[a-zA-Z0-9_]{1,10}\(/
+	condition:
+		filesize < 3000KB and 
+		capa_php_new and 
+		$dynamic in (20..500) and
+		webshell_encoded_stats
 }
 
 rule webshell_php_generic_backticks {
@@ -769,7 +799,7 @@ rule webshell_php_generic_backticks {
 
 rule webshell_php_generic_backticks_obfuscated {
 	meta:
-		description = "Generic PHP webshell which uses obfuscated backticks directly on user input"
+		description = "Generic PHP webshell which uses backticks directly on user input"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		hash = "23dc299f941d98c72bd48659cdb4673f5ba93697"
@@ -789,12 +819,15 @@ rule webshell_php_by_string {
 		author = "Arnim Rupp"
 		date = "2021/01/09"
 		hash = "d889da22893536d5965541c30896f4ed4fdf461d"
+		hash = "10f4988a191774a2c6b85604344535ee610b844c1708602a355cf7e9c12c3605"
+		hash = "7b6471774d14510cf6fa312a496eed72b614f6fc"
 	strings:
 		$ = "b374k shell"
 		$ = "b374k/b374k"
 		$ = "\"b374k"
 		$ = "$b374k"
 		$ = "b374k "
+		$ = "0de664ecd2be02cdd54234a0d1229b43"
 		$ = "pwnshell"
 		$ = "reGeorg" fullword
 		$ = "Georg says, 'All seems fine" fullword
@@ -803,11 +836,62 @@ rule webshell_php_by_string {
 		$ = "F4ckTeam" fullword
 		$ = "{\"_P\"./*-/*-*/\"OS\"./*-/*-*/\"T\"}"
 		$ = "/*-/*-*/\""
+		$ = "MulCiShell" fullword
+		$ = "'ev'.'al'" 
+		$ = "'e'.'val'" 
+		$ = "bas'.'e6'."
+		$ = "ba'.'se6'."
+		$ = "gz'.'inf'."
+		$ = "gz'.'un'.'c"
+		$ = "e'.'co'.'d"
+		$ = "cr\".\"eat"
+		$ = "un\".\"ct"
+		$ = "'c'.'h'.'r'"
+		$ = "\"ht\".\"tp\".\":/\""
+		$ = "\"ht\".\"tp\".\"s:"
+		// crawler avoid string
+		$ = "bot|spider|crawler|slurp|teoma|archive|track|snoopy|java|lwp|wget|curl|client|python|libwww"
+		$ = "'ev'.'al'" nocase
+		$ = "<?php eval(" nocase
+		$ = "eval/*" nocase
+		$ = "assert/*" nocase
+		// <?=($_=@$_GET[2]).@$_($_GET[1])?>
+		$ = /@\$_GET\[\d\]\)\.@\$_\(\$_GET\[\d\]\)/
+		$ = /@\$_GET\[\d\]\)\.@\$_\(\$_POST\[\d\]\)/
+		$ = /@\$_POST\[\d\]\)\.@\$_\(\$_GET\[\d\]\)/
+		$ = /@\$_POST\[\d\]\)\.@\$_\(\$_POST\[\d\]\)/
+		$ = /@\$_REQUEST\[\d\]\)\.@\$_\(\$_REQUEST\[\d\]\)/
+		$ = "'ass'.'ert'" nocase
+		$ = "${'_'.$_}['_'](${'_'.$_}['__'])"
+		$ = "array(\"find config.inc.php files\", \"find / -type f -name config.inc.php\")"
+		$ = "$_SERVER[\"\\x48\\x54\\x54\\x50"
+		$ = "'s'.'s'.'e'.'r'.'t'" nocase
+		$ = "'P'.'O'.'S'.'T'"
+		$ = "'G'.'E'.'T'"
+		$ = "'R'.'E'.'Q'.'U'"
 	condition:
-		filesize < 100KB and 
+		filesize < 500KB and 
 		capa_php and 
 		any of them
 }
+
+
+rule webshell_php_strings_susp {
+	meta:
+		description = "typical webshell strings, suspicious"
+		license = "https://creativecommons.org/licenses/by-nc/4.0/"
+		author = "Arnim Rupp"
+		date = "2021/01/12"
+		hash = "0dd568dbe946b5aa4e1d33eab1decbd71903ea04"
+		score = 50
+	strings:
+		$ = "eval(\"?>\"" nocase
+	condition:
+		filesize < 700KB 
+		and capa_php 
+		and ( 2 of them or ( 1 of them and capa_php_input ) )
+}
+
 
 rule webshell_php_in_htaccess {
 	meta:
@@ -934,7 +1018,7 @@ rule webshell_asp_generic_eval {
 	strings:
 		$payload_and_input0 = /eval_r[\t ]*\(Request\(/ nocase
 		$payload_and_input1 = /eval[\t ]*request\(/ nocase
-		$payload_and_input2 = /execute[\t ]*request\(/ nocase
+		$payload_and_input2 = /execute[\t \(]+request\(/ nocase
 		$payload_and_input4 = /ExecuteGlobal[\t ]*request\(/ nocase
 	condition:
 		filesize < 100KB and 
@@ -1119,6 +1203,7 @@ private rule capa_jsp {
 	strings:
 		$ = "<%"
 		$ = "<jsp:"
+		$ = /language=[\"']java[\"\']/
 	condition:
 		any of them
 } 
@@ -1134,10 +1219,13 @@ private rule capa_jsp_input {
 		$input1 = "getParameter" fullword
 		// request.getHeaders
 		$input2 = "getHeaders" fullword
-		// request.getInputStream
 		$input3 = "getInputStream" fullword
+		$req1 = "request" fullword
+		$req2 = "HttpServletRequest" fullword
+		$req3 = "getRequest" fullword
 	condition:
-		any of them
+		any of ( $input* ) and
+		any of ( $req* )
 } 
 
 rule webshell_jsp_regeorg {
@@ -1201,7 +1289,7 @@ rule webshell_jsp_writer_nano {
 
 rule webshell_jsp_generic_tiny {
 	meta:
-		description = "Generic JSP webshell Tiny"
+		description = "Generic JSP webshell tiny"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		date = "2021/01/07"
@@ -1215,7 +1303,8 @@ rule webshell_jsp_generic_tiny {
 		$payload_rt2 = "getRuntime" fullword
 		$payload_rt3 = "exec" fullword
 	condition:
-		filesize < 500 and 
+		filesize < 8000 and 
+		capa_jsp and
 		capa_jsp_input and
 		( 
 			1 of ( $payload* ) or
@@ -1238,10 +1327,12 @@ rule webshell_jsp_generic {
 		$payload_rt1 = "Runtime" fullword
 		$payload_rt2 = "getRuntime" fullword
 		$payload_rt3 = "exec" fullword
-		$susp1 = "cmd" fullword
-		$susp2 = "shell" fullword
-		$susp3 = "download" fullword
-		$susp4 = "upload" fullword
+		$susp0 = "cmd" fullword nocase
+		$susp1 = "command" fullword nocase
+		$susp2 = "shell" fullword nocase
+		$susp3 = "download" fullword nocase
+		$susp4 = "upload" fullword nocase
+		$susp5 = "Execute" fullword nocase
 	condition:
 		filesize < 300KB and 
 		any of ( $susp* ) and
@@ -1318,12 +1409,14 @@ rule webshell_jsp_generic_reflection {
 		hash = "0a20f64dbb5f4175cd0bb0a81f60546e12aba0d0"
 		date = "2021/01/07"
 	strings:
-		$exec = "invoke" fullword
-		$input = "request.get" 
-		$class = "Class" 
+		$ws_exec = "invoke" fullword
+		$ws_input = "request.get" 
+		$ws_class = "Class" fullword
+		$fp = "SOAPConnection"
 	condition:
 		filesize < 10KB and 
-		all of them
+		all of ( $ws_* ) and
+		not $fp
 }
 
 rule webshell_jsp_generic_classloader {
@@ -1411,6 +1504,9 @@ rule webshell_jsp_by_string {
 		$ = "list.jsp = Directory & File View"
 		$ = "jdbcRowSet.setDataSourceName(request.getParameter("
 		$ = "Mr.Un1k0d3r RingZer0 Team"
+		$ = "MiniWebCmdShell" fullword
+		$ = "pwnshell.jsp" fullword
+		$ = "session set &lt;key&gt; &lt;value&gt; [class]<br>" 
 	condition:
 		filesize < 100KB and 
 		capa_jsp and 
@@ -1440,24 +1536,6 @@ rule webshell_jsp_input_upload_write {
 }
 
 
-rule webshell_jsp_input_write_nano {
-	meta:
-		description = "JSP webshell input and write"
-		license = "https://creativecommons.org/licenses/by-nc/4.0/"
-		author = "Arnim Rupp"
-		date = "2021/01/24"
-		hash = "108c5eeb85f9a2bfb896a1c42a00978f5770e195"
-		hash = "30dae7c1473b767d44f8e30600891a524ac8dea0"
-		hash = "22609061c167befd5c32b0798eb52e89d68c74ef"
-	strings:
-		$write1 = "os.write" fullword
-		$write2 = "FileOutputStream" fullword
-	condition:
-		filesize < 1500 and 
-		capa_jsp and 
-		capa_jsp_input and 
-		1 of ( $write* )
-}
 
 //              _      
 //    _ __ ___ (_)_  __
@@ -1493,7 +1571,28 @@ rule webshell_generic_os_strings {
 
 // uncomment to find suspicous files but also more false positives
 
-/* hunting rule, probaly lots of FP
+/* 
+
+rule webshell_jsp_input_write_nano {
+	meta:
+		description = "Suspicious: JSP file writer: input and write"
+		license = "https://creativecommons.org/licenses/by-nc/4.0/"
+		author = "Arnim Rupp"
+		date = "2021/01/24"
+		hash = "108c5eeb85f9a2bfb896a1c42a00978f5770e195"
+		hash = "30dae7c1473b767d44f8e30600891a524ac8dea0"
+		hash = "22609061c167befd5c32b0798eb52e89d68c74ef"
+		score = 40
+	strings:
+		$write1 = "os.write" fullword
+		$write2 = "FileOutputStream" fullword
+	condition:
+		filesize < 1500 and 
+		capa_jsp and 
+		capa_jsp_input and 
+		1 of ( $write* )
+}
+
 rule suspicous_webshell_input_password_sql {
 	meta:
 		description = "JSP SQL tool with password"
