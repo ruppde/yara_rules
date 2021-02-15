@@ -96,7 +96,7 @@ private rule webshell_encoded_stats {
 	condition:
 		// file shouldn't be too small to have big enough data for math.entropy
 		filesize > 2KB and 
-		// ignore first and last 500bytes because they usually contains code for decoding and executing
+		// ignore first and last 500bytes because they usually contain code for decoding and executing
 		math.entropy(500, filesize-500) >= 5.7 and
 		// encoded text has a higher mean than text or code because it's missing the spaces and special chars with the low numbers
 		math.mean(500, filesize-500) > 80 and
@@ -123,26 +123,56 @@ private rule php_false_positive {
 		date = "2021/01/14"
 	strings:
 		// try to use only strings which would be flagged by themselves as suspicous by other rules, e.g. eval 
-		$ = "eval(\"return [$serialised_parameter" wide ascii // elgg
+		$gfp1 = "eval(\"return [$serialised_parameter" wide ascii // elgg
 	condition:
-		any of them
+		any of ( $gfp* )
 }
 
 private rule capa_php {
 	meta:
-		description = "PHP tags. Use only if needed to reduce false positives because it won't find includer shells anymore. (e.g. <? include 'webshell.txt'?> and the payload in webshell.txt without <? )"
+		description = "PHP short tag or <script language=\"php\". Ok if rule limits the filesize to less than 10kb. Use only if needed to reduce false positives because it won't find includer shells anymore. (e.g. <? include 'webshell.txt'?> and the payload in webshell.txt without <? )"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		date = "2021/01/14"
 	strings:
 		// this will hit on a lot of non-php files, asp, scripting templates, ... but it works on older php versions
-		$php1 = "<?" wide ascii
-		$php2 = "<script language=\"php" nocase wide ascii
+		$php_tag1 = "<?" wide ascii
+		$php_tag2 = "<script language=\"php" nocase wide ascii
 	condition:
-		any of them
+		any of ( $php_tag* )
 }
 
 private rule capa_php_old_safe {
+	meta:
+		description = "PHP short tag <? in the first 100 bytes or the long ones anywhere"
+		license = "https://creativecommons.org/licenses/by-nc/4.0/"
+		author = "Arnim Rupp"
+		date = "2021/02/08"
+	strings:
+		$php_short = "<?" wide ascii
+		// prevent xml and asp from hitting with the short tag
+		$no_xml1 = "<?xml version" nocase wide ascii
+		$no_xml2 = "<?xml-stylesheet" nocase wide ascii
+		$no_asp1 = "<%@LANGUAGE" nocase wide ascii
+		$no_asp2 = /<script language="(vb|jscript|c#)/ nocase wide ascii
+
+		// of course the new tags should also match
+		$php_new1 = "<?=" nocase wide ascii
+		$php_new2 = "<?php" nocase wide ascii
+		$php_new3 = "<script language=\"php" nocase wide ascii
+	condition:
+		(
+			( 
+				$php_short in (0..100) or 
+				$php_short in (filesize-1000..filesize)
+			)
+			and not any of ( $no_* )
+		) 
+		or any of ( $php_new* )
+}
+
+/*
+private rule capa_php_old_sucks {
 	meta:
 		description = "PHP tag plus some php functions because just looking for <? is error prone, that's quickly contained in any larger file and hits on asp."
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -189,6 +219,7 @@ private rule capa_php_old_safe {
 		any of ( $f* ) and 
 		not any of ( $no_* )
 }
+*/
 
 private rule capa_php_new {
 	meta:
@@ -197,11 +228,11 @@ private rule capa_php_new {
 		author = "Arnim Rupp"
 		date = "2021/01/14"
 	strings:
-		$ = "<?=" wide ascii
-		$ = "<?php" nocase wide ascii
-		$ = "<script language=\"php" nocase wide ascii
+		$new_php1 = "<?=" wide ascii
+		$new_php2 = "<?php" nocase wide ascii
+		$new_php3 = "<script language=\"php" nocase wide ascii
 	condition:
-		any of them
+		any of ( $new_php* )
 }
 
 private rule capa_php_input {
@@ -211,16 +242,16 @@ private rule capa_php_input {
 		author = "Arnim Rupp"
 		date = "2021/01/14"
 	strings:
-		$ = "php://input" wide ascii
-		$ = "_GET[" wide ascii
-		$ = "_POST[" wide ascii
-		$ = "_REQUEST[" wide ascii
+		$inp1 = "php://input" wide ascii
+		$inp2 = "_GET[" wide ascii
+		$inp3 = "_POST[" wide ascii
+		$inp4 = "_REQUEST[" wide ascii
 		// PHP automatically adds all the request headers into the $_SERVER global array, prefixing each header name by the "HTTP_" string, so e.g. @eval($_SERVER['HTTP_CMD']) will run any code in the HTTP header CMD
-		$ = "_SERVER['HTTP_" wide ascii
-		$ = "_SERVER[\"HTTP_" wide ascii
-		$ = /getenv[\t ]{0,20}\([\t ]{0,20}['"]HTTP_/ wide ascii
+		$inp5 = "_SERVER['HTTP_" wide ascii
+		$inp6 = "_SERVER[\"HTTP_" wide ascii
+		$inp7 = /getenv[\t ]{0,20}\([\t ]{0,20}['"]HTTP_/ wide ascii
 	condition:
-		any of them
+		any of ( $inp* )
 }
 
 private rule capa_php_payload {
@@ -231,22 +262,22 @@ private rule capa_php_payload {
 		date = "2021/01/14"
 	strings:
 		// \([^)] to avoid matching on e.g. eval() in comments
-		$ = /\beval[\t ]*\([^)]/ nocase wide ascii
-		$ = /\bexec[\t ]*\([^)]/ nocase wide ascii
-		$ = /\bshell_exec[\t ]*\([^)]/ nocase wide ascii
-		$ = /\bpassthru[\t ]*\([^)]/ nocase wide ascii
-		$ = /\bsystem[\t ]*\([^)]/ nocase wide ascii
-		$ = /\bpopen[\t ]*\([^)]/ nocase wide ascii
-		$ = /\bproc_open[\t ]*\([^)]/ nocase wide ascii
-		$ = /\bpcntl_exec[\t ]*\([^)]/ nocase wide ascii
-		$ = /\bassert[\t ]*\([^)]/ nocase wide ascii
-		$ = /\bpreg_replace[\t ]*\(.{1,1000}\/e/ nocase wide ascii
-		$ = /\bcreate_function[\t ]*\([^)]/ nocase wide ascii
-		$ = /\bReflectionFunction[\t ]*\([^)]/ nocase wide ascii
+		$cpayload1 = /\beval[\t ]*\([^)]/ nocase wide ascii
+		$cpayload2 = /\bexec[\t ]*\([^)]/ nocase wide ascii
+		$cpayload3 = /\bshell_exec[\t ]*\([^)]/ nocase wide ascii
+		$cpayload4 = /\bpassthru[\t ]*\([^)]/ nocase wide ascii
+		$cpayload5 = /\bsystem[\t ]*\([^)]/ nocase wide ascii
+		$cpayload6 = /\bpopen[\t ]*\([^)]/ nocase wide ascii
+		$cpayload7 = /\bproc_open[\t ]*\([^)]/ nocase wide ascii
+		$cpayload8 = /\bpcntl_exec[\t ]*\([^)]/ nocase wide ascii
+		$cpayload9 = /\bassert[\t ]*\([^)]/ nocase wide ascii
+		$cpayload10 = /\bpreg_replace[\t ]*\(.{1,1000}\/e/ nocase wide ascii
+		$cpayload11 = /\bcreate_function[\t ]*\([^)]/ nocase wide ascii
+		$cpayload12 = /\bReflectionFunction[\t ]*\([^)]/ nocase wide ascii
 		// TODO: $_GET['func_name']($_GET['argument']);
 		// TODO backticks
 	condition:
-		any of them
+		any of ( $cpayload* )
 }
 
 private rule capa_php_callback {
@@ -256,42 +287,43 @@ private rule capa_php_callback {
 		author = "Arnim Rupp"
 		date = "2021/01/14"
 	strings:
-		$c1 = /\bob_start[\t ]*\([^)]/ nocase wide ascii
-		$c2 = /\barray_diff_uassoc[\t ]*\([^)]/ nocase wide ascii
-		$c3 = /\barray_diff_ukey[\t ]*\([^)]/ nocase wide ascii
-		$c4 = /\barray_filter[\t ]*\([^)]/ nocase wide ascii
-		$c5 = /\barray_intersect_uassoc[\t ]*\([^)]/ nocase wide ascii
-		$c6 = /\barray_intersect_ukey[\t ]*\([^)]/ nocase wide ascii
-		$c7 = /\barray_map[\t ]*\([^)]/ nocase wide ascii
-		$c8 = /\barray_reduce[\t ]*\([^)]/ nocase wide ascii
-		$c9 = /\barray_udiff_assoc[\t ]*\([^)]/ nocase wide ascii
-		$c10 = /\barray_udiff_uassoc[\t ]*\([^)]/ nocase wide ascii
-		$c11 = /\barray_udiff[\t ]*\([^)]/ nocase wide ascii
-		$c12 = /\barray_uintersect_assoc[\t ]*\([^)]/ nocase wide ascii
-		$c13 = /\barray_uintersect_uassoc[\t ]*\([^)]/ nocase wide ascii
-		$c14 = /\barray_uintersect[\t ]*\([^)]/ nocase wide ascii
-		$c15 = /\barray_walk_recursive[\t ]*\([^)]/ nocase wide ascii
-		$c16 = /\barray_walk[\t ]*\([^)]/ nocase wide ascii
-		$c17 = /\bassert_options[\t ]*\([^)]/ nocase wide ascii
-		$c18 = /\buasort[\t ]*\([^)]/ nocase wide ascii
-		$c19 = /\buksort[\t ]*\([^)]/ nocase wide ascii
-		$c20 = /\busort[\t ]*\([^)]/ nocase wide ascii
-		$c21 = /\bpreg_replace_callback[\t ]*\([^)]/ nocase wide ascii
-		$c22 = /\bspl_autoload_register[\t ]*\([^)]/ nocase wide ascii
-		$c23 = /\biterator_apply[\t ]*\([^)]/ nocase wide ascii
-		$c24 = /\bcall_user_func[\t ]*\([^)]/ nocase wide ascii
-		$c25 = /\bcall_user_func_array[\t ]*\([^)]/ nocase wide ascii
-		$c26 = /\bregister_shutdown_function[\t ]*\([^)]/ nocase wide ascii
-		$c27 = /\bregister_tick_function[\t ]*\([^)]/ nocase wide ascii
-		$c28 = /\bset_error_handler[\t ]*\([^)]/ nocase wide ascii
-		$c29 = /\bset_exception_handler[\t ]*\([^)]/ nocase wide ascii
-		$c30 = /\bsession_set_save_handler[\t ]*\([^)]/ nocase wide ascii
-		$c31 = /\bsqlite_create_aggregate[\t ]*\([^)]/ nocase wide ascii
-		$c32 = /\bsqlite_create_function[\t ]*\([^)]/ nocase wide ascii
-		$fp1 = /ob_start\(['\"]ob_gzhandler/ nocase wide ascii
+		$callback1 = /\bob_start[\t ]*\([^)]/ nocase wide ascii
+		$callback2 = /\barray_diff_uassoc[\t ]*\([^)]/ nocase wide ascii
+		$callback3 = /\barray_diff_ukey[\t ]*\([^)]/ nocase wide ascii
+		$callback4 = /\barray_filter[\t ]*\([^)]/ nocase wide ascii
+		$callback5 = /\barray_intersect_uassoc[\t ]*\([^)]/ nocase wide ascii
+		$callback6 = /\barray_intersect_ukey[\t ]*\([^)]/ nocase wide ascii
+		$callback7 = /\barray_map[\t ]*\([^)]/ nocase wide ascii
+		$callback8 = /\barray_reduce[\t ]*\([^)]/ nocase wide ascii
+		$callback9 = /\barray_udiff_assoc[\t ]*\([^)]/ nocase wide ascii
+		$callback10 = /\barray_udiff_uassoc[\t ]*\([^)]/ nocase wide ascii
+		$callback11 = /\barray_udiff[\t ]*\([^)]/ nocase wide ascii
+		$callback12 = /\barray_uintersect_assoc[\t ]*\([^)]/ nocase wide ascii
+		$callback13 = /\barray_uintersect_uassoc[\t ]*\([^)]/ nocase wide ascii
+		$callback14 = /\barray_uintersect[\t ]*\([^)]/ nocase wide ascii
+		$callback15 = /\barray_walk_recursive[\t ]*\([^)]/ nocase wide ascii
+		$callback16 = /\barray_walk[\t ]*\([^)]/ nocase wide ascii
+		$callback17 = /\bassert_options[\t ]*\([^)]/ nocase wide ascii
+		$callback18 = /\buasort[\t ]*\([^)]/ nocase wide ascii
+		$callback19 = /\buksort[\t ]*\([^)]/ nocase wide ascii
+		$callback20 = /\busort[\t ]*\([^)]/ nocase wide ascii
+		$callback21 = /\bpreg_replace_callback[\t ]*\([^)]/ nocase wide ascii
+		$callback22 = /\bspl_autoload_register[\t ]*\([^)]/ nocase wide ascii
+		$callback23 = /\biterator_apply[\t ]*\([^)]/ nocase wide ascii
+		$callback24 = /\bcall_user_func[\t ]*\([^)]/ nocase wide ascii
+		$callback25 = /\bcall_user_func_array[\t ]*\([^)]/ nocase wide ascii
+		$callback26 = /\bregister_shutdown_function[\t ]*\([^)]/ nocase wide ascii
+		$callback27 = /\bregister_tick_function[\t ]*\([^)]/ nocase wide ascii
+		$callback28 = /\bset_error_handler[\t ]*\([^)]/ nocase wide ascii
+		$callback29 = /\bset_exception_handler[\t ]*\([^)]/ nocase wide ascii
+		$callback30 = /\bsession_set_save_handler[\t ]*\([^)]/ nocase wide ascii
+		$callback31 = /\bsqlite_create_aggregate[\t ]*\([^)]/ nocase wide ascii
+		$callback32 = /\bsqlite_create_function[\t ]*\([^)]/ nocase wide ascii
+
+		$cfp1 = /ob_start\(['\"]ob_gzhandler/ nocase wide ascii
 	condition:
-		any of ( $c* ) and
-		not any of ( $fp* )
+		any of ( $callback* ) and
+		not any of ( $cfp* )
 }
 
 private rule capa_php_include {
@@ -301,10 +333,27 @@ private rule capa_php_include {
 		author = "Arnim Rupp"
 		date = "2021/01/14"
 	strings:
-		$ = /\binclude[_once]?[\t ]*[('"]/ nocase wide ascii
-		$ = /\brequire[_once]?[\t ]*[('"]/ nocase wide ascii
+		$cinclude1 = /\binclude[_once]?[\t ]*[('"]/ nocase wide ascii
+		$cinclude2 = /\brequire[_once]?[\t ]*[('"]/ nocase wide ascii
 	condition:
-		capa_php and any of them
+		capa_php and any of ( $cinclude* )
+}
+
+private rule capa_php_dynamic {
+	meta:
+		description = "PHP webshell using function name from variable, e.g. $a='ev'.'al'; $a($code)"
+		license = "https://creativecommons.org/licenses/by-nc/4.0/"
+		author = "Arnim Rupp"
+		date = "2021/02/11"
+	strings:
+		$dynamic1 = /\$[a-zA-Z0-9_]{1,10}\(\$/ wide ascii
+		$dynamic2 = /\$[a-zA-Z0-9_]{1,10}\("/ wide ascii
+		$dynamic3 = /\$[a-zA-Z0-9_]{1,10}\('/ wide ascii
+		$dynamic4 = /\$[a-zA-Z0-9_]{1,10}\(str/ wide ascii
+		$dynamic5 = /\$[a-zA-Z0-9_]{1,10}\(\)/ wide ascii
+		$dynamic6 = /\$[a-zA-Z0-9_]{1,10}\(@/ wide ascii
+	condition:
+		any of ( $dynamic* )
 }
 
 
@@ -442,13 +491,13 @@ rule webshell_php_unknown_1 {
 		hash = "cf4abbd568ce0c0dfce1f2e4af669ad2"
 		date = "2021/01/07"
 	strings:
-		$s0 = /^<\?php \$[a-z]{3,30} = '/ wide ascii
-		$s1 = "=explode(chr(" wide ascii
-		$s2 = "; if (!function_exists('" wide ascii
-		$s3 = " = NULL; for(" wide ascii
+		$sp0 = /^<\?php \$[a-z]{3,30} = '/ wide ascii
+		$sp1 = "=explode(chr(" wide ascii
+		$sp2 = "; if (!function_exists('" wide ascii
+		$sp3 = " = NULL; for(" wide ascii
 	condition:
 		filesize < 300KB and 
-		all of them
+		all of ( $sp* )
 }
 
 rule webshell_php_generic_eval {
@@ -460,10 +509,10 @@ rule webshell_php_generic_eval {
 		hash = "90c5cc724ec9cf838e4229e5e08955eec4d7bf95"
 		date = "2021/01/07"
 	strings:
-		$s0 = /(exec|shell_exec|passthru|system|popen|proc_open|pcntl_exec|eval|assert)[\t ]*(stripslashes\()?[\t ]*(trim\()?[\t ]*\(\$(_POST|_GET|_REQUEST|_SERVER\[['"]HTTP_)/ wide ascii
+		$geval = /(exec|shell_exec|passthru|system|popen|proc_open|pcntl_exec|eval|assert)[\t ]*(stripslashes\()?[\t ]*(trim\()?[\t ]*\(\$(_POST|_GET|_REQUEST|_SERVER\[['"]HTTP_)/ wide ascii
 	condition:
 		filesize < 300KB and 
-		any of them
+		$geval
 }
 
 rule webshell_php_double_eval_tiny {
@@ -536,13 +585,13 @@ private rule capa_php_obfuscation_single {
 		author = "Arnim Rupp"
 		date = "2021/01/14"
 	strings:
-		$ = "gzinflate" fullword nocase wide ascii
-		$ = "gzuncompress" fullword nocase wide ascii
-		$ = "gzdecode" fullword nocase wide ascii
-		$ = "base64_decode" fullword nocase wide ascii
-		$ = "pack" fullword nocase wide ascii
+		$cobfs1 = "gzinflate" fullword nocase wide ascii
+		$cobfs2 = "gzuncompress" fullword nocase wide ascii
+		$cobfs3 = "gzdecode" fullword nocase wide ascii
+		$cobfs4 = "base64_decode" fullword nocase wide ascii
+		$cobfs5 = "pack" fullword nocase wide ascii
 	condition:
-		any of them
+		any of ( $cobfs* )
 }
 
 rule webshell_php_obfuscated {
@@ -581,7 +630,7 @@ rule webshell_php_obfuscated_str_replace {
 		$chr3  = "\\120" wide ascii
 	condition:
 		filesize < 300KB and 
-		capa_php and 
+		capa_php_old_safe and 
 		any of ( $payload* ) and 
 		#goto > 1 and 
 		( #chr1 > 10 or #chr2 > 10 or #chr3 > 10 )
@@ -614,7 +663,7 @@ rule webshell_php_obfuscated_fopo {
 		$two6 = "OwBAAGEAcwBzAGUAcgB0ACgA" wide ascii
 	condition:
 		filesize < 3000KB and
-		capa_php and 
+		capa_php_old_safe and 
 		$payload and (
 			any of ( $one* ) or any of ( $two* )
 		)
@@ -710,10 +759,9 @@ rule webshell_php_includer {
 }
 
 
-// yara says this rule slows the scanning but it's ok since it's limited to filesize < 200
 rule webshell_php_dynamic {
 	meta:
-		description = "PHP webshell using $a($code) for kind of eval"
+		description = "PHP webshell using function name from variable, e.g. $a='ev'.'al'; $a($code)"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		hash = "65dca1e652d09514e9c9b2e0004629d03ab3c3ef"
@@ -722,13 +770,26 @@ rule webshell_php_dynamic {
 		date = "2021/01/13"
 		score = 60
 	strings:
-		$dynamic = /\$[a-zA-Z0-9_]{1,10}\(/ wide ascii
 		$fp = "whoops_add_stack_frame" wide ascii
 	condition:
 		filesize < 200 and 
 		capa_php and 
-		$dynamic and
+		capa_php_dynamic and
 		not $fp
+}
+
+rule webshell_php_dynamic_big {
+	meta:
+		description = "PHP webshell using $a($code) for kind of eval with encoded blob to decode, e.g. b374k"
+		license = "https://creativecommons.org/licenses/by-nc/4.0/"
+		author = "Arnim Rupp"
+		date = "2021/02/07"
+		score = 50
+	condition:
+		filesize < 3000KB and 
+		capa_php_new and 
+		capa_php_dynamic and
+		webshell_encoded_stats
 }
 
 rule webshell_php_encoded_big {
@@ -745,21 +806,6 @@ rule webshell_php_encoded_big {
 		webshell_encoded_stats
 }
 
-rule webshell_php_dynamic_big {
-	meta:
-		description = "PHP webshell using $a($code) for kind of eval with encoded blob to decode, e.g. b374k"
-		license = "https://creativecommons.org/licenses/by-nc/4.0/"
-		author = "Arnim Rupp"
-		date = "2021/02/07"
-		score = 50
-	strings:
-		$dynamic = /\$[a-zA-Z0-9_]{1,10}\(/ wide ascii
-	condition:
-		filesize < 3000KB and 
-		capa_php_new and 
-		$dynamic in (20..500) and
-		webshell_encoded_stats
-}
 
 rule webshell_php_generic_backticks {
 	meta:
@@ -769,12 +815,12 @@ rule webshell_php_generic_backticks {
 		date = "2021/01/07"
 		hash = "339f32c883f6175233f0d1a30510caa52fdcaa37"
 	strings:
-		$s0 = /`[\t ]*\$(_POST\[|_GET\[|_REQUEST\[|_SERVER\['HTTP_)/ wide ascii
+		$backtick = /`[\t ]*\$(_POST\[|_GET\[|_REQUEST\[|_SERVER\['HTTP_)/ wide ascii
 	condition:
 		// arg, can't search everywhere because lots of people write comments like "the value of `$_POST['action']`. Default false." :(
 		filesize < 200 and 
 		capa_php and
-		any of them
+		$backtick
 }
 
 rule webshell_php_generic_backticks_obfuscated {
@@ -802,59 +848,60 @@ rule webshell_php_by_string {
 		hash = "10f4988a191774a2c6b85604344535ee610b844c1708602a355cf7e9c12c3605"
 		hash = "7b6471774d14510cf6fa312a496eed72b614f6fc"
 	strings:
-		$ = "b374k shell" wide ascii
-		$ = "b374k/b374k" wide ascii
-		$ = "\"b374k" wide ascii
-		$ = "$b374k" wide ascii
-		$ = "b374k " wide ascii
-		$ = "0de664ecd2be02cdd54234a0d1229b43" wide ascii
-		$ = "pwnshell" wide ascii
-		$ = "reGeorg" fullword wide ascii
-		$ = "Georg says, 'All seems fine" fullword wide ascii
-		$ = "My PHP Shell - A very simple web shell" wide ascii
-		$ = "<title>My PHP Shell <?echo VERSION" wide ascii
-		$ = "F4ckTeam" fullword wide ascii
-		$ = "{\"_P\"./*-/*-*/\"OS\"./*-/*-*/\"T\"}" wide ascii
-		$ = "/*-/*-*/\"" wide ascii
-		$ = "MulCiShell" fullword wide ascii
-		$ = "'ev'.'al'" wide ascii
-		$ = "'e'.'val'" wide ascii
-		$ = "e'.'v'.'a'.'l" wide ascii
-		$ = "bas'.'e6'." wide ascii
-		$ = "ba'.'se6'." wide ascii
-		$ = "as'.'e'.'6'" wide ascii
-		$ = "gz'.'inf'." wide ascii
-		$ = "gz'.'un'.'c" wide ascii
-		$ = "e'.'co'.'d" wide ascii
-		$ = "cr\".\"eat" wide ascii
-		$ = "un\".\"ct" wide ascii
-		$ = "'c'.'h'.'r'" wide ascii
-		$ = "\"ht\".\"tp\".\":/\"" wide ascii
-		$ = "\"ht\".\"tp\".\"s:" wide ascii
+		$pbs1 = "b374k shell" wide ascii
+		$pbs2 = "b374k/b374k" wide ascii
+		$pbs3 = "\"b374k" wide ascii
+		$pbs4 = "$b374k" wide ascii
+		$pbs5 = "b374k " wide ascii
+		$pbs6 = "0de664ecd2be02cdd54234a0d1229b43" wide ascii
+		$pbs7 = "pwnshell" wide ascii
+		$pbs8 = "reGeorg" fullword wide ascii
+		$pbs9 = "Georg says, 'All seems fine" fullword wide ascii
+		$pbs10 = "My PHP Shell - A very simple web shell" wide ascii
+		$pbs11 = "<title>My PHP Shell <?echo VERSION" wide ascii
+		$pbs12 = "F4ckTeam" fullword wide ascii
+		$pbs13 = "{\"_P\"./*-/*-*/\"OS\"./*-/*-*/\"T\"}" wide ascii
+		$pbs14 = "/*-/*-*/\"" wide ascii
+		$pbs15 = "MulCiShell" fullword wide ascii
+		$pbs16 = "'ev'.'al'" wide ascii
+		$pbs17 = "'e'.'val'" wide ascii
+		$pbs18 = "e'.'v'.'a'.'l" wide ascii
+		$pbs19 = "bas'.'e6'." wide ascii
+		$pbs20 = "ba'.'se6'." wide ascii
+		$pbs21 = "as'.'e'.'6'" wide ascii
+		$pbs22 = "gz'.'inf'." wide ascii
+		$pbs23 = "gz'.'un'.'c" wide ascii
+		$pbs24 = "e'.'co'.'d" wide ascii
+		$pbs25 = "cr\".\"eat" wide ascii
+		$pbs26 = "un\".\"ct" wide ascii
+		$pbs27 = "'c'.'h'.'r'" wide ascii
+		$pbs28 = "\"ht\".\"tp\".\":/\"" wide ascii
+		$pbs29 = "\"ht\".\"tp\".\"s:" wide ascii
 		// crawler avoid string
-		$ = "bot|spider|crawler|slurp|teoma|archive|track|snoopy|java|lwp|wget|curl|client|python|libwww" wide ascii
-		$ = "'ev'.'al'" nocase wide ascii
-		$ = "<?php eval(" nocase wide ascii
-		$ = "eval/*" nocase wide ascii
-		$ = "assert/*" nocase wide ascii
-		// <?=($_=@$_GET[2]).@$_($_GET[1])?>
-		$ = /@\$_GET\[\d\]\)\.@\$_\(\$_GET\[\d\]\)/ wide ascii
-		$ = /@\$_GET\[\d\]\)\.@\$_\(\$_POST\[\d\]\)/ wide ascii
-		$ = /@\$_POST\[\d\]\)\.@\$_\(\$_GET\[\d\]\)/ wide ascii
-		$ = /@\$_POST\[\d\]\)\.@\$_\(\$_POST\[\d\]\)/ wide ascii
-		$ = /@\$_REQUEST\[\d\]\)\.@\$_\(\$_REQUEST\[\d\]\)/ wide ascii
-		$ = "'ass'.'ert'" nocase wide ascii
-		$ = "${'_'.$_}['_'](${'_'.$_}['__'])" wide ascii
-		$ = "array(\"find config.inc.php files\", \"find / -type f -name config.inc.php\")" wide ascii
-		$ = "$_SERVER[\"\\x48\\x54\\x54\\x50" wide ascii
-		$ = "'s'.'s'.'e'.'r'.'t'" nocase wide ascii
-		$ = "'P'.'O'.'S'.'T'" wide ascii
-		$ = "'G'.'E'.'T'" wide ascii
-		$ = "'R'.'E'.'Q'.'U'" wide ascii
+		$pbs30 = "bot|spider|crawler|slurp|teoma|archive|track|snoopy|java|lwp|wget|curl|client|python|libwww" wide ascii
+		$pbs31 = "'ev'.'al'" nocase wide ascii
+		$pbs32 = "<?php eval(" nocase wide ascii
+		$pbs33 = "eval/*" nocase wide ascii
+		$pbs34 = "assert/*" nocase wide ascii
+		// <?=($pbs_=@$_GET[2]).@$_($_GET[1])?>
+		$pbs35 = /@\$_GET\[\d\]\)\.@\$_\(\$_GET\[\d\]\)/ wide ascii
+		$pbs36 = /@\$_GET\[\d\]\)\.@\$_\(\$_POST\[\d\]\)/ wide ascii
+		$pbs37 = /@\$_POST\[\d\]\)\.@\$_\(\$_GET\[\d\]\)/ wide ascii
+		$pbs38 = /@\$_POST\[\d\]\)\.@\$_\(\$_POST\[\d\]\)/ wide ascii
+		$pbs39 = /@\$_REQUEST\[\d\]\)\.@\$_\(\$_REQUEST\[\d\]\)/ wide ascii
+		$pbs40 = "'ass'.'ert'" nocase wide ascii
+		$pbs41 = "${'_'.$_}['_'](${'_'.$_}['__'])" wide ascii
+		$pbs42 = "array(\"find config.inc.php files\", \"find / -type f -name config.inc.php\")" wide ascii
+		$pbs43 = "$_SERVER[\"\\x48\\x54\\x54\\x50" wide ascii
+		$pbs44 = "'s'.'s'.'e'.'r'.'t'" nocase wide ascii
+		$pbs45 = "'P'.'O'.'S'.'T'" wide ascii
+		$pbs46 = "'G'.'E'.'T'" wide ascii
+		$pbs47 = "'R'.'E'.'Q'.'U'" wide ascii
+		$pbs48 = "se'.(32*2)"
 	condition:
 		filesize < 500KB and 
-		capa_php and 
-		any of them
+		capa_php_old_safe and 
+		any of ( $pbs* )
 }
 
 
@@ -867,11 +914,11 @@ rule webshell_php_strings_susp {
 		hash = "0dd568dbe946b5aa4e1d33eab1decbd71903ea04"
 		score = 50
 	strings:
-		$ = "eval(\"?>\"" nocase wide ascii
+		$sstring1 = "eval(\"?>\"" nocase wide ascii
 	condition:
 		filesize < 700KB 
-		and capa_php 
-		and ( 2 of them or ( 1 of them and capa_php_input ) )
+		and capa_php_old_safe
+		and ( 2 of ( $sstring* ) or ( 1 of ( $sstring* ) and capa_php_input ) )
 }
 
 
@@ -883,10 +930,10 @@ rule webshell_php_in_htaccess {
 		date = "2021/01/07"
 		hash = "c026d4512a32d93899d486c6f11d1e13b058a713"
 	strings:
-		$s0 = "AddType application/x-httpd-php .htaccess" wide ascii
+		$hta = "AddType application/x-httpd-php .htaccess" wide ascii
 	condition:
 		filesize < 100KB and 
-		any of them
+		$hta
 }
 
 rule webshell_php_func_in_get {
@@ -898,15 +945,15 @@ rule webshell_php_func_in_get {
 		hash = "d870e971511ea3e082662f8e6ec22e8a8443ca79"
 		date = "2021/01/09"
 	strings:
-		$s0 = /\$_GET\[.{1,30}\]\(\$_GET\[/ wide ascii
-		$s1 = /\$_POST\[.{1,30}\]\(\$_GET\[/ wide ascii
-		$s2 = /\$_POST\[.{1,30}\]\(\$_POST\[/ wide ascii
-		$s3 = /\$_GET\[.{1,30}\]\(\$_POST\[/ wide ascii
-		$s4 = /\$_REQUEST\[.{1,30}\]\(\$_REQUEST\[/ wide ascii
-		$s5 = /\$_SERVER\[HTTP_.{1,30}\]\(\$_SERVER\[HTTP_/ wide ascii
+		$sr0 = /\$_GET\[.{1,30}\]\(\$_GET\[/ wide ascii
+		$sr1 = /\$_POST\[.{1,30}\]\(\$_GET\[/ wide ascii
+		$sr2 = /\$_POST\[.{1,30}\]\(\$_POST\[/ wide ascii
+		$sr3 = /\$_GET\[.{1,30}\]\(\$_POST\[/ wide ascii
+		$sr4 = /\$_REQUEST\[.{1,30}\]\(\$_REQUEST\[/ wide ascii
+		$sr5 = /\$_SERVER\[HTTP_.{1,30}\]\(\$_SERVER\[HTTP_/ wide ascii
 	condition:
 		filesize < 500KB and 
-		any of them
+		any of ( $sr* )
 }
 
 
@@ -919,16 +966,18 @@ rule webshell_php_func_in_get {
 
 private rule capa_asp {
 	meta:
-		description = "ASP tag, short and false positive prone"
+		description = "ASP short tag in first or last 1000 bytes or long ones anywhere"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		date = "2021/01/26"
 	strings:
-		$ = "<%" wide ascii
-		//$ = "72C24DD5-D70A-438B-8A42-98424B88AFB8" wide ascii
-		//$ = "<% @language" wide ascii
+		$tagasp_short = "<%" wide ascii
+		$tagasp_long1 = "72C24DD5-D70A-438B-8A42-98424B88AFB8" wide ascii
+		$tagasp_long2 = "<% @language" wide ascii
 	condition:
-		any of them
+		$tagasp_short in ( 0..1000 ) or
+		$tagasp_short in ( filesize-1000..filesize ) or
+		any of ( $tagasp_long* )
 }
 
 private rule capa_asp_obfuscation_multi {
@@ -963,14 +1012,14 @@ private rule capa_asp_payload {
 		author = "Arnim Rupp"
 		date = "2021/02/06"
 	strings:
-		$payload0 = "eval_r" fullword nocase wide ascii
-		$payload1 = "eval" fullword nocase wide ascii
-		$payload2 = "execute" fullword nocase wide ascii
-		$payload3 = "WSCRIPT.SHELL" fullword nocase wide ascii
-		$payload4 = "Scripting.FileSystemObject" fullword nocase wide ascii
-		$payload5 = /ExecuteGlobal/ fullword nocase wide ascii
+		$cpayload0 = "eval_r" fullword nocase wide ascii
+		$cpayload1 = "eval" fullword nocase wide ascii
+		$cpayload2 = "execute" fullword nocase wide ascii
+		$cpayload3 = "WSCRIPT.SHELL" fullword nocase wide ascii
+		$cpayload4 = "Scripting.FileSystemObject" fullword nocase wide ascii
+		$cpayload5 = /ExecuteGlobal/ fullword nocase wide ascii
 	condition:
-		any of them
+		any of ( $cpayload* )
 }
 
 rule webshell_asp_obfuscated {
@@ -1006,7 +1055,7 @@ rule webshell_asp_generic_eval {
 	condition:
 		filesize < 100KB and 
 		capa_asp and
-		any of them
+		any of ( $payload_and_input* )
 }
 
 rule webshell_asp_nano {
@@ -1060,15 +1109,15 @@ rule webshell_asp_string {
 		date = "2021/01/13"
 		hash ="f72252b13d7ded46f0a206f63a1c19a66449f216"
 	strings:
-		$ = "tseuqer lave" wide ascii
-		$ = ":eval request(" wide ascii
-		$ = ":eval request(" wide ascii
-		$ = "SItEuRl=\"http://www.zjjv.com\"" wide ascii
-		$ = "ServerVariables(\"HTTP_HOST\"),\"gov.cn\"" wide ascii
+		$asp_string1 = "tseuqer lave" wide ascii
+		$asp_string2 = ":eval request(" wide ascii
+		$asp_string3 = ":eval request(" wide ascii
+		$asp_string4 = "SItEuRl=\"http://www.zjjv.com\"" wide ascii
+		$asp_string5 = "ServerVariables(\"HTTP_HOST\"),\"gov.cn\"" wide ascii
 	condition:
 		filesize < 200KB and 
 		// not checking capa_asp
-		any of them
+		any of ( $asp_string* )
 }
 
 rule webshell_asp_generic_tiny {
@@ -1107,16 +1156,16 @@ rule webshell_aspx_regeorg_csharp {
 		author = "Arnim Rupp"
 		date = "2021/01/11"
 	strings:
-		$input = "Request.QueryString.Get" fullword nocase wide ascii
-		$s1 = "AddressFamily.InterNetwork" fullword nocase wide ascii
-		$s2 = "Response.AddHeader" fullword nocase wide ascii
-		$s3 = "Request.InputStream.Read" nocase wide ascii
-		$s4 = "Response.BinaryWrite" nocase wide ascii
-		$s5 = "Socket" nocase wide ascii
+		$sainput = "Request.QueryString.Get" fullword nocase wide ascii
+		$sa1 = "AddressFamily.InterNetwork" fullword nocase wide ascii
+		$sa2 = "Response.AddHeader" fullword nocase wide ascii
+		$sa3 = "Request.InputStream.Read" nocase wide ascii
+		$sa4 = "Response.BinaryWrite" nocase wide ascii
+		$sa5 = "Socket" nocase wide ascii
 	condition:
 		filesize < 300KB and
 		capa_asp and
-		all of them
+		all of ( $sa* )
 }
 
 rule webshell_csharp_generic {
@@ -1186,13 +1235,13 @@ private rule capa_jsp {
 		author = "Arnim Rupp"
 		date = "2021/01/24"
 	strings:
-		$ = "<%" ascii wide
-		$ = "<jsp:" ascii wide
-		$ = /language=[\"']java[\"\']/ ascii wide
+		$cjsp1 = "<%" ascii wide
+		$cjsp2 = "<jsp:" ascii wide
+		$cjsp3 = /language=[\"']java[\"\']/ ascii wide
 		// JSF
-		$ = "/jstl/core" ascii wide
+		$cjsp4 = "/jstl/core" ascii wide
 	condition:
-		any of them
+		any of ( $cjsp* )
 } 
 
 private rule capa_jsp_input {
@@ -1225,16 +1274,16 @@ rule webshell_jsp_regeorg {
 		author = "Arnim Rupp"
 		date = "2021/01/24"
 	strings:
-		$ = "request" fullword wide ascii
-		$ = "getHeader" fullword wide ascii
-		$ = "X-CMD" fullword wide ascii
-		$ = "X-STATUS" fullword wide ascii
-		$ = "socket" fullword wide ascii
-		$ = "FORWARD" fullword wide ascii
+		$jgeorg1 = "request" fullword wide ascii
+		$jgeorg2 = "getHeader" fullword wide ascii
+		$jgeorg3 = "X-CMD" fullword wide ascii
+		$jgeorg4 = "X-STATUS" fullword wide ascii
+		$jgeorg5 = "socket" fullword wide ascii
+		$jgeorg6 = "FORWARD" fullword wide ascii
 	condition:
 		filesize < 300KB and 
 		capa_jsp and 
-		all of them
+		all of ( $jgeorg* )
 }
 
 rule webshell_jsp_http_proxy {
@@ -1245,16 +1294,16 @@ rule webshell_jsp_http_proxy {
 		author = "Arnim Rupp"
 		date = "2021/01/24"
 	strings:
-		$ = "OutputStream" fullword wide ascii
-		$ = "InputStream"  wide ascii
-		$ = "BufferedReader" fullword wide ascii
-		$ = "HttpRequest" fullword wide ascii
-		$ = "openConnection" fullword wide ascii
-		$ = "getParameter" fullword wide ascii
+		$jh1 = "OutputStream" fullword wide ascii
+		$jh2 = "InputStream"  wide ascii
+		$jh3 = "BufferedReader" fullword wide ascii
+		$jh4 = "HttpRequest" fullword wide ascii
+		$jh5 = "openConnection" fullword wide ascii
+		$jh6 = "getParameter" fullword wide ascii
 	condition:
 		filesize < 10KB and 
 		capa_jsp and 
-		all of them
+		all of ( $jh* )
 }
 
 rule webshell_jsp_writer_nano {
@@ -1422,7 +1471,8 @@ rule webshell_jsp_generic_classloader {
 		filesize < 10KB and 
 		capa_jsp and
 		capa_jsp_input and
-		all of them
+		$exec and
+		$class
 }
 
 rule webshell_jsp_generic_encoded_shell {
@@ -1433,16 +1483,16 @@ rule webshell_jsp_generic_encoded_shell {
 		date = "2021/01/07"
 		hash = "3eecc354390d60878afaa67a20b0802ce5805f3a9bb34e74dd8c363e3ca0ea5c"
 	strings:
-		$s0 = /{ ?47, 98, 105, 110, 47, 98, 97, 115, 104/ wide ascii
-		$s1 = /{ ?99, 109, 100}/ wide ascii
-		$s2 = /{ ?99, 109, 100, 46, 101, 120, 101/ wide ascii
-		$s3 = /{ ?47, 98, 105, 110, 47, 98, 97/ wide ascii
-		$s4 = /{ ?106, 97, 118, 97, 46, 108, 97, 110/ wide ascii
-		$s5 = /{ ?101, 120, 101, 99 }/ wide ascii
-		$s6 = /{ ?103, 101, 116, 82, 117, 110/ wide ascii
+		$sj0 = /{ ?47, 98, 105, 110, 47, 98, 97, 115, 104/ wide ascii
+		$sj1 = /{ ?99, 109, 100}/ wide ascii
+		$sj2 = /{ ?99, 109, 100, 46, 101, 120, 101/ wide ascii
+		$sj3 = /{ ?47, 98, 105, 110, 47, 98, 97/ wide ascii
+		$sj4 = /{ ?106, 97, 118, 97, 46, 108, 97, 110/ wide ascii
+		$sj5 = /{ ?101, 120, 101, 99 }/ wide ascii
+		$sj6 = /{ ?103, 101, 116, 82, 117, 110/ wide ascii
 	condition:
 		filesize < 300KB and 
-		any of them
+		any of ( $sj* )
 }
 
 rule webshell_jsp_netspy {
@@ -1483,24 +1533,24 @@ rule webshell_jsp_by_string {
 		hash = "4c2464503237beba54f66f4a099e7e75028707aa"
 		hash = "06b42d4707e7326aff402ecbb585884863c6351a"
 	strings:
-		$ = "<title>Boot Shell</title>" wide ascii
-		$ = "String oraPWD=\"" wide ascii
-		$ = "Owned by Chinese Hackers!" wide ascii
-		$ = "AntSword JSP" wide ascii
-		$ = "JSP Webshell</" wide ascii
-		$ = "motoME722remind2012" wide ascii
-		$ = "EC(getFromBase64(toStringHex(request.getParameter(\"password" wide ascii
-		$ = "http://jmmm.com/web/index.jsp" wide ascii
-		$ = "list.jsp = Directory & File View" wide ascii
-		$ = "jdbcRowSet.setDataSourceName(request.getParameter(" wide ascii
-		$ = "Mr.Un1k0d3r RingZer0 Team" wide ascii
-		$ = "MiniWebCmdShell" fullword wide ascii
-		$ = "pwnshell.jsp" fullword wide ascii
-		$ = "session set &lt;key&gt; &lt;value&gt; [class]<br>"  wide ascii
+		$jstring1 = "<title>Boot Shell</title>" wide ascii
+		$jstring2 = "String oraPWD=\"" wide ascii
+		$jstring3 = "Owned by Chinese Hackers!" wide ascii
+		$jstring4 = "AntSword JSP" wide ascii
+		$jstring5 = "JSP Webshell</" wide ascii
+		$jstring6 = "motoME722remind2012" wide ascii
+		$jstring7 = "EC(getFromBase64(toStringHex(request.getParameter(\"password" wide ascii
+		$jstring8 = "http://jmmm.com/web/index.jsp" wide ascii
+		$jstring9 = "list.jsp = Directory & File View" wide ascii
+		$jstring10 = "jdbcRowSet.setDataSourceName(request.getParameter(" wide ascii
+		$jstring11 = "Mr.Un1k0d3r RingZer0 Team" wide ascii
+		$jstring12 = "MiniWebCmdShell" fullword wide ascii
+		$jstring13 = "pwnshell.jsp" fullword wide ascii
+		$jstring14 = "session set &lt;key&gt; &lt;value&gt; [class]<br>"  wide ascii
 	condition:
 		filesize < 100KB and 
 		capa_jsp and 
-		any of them
+		any of ( $jstring* )
 }
 
 
