@@ -123,9 +123,33 @@ private rule php_false_positive {
 		date = "2021/01/14"
 	strings:
 		// try to use only strings which would be flagged by themselves as suspicous by other rules, e.g. eval 
-		$gfp1 = "eval(\"return [$serialised_parameter" wide ascii // elgg
+		$gfp1  = "eval(\"return [$serialised_parameter" // elgg
+		$gfp2  = "$this->assert(strpos($styles, $"
+		$gfp3  = "$module = new $_GET['module']($_GET['scope']);"
+		$gfp4  = "$plugin->$_POST['action']($_POST['id']);"
+		$gfp5  = "$_POST[partition_by]($_POST["
+		$gfp6  = "$object = new $_REQUEST['type']($_REQUEST['id']);"
+		$gfp7  = "The above example code can be easily exploited by passing in a string such as" // ... ;)
+		$gfp8  = "Smarty_Internal_Debug::start_render($_template);"
+		$gfp9  = "?p4yl04d=UNION%20SELECT%20'<?%20system($_GET['command']);%20?>',2,3%20INTO%20OUTFILE%20'/var/www/w3bsh3ll.php"
 	condition:
 		any of ( $gfp* )
+}
+
+private rule php_false_positive_tiny {
+	meta:
+		description = "PHP false positives"
+		license = "https://creativecommons.org/licenses/by-nc/4.0/"
+		author = "Arnim Rupp"
+		date = "2021/02/25"
+	strings:
+		// try to use only strings which would be flagged by themselves as suspicous by other rules, e.g. eval 
+		$gfp_tiny1 = "addslashes" fullword
+		$gfp_tiny2 = "escapeshellarg" fullword
+		$gfp_tiny3 = "include \"./common.php\";" // xcache
+		$gfp_tiny4 = "assert('FALSE')"
+	condition:
+		any of ( $gfp_tiny* )
 }
 
 private rule capa_php {
@@ -155,10 +179,12 @@ private rule capa_php_old_safe {
 		$no_xml2 = "<?xml-stylesheet" nocase wide ascii
 		$no_asp1 = "<%@LANGUAGE" nocase wide ascii
 		$no_asp2 = /<script language="(vb|jscript|c#)/ nocase wide ascii
+		$no_pdf = "<?xpacket" 
 
 		// of course the new tags should also match
-		$php_new1 = "<?=" nocase wide ascii
-		$php_new2 = "<?php" nocase wide ascii
+        // already matched by "<?"
+		//$php_new1 = "<?=" wide ascii
+		//$php_new2 = "<?php" nocase wide ascii
 		$php_new3 = "<script language=\"php" nocase wide ascii
 	condition:
 		(
@@ -170,56 +196,6 @@ private rule capa_php_old_safe {
 		) 
 		or any of ( $php_new* )
 }
-
-/*
-private rule capa_php_old_sucks {
-	meta:
-		description = "PHP tag plus some php functions because just looking for <? is error prone, that's quickly contained in any larger file and hits on asp."
-		license = "https://creativecommons.org/licenses/by-nc/4.0/"
-		author = "Arnim Rupp"
-		date = "2021/02/05"
-	strings:
-		$php = "<?" wide ascii
-		// of course the new tags should also match
-		$php_new1 = "<?=" nocase wide ascii
-		$php_new2 = "<?php" nocase wide ascii
-		$php_new3 = "<script language=\"php" nocase wide ascii
-		// yep, they might hit other script panguages, but still reduces false positives
-		$f1 = "echo" fullword nocase wide ascii
-		$f2 = "fwrite" fullword nocase wide ascii
-		$f3 = "empty" fullword nocase wide ascii
-		$f4 = "function" fullword nocase wide ascii
-		$f5 = "exit" fullword nocase wide ascii
-		$f6 = "eval" fullword nocase wide ascii
-		$f7 = "assert" fullword nocase wide ascii
-		$f8 = "_GET" wide ascii
-		$f9 = "_POST" wide ascii
-		$f10 = "_REQUEST" wide ascii
-		$f11 = "_SERVER" wide ascii
-		$f12 = "trim" fullword nocase wide ascii
-		$f13 = "call_" nocase wide ascii
-		$f14 = "substr" nocase wide ascii
-		$f15 = "chr(" nocase wide ascii
-		$f16 = "exec" fullword nocase wide ascii
-		$f17 = "system" fullword nocase wide ascii
-		$f18 = "strto" nocase wide ascii
-		$f19 = "foreach" fullword nocase wide ascii
-		$f20 = "array" nocase wide ascii
-		$f21 = "strrev" fullword nocase wide ascii
-		// prevent xml and asp from hitting
-		$no_xml1 = "<?xml version" nocase wide ascii
-		$no_xml2 = "<?xml-stylesheet" nocase wide ascii
-		$no_asp1 = "<%@LANGUAGE" nocase wide ascii
-		$no_asp2 = /<script language="(vb|jscript|c#)/ nocase wide ascii
-	condition:
-		(
-			$php or
-			any of ( $php_new* )
-		) and
-		any of ( $f* ) and 
-		not any of ( $no_* )
-}
-*/
 
 private rule capa_php_new {
 	meta:
@@ -271,7 +247,7 @@ private rule capa_php_payload {
 		$cpayload7 = /\bproc_open[\t ]*\([^)]/ nocase wide ascii
 		$cpayload8 = /\bpcntl_exec[\t ]*\([^)]/ nocase wide ascii
 		$cpayload9 = /\bassert[\t ]*\([^)]/ nocase wide ascii
-		$cpayload10 = /\bpreg_replace[\t ]*\(.{1,1000}\/e/ nocase wide ascii
+		$cpayload10 = /\bpreg_replace[\t ]*\([^\)]1,1000}\/e/ nocase wide ascii
 		$cpayload11 = /\bcreate_function[\t ]*\([^)]/ nocase wide ascii
 		$cpayload12 = /\bReflectionFunction[\t ]*\([^)]/ nocase wide ascii
 		// TODO: $_GET['func_name']($_GET['argument']);
@@ -365,10 +341,11 @@ rule webshell_php_generic_tiny {
 		date = "2021/01/14"
 		hash = "bee1b76b1455105d4bfe2f45191071cf05e83a309ae9defcf759248ca9bceddd"
 	condition:
-		filesize < 1000 
+		filesize < 900 
+		and capa_php_old_safe
 		and capa_php_input
 		and capa_php_payload
-		and not php_false_positive
+		and not php_false_positive_tiny
 }
 
 rule webshell_php_generic_callback_tiny {
@@ -383,6 +360,7 @@ rule webshell_php_generic_callback_tiny {
 		and capa_php_input
 		and capa_php_callback
 		and not php_false_positive
+		and not php_false_positive_tiny
 }
 
 rule webshell_php_generic_nano_input {
@@ -393,7 +371,8 @@ rule webshell_php_generic_nano_input {
 		hash = "b492336ac5907684c1b922e1c25c113ffc303ffbef645b4e95d36bc50e932033"
 		date = "2021/01/13"
 	strings:
-		$fp1 = "echo $_POST['" wide ascii
+		$fp1 = "echo $_POST['" 
+		$fp2 = "$http_raw_post_data = file_get_contents('php://input');"
 	condition:
 		filesize < 90 and 
 		capa_php and
@@ -474,12 +453,33 @@ rule webshell_php_base64_encoded_payloads {
 		$nine4 = "EAcwBzAGUAcgB0A"
 		$nine5 = "hAHMAcwBlAHIAdA"
 		$nine6 = "YQBzAHMAZQByAHQA"
+
+        // false positives
+
+        // execu
+        $execu1 = "leGVjd"
+		$execu2 = "V4ZWN1"
+		$execu3 = "ZXhlY3"
+
+        // esystem like e.g. filesystem
+        $esystem1 = "lc3lzdGVt"
+		$esystem2 = "VzeXN0ZW"
+		$esystem3 = "ZXN5c3Rlb"
+
 	condition:
 		filesize < 300KB and 
 		capa_php_old_safe and 
 		$decode and (
-			any of ( $one* ) or any of ( $two* ) or any of ( $three* ) or any of ( $four* ) or any of ( $five* ) or any of ( $six* ) or any of ( $seven* ) or any of ( $eight* ) or any of ( $nine* )
-		)
+			( any of ( $one* ) and 
+              not any of ( $execu* )
+            )   
+            or any of ( $two* ) or any of ( $three* ) or 
+
+            ( any of ( $four* ) and
+            not any of ( $esystem* )
+            ) 
+            or any of ( $five* ) or any of ( $six* ) or any of ( $seven* ) or any of ( $eight* ) or any of ( $nine* )
+		) 
 }
 
 rule webshell_php_unknown_1 {
@@ -512,7 +512,8 @@ rule webshell_php_generic_eval {
 		$geval = /(exec|shell_exec|passthru|system|popen|proc_open|pcntl_exec|eval|assert)[\t ]*(stripslashes\()?[\t ]*(trim\()?[\t ]*\(\$(_POST|_GET|_REQUEST|_SERVER\[['"]HTTP_)/ wide ascii
 	condition:
 		filesize < 300KB and 
-		$geval
+		$geval and 
+        not php_false_positive
 }
 
 rule webshell_php_double_eval_tiny {
@@ -546,8 +547,8 @@ private rule capa_php_obfuscation_multi {
 		$o2 = "chr (" nocase wide ascii
 		// not excactly a string function but also often used in obfuscation
 		$o3 = "goto" fullword nocase wide ascii
-		$o4 = "\\x1" wide ascii
-		$o5 = "\\x2" wide ascii
+		$o4 = "\\x9" wide ascii
+		$o5 = "\\x3" wide ascii
 		// just picking some random numbers because they should appear often enough in a long obfuscated blob and it's faster than a regex
 		$o6 = "\\61" wide ascii
 		$o7 = "\\44" wide ascii
@@ -568,7 +569,7 @@ private rule capa_php_obfuscation_multi {
 				filesize < 200KB and 
 				(
 					( #o1+#o2 ) > 200 or
-					#o3 > 10 or
+					#o3 > 30 or
 					( #o4+#o5+#o6+#o7+#o8+#o9 ) > 30 
 				) 
 
@@ -605,7 +606,8 @@ rule webshell_php_obfuscated {
 		// filesize checked in capa_php_obfuscation_multi
 		capa_php_old_safe and 
 		capa_php_obfuscation_multi and 
-		capa_php_payload
+		capa_php_payload and
+        not php_false_positive
 }
 
 rule webshell_php_obfuscated_str_replace {
@@ -687,9 +689,11 @@ private rule capa_os_strings {
 		$take_two2 = "/add" nocase wide ascii
 	condition:
 		filesize < 300KB and 
-		all of ( $w* ) or
-		all of ( $l* ) or
-		2 of ( $take_two* ) 
+        not uint16(0) == 0x5a4d and (
+            all of ( $w* ) or
+            all of ( $l* ) or
+            2 of ( $take_two* ) 
+        )
 }
 
 rule webshell_php_gzinflated {
@@ -880,8 +884,7 @@ rule webshell_php_by_string {
 		// crawler avoid string
 		$pbs30 = "bot|spider|crawler|slurp|teoma|archive|track|snoopy|java|lwp|wget|curl|client|python|libwww" wide ascii
 		$pbs31 = "'ev'.'al'" nocase wide ascii
-		$pbs32 = "<?php eval(" nocase wide ascii
-		$pbs33 = "eval/*" nocase wide ascii
+		$pbs32 = "eval/*" nocase wide ascii
 		$pbs34 = "assert/*" nocase wide ascii
 		// <?=($pbs_=@$_GET[2]).@$_($_GET[1])?>
 		$pbs35 = /@\$_GET\[\d\]\)\.@\$_\(\$_GET\[\d\]\)/ wide ascii
@@ -898,10 +901,14 @@ rule webshell_php_by_string {
 		$pbs46 = "'G'.'E'.'T'" wide ascii
 		$pbs47 = "'R'.'E'.'Q'.'U'" wide ascii
 		$pbs48 = "se'.(32*2)"
+		$front1 = "<?php eval(" nocase wide ascii
 	condition:
 		filesize < 500KB and 
 		capa_php_old_safe and 
-		any of ( $pbs* )
+        (
+            any of ( $pbs* ) or
+            $front1 in (0..80)
+        )
 }
 
 
@@ -916,9 +923,10 @@ rule webshell_php_strings_susp {
 	strings:
 		$sstring1 = "eval(\"?>\"" nocase wide ascii
 	condition:
-		filesize < 700KB 
-		and capa_php_old_safe
-		and ( 2 of ( $sstring* ) or ( 1 of ( $sstring* ) and capa_php_input ) )
+		filesize < 700KB and 
+        capa_php_old_safe and 
+        ( 2 of ( $sstring* ) or ( 1 of ( $sstring* ) and capa_php_input ) ) and
+        not php_false_positive
 }
 
 
@@ -953,7 +961,8 @@ rule webshell_php_func_in_get {
 		$sr5 = /\$_SERVER\[HTTP_.{1,30}\]\(\$_SERVER\[HTTP_/ wide ascii
 	condition:
 		filesize < 500KB and 
-		any of ( $sr* )
+		any of ( $sr* ) and
+        not php_false_positive
 }
 
 
@@ -1077,10 +1086,14 @@ rule webshell_asp_nano {
 		$payload5 = /ExecuteGlobal/ fullword nocase wide ascii
 		$payload6 = "cmd /c" nocase wide ascii
 		$payload7 = "cmd.exe" nocase wide ascii
+        $fp1      = "eval a"
+        $fp2      = "'Eval'"
+        $fp3      = "Eval(\""
 	condition:
 		filesize < 200 and 
 		capa_asp and 
-		any of ($payload*)
+		any of ($payload*) and
+        not any of ( $fp* )
 }
 
 rule webshell_vbscript_nano_encoded {
@@ -1359,10 +1372,11 @@ rule webshell_jsp_generic {
 		hash = "bdaf9279b3d9e07e955d0ce706d9c42e4bdf9aa1"
 	strings:
 		$payload1 = "ProcessBuilder" fullword ascii wide
+		$payload2 = "processCmd" fullword ascii wide
 		// Runtime.getRuntime().exec(
-		$payload_rt1 = "Runtime" fullword ascii wide
-		$payload_rt2 = "getRuntime" fullword ascii wide
-		$payload_rt3 = "exec" fullword ascii wide
+		$rt_payload1 = "Runtime" fullword ascii wide
+		$rt_payload2 = "getRuntime" fullword ascii wide
+		$rt_payload3 = "exec" fullword ascii wide
 		$susp0 = "cmd" fullword nocase ascii wide
 		$susp1 = "command" fullword nocase ascii wide
 		$susp2 = "shell" fullword nocase ascii wide
@@ -1371,12 +1385,15 @@ rule webshell_jsp_generic {
 		$susp5 = "Execute" fullword nocase ascii wide
 	condition:
 		filesize < 300KB and 
+        not uint16(0) == 0x5a4d and 
+        // fp on jar with zero compression
+        not uint16(0) == 0x4b50 and 
 		capa_jsp and  
 		capa_jsp_input and  
 		any of ( $susp* ) and
 		( 
 			1 of ( $payload* ) or
-			all of ( $payload_rt* )
+			all of ( $rt_payload* )
 		)
 }
 
