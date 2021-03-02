@@ -75,6 +75,8 @@ Old signature-base rules found: 1315
 This rules found: 3286
 False positives in 8gb of common webapps plus yara-ci: 2
 
+TODO: move "not php_false_positive" down once https://github.com/plyara/plyara/pull/114 is merged
+
 */
 
 //                               _
@@ -147,7 +149,9 @@ private rule php_false_positive_tiny {
 		$gfp_tiny1 = "addslashes" fullword
 		$gfp_tiny2 = "escapeshellarg" fullword
 		$gfp_tiny3 = "include \"./common.php\";" // xcache
-		$gfp_tiny4 = "assert('FALSE')"
+		$gfp_tiny4 = "assert('FALSE');"
+		$gfp_tiny5 = "assert(false);"
+		$gfp_tiny6 = "assert(FALSE);"
 	condition:
 		any of ( $gfp_tiny* )
 }
@@ -341,7 +345,7 @@ rule webshell_php_generic_tiny {
 		date = "2021/01/14"
 		hash = "bee1b76b1455105d4bfe2f45191071cf05e83a309ae9defcf759248ca9bceddd"
 	condition:
-		filesize < 900 
+		filesize < 1000 
 		and capa_php_old_safe
 		and capa_php_input
 		and capa_php_payload
@@ -356,11 +360,11 @@ rule webshell_php_generic_callback_tiny {
 		date = "2021/01/14"
 		hash = "e98889690101b59260e871c49263314526f2093f"
 	condition:
-		filesize < 1000 
-		and capa_php_input
-		and capa_php_callback
-		and not php_false_positive
-		and not php_false_positive_tiny
+		filesize < 1000 and 
+        not php_false_positive and 
+        not php_false_positive_tiny and 
+        capa_php_input and 
+        capa_php_callback
 }
 
 rule webshell_php_generic_nano_input {
@@ -512,8 +516,8 @@ rule webshell_php_generic_eval {
 		$geval = /(exec|shell_exec|passthru|system|popen|proc_open|pcntl_exec|eval|assert)[\t ]*(stripslashes\()?[\t ]*(trim\()?[\t ]*\(\$(_POST|_GET|_REQUEST|_SERVER\[['"]HTTP_)/ wide ascii
 	condition:
 		filesize < 300KB and 
-		$geval and 
-        not php_false_positive
+        not php_false_positive and
+		$geval
 }
 
 rule webshell_php_double_eval_tiny {
@@ -606,8 +610,8 @@ rule webshell_php_obfuscated {
 		// filesize checked in capa_php_obfuscation_multi
 		capa_php_old_safe and 
 		capa_php_obfuscation_multi and 
-		capa_php_payload and
-        not php_false_positive
+        not php_false_positive and
+		capa_php_payload
 }
 
 rule webshell_php_obfuscated_str_replace {
@@ -774,12 +778,13 @@ rule webshell_php_dynamic {
 		date = "2021/01/13"
 		score = 60
 	strings:
-		$fp = "whoops_add_stack_frame" wide ascii
+		$pd_fp1 = "whoops_add_stack_frame" wide ascii
+		$pd_fp2 = "$a = &new $ec($code, $mode, $options, $userinfo);" wide ascii
 	condition:
 		filesize < 200 and 
 		capa_php and 
 		capa_php_dynamic and
-		not $fp
+		not any of ( $pd_fp* )
 }
 
 rule webshell_php_dynamic_big {
@@ -907,7 +912,7 @@ rule webshell_php_by_string {
 		capa_php_old_safe and 
         (
             any of ( $pbs* ) or
-            $front1 in (0..80)
+            $front1 in (0..60)
         )
 }
 
@@ -925,8 +930,8 @@ rule webshell_php_strings_susp {
 	condition:
 		filesize < 700KB and 
         capa_php_old_safe and 
-        ( 2 of ( $sstring* ) or ( 1 of ( $sstring* ) and capa_php_input ) ) and
-        not php_false_positive
+        not php_false_positive and
+        ( 2 of ( $sstring* ) or ( 1 of ( $sstring* ) and capa_php_input ) )
 }
 
 
@@ -961,8 +966,8 @@ rule webshell_php_func_in_get {
 		$sr5 = /\$_SERVER\[HTTP_.{1,30}\]\(\$_SERVER\[HTTP_/ wide ascii
 	condition:
 		filesize < 500KB and 
-		any of ( $sr* ) and
-        not php_false_positive
+        not php_false_positive and
+		any of ( $sr* )
 }
 
 
@@ -1021,14 +1026,14 @@ private rule capa_asp_payload {
 		author = "Arnim Rupp"
 		date = "2021/02/06"
 	strings:
-		$cpayload0 = "eval_r" fullword nocase wide ascii
-		$cpayload1 = "eval" fullword nocase wide ascii
-		$cpayload2 = "execute" fullword nocase wide ascii
-		$cpayload3 = "WSCRIPT.SHELL" fullword nocase wide ascii
-		$cpayload4 = "Scripting.FileSystemObject" fullword nocase wide ascii
-		$cpayload5 = /ExecuteGlobal/ fullword nocase wide ascii
+		$asp_payload0 = "eval_r" fullword nocase wide ascii
+		$asp_payload1 = "eval" fullword nocase wide ascii
+		$asp_payload2 = "execute" fullword nocase wide ascii
+		$asp_payload3 = "WSCRIPT.SHELL" fullword nocase wide ascii
+		$asp_payload4 = "Scripting.FileSystemObject" fullword nocase wide ascii
+		$asp_payload5 = /ExecuteGlobal/ fullword nocase wide ascii
 	condition:
-		any of ( $cpayload* )
+		any of ( $asp_payload* )
 }
 
 rule webshell_asp_obfuscated {
@@ -1278,6 +1283,24 @@ private rule capa_jsp_input {
 		any of ( $req* )
 } 
 
+private rule capa_jsp_payload {
+	meta:
+		description = "capa JSP payload"
+		license = "https://creativecommons.org/licenses/by-nc/4.0/"
+		author = "Arnim Rupp"
+		date = "2021/02/27"
+	strings:
+		$payload1 = "ProcessBuilder" fullword ascii wide
+		$payload2 = "processCmd" fullword ascii wide
+		// Runtime.getRuntime().exec(
+		$rt_payload1 = "Runtime" fullword ascii wide
+		$rt_payload2 = "getRuntime" fullword ascii wide
+		$rt_payload3 = "exec" fullword ascii wide
+	condition:
+        1 of ( $payload* ) or
+        all of ( $rt_payload* )
+}
+
 rule webshell_jsp_regeorg {
 	meta:
 		description = "Webshell regeorg JSP version"
@@ -1371,12 +1394,6 @@ rule webshell_jsp_generic {
 		hash = "4762f36ca01fb9cda2ab559623d2206f401fc0b1"
 		hash = "bdaf9279b3d9e07e955d0ce706d9c42e4bdf9aa1"
 	strings:
-		$payload1 = "ProcessBuilder" fullword ascii wide
-		$payload2 = "processCmd" fullword ascii wide
-		// Runtime.getRuntime().exec(
-		$rt_payload1 = "Runtime" fullword ascii wide
-		$rt_payload2 = "getRuntime" fullword ascii wide
-		$rt_payload3 = "exec" fullword ascii wide
 		$susp0 = "cmd" fullword nocase ascii wide
 		$susp1 = "command" fullword nocase ascii wide
 		$susp2 = "shell" fullword nocase ascii wide
@@ -1390,11 +1407,8 @@ rule webshell_jsp_generic {
         not uint16(0) == 0x4b50 and 
 		capa_jsp and  
 		capa_jsp_input and  
-		any of ( $susp* ) and
-		( 
-			1 of ( $payload* ) or
-			all of ( $rt_payload* )
-		)
+		capa_jsp_payload and  
+		any of ( $susp* )
 }
 
 rule webshell_jsp_generic_base64 {
@@ -1429,6 +1443,7 @@ rule webshell_jsp_generic_base64 {
 		$three6 = "UwBjAHIAaQBwAHQARQBuAGcAaQBuAGUARgBhAGMAdABvAHIAeQ" wide ascii
 
 	condition:
+        not uint16(0) == 0x5a4d and
 		capa_jsp and
 		filesize < 300KB and (
 			any of ( $one* ) and any of ( $two* ) 
@@ -1617,6 +1632,37 @@ rule webshell_generic_os_strings {
 		( capa_asp or capa_php_old_safe or capa_jsp ) and 
 		capa_os_strings and
 		not any of ( $fp* )
+}
+
+rule webshell_in_image {
+	meta:
+		description = "Webshell in GIF, PNG or JPG"
+		license = "https://creativecommons.org/licenses/by-nc/4.0/"
+		author = "Arnim Rupp"
+		hash = "d4fde4e691db3e70a6320e78657480e563a9f87935af873a99db72d6a9a83c78"
+		date = "2021/02/27"
+	strings:
+        $png = { 89 50 4E 47 }
+        $jpg = { FF D8 FF E0 }
+        $gif = { 47 49 46 38 }
+	condition:
+        (
+            $png at 0 or
+            $jpg at 0 or
+            $gif at 0 
+        )
+        and (
+            ( 
+                capa_php_old_safe and
+                capa_php_payload 
+            ) or (
+                capa_jsp and
+                capa_jsp_payload 
+            ) or ( 
+                capa_asp and
+                capa_asp_payload 
+            )
+        )
 }
 
 //                       _      _                 
