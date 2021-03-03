@@ -112,8 +112,8 @@ rule webshell_php_generic_tiny
 
 		// of course the new tags should also match
         // already matched by "<?"
-		//$php_new1 = "<?=" wide ascii
-		//$php_new2 = "<?php" nocase wide ascii
+		$php_new1 = "<?=" wide ascii
+		$php_new2 = "<?php" nocase wide ascii
 		$php_new3 = "<script language=\"php" nocase wide ascii
 	
 		//strings from private rule capa_php_input
@@ -402,8 +402,8 @@ rule webshell_php_base64_encoded_payloads
 
 		// of course the new tags should also match
         // already matched by "<?"
-		//$php_new1 = "<?=" wide ascii
-		//$php_new2 = "<?php" nocase wide ascii
+		$php_new1 = "<?=" wide ascii
+		$php_new2 = "<?php" nocase wide ascii
 		$php_new3 = "<script language=\"php" nocase wide ascii
 	
 	condition:
@@ -522,8 +522,8 @@ rule webshell_php_obfuscated
 
 		// of course the new tags should also match
         // already matched by "<?"
-		//$php_new1 = "<?=" wide ascii
-		//$php_new2 = "<?php" nocase wide ascii
+		$php_new1 = "<?=" wide ascii
+		$php_new2 = "<?php" nocase wide ascii
 		$php_new3 = "<script language=\"php" nocase wide ascii
 	
 		//strings from private rule capa_php_obfuscation_multi
@@ -646,8 +646,8 @@ rule webshell_php_obfuscated_str_replace
 
 		// of course the new tags should also match
         // already matched by "<?"
-		//$php_new1 = "<?=" wide ascii
-		//$php_new2 = "<?php" nocase wide ascii
+		$php_new1 = "<?=" wide ascii
+		$php_new2 = "<?php" nocase wide ascii
 		$php_new3 = "<script language=\"php" nocase wide ascii
 	
 	condition:
@@ -704,8 +704,8 @@ rule webshell_php_obfuscated_fopo
 
 		// of course the new tags should also match
         // already matched by "<?"
-		//$php_new1 = "<?=" wide ascii
-		//$php_new2 = "<?php" nocase wide ascii
+		$php_new1 = "<?=" wide ascii
+		$php_new2 = "<?php" nocase wide ascii
 		$php_new3 = "<script language=\"php" nocase wide ascii
 	
 	condition:
@@ -791,8 +791,8 @@ rule webshell_php_obfuscated_2
 
 		// of course the new tags should also match
         // already matched by "<?"
-		//$php_new1 = "<?=" wide ascii
-		//$php_new2 = "<?php" nocase wide ascii
+		$php_new1 = "<?=" wide ascii
+		$php_new2 = "<?php" nocase wide ascii
 		$php_new3 = "<script language=\"php" nocase wide ascii
 	
 	condition:
@@ -1023,8 +1023,8 @@ rule webshell_php_generic_backticks_obfuscated
 
 		// of course the new tags should also match
         // already matched by "<?"
-		//$php_new1 = "<?=" wide ascii
-		//$php_new2 = "<?php" nocase wide ascii
+		$php_new1 = "<?=" wide ascii
+		$php_new2 = "<?php" nocase wide ascii
 		$php_new3 = "<script language=\"php" nocase wide ascii
 	
 	condition:
@@ -1118,8 +1118,8 @@ rule webshell_php_by_string
 
 		// of course the new tags should also match
         // already matched by "<?"
-		//$php_new1 = "<?=" wide ascii
-		//$php_new2 = "<?php" nocase wide ascii
+		$php_new1 = "<?=" wide ascii
+		$php_new2 = "<?php" nocase wide ascii
 		$php_new3 = "<script language=\"php" nocase wide ascii
 	
 	condition:
@@ -1161,8 +1161,8 @@ rule webshell_php_strings_susp
 
 		// of course the new tags should also match
         // already matched by "<?"
-		//$php_new1 = "<?=" wide ascii
-		//$php_new2 = "<?php" nocase wide ascii
+		$php_new1 = "<?=" wide ascii
+		$php_new2 = "<?php" nocase wide ascii
 		$php_new3 = "<script language=\"php" nocase wide ascii
 	
 		//strings from private rule php_false_positive
@@ -2160,8 +2160,8 @@ rule webshell_generic_os_strings
 
 		// of course the new tags should also match
         // already matched by "<?"
-		//$php_new1 = "<?=" wide ascii
-		//$php_new2 = "<?php" nocase wide ascii
+		$php_new1 = "<?=" wide ascii
+		$php_new2 = "<?php" nocase wide ascii
 		$php_new3 = "<script language=\"php" nocase wide ascii
 	
 		//strings from private rule capa_jsp
@@ -2238,8 +2238,8 @@ rule webshell_in_image
 
 		// of course the new tags should also match
         // already matched by "<?"
-		//$php_new1 = "<?=" wide ascii
-		//$php_new2 = "<?php" nocase wide ascii
+		$php_new1 = "<?=" wide ascii
+		$php_new2 = "<?php" nocase wide ascii
 		$php_new3 = "<script language=\"php" nocase wide ascii
 	
 		//strings from private rule capa_php_payload
