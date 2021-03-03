@@ -179,6 +179,7 @@ rule webshell_php_generic_callback_tiny
 
 		//strings from private rule php_false_positive
 		// try to use only strings which would be flagged by themselves as suspicous by other rules, e.g. eval 
+        // a good choice is a string with good atom quality = ideally 4 unusual characters next to each other
 		$gfp1  = "eval(\"return [$serialised_parameter" // elgg
 		$gfp2  = "$this->assert(strpos($styles, $"
 		$gfp3  = "$module = new $_GET['module']($_GET['scope']);"
@@ -188,6 +189,8 @@ rule webshell_php_generic_callback_tiny
 		$gfp7  = "The above example code can be easily exploited by passing in a string such as" // ... ;)
 		$gfp8  = "Smarty_Internal_Debug::start_render($_template);"
 		$gfp9  = "?p4yl04d=UNION%20SELECT%20'<?%20system($_GET['command']);%20?>',2,3%20INTO%20OUTFILE%20'/var/www/w3bsh3ll.php"
+		$gfp10 = "[][}{;|]\\|\\\\[+=]\\|<?=>?"
+		$gfp11 = "(eval (getenv \"EPROLOG\")))"
 	
 		//strings from private rule php_false_positive_tiny
 		// try to use only strings which would be flagged by themselves as suspicous by other rules, e.g. eval 
@@ -457,6 +460,7 @@ rule webshell_php_generic_eval
 	
 		//strings from private rule php_false_positive
 		// try to use only strings which would be flagged by themselves as suspicous by other rules, e.g. eval 
+        // a good choice is a string with good atom quality = ideally 4 unusual characters next to each other
 		$gfp1  = "eval(\"return [$serialised_parameter" // elgg
 		$gfp2  = "$this->assert(strpos($styles, $"
 		$gfp3  = "$module = new $_GET['module']($_GET['scope']);"
@@ -466,6 +470,8 @@ rule webshell_php_generic_eval
 		$gfp7  = "The above example code can be easily exploited by passing in a string such as" // ... ;)
 		$gfp8  = "Smarty_Internal_Debug::start_render($_template);"
 		$gfp9  = "?p4yl04d=UNION%20SELECT%20'<?%20system($_GET['command']);%20?>',2,3%20INTO%20OUTFILE%20'/var/www/w3bsh3ll.php"
+		$gfp10 = "[][}{;|]\\|\\\\[+=]\\|<?=>?"
+		$gfp11 = "(eval (getenv \"EPROLOG\")))"
 	
 	condition:
 		filesize < 300KB and not ( 
@@ -542,6 +548,7 @@ rule webshell_php_obfuscated
 	
 		//strings from private rule php_false_positive
 		// try to use only strings which would be flagged by themselves as suspicous by other rules, e.g. eval 
+        // a good choice is a string with good atom quality = ideally 4 unusual characters next to each other
 		$gfp1  = "eval(\"return [$serialised_parameter" // elgg
 		$gfp2  = "$this->assert(strpos($styles, $"
 		$gfp3  = "$module = new $_GET['module']($_GET['scope']);"
@@ -551,6 +558,8 @@ rule webshell_php_obfuscated
 		$gfp7  = "The above example code can be easily exploited by passing in a string such as" // ... ;)
 		$gfp8  = "Smarty_Internal_Debug::start_render($_template);"
 		$gfp9  = "?p4yl04d=UNION%20SELECT%20'<?%20system($_GET['command']);%20?>',2,3%20INTO%20OUTFILE%20'/var/www/w3bsh3ll.php"
+		$gfp10 = "[][}{;|]\\|\\\\[+=]\\|<?=>?"
+		$gfp11 = "(eval (getenv \"EPROLOG\")))"
 	
 		//strings from private rule capa_php_payload
 		// \([^)] to avoid matching on e.g. eval() in comments
@@ -745,6 +754,7 @@ rule webshell_php_gzinflated
 	
 		//strings from private rule php_false_positive
 		// try to use only strings which would be flagged by themselves as suspicous by other rules, e.g. eval 
+        // a good choice is a string with good atom quality = ideally 4 unusual characters next to each other
 		$gfp1  = "eval(\"return [$serialised_parameter" // elgg
 		$gfp2  = "$this->assert(strpos($styles, $"
 		$gfp3  = "$module = new $_GET['module']($_GET['scope']);"
@@ -754,6 +764,8 @@ rule webshell_php_gzinflated
 		$gfp7  = "The above example code can be easily exploited by passing in a string such as" // ... ;)
 		$gfp8  = "Smarty_Internal_Debug::start_render($_template);"
 		$gfp9  = "?p4yl04d=UNION%20SELECT%20'<?%20system($_GET['command']);%20?>',2,3%20INTO%20OUTFILE%20'/var/www/w3bsh3ll.php"
+		$gfp10 = "[][}{;|]\\|\\\\[+=]\\|<?=>?"
+		$gfp11 = "(eval (getenv \"EPROLOG\")))"
 	
 	condition:
 		filesize < 700KB and not ( 
@@ -1167,6 +1179,7 @@ rule webshell_php_strings_susp
 	
 		//strings from private rule php_false_positive
 		// try to use only strings which would be flagged by themselves as suspicous by other rules, e.g. eval 
+        // a good choice is a string with good atom quality = ideally 4 unusual characters next to each other
 		$gfp1  = "eval(\"return [$serialised_parameter" // elgg
 		$gfp2  = "$this->assert(strpos($styles, $"
 		$gfp3  = "$module = new $_GET['module']($_GET['scope']);"
@@ -1176,6 +1189,8 @@ rule webshell_php_strings_susp
 		$gfp7  = "The above example code can be easily exploited by passing in a string such as" // ... ;)
 		$gfp8  = "Smarty_Internal_Debug::start_render($_template);"
 		$gfp9  = "?p4yl04d=UNION%20SELECT%20'<?%20system($_GET['command']);%20?>',2,3%20INTO%20OUTFILE%20'/var/www/w3bsh3ll.php"
+		$gfp10 = "[][}{;|]\\|\\\\[+=]\\|<?=>?"
+		$gfp11 = "(eval (getenv \"EPROLOG\")))"
 	
 		//strings from private rule capa_php_input
 		$inp1 = "php://input" wide ascii
@@ -1245,6 +1260,7 @@ rule webshell_php_func_in_get
 	
 		//strings from private rule php_false_positive
 		// try to use only strings which would be flagged by themselves as suspicous by other rules, e.g. eval 
+        // a good choice is a string with good atom quality = ideally 4 unusual characters next to each other
 		$gfp1  = "eval(\"return [$serialised_parameter" // elgg
 		$gfp2  = "$this->assert(strpos($styles, $"
 		$gfp3  = "$module = new $_GET['module']($_GET['scope']);"
@@ -1254,6 +1270,8 @@ rule webshell_php_func_in_get
 		$gfp7  = "The above example code can be easily exploited by passing in a string such as" // ... ;)
 		$gfp8  = "Smarty_Internal_Debug::start_render($_template);"
 		$gfp9  = "?p4yl04d=UNION%20SELECT%20'<?%20system($_GET['command']);%20?>',2,3%20INTO%20OUTFILE%20'/var/www/w3bsh3ll.php"
+		$gfp10 = "[][}{;|]\\|\\\\[+=]\\|<?=>?"
+		$gfp11 = "(eval (getenv \"EPROLOG\")))"
 	
 	condition:
 		filesize < 500KB and not ( 
