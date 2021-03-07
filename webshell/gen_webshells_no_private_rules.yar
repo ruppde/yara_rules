@@ -1407,7 +1407,8 @@ rule webshell_asp_obfuscated
 		$tagasp_long31 = /[<:]SCRIPT.{1,30}LANGUAGE=/ wide ascii
 	
 		//strings from private rule capa_asp_obfuscation_multi
-        $loop1 = "For "
+        // many Chr or few and a loop????
+        //$loop1 = "For "
 		$o1 = "chr(" nocase wide ascii
 		$o2 = "chr (" nocase wide ascii
 		// not excactly a string function but also often used in obfuscation
@@ -1442,20 +1443,17 @@ rule webshell_asp_obfuscated
 			any of ( $tagasp_long* ) 
 		)
 		and ( 
-        any of ( $loop* ) and
         (
+            filesize < 100KB and 
             (
-                filesize < 100KB and 
-                (
-                    ( #o1+#o2 ) > 50 or
-                    ( #o4+#o5+#o6+#o7+#o8+#o9 ) > 20 
-                ) 
-            ) or (
-                filesize < 700 and 
-                (
-                    ( #o1+#o2 ) > 1 or
-                    ( #o4+#o5+#o6+#o7+#o8+#o9 ) > 3 
-                ) 
+                ( #o1+#o2 ) > 50 or
+                ( #o4+#o5+#o6+#o7+#o8+#o9 ) > 20 
+            ) 
+        ) or (
+            filesize < 700 and 
+            (
+                ( #o1+#o2 ) > 1 or
+                ( #o4+#o5+#o6+#o7+#o8+#o9 ) > 3 
             ) 
         )  
 		)
