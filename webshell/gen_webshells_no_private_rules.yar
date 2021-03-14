@@ -2287,6 +2287,9 @@ rule webshell_asp_generic_tiny
         $asp_text1 = ".text" wide ascii
         $asp_text2 = ".Text" wide ascii
 	
+		//strings from private rule capa_bin_files
+        $dex   = { 64 65 78 0a 30 }
+	
 		//strings from private rule capa_asp_payload
 		$asp_payload0  = "eval_r" fullword nocase wide ascii
 		$asp_payload1  = /\beval\s/ nocase wide ascii
@@ -2342,6 +2345,12 @@ rule webshell_asp_generic_tiny
             any of ( $asp_text* ) and
             $asp_asp
         ) 
+		)
+		and not ( 
+        uint16(0) == 0x5a4d or 
+        $dex at 0 or 
+        // fp on jar with zero compression
+        uint16(0) == 0x4b50 
 		)
 		and 
 		( ( filesize < 1000 and ( 
@@ -2427,6 +2436,9 @@ rule webshell_asp_generic
         $php1 = "<?php"
         $php2 = "<?="
 	
+		//strings from private rule capa_bin_files
+        $dex   = { 64 65 78 0a 30 }
+	
 		//strings from private rule capa_asp_input
         // Request.BinaryRead
         // Request.Form
@@ -2493,6 +2505,12 @@ rule webshell_asp_generic
             $php1 at 0 or
             $php2 at 0 
         ) 
+		)
+		and not ( 
+        uint16(0) == 0x5a4d or 
+        $dex at 0 or 
+        // fp on jar with zero compression
+        uint16(0) == 0x4b50 
 		)
 		and ( 
 			any of ( $asp_input* ) or
