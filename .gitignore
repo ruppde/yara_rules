@@ -130,3 +130,4 @@ dmypy.json
 
 tmp/
 *.swp
+webshell/gen_webshells.yar

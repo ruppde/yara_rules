@@ -2353,7 +2353,7 @@ rule webshell_asp_generic_tiny
         uint16(0) == 0x4b50 
 		)
 		and 
-		( ( filesize < 1000 and ( 
+		( ( filesize < 700 and ( 
 			any of ( $asp_payload* ) or
         all of ( $asp_multi_payload_one* ) or
         all of ( $asp_multi_payload_two* ) or
@@ -2384,7 +2384,7 @@ rule webshell_asp_generic
         $asp_gen_sus9  = "\"cmd /c" nocase
         $asp_gen_sus10 = "\"cmd\"" nocase
         $asp_gen_sus11 = "\"cmd.exe" nocase
-        $asp_gen_sus12 = ".UserName" nocase
+        //TODO:$asp_gen_sus12 = ".UserName" nocase
         $asp_gen_sus13 = "Hklm.GetValueNames();" nocase
         $asp_gen_sus14 = "\\pcAnywhere\\" nocase
         $asp_gen_sus15 = "antivirus" nocase
