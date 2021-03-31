@@ -3394,7 +3394,6 @@ rule webshell_jsp_generic_tiny
 		author = "Arnim Rupp"
 		date = "2021/01/07"
 		hash = "8fd343db0442136e693e745d7af1018a99b042af"
-		hash = "ee9408eb923f2d16f606a5aaac7e16b009797a07"
 
 	strings:
 		$payload1 = "ProcessBuilder" fullword wide ascii
@@ -3456,6 +3455,7 @@ rule webshell_jsp_generic
 		date = "2021/01/07"
 		hash = "4762f36ca01fb9cda2ab559623d2206f401fc0b1"
 		hash = "bdaf9279b3d9e07e955d0ce706d9c42e4bdf9aa1"
+		hash = "ee9408eb923f2d16f606a5aaac7e16b009797a07"
 
 	strings:
 		$susp0 = "cmd" fullword nocase ascii wide
