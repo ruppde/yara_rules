@@ -213,6 +213,7 @@ rule webshell_php_generic
         $gen_bit_sus71 = "Hacking" fullword wide ascii
         $gen_bit_sus72 = "hacking" fullword wide ascii
         $gen_bit_sus73 = ".htpasswd" wide ascii
+        $gen_bit_sus74 = /\btouch\(\$[^,]{1,30},/ wide ascii
 
         // very suspicious strings, one is enough
         $gen_much_sus7  = "Web Shell" nocase
@@ -262,7 +263,6 @@ rule webshell_php_generic
         $gen_much_sus72 = "grep -li password" wide ascii
         $gen_much_sus73 = "-name config.inc.php" wide ascii
         // touch without parameters sets the time to now, not malicious and gives fp
-        $gen_much_sus74 = /\btouch\(\$[^,]{1,30},/ wide ascii
         $gen_much_sus75 = "password crack" wide ascii
         $gen_much_sus76 = "mysqlDll.dll" wide ascii
         $gen_much_sus77 = "net user" wide ascii
@@ -525,6 +525,7 @@ rule webshell_php_generic_callback
         $gen_bit_sus71 = "Hacking" fullword wide ascii
         $gen_bit_sus72 = "hacking" fullword wide ascii
         $gen_bit_sus73 = ".htpasswd" wide ascii
+        $gen_bit_sus74 = /\btouch\(\$[^,]{1,30},/ wide ascii
 
         // very suspicious strings, one is enough
         $gen_much_sus7  = "Web Shell" nocase
@@ -574,7 +575,6 @@ rule webshell_php_generic_callback
         $gen_much_sus72 = "grep -li password" wide ascii
         $gen_much_sus73 = "-name config.inc.php" wide ascii
         // touch without parameters sets the time to now, not malicious and gives fp
-        $gen_much_sus74 = /\btouch\(\$[^,]{1,30},/ wide ascii
         $gen_much_sus75 = "password crack" wide ascii
         $gen_much_sus76 = "mysqlDll.dll" wide ascii
         $gen_much_sus77 = "net user" wide ascii
@@ -1514,6 +1514,7 @@ rule webshell_php_obfuscated_3
         $gen_bit_sus71 = "Hacking" fullword wide ascii
         $gen_bit_sus72 = "hacking" fullword wide ascii
         $gen_bit_sus73 = ".htpasswd" wide ascii
+        $gen_bit_sus74 = /\btouch\(\$[^,]{1,30},/ wide ascii
 
         // very suspicious strings, one is enough
         $gen_much_sus7  = "Web Shell" nocase
@@ -1563,7 +1564,6 @@ rule webshell_php_obfuscated_3
         $gen_much_sus72 = "grep -li password" wide ascii
         $gen_much_sus73 = "-name config.inc.php" wide ascii
         // touch without parameters sets the time to now, not malicious and gives fp
-        $gen_much_sus74 = /\btouch\(\$[^,]{1,30},/ wide ascii
         $gen_much_sus75 = "password crack" wide ascii
         $gen_much_sus76 = "mysqlDll.dll" wide ascii
         $gen_much_sus77 = "net user" wide ascii
@@ -1885,6 +1885,7 @@ rule webshell_php_dynamic_big
         $gen_bit_sus71 = "Hacking" fullword wide ascii
         $gen_bit_sus72 = "hacking" fullword wide ascii
         $gen_bit_sus73 = ".htpasswd" wide ascii
+        $gen_bit_sus74 = /\btouch\(\$[^,]{1,30},/ wide ascii
 
         // very suspicious strings, one is enough
         $gen_much_sus7  = "Web Shell" nocase
@@ -1934,7 +1935,6 @@ rule webshell_php_dynamic_big
         $gen_much_sus72 = "grep -li password" wide ascii
         $gen_much_sus73 = "-name config.inc.php" wide ascii
         // touch without parameters sets the time to now, not malicious and gives fp
-        $gen_much_sus74 = /\btouch\(\$[^,]{1,30},/ wide ascii
         $gen_much_sus75 = "password crack" wide ascii
         $gen_much_sus76 = "mysqlDll.dll" wide ascii
         $gen_much_sus77 = "net user" wide ascii
@@ -2531,7 +2531,7 @@ rule webshell_php_writer
         $sus4 = "\"upload\"" wide ascii
         $sus5 = "\"Upload\"" wide ascii
         $sus6 = "gif89" wide ascii
-        $sus13= "<textarea " wide ascii
+        //$sus13= "<textarea " wide ascii
         $sus16= "Army" fullword wide ascii
 	
 		//strings from private rule capa_php_old_safe
@@ -4050,8 +4050,6 @@ rule webshell_asp_generic
         $asp_gen_sus19 = "http://schemas.microsoft.com/exchange/" wide ascii
         $asp_gen_sus21 = "\"upload\"" wide ascii
         $asp_gen_sus22 = "\"Upload\"" wide ascii
-        $asp_gen_sus23 = "<pre>" wide ascii
-        $asp_gen_sus24 = "<PRE>" wide ascii
         $asp_gen_sus25 = "shell_" wide ascii
         //$asp_gen_sus26 = "password" fullword wide ascii
         //$asp_gen_sus27 = "passw" fullword wide ascii
@@ -4060,6 +4058,10 @@ rule webshell_asp_generic
         $asp_gen_sus30 = "serv-u" wide ascii
         $asp_gen_sus31 = "Serv-u" wide ascii
         $asp_gen_sus32 = "Army" fullword wide ascii
+
+        $asp_slightly_sus1 = "<pre>" wide ascii
+        $asp_slightly_sus2 = "<PRE>" wide ascii
+
 
         // "e"+"x"+"e"
         $asp_gen_obf1 = "\"+\"" wide ascii 
@@ -4250,7 +4252,9 @@ rule webshell_asp_generic
         all of ( $asp_multi_payload_five* ) 
 		)
 		and not any of ( $fp* ) and 
-		( ( filesize < 25KB and 
+		( ( filesize < 3KB and 
+		( 1 of ( $asp_slightly_sus* ) ) ) or 
+		( filesize < 25KB and 
 		( 1 of ( $asp_much_sus* ) or 1 of ( $asp_gen_sus* ) or 
 		( #asp_gen_obf1 > 2 ) ) ) or 
 		( filesize < 50KB and 
@@ -4740,8 +4744,8 @@ rule webshell_asp_sql
         $sus16 = "\"sqlCommand\"" wide ascii
         $sus17 = "\"sqlcommand\"" wide ascii
 
-        $slightly_sus1 = "select * from " wide ascii
-        $slightly_sus2 = "SELECT * FROM " wide ascii
+        //$slightly_sus1 = "select * from " wide ascii
+        //$slightly_sus2 = "SELECT * FROM " wide ascii
         $slightly_sus3 = "SHOW COLUMNS FROM " wide ascii
         $slightly_sus4 = "show columns from " wide ascii
         
