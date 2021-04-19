@@ -105,10 +105,20 @@ rule webshell_php_generic
 		$gfp_tiny9 = "throw new Exception('Could not find authentication source with id ' . $sourceId);"
 		$gfp_tiny10= "return isset( $_POST[ $key ] ) ? $_POST[ $key ] : ( isset( $_REQUEST[ $key ] ) ? $_REQUEST[ $key ] : $default );"
 	
-		//strings from private rule capa_php
-		// this will hit on a lot of non-php files, asp, scripting templates, ... but it works on older php versions
-		$php_tag1 = "<?" wide ascii
-		$php_tag2 = "<script language=\"php" nocase wide ascii
+		//strings from private rule capa_php_old_safe
+		$php_short = "<?" wide ascii
+		// prevent xml and asp from hitting with the short tag
+		$no_xml1 = "<?xml version" nocase wide ascii
+		$no_xml2 = "<?xml-stylesheet" nocase wide ascii
+		$no_asp1 = "<%@LANGUAGE" nocase wide ascii
+		$no_asp2 = /<script language="(vb|jscript|c#)/ nocase wide ascii
+		$no_pdf = "<?xpacket" 
+
+		// of course the new tags should also match
+        // already matched by "<?"
+		$php_new1 = /<\?=[^?]/ wide ascii
+		$php_new2 = "<?php" nocase wide ascii
+		$php_new3 = "<script language=\"php" nocase wide ascii
 	
 		//strings from private rule capa_php_input
 		$inp1 = "php://input" wide ascii
@@ -193,13 +203,16 @@ rule webshell_php_generic
         $gen_bit_sus61 = "/bin/sh" wide ascii
         $gen_bit_sus62 = "Cyber" wide ascii
         $gen_bit_sus63 = "portscan" fullword wide ascii
-        $gen_bit_sus64 = "\"command\"" fullword wide ascii
-        $gen_bit_sus65 = "'command'" fullword wide ascii
+        //$gen_bit_sus64 = "\"command\"" fullword wide ascii
+        //$gen_bit_sus65 = "'command'" fullword wide ascii
         $gen_bit_sus66 = "whoami" fullword wide ascii
         $gen_bit_sus67 = "$password='" fullword wide ascii
         $gen_bit_sus68 = "$password=\"" fullword wide ascii
         $gen_bit_sus69 = "$cmd" fullword wide ascii
         $gen_bit_sus70 = "\"?>\"." fullword wide ascii
+        $gen_bit_sus71 = "Hacking" fullword wide ascii
+        $gen_bit_sus72 = "hacking" fullword wide ascii
+        $gen_bit_sus73 = ".htpasswd" wide ascii
 
         // very suspicious strings, one is enough
         $gen_much_sus7  = "Web Shell" nocase
@@ -248,7 +261,8 @@ rule webshell_php_generic
         $gen_much_sus71 = "-perm -02000" wide ascii
         $gen_much_sus72 = "grep -li password" wide ascii
         $gen_much_sus73 = "-name config.inc.php" wide ascii
-        $gen_much_sus74 = "touch($" wide ascii
+        // touch without parameters sets the time to now, not malicious and gives fp
+        $gen_much_sus74 = /\btouch\(\$[^,]{1,30},/ wide ascii
         $gen_much_sus75 = "password crack" wide ascii
         $gen_much_sus76 = "mysqlDll.dll" wide ascii
         $gen_much_sus77 = "net user" wide ascii
@@ -260,15 +274,13 @@ rule webshell_php_generic
         $gen_much_sus821= "PHP Shell" fullword wide ascii
         $gen_much_sus83 = "phpshell" fullword wide ascii
         $gen_much_sus84 = "PHPshell" fullword wide ascii
-        $gen_much_sus85 = "Hacking" fullword wide ascii
-        $gen_much_sus86 = "hacking" fullword wide ascii
         $gen_much_sus87 = "deface" wide ascii
         $gen_much_sus88 = "Deface" wide ascii
         $gen_much_sus89 = "backdoor" wide ascii
         $gen_much_sus90 = "r00t" fullword wide ascii
         $gen_much_sus91 = "xp_cmdshell" fullword wide ascii
-        $gen_much_sus92 = ".htpasswd" wide ascii
 
+        $gif = { 47 49 46 38 }
 
 	
 		//strings from private rule capa_php_payload_multiple
@@ -293,7 +305,14 @@ rule webshell_php_generic
 			any of ( $gfp_tiny* ) 
 		)
 		and ( 
-			any of ( $php_tag* ) 
+			(
+				( 
+						$php_short in (0..100) or 
+						$php_short in (filesize-1000..filesize)
+				)
+				and not any of ( $no_* )
+			) 
+			or any of ( $php_new* ) 
 		)
 		and ( 
 			any of ( $inp* ) 
@@ -303,7 +322,9 @@ rule webshell_php_generic
         all of ( $m_cpayload_preg_filter* ) 
 		)
 		and 
-		( ( filesize < 1000 and not any of ( $wfp_tiny* ) ) or ( 
+		( ( filesize < 1000 and not any of ( $wfp_tiny* ) ) or 
+		( ( 
+        $gif at 0 or
         (
             filesize < 4KB and 
             (
@@ -342,7 +363,8 @@ rule webshell_php_generic
             )
         ) 
 		)
-		or 
+		and 
+		( filesize > 5KB or not any of ( $wfp_tiny* ) ) ) or 
 		( filesize < 500KB and ( 
 			4 of ( $cmpayload* ) 
 		)
@@ -493,13 +515,16 @@ rule webshell_php_generic_callback
         $gen_bit_sus61 = "/bin/sh" wide ascii
         $gen_bit_sus62 = "Cyber" wide ascii
         $gen_bit_sus63 = "portscan" fullword wide ascii
-        $gen_bit_sus64 = "\"command\"" fullword wide ascii
-        $gen_bit_sus65 = "'command'" fullword wide ascii
+        //$gen_bit_sus64 = "\"command\"" fullword wide ascii
+        //$gen_bit_sus65 = "'command'" fullword wide ascii
         $gen_bit_sus66 = "whoami" fullword wide ascii
         $gen_bit_sus67 = "$password='" fullword wide ascii
         $gen_bit_sus68 = "$password=\"" fullword wide ascii
         $gen_bit_sus69 = "$cmd" fullword wide ascii
         $gen_bit_sus70 = "\"?>\"." fullword wide ascii
+        $gen_bit_sus71 = "Hacking" fullword wide ascii
+        $gen_bit_sus72 = "hacking" fullword wide ascii
+        $gen_bit_sus73 = ".htpasswd" wide ascii
 
         // very suspicious strings, one is enough
         $gen_much_sus7  = "Web Shell" nocase
@@ -548,7 +573,8 @@ rule webshell_php_generic_callback
         $gen_much_sus71 = "-perm -02000" wide ascii
         $gen_much_sus72 = "grep -li password" wide ascii
         $gen_much_sus73 = "-name config.inc.php" wide ascii
-        $gen_much_sus74 = "touch($" wide ascii
+        // touch without parameters sets the time to now, not malicious and gives fp
+        $gen_much_sus74 = /\btouch\(\$[^,]{1,30},/ wide ascii
         $gen_much_sus75 = "password crack" wide ascii
         $gen_much_sus76 = "mysqlDll.dll" wide ascii
         $gen_much_sus77 = "net user" wide ascii
@@ -560,15 +586,13 @@ rule webshell_php_generic_callback
         $gen_much_sus821= "PHP Shell" fullword wide ascii
         $gen_much_sus83 = "phpshell" fullword wide ascii
         $gen_much_sus84 = "PHPshell" fullword wide ascii
-        $gen_much_sus85 = "Hacking" fullword wide ascii
-        $gen_much_sus86 = "hacking" fullword wide ascii
         $gen_much_sus87 = "deface" wide ascii
         $gen_much_sus88 = "Deface" wide ascii
         $gen_much_sus89 = "backdoor" wide ascii
         $gen_much_sus90 = "r00t" fullword wide ascii
         $gen_much_sus91 = "xp_cmdshell" fullword wide ascii
-        $gen_much_sus92 = ".htpasswd" wide ascii
 
+        $gif = { 47 49 46 38 }
 
 	
 	condition:
@@ -590,6 +614,7 @@ rule webshell_php_generic_callback
 		)
 		and 
 		( filesize < 1000 or ( 
+        $gif at 0 or
         (
             filesize < 4KB and 
             (
@@ -833,14 +858,31 @@ rule webshell_php_double_eval_tiny
 		$payload = /(\beval[\t ]*\([^)]|\bassert[\t ]*\([^)])/ nocase wide ascii
 		$fp1 = "clone" fullword wide ascii
 	
-		//strings from private rule capa_php
-		// this will hit on a lot of non-php files, asp, scripting templates, ... but it works on older php versions
-		$php_tag1 = "<?" wide ascii
-		$php_tag2 = "<script language=\"php" nocase wide ascii
+		//strings from private rule capa_php_old_safe
+		$php_short = "<?" wide ascii
+		// prevent xml and asp from hitting with the short tag
+		$no_xml1 = "<?xml version" nocase wide ascii
+		$no_xml2 = "<?xml-stylesheet" nocase wide ascii
+		$no_asp1 = "<%@LANGUAGE" nocase wide ascii
+		$no_asp2 = /<script language="(vb|jscript|c#)/ nocase wide ascii
+		$no_pdf = "<?xpacket" 
+
+		// of course the new tags should also match
+        // already matched by "<?"
+		$php_new1 = /<\?=[^?]/ wide ascii
+		$php_new2 = "<?php" nocase wide ascii
+		$php_new3 = "<script language=\"php" nocase wide ascii
 	
 	condition:
 		filesize > 70 and filesize < 300 and ( 
-			any of ( $php_tag* ) 
+			(
+				( 
+						$php_short in (0..100) or 
+						$php_short in (filesize-1000..filesize)
+				)
+				and not any of ( $no_* )
+			) 
+			or any of ( $php_new* ) 
 		)
 		and #payload >= 2 and not any of ( $fp* )
 }
@@ -1061,7 +1103,6 @@ rule webshell_php_obfuscated_tiny
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		date = "2021/01/12"
-		hash = "eec9ac58a1e763f5ea0f7fa249f1fe752047fa60"
 
 	strings:
         // 'ev'.'al'
@@ -1326,7 +1367,6 @@ rule webshell_php_obfuscated_3
 		description = "PHP webshell which eval()s obfuscated string"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
-		hash = "1d4b374d284c12db881ba42ee63ebce2759e0b14"
 		date = "2021/04/17"
 
 	strings:
@@ -1464,13 +1504,16 @@ rule webshell_php_obfuscated_3
         $gen_bit_sus61 = "/bin/sh" wide ascii
         $gen_bit_sus62 = "Cyber" wide ascii
         $gen_bit_sus63 = "portscan" fullword wide ascii
-        $gen_bit_sus64 = "\"command\"" fullword wide ascii
-        $gen_bit_sus65 = "'command'" fullword wide ascii
+        //$gen_bit_sus64 = "\"command\"" fullword wide ascii
+        //$gen_bit_sus65 = "'command'" fullword wide ascii
         $gen_bit_sus66 = "whoami" fullword wide ascii
         $gen_bit_sus67 = "$password='" fullword wide ascii
         $gen_bit_sus68 = "$password=\"" fullword wide ascii
         $gen_bit_sus69 = "$cmd" fullword wide ascii
         $gen_bit_sus70 = "\"?>\"." fullword wide ascii
+        $gen_bit_sus71 = "Hacking" fullword wide ascii
+        $gen_bit_sus72 = "hacking" fullword wide ascii
+        $gen_bit_sus73 = ".htpasswd" wide ascii
 
         // very suspicious strings, one is enough
         $gen_much_sus7  = "Web Shell" nocase
@@ -1519,7 +1562,8 @@ rule webshell_php_obfuscated_3
         $gen_much_sus71 = "-perm -02000" wide ascii
         $gen_much_sus72 = "grep -li password" wide ascii
         $gen_much_sus73 = "-name config.inc.php" wide ascii
-        $gen_much_sus74 = "touch($" wide ascii
+        // touch without parameters sets the time to now, not malicious and gives fp
+        $gen_much_sus74 = /\btouch\(\$[^,]{1,30},/ wide ascii
         $gen_much_sus75 = "password crack" wide ascii
         $gen_much_sus76 = "mysqlDll.dll" wide ascii
         $gen_much_sus77 = "net user" wide ascii
@@ -1531,15 +1575,13 @@ rule webshell_php_obfuscated_3
         $gen_much_sus821= "PHP Shell" fullword wide ascii
         $gen_much_sus83 = "phpshell" fullword wide ascii
         $gen_much_sus84 = "PHPshell" fullword wide ascii
-        $gen_much_sus85 = "Hacking" fullword wide ascii
-        $gen_much_sus86 = "hacking" fullword wide ascii
         $gen_much_sus87 = "deface" wide ascii
         $gen_much_sus88 = "Deface" wide ascii
         $gen_much_sus89 = "backdoor" wide ascii
         $gen_much_sus90 = "r00t" fullword wide ascii
         $gen_much_sus91 = "xp_cmdshell" fullword wide ascii
-        $gen_much_sus92 = ".htpasswd" wide ascii
 
+        $gif = { 47 49 46 38 }
 
 	
 	condition:
@@ -1572,6 +1614,7 @@ rule webshell_php_obfuscated_3
 		( filesize < 1KB or 
 		( filesize < 3KB and 
 		( ( 
+        $gif at 0 or
         (
             filesize < 4KB and 
             (
@@ -1628,14 +1671,31 @@ rule webshell_php_includer_eval
 		$include1 = "$_FILE" wide ascii
 		$include2 = "include" wide ascii
 	
-		//strings from private rule capa_php
-		// this will hit on a lot of non-php files, asp, scripting templates, ... but it works on older php versions
-		$php_tag1 = "<?" wide ascii
-		$php_tag2 = "<script language=\"php" nocase wide ascii
+		//strings from private rule capa_php_old_safe
+		$php_short = "<?" wide ascii
+		// prevent xml and asp from hitting with the short tag
+		$no_xml1 = "<?xml version" nocase wide ascii
+		$no_xml2 = "<?xml-stylesheet" nocase wide ascii
+		$no_asp1 = "<%@LANGUAGE" nocase wide ascii
+		$no_asp2 = /<script language="(vb|jscript|c#)/ nocase wide ascii
+		$no_pdf = "<?xpacket" 
+
+		// of course the new tags should also match
+        // already matched by "<?"
+		$php_new1 = /<\?=[^?]/ wide ascii
+		$php_new2 = "<?php" nocase wide ascii
+		$php_new3 = "<script language=\"php" nocase wide ascii
 	
 	condition:
 		filesize < 200 and ( 
-			any of ( $php_tag* ) 
+			(
+				( 
+						$php_short in (0..100) or 
+						$php_short in (filesize-1000..filesize)
+				)
+				and not any of ( $no_* )
+			) 
+			or any of ( $php_new* ) 
 		)
 		and 1 of ( $payload* ) and 1 of ( $include* )
 }
@@ -1651,14 +1711,31 @@ rule webshell_php_includer_tiny
 	strings:
 		$php_include1 = /include\(\$_(GET|POST|REQUEST)\[/ nocase wide ascii
 	
-		//strings from private rule capa_php
-		// this will hit on a lot of non-php files, asp, scripting templates, ... but it works on older php versions
-		$php_tag1 = "<?" wide ascii
-		$php_tag2 = "<script language=\"php" nocase wide ascii
+		//strings from private rule capa_php_old_safe
+		$php_short = "<?" wide ascii
+		// prevent xml and asp from hitting with the short tag
+		$no_xml1 = "<?xml version" nocase wide ascii
+		$no_xml2 = "<?xml-stylesheet" nocase wide ascii
+		$no_asp1 = "<%@LANGUAGE" nocase wide ascii
+		$no_asp2 = /<script language="(vb|jscript|c#)/ nocase wide ascii
+		$no_pdf = "<?xpacket" 
+
+		// of course the new tags should also match
+        // already matched by "<?"
+		$php_new1 = /<\?=[^?]/ wide ascii
+		$php_new2 = "<?php" nocase wide ascii
+		$php_new3 = "<script language=\"php" nocase wide ascii
 	
 	condition:
 		filesize < 100 and ( 
-			any of ( $php_tag* ) 
+			(
+				( 
+						$php_short in (0..100) or 
+						$php_short in (filesize-1000..filesize)
+				)
+				and not any of ( $no_* )
+			) 
+			or any of ( $php_new* ) 
 		)
 		and any of ( $php_include* )
 }
@@ -1679,10 +1756,20 @@ rule webshell_php_dynamic
 		$pd_fp1 = "whoops_add_stack_frame" wide ascii
 		$pd_fp2 = "new $ec($code, $mode, $options, $userinfo);" wide ascii
 	
-		//strings from private rule capa_php
-		// this will hit on a lot of non-php files, asp, scripting templates, ... but it works on older php versions
-		$php_tag1 = "<?" wide ascii
-		$php_tag2 = "<script language=\"php" nocase wide ascii
+		//strings from private rule capa_php_old_safe
+		$php_short = "<?" wide ascii
+		// prevent xml and asp from hitting with the short tag
+		$no_xml1 = "<?xml version" nocase wide ascii
+		$no_xml2 = "<?xml-stylesheet" nocase wide ascii
+		$no_asp1 = "<%@LANGUAGE" nocase wide ascii
+		$no_asp2 = /<script language="(vb|jscript|c#)/ nocase wide ascii
+		$no_pdf = "<?xpacket" 
+
+		// of course the new tags should also match
+        // already matched by "<?"
+		$php_new1 = /<\?=[^?]/ wide ascii
+		$php_new2 = "<?php" nocase wide ascii
+		$php_new3 = "<script language=\"php" nocase wide ascii
 	
 		//strings from private rule capa_php_dynamic
         // php variable regex from https://www.php.net/manual/en/language.variables.basics.php
@@ -1696,7 +1783,14 @@ rule webshell_php_dynamic
 	
 	condition:
 		filesize > 20 and filesize < 200 and ( 
-			any of ( $php_tag* ) 
+			(
+				( 
+						$php_short in (0..100) or 
+						$php_short in (filesize-1000..filesize)
+				)
+				and not any of ( $no_* )
+			) 
+			or any of ( $php_new* ) 
 		)
 		and ( 
 			any of ( $dynamic* ) 
@@ -1715,10 +1809,15 @@ rule webshell_php_dynamic_big
 
 	strings:
 
-		//strings from private rule capa_php_new
-		$new_php1 = /<\?=[\w\s]/ wide ascii
+		//strings from private rule capa_bin_files
+        $dex   = { 64 65 ( 78 | 79 ) 0a 30 }
+        $pack  = { 50 41 43 4b 00 00 00 02 00 }
+	
+		//strings from private rule capa_php_new_long
+		// no <?=
 		$new_php2 = "<?php" nocase wide ascii
 		$new_php3 = "<script language=\"php" nocase wide ascii
+        $php_short = "<?"
 	
 		//strings from private rule capa_php_dynamic
         // php variable regex from https://www.php.net/manual/en/language.variables.basics.php
@@ -1776,13 +1875,16 @@ rule webshell_php_dynamic_big
         $gen_bit_sus61 = "/bin/sh" wide ascii
         $gen_bit_sus62 = "Cyber" wide ascii
         $gen_bit_sus63 = "portscan" fullword wide ascii
-        $gen_bit_sus64 = "\"command\"" fullword wide ascii
-        $gen_bit_sus65 = "'command'" fullword wide ascii
+        //$gen_bit_sus64 = "\"command\"" fullword wide ascii
+        //$gen_bit_sus65 = "'command'" fullword wide ascii
         $gen_bit_sus66 = "whoami" fullword wide ascii
         $gen_bit_sus67 = "$password='" fullword wide ascii
         $gen_bit_sus68 = "$password=\"" fullword wide ascii
         $gen_bit_sus69 = "$cmd" fullword wide ascii
         $gen_bit_sus70 = "\"?>\"." fullword wide ascii
+        $gen_bit_sus71 = "Hacking" fullword wide ascii
+        $gen_bit_sus72 = "hacking" fullword wide ascii
+        $gen_bit_sus73 = ".htpasswd" wide ascii
 
         // very suspicious strings, one is enough
         $gen_much_sus7  = "Web Shell" nocase
@@ -1831,7 +1933,8 @@ rule webshell_php_dynamic_big
         $gen_much_sus71 = "-perm -02000" wide ascii
         $gen_much_sus72 = "grep -li password" wide ascii
         $gen_much_sus73 = "-name config.inc.php" wide ascii
-        $gen_much_sus74 = "touch($" wide ascii
+        // touch without parameters sets the time to now, not malicious and gives fp
+        $gen_much_sus74 = /\btouch\(\$[^,]{1,30},/ wide ascii
         $gen_much_sus75 = "password crack" wide ascii
         $gen_much_sus76 = "mysqlDll.dll" wide ascii
         $gen_much_sus77 = "net user" wide ascii
@@ -1843,20 +1946,26 @@ rule webshell_php_dynamic_big
         $gen_much_sus821= "PHP Shell" fullword wide ascii
         $gen_much_sus83 = "phpshell" fullword wide ascii
         $gen_much_sus84 = "PHPshell" fullword wide ascii
-        $gen_much_sus85 = "Hacking" fullword wide ascii
-        $gen_much_sus86 = "hacking" fullword wide ascii
         $gen_much_sus87 = "deface" wide ascii
         $gen_much_sus88 = "Deface" wide ascii
         $gen_much_sus89 = "backdoor" wide ascii
         $gen_much_sus90 = "r00t" fullword wide ascii
         $gen_much_sus91 = "xp_cmdshell" fullword wide ascii
-        $gen_much_sus92 = ".htpasswd" wide ascii
 
+        $gif = { 47 49 46 38 }
 
 	
 	condition:
-		filesize < 3000KB and ( 
-			any of ( $new_php* ) 
+		filesize < 500KB and not ( 
+        uint16(0) == 0x5a4d or 
+        $dex at 0 or 
+        $pack at 0 or 
+        // fp on jar with zero compression
+        uint16(0) == 0x4b50 
+		)
+		and ( 
+			any of ( $new_php* ) or
+        $php_short at 0 
 		)
 		and ( 
 			any of ( $dynamic* ) 
@@ -1889,6 +1998,7 @@ rule webshell_php_dynamic_big
         ) 
 		)
 		or ( 
+        $gif at 0 or
         (
             filesize < 4KB and 
             (
@@ -1938,13 +2048,15 @@ rule webshell_php_encoded_big
 		author = "Arnim Rupp"
 		date = "2021/02/07"
 		score = 50
+		hash = "1d4b374d284c12db881ba42ee63ebce2759e0b14"
 
 	strings:
 
 		//strings from private rule capa_php_new
-		$new_php1 = /<\?=[\w\s]/ wide ascii
+		$new_php1 = /<\?=[\w\s@$]/ wide ascii
 		$new_php2 = "<?php" nocase wide ascii
 		$new_php3 = "<script language=\"php" nocase wide ascii
+        $php_short = "<?"
 	
 		//strings from private rule capa_php_payload
 		// \([^)] to avoid matching on e.g. eval() in comments
@@ -1969,7 +2081,8 @@ rule webshell_php_encoded_big
 	
 	condition:
 		filesize < 1000KB and ( 
-			any of ( $new_php* ) 
+			any of ( $new_php* ) or
+        $php_short at 0 
 		)
 		and ( 
 			any of ( $cpayload* ) or
@@ -2016,14 +2129,31 @@ rule webshell_php_generic_backticks
 	strings:
 		$backtick = /`[\t ]*\$(_POST\[|_GET\[|_REQUEST\[|_SERVER\['HTTP_)/ wide ascii
 	
-		//strings from private rule capa_php
-		// this will hit on a lot of non-php files, asp, scripting templates, ... but it works on older php versions
-		$php_tag1 = "<?" wide ascii
-		$php_tag2 = "<script language=\"php" nocase wide ascii
+		//strings from private rule capa_php_old_safe
+		$php_short = "<?" wide ascii
+		// prevent xml and asp from hitting with the short tag
+		$no_xml1 = "<?xml version" nocase wide ascii
+		$no_xml2 = "<?xml-stylesheet" nocase wide ascii
+		$no_asp1 = "<%@LANGUAGE" nocase wide ascii
+		$no_asp2 = /<script language="(vb|jscript|c#)/ nocase wide ascii
+		$no_pdf = "<?xpacket" 
+
+		// of course the new tags should also match
+        // already matched by "<?"
+		$php_new1 = /<\?=[^?]/ wide ascii
+		$php_new2 = "<?php" nocase wide ascii
+		$php_new3 = "<script language=\"php" nocase wide ascii
 	
 	condition:
 		( 
-			any of ( $php_tag* ) 
+			(
+				( 
+						$php_short in (0..100) or 
+						$php_short in (filesize-1000..filesize)
+				)
+				and not any of ( $no_* )
+			) 
+			or any of ( $php_new* ) 
 		)
 		and $backtick and filesize < 200
 }
@@ -2084,7 +2214,7 @@ rule webshell_php_by_string_known_webshell
 		$pbs1 = "b374k shell" wide ascii
 		$pbs2 = "b374k/b374k" wide ascii
 		$pbs3 = "\"b374k" wide ascii
-		$pbs4 = "$b374k" wide ascii
+		$pbs4 = "$b374k(\"" wide ascii
 		$pbs5 = "b374k " wide ascii
 		$pbs6 = "0de664ecd2be02cdd54234a0d1229b43" wide ascii
 		$pbs7 = "pwnshell" wide ascii
@@ -2132,6 +2262,7 @@ rule webshell_php_by_string_known_webshell
 	
 		//strings from private rule capa_bin_files
         $dex   = { 64 65 ( 78 | 79 ) 0a 30 }
+        $pack  = { 50 41 43 4b 00 00 00 02 00 }
 	
 	condition:
 		filesize < 500KB and ( 
@@ -2147,6 +2278,7 @@ rule webshell_php_by_string_known_webshell
 		and not ( 
         uint16(0) == 0x5a4d or 
         $dex at 0 or 
+        $pack at 0 or 
         // fp on jar with zero compression
         uint16(0) == 0x4b50 
 		)
@@ -2402,10 +2534,20 @@ rule webshell_php_writer
         $sus13= "<textarea " wide ascii
         $sus16= "Army" fullword wide ascii
 	
-		//strings from private rule capa_php
-		// this will hit on a lot of non-php files, asp, scripting templates, ... but it works on older php versions
-		$php_tag1 = "<?" wide ascii
-		$php_tag2 = "<script language=\"php" nocase wide ascii
+		//strings from private rule capa_php_old_safe
+		$php_short = "<?" wide ascii
+		// prevent xml and asp from hitting with the short tag
+		$no_xml1 = "<?xml version" nocase wide ascii
+		$no_xml2 = "<?xml-stylesheet" nocase wide ascii
+		$no_asp1 = "<%@LANGUAGE" nocase wide ascii
+		$no_asp2 = /<script language="(vb|jscript|c#)/ nocase wide ascii
+		$no_pdf = "<?xpacket" 
+
+		// of course the new tags should also match
+        // already matched by "<?"
+		$php_new1 = /<\?=[^?]/ wide ascii
+		$php_new2 = "<?php" nocase wide ascii
+		$php_new3 = "<script language=\"php" nocase wide ascii
 	
 		//strings from private rule capa_php_input
 		$inp1 = "php://input" wide ascii
@@ -2430,7 +2572,14 @@ rule webshell_php_writer
 	
 	condition:
 		( 
-			any of ( $php_tag* ) 
+			(
+				( 
+						$php_short in (0..100) or 
+						$php_short in (filesize-1000..filesize)
+				)
+				and not any of ( $no_* )
+			) 
+			or any of ( $php_new* ) 
 		)
 		and ( 
 			any of ( $inp* ) 
@@ -2441,7 +2590,7 @@ rule webshell_php_writer
 		)
 		and 
 		( filesize < 400 or 
-		( filesize < 6000 and 1 of ( $sus* ) ) )
+		( filesize < 4000 and 1 of ( $sus* ) ) )
 }
 
 rule webshell_php_TESTING_RULE_NEVERUSE
@@ -2451,10 +2600,20 @@ rule webshell_php_TESTING_RULE_NEVERUSE
 
 	strings:
 
-		//strings from private rule capa_php
-		// this will hit on a lot of non-php files, asp, scripting templates, ... but it works on older php versions
-		$php_tag1 = "<?" wide ascii
-		$php_tag2 = "<script language=\"php" nocase wide ascii
+		//strings from private rule capa_php_old_safe
+		$php_short = "<?" wide ascii
+		// prevent xml and asp from hitting with the short tag
+		$no_xml1 = "<?xml version" nocase wide ascii
+		$no_xml2 = "<?xml-stylesheet" nocase wide ascii
+		$no_asp1 = "<%@LANGUAGE" nocase wide ascii
+		$no_asp2 = /<script language="(vb|jscript|c#)/ nocase wide ascii
+		$no_pdf = "<?xpacket" 
+
+		// of course the new tags should also match
+        // already matched by "<?"
+		$php_new1 = /<\?=[^?]/ wide ascii
+		$php_new2 = "<?php" nocase wide ascii
+		$php_new3 = "<script language=\"php" nocase wide ascii
 	
 		//strings from private rule capa_php_payload
 		// \([^)] to avoid matching on e.g. eval() in comments
@@ -2495,7 +2654,14 @@ rule webshell_php_TESTING_RULE_NEVERUSE
 	
 	condition:
 		( 
-			any of ( $php_tag* ) 
+			(
+				( 
+						$php_short in (0..100) or 
+						$php_short in (filesize-1000..filesize)
+				)
+				and not any of ( $no_* )
+			) 
+			or any of ( $php_new* ) 
 		)
 		and 
 		( ( 
@@ -2679,8 +2845,6 @@ rule webshell_asp_obfuscated
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		date = "2021/01/12"
-		hash = "7466d1434870eb151dbb415191fef2884dfade52"
-		hash = "a6ab3695e46cd65610edb3c7780495d03a72c43d"
 
 	strings:
         $asp_obf1 = "/*-/*-*/" wide ascii
@@ -3793,6 +3957,7 @@ rule webshell_asp_generic_tiny
 	
 		//strings from private rule capa_bin_files
         $dex   = { 64 65 ( 78 | 79 ) 0a 30 }
+        $pack  = { 50 41 43 4b 00 00 00 02 00 }
 	
 		//strings from private rule capa_asp_payload
 		$asp_payload0  = "eval_r" fullword nocase wide ascii
@@ -3880,6 +4045,7 @@ rule webshell_asp_generic_tiny
 		and not 1 of ( $fp* ) and not ( 
         uint16(0) == 0x5a4d or 
         $dex at 0 or 
+        $pack at 0 or 
         // fp on jar with zero compression
         uint16(0) == 0x4b50 
 		)
@@ -4038,6 +4204,7 @@ rule webshell_asp_generic
 	
 		//strings from private rule capa_bin_files
         $dex   = { 64 65 ( 78 | 79 ) 0a 30 }
+        $pack  = { 50 41 43 4b 00 00 00 02 00 }
 	
 		//strings from private rule capa_asp_input
         // Request.BinaryRead
@@ -4139,6 +4306,7 @@ rule webshell_asp_generic
 		and not ( 
         uint16(0) == 0x5a4d or 
         $dex at 0 or 
+        $pack at 0 or 
         // fp on jar with zero compression
         uint16(0) == 0x4b50 
 		)
@@ -5147,6 +5315,7 @@ rule webshell_jsp_generic
 	
 		//strings from private rule capa_bin_files
         $dex   = { 64 65 ( 78 | 79 ) 0a 30 }
+        $pack  = { 50 41 43 4b 00 00 00 02 00 }
 	
 		//strings from private rule capa_jsp_safe
 		$cjsp_short1 = "<%" ascii wide
@@ -5183,6 +5352,7 @@ rule webshell_jsp_generic
 		filesize < 300KB and not ( 
         uint16(0) == 0x5a4d or 
         $dex at 0 or 
+        $pack at 0 or 
         // fp on jar with zero compression
         uint16(0) == 0x4b50 
 		)
@@ -5256,6 +5426,7 @@ rule webshell_jsp_generic_base64
 	
 		//strings from private rule capa_bin_files
         $dex   = { 64 65 ( 78 | 79 ) 0a 30 }
+        $pack  = { 50 41 43 4b 00 00 00 02 00 }
 	
 	condition:
 		( 
@@ -5272,6 +5443,7 @@ rule webshell_jsp_generic_base64
 		and not ( 
         uint16(0) == 0x5a4d or 
         $dex at 0 or 
+        $pack at 0 or 
         // fp on jar with zero compression
         uint16(0) == 0x4b50 
 		)
@@ -5552,6 +5724,7 @@ rule webshell_jsp_by_string
 	
 		//strings from private rule capa_bin_files
         $dex   = { 64 65 ( 78 | 79 ) 0a 30 }
+        $pack  = { 50 41 43 4b 00 00 00 02 00 }
 	
 	condition:
 		filesize < 100KB and ( 
@@ -5568,6 +5741,7 @@ rule webshell_jsp_by_string
 		and not ( 
         uint16(0) == 0x5a4d or 
         $dex at 0 or 
+        $pack at 0 or 
         // fp on jar with zero compression
         uint16(0) == 0x4b50 
 		)
