@@ -1108,6 +1108,7 @@ rule webshell_php_obfuscated_tiny
         // 'ev'.'al'
         $obf1 = /\w'\.'\w/ wide ascii
         $obf2 = /\w\"\.\"\w/ wide ascii
+        $obf3 = "].$" wide ascii
 	
 		//strings from private rule php_false_positive
 		// try to use only strings which would be flagged by themselves as suspicous by other rules, e.g. eval 
@@ -1180,7 +1181,7 @@ rule webshell_php_obfuscated_tiny
         all of ( $m_cpayload_preg_filter* ) 
 		)
 		and 
-		( #obf1 + #obf2 ) > 2
+		( ( #obf1 + #obf2 ) > 2 or #obf3 > 10 )
 }
 
 rule webshell_php_obfuscated_str_replace
