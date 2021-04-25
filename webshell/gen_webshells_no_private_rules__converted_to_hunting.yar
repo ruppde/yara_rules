@@ -1,8 +1,8 @@
-// Rules converted using yara_convert_to_hunting_rules.py on 2021-04-25 21:34:47
+// Rules converted using yara_convert_to_hunting_rules.py on 2021-04-25 21:43:14
 // Original rules from: ../yara_rules/webshell/gen_webshells_no_private_rules.yar
 // Factor of 'filesize' conditions increase: 3
 // Number of converted rules: 58
-// Number of already hunting rules: 9
+// Number of already hunting rules: 8
 // BEWARE of dropped comments in the rules after converting!!!
 
 import "math"
@@ -14,7 +14,6 @@ rule webshell_php_generic__converted_for_hunting : WEBSHELL HUNT_CONVERTED
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
 		key = "2021/01/14"
-		key = "bee1b76b1455105d4bfe2f45191071cf05e83a309ae9defcf759248ca9bceddd"
 		score = 40
 
 	strings:
@@ -238,7 +237,6 @@ rule webshell_php_generic_callback__converted_for_hunting : WEBSHELL HUNT_CONVER
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
 		key = "2021/01/14"
-		key = "e98889690101b59260e871c49263314526f2093f"
 		score = 40
 
 	strings:
@@ -466,7 +464,6 @@ rule webshell_php_base64_encoded_payloads__converted_for_hunting : WEBSHELL HUNT
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
 		key = "2021/01/07"
-		key = "88d0d4696c9cb2d37d16e330e236cb37cfaec4cd"
 		score = 40
 
 	strings:
@@ -563,8 +560,6 @@ rule webshell_php_unknown_1__converted_for_hunting : WEBSHELL HUNT_CONVERTED
 		key = "obfuscated php webshell"
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
-		key = "12ce6c7167b33cc4e8bdec29fb1cfc44ac9487d1"
-		key = "cf4abbd568ce0c0dfce1f2e4af669ad2"
 		key = "2021/01/07"
 		score = 40
 
@@ -586,8 +581,6 @@ rule webshell_php_generic_eval__converted_for_hunting : WEBSHELL HUNT_CONVERTED
 		key = "Generic PHP webshell which uses any eval/exec function in the same line with user input"
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
-		key = "a61437a427062756e2221bfb6d58cd62439d09d9"
-		key = "90c5cc724ec9cf838e4229e5e08955eec4d7bf95"
 		key = "2021/01/07"
 		score = 40
 
@@ -618,7 +611,6 @@ rule webshell_php_double_eval_tiny__converted_for_hunting : WEBSHELL HUNT_CONVER
 		key = "PHP webshell which probably hides the input inside an eval()ed obfuscated string"
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
-		key = "aabfd179aaf716929c8b820eefa3c1f613f8dcac"
 		key = "2021/01/11"
 		score = 40
 
@@ -649,7 +641,6 @@ rule webshell_php_obfuscated__converted_for_hunting : WEBSHELL HUNT_CONVERTED
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
 		key = "2021/01/12"
-		key = "eec9ac58a1e763f5ea0f7fa249f1fe752047fa60"
 		score = 40
 
 	strings:
@@ -844,12 +835,6 @@ rule webshell_php_obfuscated_str_replace__converted_for_hunting : WEBSHELL HUNT_
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
 		key = "2021/01/12"
-		key = "691305753e26884d0f930cda0fe5231c6437de94"
-		key = "7efd463aeb5bf0120dc5f963b62463211bd9e678"
-		key = "fb655ddb90892e522ae1aaaf6cd8bde27a7f49ef"
-		key = "d1863aeca1a479462648d975773f795bb33a7af2"
-		key = "4d31d94b88e2bbd255cf501e178944425d40ee97"
-		key = "e1a2af3477d62a58f9e6431f5a4a123fb897ea80"
 		score = 40
 
 	strings:
@@ -883,9 +868,6 @@ rule webshell_php_obfuscated_fopo__converted_for_hunting : WEBSHELL HUNT_CONVERT
 		key = "PHP webshell which eval()s obfuscated string"
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
-		key = "fbcff8ea5ce04fc91c05384e847f2c316e013207"
-		key = "6da57ad8be1c587bb5cc8a1413f07d10fb314b72"
-		key = "a698441f817a9a72908a0d93a34133469f33a7b34972af3e351bdccae0737d99"
 		key = "2021/01/12"
 		score = 40
 
@@ -928,7 +910,6 @@ rule webshell_php_gzinflated__converted_for_hunting : WEBSHELL HUNT_CONVERTED
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
 		key = "2021/01/12"
-		key = "49e5bc75a1ec36beeff4fbaeb16b322b08cf192d"
 		score = 40
 
 	strings:
@@ -1204,7 +1185,6 @@ rule webshell_php_includer_eval__converted_for_hunting : WEBSHELL HUNT_CONVERTED
 		key = "PHP webshell which eval()s another included file"
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
-		key = "3a07e9188028efa32872ba5b6e5363920a6b2489"
 		key = "2021/01/13"
 		score = 40
 
@@ -1264,9 +1244,6 @@ rule webshell_php_dynamic__converted_for_hunting : WEBSHELL HUNT_CONVERTED
 		key = "PHP webshell using function name from variable, e.g. $a='ev'.'al'; $a($code)"
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
-		key = "65dca1e652d09514e9c9b2e0004629d03ab3c3ef"
-		key = "b8ab38dc75cec26ce3d3a91cb2951d7cdd004838"
-		key = "c4765e81550b476976604d01c20e3dbd415366df"
 		key = "2021/01/13"
 		score = 40
 
@@ -1476,7 +1453,6 @@ rule webshell_php_encoded_big__converted_for_hunting : WEBSHELL HUNT_CONVERTED
 		key = "Arnim Rupp"
 		key = "2021/02/07"
 		score = 40
-		key = "1d4b374d284c12db881ba42ee63ebce2759e0b14"
 
 	strings:
 		$new_php1 = /<\?=[\w\s@$]/ wide ascii
@@ -1518,7 +1494,6 @@ rule webshell_php_generic_backticks__converted_for_hunting : WEBSHELL HUNT_CONVE
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
 		key = "2021/01/07"
-		key = "339f32c883f6175233f0d1a30510caa52fdcaa37"
 		score = 40
 
 	strings:
@@ -1545,7 +1520,6 @@ rule webshell_php_generic_backticks_obfuscated__converted_for_hunting : WEBSHELL
 		key = "Generic PHP webshell which uses backticks directly on user input"
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
-		key = "23dc299f941d98c72bd48659cdb4673f5ba93697"
 		key = "2021/01/07"
 		score = 40
 
@@ -1575,9 +1549,6 @@ rule webshell_php_by_string_known_webshell__converted_for_hunting : WEBSHELL HUN
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
 		key = "2021/01/09"
-		key = "d889da22893536d5965541c30896f4ed4fdf461d"
-		key = "10f4988a191774a2c6b85604344535ee610b844c1708602a355cf7e9c12c3605"
-		key = "7b6471774d14510cf6fa312a496eed72b614f6fc"
 		score = 40
 
 	strings:
@@ -1637,7 +1608,6 @@ rule webshell_php_by_string_obfuscation__converted_for_hunting : WEBSHELL HUNT_C
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
 		key = "2021/01/09"
-		key = "e4a15637c90e8eabcbdc748366ae55996dbec926382220c423e754bd819d22bc"
 		score = 40
 
 	strings:
@@ -1714,7 +1684,6 @@ rule webshell_php_strings_susp__converted_for_hunting : WEBSHELL HUNT_CONVERTED
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
 		key = "2021/01/12"
-		key = "0dd568dbe946b5aa4e1d33eab1decbd71903ea04"
 		score = 40
 
 	strings:
@@ -1770,7 +1739,6 @@ rule webshell_php_in_htaccess__converted_for_hunting : WEBSHELL HUNT_CONVERTED
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
 		key = "2021/01/07"
-		key = "c026d4512a32d93899d486c6f11d1e13b058a713"
 		score = 40
 
 	strings:
@@ -1788,9 +1756,6 @@ rule webshell_php_function_via_get__converted_for_hunting : WEBSHELL HUNT_CONVER
 		key = "Webshell which sends eval/assert via GET"
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
-		key = "ce739d65c31b3c7ea94357a38f7bd0dc264da052d4fd93a1eabb257f6e3a97a6"
-		key = "d870e971511ea3e082662f8e6ec22e8a8443ca79"
-		key = "73fa97372b3bb829835270a5e20259163ecc3fdbf73ef2a99cb80709ea4572be"
 		key = "2021/01/09"
 		score = 40
 
@@ -2105,10 +2070,6 @@ rule webshell_asp_generic_eval_on_input__converted_for_hunting : WEBSHELL HUNT_C
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
 		key = "2021/01/07"
-		key = "d6b96d844ac395358ee38d4524105d331af42ede"
-		key = "9be2088d5c3bfad9e8dfa2d7d7ba7834030c7407"
-		key = "a1df4cfb978567c4d1c353e988915c25c19a0e4a"
-		key = "069ea990d32fc980939fffdf1aed77384bf7806bc57c0a7faaff33bd1a3447f6"
 		score = 40
 
 	strings:
@@ -2163,11 +2124,6 @@ rule webshell_asp_nano__converted_for_hunting : WEBSHELL HUNT_CONVERTED
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
 		key = "2021/01/13"
-		key = "3b7910a499c603715b083ddb6f881c1a0a3a924d"
-		key = "990e3f129b8ba409a819705276f8fa845b95dad0"
-		key = "22345e956bce23304f5e8e356c423cee60b0912c"
-		key = "c84a6098fbd89bd085526b220d0a3f9ab505bcba"
-		key = "b977c0ad20dc738b5dacda51ec8da718301a75d7"
 		score = 40
 
 	strings:
@@ -2384,7 +2340,6 @@ rule webshell_asp_by_string__converted_for_hunting : WEBSHELL HUNT_CONVERTED
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
 		key = "2021/01/13"
-		key = "f72252b13d7ded46f0a206f63a1c19a66449f216"
 		score = 40
 
 	strings:
@@ -2547,8 +2502,6 @@ rule webshell_asp_generic_tiny__converted_for_hunting : WEBSHELL HUNT_CONVERTED
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
 		key = "2021/01/07"
-		key = "990e3f129b8ba409a819705276f8fa845b95dad0"
-		key = "52ce724580e533da983856c4ebe634336f5fd13a"
 		score = 40
 
 	strings:
@@ -2655,7 +2608,6 @@ rule webshell_asp_generic__converted_for_hunting : WEBSHELL HUNT_CONVERTED
 		key = "Arnim Rupp"
 		key = "2021/03/07"
 		score = 40
-		key = "a8c63c418609c1c291b3e731ca85ded4b3e0fba83f3489c21a3199173b176a75"
 
 	strings:
 		$asp_much_sus7 = "Web Shell" nocase
@@ -2920,7 +2872,6 @@ rule webshell_aspx_regeorg_csharp__converted_for_hunting : WEBSHELL HUNT_CONVERT
 		key = "Webshell regeorg aspx c# version"
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "https://github.com/sensepost/reGeorg"
-		key = "c1f43b7cf46ba12cfc1357b17e4f5af408740af7ae70572c9cf988ac50260ce1"
 		key = "Arnim Rupp"
 		key = "2021/01/11"
 		score = 40
@@ -2979,7 +2930,6 @@ rule webshell_csharp_generic__converted_for_hunting : WEBSHELL HUNT_CONVERTED
 		key = "Webshell in c#"
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
-		key = "b6721683aadc4b4eba4f081f2bc6bc57adfc0e378f6d80e2bfa0b1e3e57c85c7"
 		key = "2021/01/11"
 		score = 40
 
@@ -3036,9 +2986,6 @@ rule webshell_asp_runtime_compile__converted_for_hunting : WEBSHELL HUNT_CONVERT
 		key = "Arnim Rupp"
 		key = "https://github.com/antonioCoco/SharPyShell"
 		key = "2021/01/11"
-		key = "e826c4139282818d38dcccd35c7ae6857b1d1d01"
-		key = "e20e078d9fcbb209e3733a06ad21847c5c5f0e52"
-		key = "57f758137aa3a125e4af809789f3681d1b08ee5b"
 		key = "file"
 		score = 40
 
@@ -3190,8 +3137,6 @@ rule webshell_asp_scan_writable__converted_for_hunting : WEBSHELL HUNT_CONVERTED
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
 		key = "2021/03/14"
-		key = "2409eda9047085baf12e0f1b9d0b357672f7a152"
-		key = "af1c00696243f8b062a53dad9fb8b773fa1f0395631ffe6c7decc42c47eedee7"
 		score = 40
 
 	strings:
@@ -3265,7 +3210,6 @@ rule webshell_jsp_regeorg__converted_for_hunting : WEBSHELL HUNT_CONVERTED
 		key = "Webshell regeorg JSP version"
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "https://github.com/sensepost/reGeorg"
-		key = "6db49e43722080b5cd5f07e058a073ba5248b584"
 		key = "Arnim Rupp"
 		key = "2021/01/24"
 		score = 40
@@ -3301,7 +3245,6 @@ rule webshell_jsp_http_proxy__converted_for_hunting : WEBSHELL HUNT_CONVERTED
 	meta:
 		key = "Webshell JSP HTTP proxy"
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
-		key = "2f9b647660923c5262636a5344e2665512a947a4"
 		key = "Arnim Rupp"
 		key = "2021/01/24"
 		score = 40
@@ -3339,8 +3282,6 @@ rule webshell_jsp_writer_nano__converted_for_hunting : WEBSHELL HUNT_CONVERTED
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
 		key = "2021/01/24"
-		key = "ac91e5b9b9dcd373eaa9360a51aa661481ab9429"
-		key = "c718c885b5d6e29161ee8ea0acadb6e53c556513"
 		score = 40
 
 	strings:
@@ -3380,7 +3321,6 @@ rule webshell_jsp_generic_tiny__converted_for_hunting : WEBSHELL HUNT_CONVERTED
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
 		key = "2021/01/07"
-		key = "8fd343db0442136e693e745d7af1018a99b042af"
 		score = 40
 
 	strings:
@@ -3424,9 +3364,6 @@ rule webshell_jsp_generic__converted_for_hunting : WEBSHELL HUNT_CONVERTED
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
 		key = "2021/01/07"
-		key = "4762f36ca01fb9cda2ab559623d2206f401fc0b1"
-		key = "bdaf9279b3d9e07e955d0ce706d9c42e4bdf9aa1"
-		key = "ee9408eb923f2d16f606a5aaac7e16b009797a07"
 		score = 40
 
 	strings:
@@ -3481,8 +3418,6 @@ rule webshell_jsp_generic_base64__converted_for_hunting : WEBSHELL HUNT_CONVERTE
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
 		key = "2021/01/24"
-		key = "8b5fe53f8833df3657ae2eeafb4fd101c05f0db0"
-		key = "1b916afdd415dfa4e77cecf47321fd676ba2184d"
 		score = 40
 
 	strings:
@@ -3532,8 +3467,6 @@ rule webshell_jsp_generic_processbuilder__converted_for_hunting : WEBSHELL HUNT_
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
 		key = "2021/01/07"
-		key = "82198670ac2072cd5c2853d59dcd0f8dfcc28923"
-		key = "c05a520d96e4ebf9eb5c73fc0fa446ceb5caf343"
 		score = 40
 
 	strings:
@@ -3561,7 +3494,6 @@ rule webshell_jsp_generic_reflection__converted_for_hunting : WEBSHELL HUNT_CONV
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
 		key = "2021/01/07"
-		key = "62e6c6065b5ca45819c1fc049518c81d7d165744"
 		score = 40
 
 	strings:
@@ -3601,7 +3533,6 @@ rule webshell_jsp_generic_classloader__converted_for_hunting : WEBSHELL HUNT_CON
 		key = "Generic JSP webshell which uses classloader to execute user input"
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
-		key = "6b546e78cc7821b63192bb8e087c133e8702a377d17baaeb64b13f0dd61e2347"
 		key = "2021/01/07"
 		score = 40
 
@@ -3642,7 +3573,6 @@ rule webshell_jsp_generic_encoded_shell__converted_for_hunting : WEBSHELL HUNT_C
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
 		key = "2021/01/07"
-		key = "3eecc354390d60878afaa67a20b0802ce5805f3a9bb34e74dd8c363e3ca0ea5c"
 		score = 40
 
 	strings:
@@ -3667,8 +3597,6 @@ rule webshell_jsp_netspy__converted_for_hunting : WEBSHELL HUNT_CONVERTED
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
 		key = "2021/01/24"
-		key = "94d1aaabde8ff9b4b8f394dc68caebf981c86587"
-		key = "3870b31f26975a7cb424eab6521fc9bffc2af580"
 		score = 40
 
 	strings:
@@ -3716,9 +3644,6 @@ rule webshell_jsp_by_string__converted_for_hunting : WEBSHELL HUNT_CONVERTED
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
 		key = "2021/01/09"
-		key = "e9060aa2caf96be49e3b6f490d08b8a996c4b084"
-		key = "4c2464503237beba54f66f4a099e7e75028707aa"
-		key = "06b42d4707e7326aff402ecbb585884863c6351a"
 		score = 40
 
 	strings:
@@ -3766,9 +3691,6 @@ rule webshell_jsp_input_upload_write__converted_for_hunting : WEBSHELL HUNT_CONV
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
 		key = "2021/01/24"
-		key = "ef98ca135dfb9dcdd2f730b18e883adf50c4ab82"
-		key = "583231786bc1d0ecca7d8d2b083804736a3f0a32"
-		key = "19eca79163259d80375ebebbc440b9545163e6a3"
 		score = 40
 
 	strings:
@@ -3890,7 +3812,6 @@ rule webshell_in_image__converted_for_hunting : WEBSHELL HUNT_CONVERTED
 		key = "Webshell in GIF, PNG or JPG"
 		key = "https://creativecommons.org/licenses/by-nc/4.0/"
 		key = "Arnim Rupp"
-		key = "d4fde4e691db3e70a6320e78657480e563a9f87935af873a99db72d6a9a83c78"
 		key = "2021/02/27"
 		score = 40
 
@@ -4362,43 +4283,6 @@ rule webshell_hunting_asp_encoded : WEBSHELL HUNT
 
 	condition:
 		filesize <2000KB and (( any of ($tagasp_long*) or any of ($tagasp_classid*) or ($tagasp_short1 and $tagasp_short2 in ( filesize -100.. filesize )) or ($tagasp_short2 and ($tagasp_short1 in (0..1000) or $tagasp_short1 in ( filesize -1000.. filesize )))) and not (( any of ($perl*) or $php1 at 0 or $php2 at 0) or ((#jsp1+#jsp2+#jsp3)>0 and (#jsp4+#jsp5+#jsp6+#jsp7)>0))) and any of ($asp_encoded*) and $encoded_data
-}
-
-rule webshell_hunting_asp_sql : WEBSHELL HUNT
-{
-	meta:
-		description = "ASP webshell giving SQL access. Might also be a dual use tool."
-		license = "https://creativecommons.org/licenses/by-nc/4.0/"
-		author = "Arnim Rupp"
-		date = "2021/03/14"
-		score = 40
-
-	strings:
-		$sql1 = "SqlConnection" fullword wide ascii
-		$sql2 = "SQLConnection" fullword wide ascii
-		$sql3 = "System" fullword wide ascii
-		$sql4 = "Data" fullword wide ascii
-		$sql5 = "SqlClient" fullword wide ascii
-		$sql6 = "SQLClient" fullword wide ascii
-		$sql7 = "Open" fullword wide ascii
-		$sql8 = "SqlCommand" fullword wide ascii
-		$sql9 = "SQLCommand" fullword wide ascii
-		$asp_input1 = "request" fullword nocase wide ascii
-		$asp_input2 = "Page_Load" fullword nocase wide ascii
-		$asp_input3 = "UmVxdWVzdC5Gb3JtK" fullword wide ascii
-		$asp_xml_http = "Microsoft.XMLHTTP" fullword nocase wide ascii
-		$asp_xml_method1 = "GET" fullword wide ascii
-		$asp_xml_method2 = "POST" fullword wide ascii
-		$asp_xml_method3 = "HEAD" fullword wide ascii
-		$asp_form1 = "<form " wide ascii
-		$asp_form2 = "<Form " wide ascii
-		$asp_form3 = "<FORM " wide ascii
-		$asp_asp = "<asp:" wide ascii
-		$asp_text1 = ".text" wide ascii
-		$asp_text2 = ".Text" wide ascii
-
-	condition:
-		filesize >150KB and ( any of ($asp_input*) or ($asp_xml_http and any of ($asp_xml_method*)) or ( any of ($asp_form*) and any of ($asp_text*) and $asp_asp)) and 6 of ($sql*)
 }
 
 rule webshell_hunting_php_includer : WEBSHELL HUNT
