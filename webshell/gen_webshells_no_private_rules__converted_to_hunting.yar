@@ -1,4 +1,5 @@
-// Rules converted using yara_convert_to_hunting_rules.py on 2021-04-25 21:43:14
+// Rules converted using yara_convert_to_hunting_rules.py on 2021-04-26 20:15:56
+// Use in conjunction with https://github.com/2d4d/signature-base/blob/master/yara/gen_webshells.yar2021-04-26 20:15:56
 // Original rules from: ../yara_rules/webshell/gen_webshells_no_private_rules.yar
 // Factor of 'filesize' conditions increase: 3
 // Number of converted rules: 58
@@ -174,6 +175,7 @@ rule webshell_php_generic__converted_for_hunting : WEBSHELL HUNT_CONVERTED
 		$gen_much_sus90 = "r00t" fullword wide ascii
 		$gen_much_sus91 = "xp_cmdshell" fullword wide ascii
 		$gen_much_sus92 = ",3306,3389," wide ascii
+		$gen_much_sus93 = "#l@$ak#.lk;0@P" wide ascii
 		$gif = { 47 49 46 38 }
 		$cmpayload1 = /\beval[\t ]*\([^)]/ nocase wide ascii
 		$cmpayload2 = /\bexec[\t ]*\([^)]/ nocase wide ascii
@@ -420,6 +422,7 @@ rule webshell_php_generic_callback__converted_for_hunting : WEBSHELL HUNT_CONVER
 		$gen_much_sus90 = "r00t" fullword wide ascii
 		$gen_much_sus91 = "xp_cmdshell" fullword wide ascii
 		$gen_much_sus92 = ",3306,3389," wide ascii
+		$gen_much_sus93 = "#l@$ak#.lk;0@P" wide ascii
 		$gif = { 47 49 46 38 }
 
 	condition:
@@ -1138,6 +1141,7 @@ rule webshell_php_obfuscated_3__converted_for_hunting : WEBSHELL HUNT_CONVERTED
 		$gen_much_sus90 = "r00t" fullword wide ascii
 		$gen_much_sus91 = "xp_cmdshell" fullword wide ascii
 		$gen_much_sus92 = ",3306,3389," wide ascii
+		$gen_much_sus93 = "#l@$ak#.lk;0@P" wide ascii
 		$gif = { 47 49 46 38 }
 
 	condition:
@@ -1407,6 +1411,7 @@ rule webshell_php_dynamic_big__converted_for_hunting : WEBSHELL HUNT_CONVERTED
 		$gen_much_sus90 = "r00t" fullword wide ascii
 		$gen_much_sus91 = "xp_cmdshell" fullword wide ascii
 		$gen_much_sus92 = ",3306,3389," wide ascii
+		$gen_much_sus93 = "#l@$ak#.lk;0@P" wide ascii
 		$gif = { 47 49 46 38 }
 
 	condition:
