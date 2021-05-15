@@ -2640,7 +2640,7 @@ rule capa_interact_with_driver_via_control_codes {
 	hash = "Practical Malware Analysis Lab 10-03.exe_:0x401000"
 	hash = "9412A66BC81F51A1FA916AC47C77E02AC1A7C9DFF543233ED70AA265EF6A1E76"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/driver/interact-with-driver-via-control-codes.yml"
-	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported featre and was skipped => coverage is reduced compared to the original capa rule. "
+	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
 	date = "2021-05-15"
 
   strings: 
@@ -3328,7 +3328,7 @@ rule capa_get_local_IPv4_addresses {
 	hash = "Practical Malware Analysis Lab 05-01.dll_:0x100037e6"
 	hash = "4C0553285D724DCAF5909924B4E3E90A"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/network/address/get-local-ipv4-addresses.yml"
-	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported featre and was skipped => coverage is reduced compared to the original capa rule. "
+	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
 	date = "2021-05-15"
 
   strings: 
@@ -4406,7 +4406,7 @@ rule capa_encrypt_data_using_Sosemanuk {
 	references = "https://labs.sentinelone.com/enter-the-maze-demystifying-an-affiliate-involved-in-maze-snow/"
 	hash = "ea7bb99e03606702c1cbe543bb32b27e"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/sosemanuk/encrypt-data-using-sosemanuk.yml"
-	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported featre and was skipped => coverage is reduced compared to the original capa rule. "
+	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
 	date = "2021-05-15"
 
   strings: 
@@ -4439,7 +4439,7 @@ rule capa_encrypt_data_using_DES {
 	mbc = "Cryptography::Encrypt Data::3DES [C0027.004]"
 	hash = "91a12a4cf437589ba70b1687f5acad19"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/des/encrypt-data-using-des.yml"
-	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported featre and was skipped => coverage is reduced compared to the original capa rule. "
+	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
 	date = "2021-05-15"
 
   strings: 
@@ -4746,7 +4746,7 @@ rule capa_hash_data_with_CRC32 {
 	hash = "7D28CB106CB54876B2A5C111724A07CD"
 	hash = "7EFF498DE13CC734262F87E6B3EF38AB"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/checksum/crc32/hash-data-with-crc32.yml"
-	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported featre and was skipped => coverage is reduced compared to the original capa rule. This rule is incomplete because a branch inside an Or-statement had an unsupported featre and was skipped => coverage is reduced compared to the original capa rule. "
+	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
 	date = "2021-05-15"
 
   strings: 
@@ -4828,7 +4828,7 @@ rule capa_hash_data_using_tiger {
 	mbc = "Cryptography::Cryptographic Hash::Tiger [C0029.005]"
 	hash = "0761142efbda6c4b1e801223de723578"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/hashing/tiger/hash-data-using-tiger.yml"
-	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported featre and was skipped => coverage is reduced compared to the original capa rule. "
+	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
 	date = "2021-05-15"
 
   strings: 
@@ -4926,7 +4926,7 @@ rule capa_persist_via_Windows_service {
 	attack = "Execution::System Services::Service Execution [T1569.002]"
 	hash = "Practical Malware Analysis Lab 03-02.dll_:0x10004706"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/persistence/service/persist-via-windows-service.yml"
-	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported featre and was skipped => coverage is reduced compared to the original capa rule. "
+	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
 	date = "2021-05-15"
 
   strings: 
@@ -5443,7 +5443,7 @@ rule capa_create_container {
 	references = "https://docs.docker.com/engine/api/v1.24/"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/create-container.yml"
 	capa_nursery = "True"
-	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported featre and was skipped => coverage is reduced compared to the original capa rule. This rule is incomplete because a branch inside an Or-statement had an unsupported featre and was skipped => coverage is reduced compared to the original capa rule. "
+	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
 	date = "2021-05-15"
 
   strings: 
@@ -5649,7 +5649,7 @@ rule capa_list_containers {
 	references = "https://docs.docker.com/engine/api/v1.24/"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/list-containers.yml"
 	capa_nursery = "True"
-	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported featre and was skipped => coverage is reduced compared to the original capa rule. "
+	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
 	date = "2021-05-15"
 
   strings: 
@@ -6310,7 +6310,7 @@ rule capa_build_Docker_image {
 	references = "https://docs.docker.com/engine/api/v1.24/"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/build-docker-image.yml"
 	capa_nursery = "True"
-	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported featre and was skipped => coverage is reduced compared to the original capa rule. "
+	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
 	date = "2021-05-15"
 
   strings: 
@@ -6414,7 +6414,7 @@ rule capa_run_in_container {
 	references = "https://docs.docker.com/engine/api/v1.24/"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/run-in-container.yml"
 	capa_nursery = "True"
-	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported featre and was skipped => coverage is reduced compared to the original capa rule. This rule is incomplete because a branch inside an Or-statement had an unsupported featre and was skipped => coverage is reduced compared to the original capa rule. "
+	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
 	date = "2021-05-15"
 
   strings: 
@@ -8560,7 +8560,7 @@ rule capa_send_HTTP_request {
 	hash = "BFB9B5391A13D0AFD787E87AB90F14F5"
 	hash = "6A352C3E55E8AE5ED39DC1BE7FB964B1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/http/client/send-http-request.yml"
-	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported featre and was skipped => coverage is reduced compared to the original capa rule. "
+	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
 	date = "2021-05-15"
 
   condition: 
@@ -8833,7 +8833,7 @@ rule capa_write_pipe {
 	mbc = "Communication::Interprocess Communication::Write Pipe [C0003.004]"
 	hash = "C91887D861D9BD4A5872249B641BC9F9"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/named-pipe/write/write-pipe.yml"
-	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported featre and was skipped => coverage is reduced compared to the original capa rule. "
+	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
 	date = "2021-05-15"
 
   condition: 
@@ -9833,7 +9833,7 @@ rule capa_gather_leapftp_information {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-leapftp-information.yml"
-	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported featre and was skipped => coverage is reduced compared to the original capa rule. "
+	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
 	date = "2021-05-15"
 
   strings: 
@@ -10637,7 +10637,7 @@ rule capa_create_reverse_shell {
 	mbc = "Impact::Remote Access::Reverse Shell [B0022.001]"
 	hash = "C91887D861D9BD4A5872249B641BC9F9"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/c2/shell/create-reverse-shell.yml"
-	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported featre and was skipped => coverage is reduced compared to the original capa rule. "
+	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
 	date = "2021-05-15"
 
   condition: 
@@ -11222,6 +11222,9 @@ rule capa_receive_and_write_data_from_server_to_client {
  ) 
 }
 
-// done, converted rules: 390
-// done, unconverted rules: 155
+
+// converted rules          : 390
+//   among those incomplete : 65
+// unconverted rules        : 155
+
 
