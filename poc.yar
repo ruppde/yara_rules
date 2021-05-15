@@ -1,5 +1,4 @@
 
-
 //POC: rules from https://github.com/fireeye/capa-rules converted to YARA using capa2yara.py by Arnim Rupp (not published yet)
 
 //Beware: This has less rules than capa (because not all fit into YARA) and is less precise because e.g. capas function scopes are applied to the whole file
@@ -27,14 +26,14 @@ private rule capa_create_or_open_file {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	pe.imports(/\w{1,20}\.dll/i, /CreateFile/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /CreateFileEx/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /IoCreateFile/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /IoCreateFileEx/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ZwOpenFile/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ZwCreateFile/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /NtOpenFile/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /NtCreateFile/)  ) 
+ ( 	pe.imports(/.{1,30}/i, /CreateFile/) 
+	or 	pe.imports(/.{1,30}/i, /CreateFileEx/) 
+	or 	pe.imports(/.{1,30}/i, /IoCreateFile/) 
+	or 	pe.imports(/.{1,30}/i, /IoCreateFileEx/) 
+	or 	pe.imports(/.{1,30}/i, /ZwOpenFile/) 
+	or 	pe.imports(/.{1,30}/i, /ZwCreateFile/) 
+	or 	pe.imports(/.{1,30}/i, /NtOpenFile/) 
+	or 	pe.imports(/.{1,30}/i, /NtCreateFile/)  ) 
 }
 
 private rule capa_open_thread { 
@@ -54,8 +53,8 @@ private rule capa_open_thread {
 		uint16be(0) == 0x5649
 	) and
  ( 	pe.imports(/kernel32.dll/i, /OpenThread/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /NtOpenThread/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ZwOpenThread/)  ) 
+	or 	pe.imports(/.{1,30}/i, /NtOpenThread/) 
+	or 	pe.imports(/.{1,30}/i, /ZwOpenThread/)  ) 
 }
 
 private rule capa_allocate_memory { 
@@ -81,10 +80,10 @@ private rule capa_allocate_memory {
 	or 	pe.imports(/kernel32.dll/i, /VirtualAllocExNuma/) 
 	or 	pe.imports(/kernel32.dll/i, /VirtualProtect/) 
 	or 	pe.imports(/kernel32.dll/i, /VirtualProtectEx/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /NtAllocateVirtualMemory/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ZwAllocateVirtualMemory/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /NtMapViewOfSection/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ZwMapViewOfSection/)  ) 
+	or 	pe.imports(/.{1,30}/i, /NtAllocateVirtualMemory/) 
+	or 	pe.imports(/.{1,30}/i, /ZwAllocateVirtualMemory/) 
+	or 	pe.imports(/.{1,30}/i, /NtMapViewOfSection/) 
+	or 	pe.imports(/.{1,30}/i, /ZwMapViewOfSection/)  ) 
 }
 
 private rule capa_delay_execution { 
@@ -115,12 +114,12 @@ private rule capa_delay_execution {
 	or 	pe.imports(/kernel32.dll/i, /WaitForMultipleObjects/) 
 	or 	pe.imports(/kernel32.dll/i, /WaitForMultipleObjectsEx/) 
 	or 	pe.imports(/kernel32.dll/i, /RegisterWaitForSingleObject/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /WaitOnAddress/) 
+	or 	pe.imports(/.{1,30}/i, /WaitOnAddress/) 
 	or 	pe.imports(/user32.dll/i, /MsgWaitForMultipleObjects/) 
 	or 	pe.imports(/user32.dll/i, /MsgWaitForMultipleObjectsEx/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /NtDelayExecution/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /KeWaitForSingleObject/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /KeDelayExecutionThread/)  ) 
+	or 	pe.imports(/.{1,30}/i, /NtDelayExecution/) 
+	or 	pe.imports(/.{1,30}/i, /KeWaitForSingleObject/) 
+	or 	pe.imports(/.{1,30}/i, /KeDelayExecutionThread/)  ) 
 }
 
 private rule capa_write_process_memory { 
@@ -143,7 +142,7 @@ private rule capa_write_process_memory {
  ( 	pe.imports(/kernel32.dll/i, /WriteProcessMemory/) 
 	or 	pe.imports(/ntdll.dll/i, /NtWriteVirtualMemory/) 
 	or 	pe.imports(/ntdll.dll/i, /ZwWriteVirtualMemory/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /NtWow64WriteVirtualMemory64/)  ) 
+	or 	pe.imports(/.{1,30}/i, /NtWow64WriteVirtualMemory64/)  ) 
 }
 
 private rule capa_open_process { 
@@ -163,8 +162,8 @@ private rule capa_open_process {
 		uint16be(0) == 0x5649
 	) and
  ( 	pe.imports(/kernel32.dll/i, /OpenProcess/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /NtOpenProcess/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ZwOpenProcess/)  ) 
+	or 	pe.imports(/.{1,30}/i, /NtOpenProcess/) 
+	or 	pe.imports(/.{1,30}/i, /ZwOpenProcess/)  ) 
 }
 
 private rule capa_delete_volume_shadow_copies { 
@@ -365,7 +364,7 @@ private rule capa_check_for_sandbox_and_av_modules {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	pe.imports(/\w{1,20}\.dll/i, /GetModuleHandle/) 
+ ( 	pe.imports(/.{1,30}/i, /GetModuleHandle/) 
 	and  (  ( 	$abm 
 	or 	$abn 
 	or 	$abo 
@@ -849,7 +848,7 @@ private rule capa_check_for_windows_sandbox_via_device {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	pe.imports(/\w{1,20}\.dll/i, /CreateFile/) 
+ ( 	pe.imports(/.{1,30}/i, /CreateFile/) 
 	and 	$str_aet  ) 
 }
 
@@ -876,7 +875,7 @@ private rule capa_check_for_microsoft_office_emulation {
 		uint16be(0) == 0x5649
 	) and
  ( 	$aeu 
-	and 	pe.imports(/\w{1,20}\.dll/i, /GetWindowsDirectory/)  ) 
+	and 	pe.imports(/.{1,30}/i, /GetWindowsDirectory/)  ) 
 }
 
 private rule capa_check_for_sandbox_username { 
@@ -925,7 +924,7 @@ private rule capa_check_for_sandbox_username {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	pe.imports(/\w{1,20}\.dll/i, /GetUserName/) 
+ ( 	pe.imports(/.{1,30}/i, /GetUserName/) 
 	and  (  ( 	$aev 
 	or 	$aew 
 	or 	$aex 
@@ -1148,8 +1147,8 @@ private rule capa_check_for_windows_sandbox_via_registry {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	pe.imports(/\w{1,20}\.dll/i, /RegOpenKeyEx/) 
-	and 	pe.imports(/\w{1,20}\.dll/i, /RegEnumValue/) 
+ ( 	pe.imports(/.{1,30}/i, /RegOpenKeyEx/) 
+	and 	pe.imports(/.{1,30}/i, /RegEnumValue/) 
 	and 	$aif 
 	and 	$aig  ) 
 }
@@ -1355,8 +1354,8 @@ private rule capa_check_if_process_is_running_under_wine {
 		uint16be(0) == 0x5649
 	) and
  ( 	$ajw 
-	or  (  ( 	pe.imports(/\w{1,20}\.dll/i, /GetModuleHandle/) 
-	and 	pe.imports(/\w{1,20}\.dll/i, /GetProcAddress/) 
+	or  (  ( 	pe.imports(/.{1,30}/i, /GetModuleHandle/) 
+	and 	pe.imports(/.{1,30}/i, /GetProcAddress/) 
 	and 	$str_ajx 
 	and  (  ( 	$str_ajy 
 	or 	$str_ajz  )  )  )  )  ) 
@@ -1489,7 +1488,7 @@ private rule capa_extract_resource_via_kernel32_functions {
 	) and
  (  (  (  (  ( 	pe.imports(/kernel32.dll/i, /LoadResource/) 
 	or 	pe.imports(/kernel32.dll/i, /LockResource/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /LdrAccessResource/)  )  )  )  ) 
+	or 	pe.imports(/.{1,30}/i, /LdrAccessResource/)  )  )  )  ) 
 	or 	pe.imports(/user32.dll/i, /LoadString/)  ) 
 }
 
@@ -1540,11 +1539,11 @@ private rule capa_create_thread {
 		uint16be(0) == 0x5649
 	) and
  ( 	pe.imports(/kernel32.dll/i, /CreateThread/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /_beginthread/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /_beginthreadex/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /PsCreateSystemThread/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHCreateThread/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHCreateThreadWithHandle/) 
+	or 	pe.imports(/.{1,30}/i, /_beginthread/) 
+	or 	pe.imports(/.{1,30}/i, /_beginthreadex/) 
+	or 	pe.imports(/.{1,30}/i, /PsCreateSystemThread/) 
+	or 	pe.imports(/.{1,30}/i, /SHCreateThread/) 
+	or 	pe.imports(/.{1,30}/i, /SHCreateThreadWithHandle/) 
 	or 	pe.imports(/kernel32.dll/i, /CreateRemoteThread/) 
 	or 	pe.imports(/kernel32.dll/i, /CreateRemoteThreadEx/) 
 	or 	pe.imports(/ntdll.dll/i, /RtlCreateUserThread/) 
@@ -1619,7 +1618,7 @@ private rule capa_terminate_thread {
 		uint16be(0) == 0x5649
 	) and
  ( 	pe.imports(/kernel32.dll/i, /TerminateThread/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /PsTerminateSystemThread/)  ) 
+	or 	pe.imports(/.{1,30}/i, /PsTerminateSystemThread/)  ) 
 }
 
 private rule capa_manipulate_console { 
@@ -1691,7 +1690,7 @@ private rule capa_start_minifilter_driver {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	pe.imports(/\w{1,20}\.dll/i, /FltStartFiltering/)  ) 
+ ( 	pe.imports(/.{1,30}/i, /FltStartFiltering/)  ) 
 }
 
 private rule capa_register_minifilter_driver { 
@@ -1711,7 +1710,7 @@ private rule capa_register_minifilter_driver {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	pe.imports(/\w{1,20}\.dll/i, /FltRegisterFilter/)  ) 
+ ( 	pe.imports(/.{1,30}/i, /FltRegisterFilter/)  ) 
 }
 
 private rule capa_get_common_file_path { 
@@ -1737,13 +1736,13 @@ private rule capa_get_common_file_path {
 	or 	pe.imports(/kernel32.dll/i, /GetSystemDirectory/) 
 	or 	pe.imports(/kernel32.dll/i, /GetWindowsDirectory/) 
 	or 	pe.imports(/kernel32.dll/i, /GetSystemWow64Directory/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /GetAllUsersProfileDirectory/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /GetAppContainerFolderPath/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /GetCurrentDirectory/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /GetDefaultUserProfileDirectory/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /GetProfilesDirectory/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /GetUserProfileDirectory/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHGetFolderPathAndSubDir/) 
+	or 	pe.imports(/.{1,30}/i, /GetAllUsersProfileDirectory/) 
+	or 	pe.imports(/.{1,30}/i, /GetAppContainerFolderPath/) 
+	or 	pe.imports(/.{1,30}/i, /GetCurrentDirectory/) 
+	or 	pe.imports(/.{1,30}/i, /GetDefaultUserProfileDirectory/) 
+	or 	pe.imports(/.{1,30}/i, /GetProfilesDirectory/) 
+	or 	pe.imports(/.{1,30}/i, /GetUserProfileDirectory/) 
+	or 	pe.imports(/.{1,30}/i, /SHGetFolderPathAndSubDir/) 
 	or 	pe.imports(/shell32.dll/i, /SHGetFolderPath/) 
 	or 	pe.imports(/shell32.dll/i, /SHGetFolderLocation/) 
 	or 	pe.imports(/shell32.dll/i, /SHGetSpecialFolderPath/) 
@@ -1771,7 +1770,7 @@ private rule capa_bypass_Mark_of_the_Web {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	pe.imports(/\w{1,20}\.dll/i, /DeleteFile/) 
+ ( 	pe.imports(/.{1,30}/i, /DeleteFile/) 
 	and  (  ( 	$str_akj 
 	or 	$str_akk  )  )  ) 
 }
@@ -1793,7 +1792,7 @@ private rule capa_get_file_system_object_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	pe.imports(/\w{1,20}\.dll/i, /SHGetFileInfo/)  ) 
+ ( 	pe.imports(/.{1,30}/i, /SHGetFileInfo/)  ) 
 }
 
 private rule capa_delete_directory { 
@@ -1814,10 +1813,10 @@ private rule capa_delete_directory {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	pe.imports(/\w{1,20}\.dll/i, /RemoveDirectory/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /RemoveDirectoryTransacted/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /_rmdir/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /_wrmdir/)  ) 
+ ( 	pe.imports(/.{1,30}/i, /RemoveDirectory/) 
+	or 	pe.imports(/.{1,30}/i, /RemoveDirectoryTransacted/) 
+	or 	pe.imports(/.{1,30}/i, /_rmdir/) 
+	or 	pe.imports(/.{1,30}/i, /_wrmdir/)  ) 
 }
 
 private rule capa_create_directory { 
@@ -1840,12 +1839,12 @@ private rule capa_create_directory {
  ( 	pe.imports(/kernel32.dll/i, /CreateDirectory/) 
 	or 	pe.imports(/kernel32.dll/i, /CreateDirectoryEx/) 
 	or 	pe.imports(/kernel32.dll/i, /CreateDirectoryTransacted/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /NtCreateDirectoryObject/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ZwCreateDirectoryObject/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHCreateDirectory/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHCreateDirectoryEx/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /_mkdir/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /_wmkdir/)  ) 
+	or 	pe.imports(/.{1,30}/i, /NtCreateDirectoryObject/) 
+	or 	pe.imports(/.{1,30}/i, /ZwCreateDirectoryObject/) 
+	or 	pe.imports(/.{1,30}/i, /SHCreateDirectory/) 
+	or 	pe.imports(/.{1,30}/i, /SHCreateDirectoryEx/) 
+	or 	pe.imports(/.{1,30}/i, /_mkdir/) 
+	or 	pe.imports(/.{1,30}/i, /_wmkdir/)  ) 
 }
 
 private rule capa_write_file { 
@@ -1868,10 +1867,10 @@ private rule capa_write_file {
 	) and
  (  (  ( 	pe.imports(/kernel32.dll/i, /WriteFile/) 
 	or 	pe.imports(/kernel32.dll/i, /WriteFileEx/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /NtWriteFile/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ZwWriteFile/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /_fwrite/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /fwrite/)  )  )  ) 
+	or 	pe.imports(/.{1,30}/i, /NtWriteFile/) 
+	or 	pe.imports(/.{1,30}/i, /ZwWriteFile/) 
+	or 	pe.imports(/.{1,30}/i, /_fwrite/) 
+	or 	pe.imports(/.{1,30}/i, /fwrite/)  )  )  ) 
 }
 
 private rule capa_get_file_attributes { 
@@ -1893,10 +1892,10 @@ private rule capa_get_file_attributes {
 		uint16be(0) == 0x5649
 	) and
  ( 	pe.imports(/kernel32.dll/i, /GetFileAttributes/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ZwQueryDirectoryFile/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ZwQueryInformationFile/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /NtQueryDirectoryFile/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /NtQueryInformationFile/)  ) 
+	or 	pe.imports(/.{1,30}/i, /ZwQueryDirectoryFile/) 
+	or 	pe.imports(/.{1,30}/i, /ZwQueryInformationFile/) 
+	or 	pe.imports(/.{1,30}/i, /NtQueryDirectoryFile/) 
+	or 	pe.imports(/.{1,30}/i, /NtQueryInformationFile/)  ) 
 }
 
 private rule capa_set_file_attributes { 
@@ -1920,8 +1919,8 @@ private rule capa_set_file_attributes {
 		uint16be(0) == 0x5649
 	) and
  ( 	pe.imports(/kernel32.dll/i, /SetFileAttributes/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ZwSetInformationFile/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /NtSetInformationFile/)  ) 
+	or 	pe.imports(/.{1,30}/i, /ZwSetInformationFile/) 
+	or 	pe.imports(/.{1,30}/i, /NtSetInformationFile/)  ) 
 }
 
 private rule capa_read_virtual_disk { 
@@ -1943,9 +1942,9 @@ private rule capa_read_virtual_disk {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	pe.imports(/\w{1,20}\.dll/i, /OpenVirtualDisk/) 
-	and 	pe.imports(/\w{1,20}\.dll/i, /AttachVirtualDisk/) 
-	and 	pe.imports(/\w{1,20}\.dll/i, /GetVirtualDiskPhysicalPath/)  ) 
+ ( 	pe.imports(/.{1,30}/i, /OpenVirtualDisk/) 
+	and 	pe.imports(/.{1,30}/i, /AttachVirtualDisk/) 
+	and 	pe.imports(/.{1,30}/i, /GetVirtualDiskPhysicalPath/)  ) 
 }
 
 private rule capa_read_file { 
@@ -1966,11 +1965,11 @@ private rule capa_read_file {
 		uint16be(0) == 0x5649
 	) and
  (  (  (  (  ( 	pe.imports(/kernel32.dll/i, /ReadFile/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ReadFileEx/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /NtReadFile/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ZwReadFile/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /_read/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /fread/)  )  )  )  )  ) 
+	or 	pe.imports(/.{1,30}/i, /ReadFileEx/) 
+	or 	pe.imports(/.{1,30}/i, /NtReadFile/) 
+	or 	pe.imports(/.{1,30}/i, /ZwReadFile/) 
+	or 	pe.imports(/.{1,30}/i, /_read/) 
+	or 	pe.imports(/.{1,30}/i, /fread/)  )  )  )  )  ) 
 }
 
 private rule capa_read__ini_file { 
@@ -1992,11 +1991,11 @@ private rule capa_read__ini_file {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- (  (  ( 	pe.imports(/\w{1,20}\.dll/i, /GetPrivateProfileInt/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /GetPrivateProfileString/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /GetPrivateProfileStruct/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /GetPrivateProfileSection/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /GetPrivateProfileSectionNames/)  )  )  ) 
+ (  (  ( 	pe.imports(/.{1,30}/i, /GetPrivateProfileInt/) 
+	or 	pe.imports(/.{1,30}/i, /GetPrivateProfileString/) 
+	or 	pe.imports(/.{1,30}/i, /GetPrivateProfileStruct/) 
+	or 	pe.imports(/.{1,30}/i, /GetPrivateProfileSection/) 
+	or 	pe.imports(/.{1,30}/i, /GetPrivateProfileSectionNames/)  )  )  ) 
 }
 
 private rule capa_enumerate_files_via_kernel32_functions { 
@@ -2066,11 +2065,11 @@ private rule capa_get_system_information {
 	) and
  ( 	pe.imports(/kernel32.dll/i, /GetSystemInfo/) 
 	or 	pe.imports(/kernel32.dll/i, /GetNativeSystemInfo/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /NtQuerySystemInformation/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /NtQuerySystemInformationEx/) 
+	or 	pe.imports(/.{1,30}/i, /NtQuerySystemInformation/) 
+	or 	pe.imports(/.{1,30}/i, /NtQuerySystemInformationEx/) 
 	or 	pe.imports(/ntdll.dll/i, /RtlGetNativeSystemInformation/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ZwQuerySystemInformation/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ZwQuerySystemInformationEx/)  ) 
+	or 	pe.imports(/.{1,30}/i, /ZwQuerySystemInformation/) 
+	or 	pe.imports(/.{1,30}/i, /ZwQuerySystemInformationEx/)  ) 
 }
 
 private rule capa_get_hostname { 
@@ -2092,7 +2091,7 @@ private rule capa_get_hostname {
 	) and
  ( 	pe.imports(/kernel32.dll/i, /GetComputerName/) 
 	or 	pe.imports(/kernel32.dll/i, /GetComputerNameEx/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /GetComputerObjectName/) 
+	or 	pe.imports(/.{1,30}/i, /GetComputerObjectName/) 
 	or 	pe.imports(/ws2_32.dll/i, /gethostname/)  ) 
 }
 
@@ -2467,7 +2466,7 @@ private rule capa_install_driver {
 		uint16be(0) == 0x5649
 	) and
  ( 	pe.imports(/ntdll.dll/i, /NtLoadDriver/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ZwLoadDriver/)  ) 
+	or 	pe.imports(/.{1,30}/i, /ZwLoadDriver/)  ) 
 }
 
 private rule capa_disable_driver_code_integrity { 
@@ -2517,9 +2516,9 @@ private rule capa_interact_with_driver_via_control_codes {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	pe.imports(/\w{1,20}\.dll/i, /DeviceIoControl/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /NtUnloadDriver/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ZwUnloadDriver/) 
+ ( 	pe.imports(/.{1,30}/i, /DeviceIoControl/) 
+	or 	pe.imports(/.{1,30}/i, /NtUnloadDriver/) 
+	or 	pe.imports(/.{1,30}/i, /ZwUnloadDriver/) 
   ) 
 }
 
@@ -2588,10 +2587,10 @@ private rule capa_enumerate_gui_resources {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	pe.imports(/\w{1,20}\.dll/i, /EnumResourceTypes/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /EnumWindowStations/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /EnumDesktops/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /EnumWindows/)  ) 
+ ( 	pe.imports(/.{1,30}/i, /EnumResourceTypes/) 
+	or 	pe.imports(/.{1,30}/i, /EnumWindowStations/) 
+	or 	pe.imports(/.{1,30}/i, /EnumDesktops/) 
+	or 	pe.imports(/.{1,30}/i, /EnumWindows/)  ) 
 }
 
 private rule capa_find_graphical_window { 
@@ -2704,8 +2703,8 @@ private rule capa_accept_command_line_arguments {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	pe.imports(/\w{1,20}\.dll/i, /GetCommandLine/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /CommandLineToArgv/)  ) 
+ ( 	pe.imports(/.{1,30}/i, /GetCommandLine/) 
+	or 	pe.imports(/.{1,30}/i, /CommandLineToArgv/)  ) 
 }
 
 private rule capa_set_thread_local_storage_value { 
@@ -2818,7 +2817,7 @@ private rule capa_inject_APC {
  (  (  ( 	capa_write_process_memory
 
 	or 	pe.imports(/kernel32.dll/i, /MapViewOfSection/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /NtMapViewOfSection/) 
+	or 	pe.imports(/.{1,30}/i, /NtMapViewOfSection/) 
 	or 	pe.imports(/ntdll.dll/i, /ZwMapViewOfSection/) 
 	or 	pe.imports(/kernel32.dll/i, /MapViewOfFile/)  )  ) 
 	and  (  ( 	pe.imports(/kernel32.dll/i, /QueueUserAPC/) 
@@ -2887,8 +2886,8 @@ private rule capa_get_Explorer_PID {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	pe.imports(/\w{1,20}\.dll/i, /GetShellWindow/) 
-	and 	pe.imports(/\w{1,20}\.dll/i, /GetWindowThreadProcessId/)  ) 
+ ( 	pe.imports(/.{1,30}/i, /GetShellWindow/) 
+	and 	pe.imports(/.{1,30}/i, /GetWindowThreadProcessId/)  ) 
 }
 
 private rule capa_find_process_by_PID { 
@@ -2941,7 +2940,7 @@ private rule capa_create_process {
 	or 	pe.imports(/ntdll.dll/i, /NtCreateProcess/) 
 	or 	pe.imports(/ntdll.dll/i, /NtCreateProcessEx/) 
 	or 	pe.imports(/ntdll.dll/i, /ZwCreateProcess/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ZwCreateProcessEx/) 
+	or 	pe.imports(/.{1,30}/i, /ZwCreateProcessEx/) 
 	or 	pe.imports(/ntdll.dll/i, /ZwCreateUserProcess/) 
 	or 	pe.imports(/ntdll.dll/i, /RtlCreateUserProcess/)  ) 
 }
@@ -3010,9 +3009,9 @@ private rule capa_enumerate_process_modules {
  (  (  ( 	pe.imports(/kernel32.dll/i, /K32EnumProcessModules/) 
 	or 	pe.imports(/kernel32.dll/i, /K32EnumProcessModulesEx/) 
 	or 	pe.imports(/kernel32.dll/i, /K32EnumProcesses/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /EnumProcessModules/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /EnumProcessModulesEx/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /EnumProcesses/)  )  )  ) 
+	or 	pe.imports(/.{1,30}/i, /EnumProcessModules/) 
+	or 	pe.imports(/.{1,30}/i, /EnumProcessModulesEx/) 
+	or 	pe.imports(/.{1,30}/i, /EnumProcesses/)  )  )  ) 
 }
 
 private rule capa_get_domain_information { 
@@ -3116,13 +3115,13 @@ private rule capa_resolve_DNS {
 		uint16be(0) == 0x5649
 	) and
  ( 	pe.imports(/ws2_32.dll/i, /gethostbyname/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /DnsQuery_A/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /DnsQuery_W/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /DnsQuery_UTF8/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /DnsQueryEx/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /getaddrinfo/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /GetAddrInfo/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /GetAddrInfoEx/)  ) 
+	or 	pe.imports(/.{1,30}/i, /DnsQuery_A/) 
+	or 	pe.imports(/.{1,30}/i, /DnsQuery_W/) 
+	or 	pe.imports(/.{1,30}/i, /DnsQuery_UTF8/) 
+	or 	pe.imports(/.{1,30}/i, /DnsQueryEx/) 
+	or 	pe.imports(/.{1,30}/i, /getaddrinfo/) 
+	or 	pe.imports(/.{1,30}/i, /GetAddrInfo/) 
+	or 	pe.imports(/.{1,30}/i, /GetAddrInfoEx/)  ) 
 }
 
 private rule capa_check_Internet_connectivity_via_WinINet { 
@@ -3166,7 +3165,7 @@ private rule capa_get_local_IPv4_addresses {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- (  (  ( 	pe.imports(/\w{1,20}\.dll/i, /GetAdaptersAddresses/)  )  )  ) 
+ (  (  ( 	pe.imports(/.{1,30}/i, /GetAdaptersAddresses/)  )  )  ) 
 }
 
 private rule capa_create_mutex { 
@@ -3212,10 +3211,10 @@ private rule capa_bypass_UAC_via_token_manipulation {
 		uint16be(0) == 0x5649
 	) and
  ( 	$str_ald 
-	and 	pe.imports(/\w{1,20}\.dll/i, /ShellExecuteExW/) 
-	and 	pe.imports(/\w{1,20}\.dll/i, /ImpersonateLoggedOnUser/) 
-	and 	pe.imports(/\w{1,20}\.dll/i, /GetStartupInfoW/) 
-	and 	pe.imports(/\w{1,20}\.dll/i, /CreateProcessWithLogonW/)  ) 
+	and 	pe.imports(/.{1,30}/i, /ShellExecuteExW/) 
+	and 	pe.imports(/.{1,30}/i, /ImpersonateLoggedOnUser/) 
+	and 	pe.imports(/.{1,30}/i, /GetStartupInfoW/) 
+	and 	pe.imports(/.{1,30}/i, /CreateProcessWithLogonW/)  ) 
 }
 
 private rule capa_bypass_UAC_via_AppInfo_ALPC { 
@@ -3244,9 +3243,9 @@ private rule capa_bypass_UAC_via_AppInfo_ALPC {
  ( 	$str_ale 
 	and 	$str_alf 
 	and 	$str_alg 
-	and 	pe.imports(/\w{1,20}\.dll/i, /WaitForDebugEvent/) 
-	and 	pe.imports(/\w{1,20}\.dll/i, /ContinueDebugEvent/) 
-	and 	pe.imports(/\w{1,20}\.dll/i, /TerminateProcess/)  ) 
+	and 	pe.imports(/.{1,30}/i, /WaitForDebugEvent/) 
+	and 	pe.imports(/.{1,30}/i, /ContinueDebugEvent/) 
+	and 	pe.imports(/.{1,30}/i, /TerminateProcess/)  ) 
 }
 
 private rule capa_access_the_Windows_event_log { 
@@ -3266,10 +3265,10 @@ private rule capa_access_the_Windows_event_log {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	pe.imports(/\w{1,20}\.dll/i, /OpenEventLog/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ClearEventLog/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /OpenBackupEventLog/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ReportEvent/)  ) 
+ ( 	pe.imports(/.{1,30}/i, /OpenEventLog/) 
+	or 	pe.imports(/.{1,30}/i, /ClearEventLog/) 
+	or 	pe.imports(/.{1,30}/i, /OpenBackupEventLog/) 
+	or 	pe.imports(/.{1,30}/i, /ReportEvent/)  ) 
 }
 
 private rule capa_print_debug_messages { 
@@ -3356,8 +3355,8 @@ private rule capa_open_registry_key_via_offline_registry_library {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	pe.imports(/\w{1,20}\.dll/i, /OROpenHive/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /OROpenKey/)  ) 
+ ( 	pe.imports(/.{1,30}/i, /OROpenHive/) 
+	or 	pe.imports(/.{1,30}/i, /OROpenKey/)  ) 
 }
 
 private rule capa_query_or_enumerate_registry_value { 
@@ -3385,25 +3384,25 @@ private rule capa_query_or_enumerate_registry_value {
 	or 	pe.imports(/advapi32.dll/i, /RegQueryValue/) 
 	or 	pe.imports(/advapi32.dll/i, /RegQueryValueEx/) 
 	or 	pe.imports(/advapi32.dll/i, /RegQueryMultipleValues/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ZwQueryValueKey/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ZwEnumerateValueKey/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /NtQueryValueKey/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /NtEnumerateValueKey/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /RtlQueryRegistryValues/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHGetValue/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHEnumValue/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHRegGetInt/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHRegGetPath/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHRegGetValue/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHQueryValueEx/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHRegGetUSValue/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHOpenRegStream/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHRegEnumUSValue/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHOpenRegStream2/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHRegQueryUSValue/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHRegGetBoolUSValue/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHRegGetValueFromHKCUHKLM/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHRegGetBoolValueFromHKCUHKLM/)  )  )  ) 
+	or 	pe.imports(/.{1,30}/i, /ZwQueryValueKey/) 
+	or 	pe.imports(/.{1,30}/i, /ZwEnumerateValueKey/) 
+	or 	pe.imports(/.{1,30}/i, /NtQueryValueKey/) 
+	or 	pe.imports(/.{1,30}/i, /NtEnumerateValueKey/) 
+	or 	pe.imports(/.{1,30}/i, /RtlQueryRegistryValues/) 
+	or 	pe.imports(/.{1,30}/i, /SHGetValue/) 
+	or 	pe.imports(/.{1,30}/i, /SHEnumValue/) 
+	or 	pe.imports(/.{1,30}/i, /SHRegGetInt/) 
+	or 	pe.imports(/.{1,30}/i, /SHRegGetPath/) 
+	or 	pe.imports(/.{1,30}/i, /SHRegGetValue/) 
+	or 	pe.imports(/.{1,30}/i, /SHQueryValueEx/) 
+	or 	pe.imports(/.{1,30}/i, /SHRegGetUSValue/) 
+	or 	pe.imports(/.{1,30}/i, /SHOpenRegStream/) 
+	or 	pe.imports(/.{1,30}/i, /SHRegEnumUSValue/) 
+	or 	pe.imports(/.{1,30}/i, /SHOpenRegStream2/) 
+	or 	pe.imports(/.{1,30}/i, /SHRegQueryUSValue/) 
+	or 	pe.imports(/.{1,30}/i, /SHRegGetBoolUSValue/) 
+	or 	pe.imports(/.{1,30}/i, /SHRegGetValueFromHKCUHKLM/) 
+	or 	pe.imports(/.{1,30}/i, /SHRegGetBoolValueFromHKCUHKLM/)  )  )  ) 
 }
 
 private rule capa_set_registry_key_via_offline_registry_library { 
@@ -3424,7 +3423,7 @@ private rule capa_set_registry_key_via_offline_registry_library {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	pe.imports(/\w{1,20}\.dll/i, /ORSetValue/)  ) 
+ ( 	pe.imports(/.{1,30}/i, /ORSetValue/)  ) 
 }
 
 private rule capa_query_registry_key_via_offline_registry_library { 
@@ -3445,7 +3444,7 @@ private rule capa_query_registry_key_via_offline_registry_library {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	pe.imports(/\w{1,20}\.dll/i, /ORGetValue/)  ) 
+ ( 	pe.imports(/.{1,30}/i, /ORGetValue/)  ) 
 }
 
 private rule capa_query_or_enumerate_registry_key { 
@@ -3470,15 +3469,15 @@ private rule capa_query_or_enumerate_registry_key {
  (  (  ( 	pe.imports(/advapi32.dll/i, /RegEnumKey/) 
 	or 	pe.imports(/advapi32.dll/i, /RegEnumKeyEx/) 
 	or 	pe.imports(/advapi32.dll/i, /RegQueryInfoKeyA/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ZwQueryKey/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ZwEnumerateKey/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /NtQueryKey/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /NtEnumerateKey/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /RtlCheckRegistryKey/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHEnumKeyEx/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHQueryInfoKey/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHRegEnumUSKey/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHRegQueryInfoUSKey/)  )  )  ) 
+	or 	pe.imports(/.{1,30}/i, /ZwQueryKey/) 
+	or 	pe.imports(/.{1,30}/i, /ZwEnumerateKey/) 
+	or 	pe.imports(/.{1,30}/i, /NtQueryKey/) 
+	or 	pe.imports(/.{1,30}/i, /NtEnumerateKey/) 
+	or 	pe.imports(/.{1,30}/i, /RtlCheckRegistryKey/) 
+	or 	pe.imports(/.{1,30}/i, /SHEnumKeyEx/) 
+	or 	pe.imports(/.{1,30}/i, /SHQueryInfoKey/) 
+	or 	pe.imports(/.{1,30}/i, /SHRegEnumUSKey/) 
+	or 	pe.imports(/.{1,30}/i, /SHRegQueryInfoUSKey/)  )  )  ) 
 }
 
 private rule capa_create_registry_key_via_offline_registry_library { 
@@ -3499,8 +3498,8 @@ private rule capa_create_registry_key_via_offline_registry_library {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	pe.imports(/\w{1,20}\.dll/i, /ORCreateHive/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ORCreateKey/)  ) 
+ ( 	pe.imports(/.{1,30}/i, /ORCreateHive/) 
+	or 	pe.imports(/.{1,30}/i, /ORCreateKey/)  ) 
 }
 
 private rule capa_create_or_open_registry_key { 
@@ -3532,17 +3531,17 @@ private rule capa_create_or_open_registry_key {
 	or 	pe.imports(/advapi32.dll/i, /RegOpenKeyTransacted/) 
 	or 	pe.imports(/advapi32.dll/i, /RegOpenUserClassesRoot/) 
 	or 	pe.imports(/advapi32.dll/i, /RegCreateKeyTransacted/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ZwOpenKey/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ZwOpenKeyEx/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ZwCreateKey/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ZwOpenKeyTransacted/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ZwOpenKeyTransactedEx/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ZwCreateKeyTransacted/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /NtOpenKey/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /NtCreateKey/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHRegOpenUSKey/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHRegCreateUSKey/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /RtlCreateRegistryKey/)  ) 
+	or 	pe.imports(/.{1,30}/i, /ZwOpenKey/) 
+	or 	pe.imports(/.{1,30}/i, /ZwOpenKeyEx/) 
+	or 	pe.imports(/.{1,30}/i, /ZwCreateKey/) 
+	or 	pe.imports(/.{1,30}/i, /ZwOpenKeyTransacted/) 
+	or 	pe.imports(/.{1,30}/i, /ZwOpenKeyTransactedEx/) 
+	or 	pe.imports(/.{1,30}/i, /ZwCreateKeyTransacted/) 
+	or 	pe.imports(/.{1,30}/i, /NtOpenKey/) 
+	or 	pe.imports(/.{1,30}/i, /NtCreateKey/) 
+	or 	pe.imports(/.{1,30}/i, /SHRegOpenUSKey/) 
+	or 	pe.imports(/.{1,30}/i, /SHRegCreateUSKey/) 
+	or 	pe.imports(/.{1,30}/i, /RtlCreateRegistryKey/)  ) 
 }
 
 private rule capa_delete_registry_key { 
@@ -3570,11 +3569,11 @@ private rule capa_delete_registry_key {
 	or 	pe.imports(/advapi32.dll/i, /RegDeleteTree/) 
 	or 	pe.imports(/advapi32.dll/i, /RegDeleteKeyEx/) 
 	or 	pe.imports(/advapi32.dll/i, /RegDeleteKeyTransacted/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ZwDeleteKey/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /NtDeleteKey/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHDeleteKey/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHDeleteEmptyKey/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHRegDeleteEmptyUSKey/)  )  )  ) 
+	or 	pe.imports(/.{1,30}/i, /ZwDeleteKey/) 
+	or 	pe.imports(/.{1,30}/i, /NtDeleteKey/) 
+	or 	pe.imports(/.{1,30}/i, /SHDeleteKey/) 
+	or 	pe.imports(/.{1,30}/i, /SHDeleteEmptyKey/) 
+	or 	pe.imports(/.{1,30}/i, /SHRegDeleteEmptyUSKey/)  )  )  ) 
 }
 
 private rule capa_delete_registry_value { 
@@ -3597,11 +3596,11 @@ private rule capa_delete_registry_value {
 	) and
  (  (  ( 	pe.imports(/advapi32.dll/i, /RegDeleteValue/) 
 	or 	pe.imports(/advapi32.dll/i, /RegDeleteKeyValue/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ZwDeleteValueKey/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /NtDeleteValueKey/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /RtlDeleteRegistryValue/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHDeleteValue/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHRegDeleteUSValue/)  )  )  ) 
+	or 	pe.imports(/.{1,30}/i, /ZwDeleteValueKey/) 
+	or 	pe.imports(/.{1,30}/i, /NtDeleteValueKey/) 
+	or 	pe.imports(/.{1,30}/i, /RtlDeleteRegistryValue/) 
+	or 	pe.imports(/.{1,30}/i, /SHDeleteValue/) 
+	or 	pe.imports(/.{1,30}/i, /SHRegDeleteUSValue/)  )  )  ) 
 }
 
 private rule capa_set_registry_value { 
@@ -3629,14 +3628,14 @@ private rule capa_set_registry_value {
  (  (  (  (  ( 	pe.imports(/advapi32.dll/i, /RegSetValue/) 
 	or 	pe.imports(/advapi32.dll/i, /RegSetValueEx/) 
 	or 	pe.imports(/advapi32.dll/i, /RegSetKeyValue/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ZwSetValueKey/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /NtSetValueKey/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /RtlWriteRegistryValue/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHSetValue/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHRegSetPath/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHRegSetValue/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHRegSetUSValue/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /SHRegWriteUSValue/)  )  )  )  ) 
+	or 	pe.imports(/.{1,30}/i, /ZwSetValueKey/) 
+	or 	pe.imports(/.{1,30}/i, /NtSetValueKey/) 
+	or 	pe.imports(/.{1,30}/i, /RtlWriteRegistryValue/) 
+	or 	pe.imports(/.{1,30}/i, /SHSetValue/) 
+	or 	pe.imports(/.{1,30}/i, /SHRegSetPath/) 
+	or 	pe.imports(/.{1,30}/i, /SHRegSetValue/) 
+	or 	pe.imports(/.{1,30}/i, /SHRegSetUSValue/) 
+	or 	pe.imports(/.{1,30}/i, /SHRegWriteUSValue/)  )  )  )  ) 
 	or  (  ( 	capa_create_process
 
 	and 	$alh  )  )  ) 
@@ -3939,8 +3938,8 @@ private rule capa_encrypt_or_decrypt_via_WinCrypt {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- (  (  ( 	pe.imports(/\w{1,20}\.dll/i, /CryptEncrypt/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /CryptDecrypt/)  )  )  ) 
+ (  (  ( 	pe.imports(/.{1,30}/i, /CryptEncrypt/) 
+	or 	pe.imports(/.{1,30}/i, /CryptDecrypt/)  )  )  ) 
 }
 
 private rule capa_encrypt_data_using_DPAPI { 
@@ -3961,8 +3960,8 @@ private rule capa_encrypt_data_using_DPAPI {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	pe.imports(/\w{1,20}\.dll/i, /CryptProtectMemory/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /CryptUnprotectMemory/) 
+ ( 	pe.imports(/.{1,30}/i, /CryptProtectMemory/) 
+	or 	pe.imports(/.{1,30}/i, /CryptUnprotectMemory/) 
 	or 	pe.imports(/crypt32.dll/i, /CryptProtectData/) 
 	or 	pe.imports(/crypt32.dll/i, /CryptUnprotectData/)  ) 
 }
@@ -4374,8 +4373,8 @@ private rule capa_generate_random_numbers_via_WinAPI {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- (  (  ( 	pe.imports(/\w{1,20}\.dll/i, /BCryptGenRandom/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /CryptGenRandom/)  )  )  ) 
+ (  (  ( 	pe.imports(/.{1,30}/i, /BCryptGenRandom/) 
+	or 	pe.imports(/.{1,30}/i, /CryptGenRandom/)  )  )  ) 
 }
 
 private rule capa_generate_random_numbers_using_a_Mersenne_Twister { 
@@ -4438,15 +4437,15 @@ private rule capa_compress_data_via_WinAPI {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	pe.imports(/\w{1,20}\.dll/i, /RtlDecompressBuffer/) 
+ ( 	pe.imports(/.{1,30}/i, /RtlDecompressBuffer/) 
 	or 	$str_apk 
-	or 	pe.imports(/\w{1,20}\.dll/i, /RtlDecompressBufferEx/) 
+	or 	pe.imports(/.{1,30}/i, /RtlDecompressBufferEx/) 
 	or 	$str_apl 
-	or 	pe.imports(/\w{1,20}\.dll/i, /RtlDecompressBufferEx2/) 
+	or 	pe.imports(/.{1,30}/i, /RtlDecompressBufferEx2/) 
 	or 	$str_apm 
-	or 	pe.imports(/\w{1,20}\.dll/i, /RtlCompressBuffer/) 
+	or 	pe.imports(/.{1,30}/i, /RtlCompressBuffer/) 
 	or 	$str_apn 
-	or 	pe.imports(/\w{1,20}\.dll/i, /RtlCompressBufferLZNT1/) 
+	or 	pe.imports(/.{1,30}/i, /RtlCompressBufferLZNT1/) 
 	or 	$str_apo  ) 
 }
 
@@ -4470,7 +4469,7 @@ private rule capa_hash_data_with_CRC32 {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	pe.imports(/\w{1,20}\.dll/i, /RtlComputeCrc32/)  ) 
+ ( 	pe.imports(/.{1,30}/i, /RtlComputeCrc32/)  ) 
 }
 
 private rule capa_hash_data_via_WinCrypt { 
@@ -5635,8 +5634,8 @@ private rule capa_delete_registry_key_via_offline_registry_library {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	pe.imports(/\w{1,20}\.dll/i, /ORDeleteKey/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /ORDeleteValue/)  ) 
+ ( 	pe.imports(/.{1,30}/i, /ORDeleteKey/) 
+	or 	pe.imports(/.{1,30}/i, /ORDeleteValue/)  ) 
 }
 
 private rule capa_get_token_membership { 
@@ -5867,12 +5866,12 @@ private rule capa_migrate_process_to_active_window_station {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	pe.imports(/\w{1,20}\.dll/i, /OpenWindowStation/) 
+ ( 	pe.imports(/.{1,30}/i, /OpenWindowStation/) 
 	and  (  ( 	$str_axt 
 	or 	$str_axu  )  ) 
-	and 	pe.imports(/\w{1,20}\.dll/i, /SetProcessWindowStation/) 
-	and 	pe.imports(/\w{1,20}\.dll/i, /OpenInputDesktop/) 
-	and 	pe.imports(/\w{1,20}\.dll/i, /SetThreadDesktop/)  ) 
+	and 	pe.imports(/.{1,30}/i, /SetProcessWindowStation/) 
+	and 	pe.imports(/.{1,30}/i, /OpenInputDesktop/) 
+	and 	pe.imports(/.{1,30}/i, /SetThreadDesktop/)  ) 
 }
 
 private rule capa_packed_with_Epack { 
@@ -6177,7 +6176,7 @@ private rule capa_empty_the_recycle_bin {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	pe.imports(/\w{1,20}\.dll/i, /SHEmptyRecycleBin/)  ) 
+ ( 	pe.imports(/.{1,30}/i, /SHEmptyRecycleBin/)  ) 
 }
 
 private rule capa_compare_security_identifiers { 
@@ -6434,7 +6433,7 @@ private rule capa_check_license_value {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	pe.imports(/\w{1,20}\.dll/i, /NtQueryLicenseValue/) 
+ ( 	pe.imports(/.{1,30}/i, /NtQueryLicenseValue/) 
 	and 	$str_ayx  ) 
 }
 
@@ -6844,8 +6843,8 @@ private rule capa_encrypt_or_decrypt_data_via_BCrypt {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- (  (  ( 	pe.imports(/\w{1,20}\.dll/i, /BCryptDecrypt/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /BCryptEncrypt/)  )  )  ) 
+ (  (  ( 	pe.imports(/.{1,30}/i, /BCryptDecrypt/) 
+	or 	pe.imports(/.{1,30}/i, /BCryptEncrypt/)  )  )  ) 
 }
 
 private rule capa_connect_network_resource { 
@@ -7276,8 +7275,8 @@ private rule capa_hash_data_via_BCrypt {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- (  (  ( 	pe.imports(/\w{1,20}\.dll/i, /BCryptHash/) 
-	or  (  ( 	pe.imports(/\w{1,20}\.dll/i, /BCryptHashData/)  )  )  )  )  ) 
+ (  (  ( 	pe.imports(/.{1,30}/i, /BCryptHash/) 
+	or  (  ( 	pe.imports(/.{1,30}/i, /BCryptHashData/)  )  )  )  )  ) 
 }
 
 private rule capa_delete_internet_cache { 
@@ -7765,7 +7764,7 @@ private rule capa_compiled_with_py2exe {
 		uint16be(0) == 0x5649
 	) and
  ( 	$str_bfc 
-	and 	pe.imports(/\w{1,20}\.dll/i, /getenv/)  ) 
+	and 	pe.imports(/.{1,30}/i, /getenv/)  ) 
 }
 
 private rule capa_identify_ATM_dispenser_service_provider { 
@@ -8369,10 +8368,10 @@ private rule capa_send_ICMP_echo_request {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- (  (  ( 	pe.imports(/\w{1,20}\.dll/i, /IcmpSendEcho/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /IcmpSendEcho2/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /IcmpSendEcho2Ex/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /Icmp6SendEcho2/)  )  )  ) 
+ (  (  ( 	pe.imports(/.{1,30}/i, /IcmpSendEcho/) 
+	or 	pe.imports(/.{1,30}/i, /IcmpSendEcho2/) 
+	or 	pe.imports(/.{1,30}/i, /IcmpSendEcho2Ex/) 
+	or 	pe.imports(/.{1,30}/i, /Icmp6SendEcho2/)  )  )  ) 
 }
 
 private rule capa_initialize_Winsock_library { 
@@ -8595,7 +8594,7 @@ private rule capa_access_PE_header {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	pe.imports(/\w{1,20}\.dll/i, /RtlImageNtHeader/) 
+ ( 	pe.imports(/.{1,30}/i, /RtlImageNtHeader/) 
 	or 	pe.imports(/ntdll.dll/i, /RtlImageNtHeaderEx/)  ) 
 }
 
@@ -8629,7 +8628,7 @@ private rule capa_acquire_credentials_from_Windows_Credential_Manager {
 	or 	$str_bhc 
 	or 	$str_bhd 
 	or 	$bhe 
-	or 	pe.imports(/\w{1,20}\.dll/i, /CredEnumerate/) 
+	or 	pe.imports(/.{1,30}/i, /CredEnumerate/) 
 	or  (  (  (  ( 	$bhf 
 	or 	$bhg 
 	or 	$bhh  )  )  )  )  ) 
@@ -8667,8 +8666,8 @@ private rule capa_get_geographical_location {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	pe.imports(/\w{1,20}\.dll/i, /GetLocaleInfo/) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /GetLocaleInfoEx/) 
+ ( 	pe.imports(/.{1,30}/i, /GetLocaleInfo/) 
+	or 	pe.imports(/.{1,30}/i, /GetLocaleInfoEx/) 
 	or 	$bhi 
 	or 	$bhj 
 	or 	$bhk 
@@ -8727,12 +8726,12 @@ private rule capa_log_keystrokes {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- (  (  ( 	pe.imports(/\w{1,20}\.dll/i, /SetWindowsHookEx/) 
-	and 	pe.imports(/\w{1,20}\.dll/i, /GetKeyState/)  )  ) 
-	or  (  ( 	pe.imports(/\w{1,20}\.dll/i, /RegisterHotKey/) 
+ (  (  ( 	pe.imports(/.{1,30}/i, /SetWindowsHookEx/) 
+	and 	pe.imports(/.{1,30}/i, /GetKeyState/)  )  ) 
+	or  (  ( 	pe.imports(/.{1,30}/i, /RegisterHotKey/) 
 	and 	pe.imports(/user32.dll/i, /keybd_event/) 
-	and 	pe.imports(/\w{1,20}\.dll/i, /UnregisterHotKey/)  )  ) 
-	or  (  ( 	pe.imports(/\w{1,20}\.dll/i, /CallNextHookEx/) 
+	and 	pe.imports(/.{1,30}/i, /UnregisterHotKey/)  )  ) 
+	or  (  ( 	pe.imports(/.{1,30}/i, /CallNextHookEx/) 
 	and 	pe.imports(/user32.dll/i, /GetKeyNameText/) 
 	and 	pe.imports(/user32.dll/i, /GetAsyncKeyState/) 
 	and 	pe.imports(/user32.dll/i, /GetForgroundWindow/)  )  ) 
@@ -8762,7 +8761,7 @@ private rule capa_capture_microphone_audio {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	pe.imports(/\w{1,20}\.dll/i, /mciSendString/) 
+ ( 	pe.imports(/.{1,30}/i, /mciSendString/) 
 	and 	$bhw 
 	and 	$bhx 
 	and 	$bhy  ) 
@@ -8796,7 +8795,7 @@ private rule capa_get_domain_trust_relationships {
 	and  (  ( 	$bia 
 	or 	$bib 
 	or 	$bic  )  )  )  ) 
-	or 	pe.imports(/\w{1,20}\.dll/i, /DsEnumerateDomainTrusts/)  ) 
+	or 	pe.imports(/.{1,30}/i, /DsEnumerateDomainTrusts/)  ) 
 }
 
 private rule capa_capture_network_configuration_via_ipconfig { 
@@ -8853,9 +8852,9 @@ private rule capa_capture_public_ip {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	pe.imports(/\w{1,20}\.dll/i, /InternetOpen/) 
-	and 	pe.imports(/\w{1,20}\.dll/i, /InternetOpenUrl/) 
-	and 	pe.imports(/\w{1,20}\.dll/i, /InternetReadFile/) 
+ ( 	pe.imports(/.{1,30}/i, /InternetOpen/) 
+	and 	pe.imports(/.{1,30}/i, /InternetOpenUrl/) 
+	and 	pe.imports(/.{1,30}/i, /InternetReadFile/) 
 	and  (  ( 	$bie 
 	or 	$bif 
 	or 	$big 
@@ -10891,7 +10890,6 @@ private rule capa_receive_and_write_data_from_server_to_client {
 
 // done, converted rules: 390
 // done, unconverted rules: 155
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // real rules:
