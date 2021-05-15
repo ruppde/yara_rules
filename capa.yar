@@ -3985,18 +3985,18 @@ rule capa_encrypt_data_using_Camellia {
 	$amf = { 38 38 00 38 41 41 00 41 16 16 00 16 76 76 00 76 D9 D9 00 D9 93 93 00 93 60 60 00 60 F2 F2 00 F2 72 72 00 72 C2 C2 00 C2 AB AB 00 AB 9A 9A 00 9A 75 75 00 75 06 06 00 06 57 57 00 57 A0 A0 00 A0 91 91 00 91 F7 F7 00 F7 B5 B5 00 B5 C9 C9 00 C9 A2 A2 00 A2 8C 8C 00 8C D2 D2 00 D2 90 90 00 90 F6 F6 00 F6 07 07 00 07 A7 A7 00 A7 27 27 00 27 8E 8E 00 8E B2 B2 00 B2 49 49 00 49 DE DE 00 DE 43 43 00 43 5C 5C 00 5C D7 D7 00 D7 C7 C7 00 C7 3E 3E 00 3E F5 F5 00 F5 8F 8F 00 8F 67 67 00 67 1F 1F 00 1F 18 18 00 18 6E 6E 00 }
 	$amg = { 70 00 70 70 2C 00 2C 2C B3 00 B3 B3 C0 00 C0 C0 E4 00 E4 E4 57 00 57 57 EA 00 EA EA AE 00 AE AE 23 00 23 23 6B 00 6B 6B 45 00 45 45 A5 00 A5 A5 ED 00 ED ED 4F 00 4F 4F 1D 00 1D 1D 92 00 92 92 86 00 86 86 AF 00 AF AF 7C 00 7C 7C 1F 00 1F 1F 3E 00 3E 3E DC 00 DC DC 5E 00 5E 5E 0B 00 0B 0B A6 00 A6 A6 39 00 39 39 D5 00 D5 D5 5D 00 5D 5D D9 00 D9 D9 5A 00 5A 5A 51 00 51 51 6C 00 6C 6C 8B 00 8B 8B 9A 00 9A 9A FB 00 FB FB B0 00 B0 B0 74 00 74 74 2B 00 2B 2B F0 00 F0 F0 84 00 84 84 DF 00 DF DF CB 00 CB CB 34 00 34 }
 	$amh = { 70 82 2C EC B3 27 C0 E5 E4 85 57 35 EA 0C AE 41 23 EF 6B 93 45 19 A5 21 ED 0E 4F 4E 1D 65 92 BD 86 B8 AF 8F 7C EB 1F CE 3E 30 DC 5F 5E C5 0B 1A A6 E1 39 CA D5 47 5D 3D D9 01 5A D6 51 56 6C 4D 8B 0D 9A 66 FB CC B0 2D 74 12 2B 20 F0 B1 84 99 DF 4C CB C2 34 7E 76 05 6D B7 A9 31 D1 17 04 D7 14 58 3A 61 DE 1B 11 1C 32 0F 9C 16 53 18 F2 22 FE 44 CF B2 C3 B5 7A 91 24 08 E8 A8 60 FC 69 50 AA D0 A0 7D A1 89 62 97 54 5B 1E 95 E0 FF 64 D2 10 C4 00 48 A3 F7 75 DB 8A 03 E6 DA 09 3F DD 94 87 5C 83 02 CD 4A 90 33 73 67 F6 F3 9D 7F BF E2 52 9B D8 26 C8 37 C6 3B 81 96 6F 4B 13 BE 63 2E E9 79 A7 8C 9F 6E BC 8E 29 F5 F9 B6 2F FD B4 59 78 98 06 6A E7 46 71 BA D4 25 AB 42 88 A2 8D FA 72 07 B9 55 F8 EE AC 0A 36 49 2A 68 3C 38 F1 A4 40 28 D3 7B BB C9 43 C1 15 E3 AD F4 77 C7 80 9E }
-	$num_ami = { 3B CC 90 8B }
-	$num_amj = { A0 9E 66 7F }
-	$num_amk = { 4C AA 73 B2 }
-	$num_aml = { B6 7A E8 58 }
-	$num_amm = { C6 EF 37 2F }
-	$num_amn = { E9 4F 82 BE }
-	$num_amo = { 54 FF 53 A5 }
-	$num_amp = { F1 D3 6F 1C }
-	$num_amq = { 10 E5 27 FA }
-	$num_amr = { DE 68 2D 1D }
-	$num_ams = { B0 56 88 C2 }
-	$num_amt = { B3 E6 C1 FD }
+	$num_ami = { 8B 90 CC 3B }
+	$num_amj = { 7F 66 9E A0 }
+	$num_amk = { B2 73 AA 4C }
+	$num_aml = { 58 E8 7A B6 }
+	$num_amm = { 2F 37 EF C6 }
+	$num_amn = { BE 82 4F E9 }
+	$num_amo = { A5 53 FF 54 }
+	$num_amp = { 1C 6F D3 F1 }
+	$num_amq = { FA 27 E5 10 }
+	$num_amr = { 1D 2D 68 DE }
+	$num_ams = { C2 88 56 B0 }
+	$num_amt = { FD C1 E6 B3 }
 	$amu = { 8B 90 CC 3B 7F 66 9E A0 }
 	$amv = { B2 73 AA 4C 58 E8 7A B6 }
 	$amw = { BE 82 4F E9 2F 37 EF C6 }
@@ -4061,9 +4061,9 @@ rule capa_encrypt_data_using_RC6 {
 	date = "2021-05-15"
 
   strings: 
- 	$num_ang = { B7 E1 51 63 }
-	$num_anh = { 9E 37 79 B9 }
-	$num_ani = { 61 C8 86 47 }
+ 	$num_ang = { 63 51 E1 B7 }
+	$num_anh = { B9 79 37 9E }
+	$num_ani = { 47 86 C8 61 }
  
   condition: 
 	(
@@ -4324,10 +4324,10 @@ rule capa_encrypt_data_using_blowfish {
 	date = "2021-05-15"
 
   strings: 
- 	$num_aos = { 3A 39 CE 37 }
-	$num_aot = { E9 3D 5A 68 }
-	$num_aou = { 4B 7A 70 E9 }
-	$num_aov = { D1 31 0B A6 }
+ 	$num_aos = { 37 CE 39 3A }
+	$num_aot = { 68 5A 3D E9 }
+	$num_aou = { E9 70 7A 4B }
+	$num_aov = { A6 0B 31 D1 }
 	$aow = { 88 6A 3F 24 D3 08 A3 85 2E 8A 19 13 44 73 70 03 22 38 09 A4 D0 31 9F 29 98 FA 2E 08 89 6C 4E EC E6 21 28 45 77 13 D0 38 CF 66 54 BE 6C 0C E9 34 B7 29 AC C0 DD 50 7C C9 B5 D5 84 3F 17 09 47 B5 D9 D5 16 92 1B FB 79 89 }
 	$aox = { A6 0B 31 D1 AC B5 DF 98 DB 72 FD 2F B7 DF 1A D0 ED AF E1 B8 96 7E 26 6A 45 90 7C BA 99 7F 2C F1 47 99 A1 24 F7 6C 91 B3 E2 F2 01 08 16 FC 8E 85 D8 20 69 63 69 4E 57 71 A3 FE 58 A4 7E 3D 93 F4 8F 74 95 0D 58 B6 8E 72 58 CD 8B 71 EE 4A 15 82 1D A4 54 7B B5 59 5A C2 39 D5 30 9C 13 60 F2 2A 23 B0 D1 C5 F0 85 60 28 18 79 41 CA EF 38 DB B8 B0 DC 79 8E 0E 18 3A 60 8B 0E 9E 6C 3E 8A 1E B0 C1 77 15 D7 27 4B 31 BD DA 2F AF 78 60 5C 60 55 F3 25 55 E6 94 AB 55 AA 62 98 48 57 40 14 E8 63 6A 39 CA 55 B6 10 AB 2A 34 5C CC }
 	$aoy = { E9 70 7A 4B 44 29 B3 B5 2E 09 75 DB 23 26 19 C4 B0 A6 6E AD 7D DF A7 49 B8 60 EE 9C 66 B2 ED 8F 71 8C AA EC FF 17 9A 69 6C 52 64 56 E1 9E B1 C2 A5 02 36 19 29 4C 09 75 40 13 59 A0 3E 3A 18 E4 9A 98 54 3F 65 9D 42 5B D6 E4 8F 6B D6 3F F7 99 07 9C D2 A1 F5 30 E8 EF E6 38 2D 4D C1 5D 25 F0 86 20 DD 4C 26 EB 70 84 C6 E9 82 63 5E CC 1E 02 3F 6B 68 09 C9 EF BA 3E 14 18 97 3C A1 70 6A 6B 84 35 7F 68 86 E2 A0 52 05 53 9C B7 37 07 50 AA 1C 84 07 3E 5C AE DE 7F EC 44 7D 8E B8 F2 16 57 37 DA 3A B0 0D 0C 50 F0 04 1F 1C }
@@ -4388,13 +4388,13 @@ rule capa_generate_random_numbers_using_a_Mersenne_Twister {
 	date = "2021-05-15"
 
   strings: 
- 	$num_apb = { 6C 07 89 65 }
-	$num_apc = { 99 08 B0 DF }
-	$num_apd = { 9D 2C 56 80 }
-	$num_ape = { EF C6 00 00 }
-	$num_apf = { FF 3A 58 AD }
-	$num_apg = { B5 02 6F 5A A9 66 19 E9 }
-	$num_aph = { 71 D6 7F FF ED A6 00 00 }
+ 	$num_apb = { 65 89 07 6C }
+	$num_apc = { DF B0 08 99 }
+	$num_apd = { 80 56 2C 9D }
+	$num_ape = { 00 00 C6 EF }
+	$num_apf = { AD 58 3A FF }
+	$num_apg = { E9 19 66 A9 5A 6F 02 B5 }
+	$num_aph = { 00 00 A6 ED FF 7F D6 71 }
  
   condition: 
 	(
@@ -4504,14 +4504,14 @@ rule capa_hash_data_using_SHA256 {
 	date = "2021-05-15"
 
   strings: 
- 	$num_app = { 6A 09 E6 67 }
-	$num_apq = { BB 67 AE 85 }
-	$num_apr = { 3C 6E F3 72 }
-	$num_aps = { A5 4F F5 3A }
-	$num_apt = { 51 0E 52 7F }
-	$num_apu = { 9B 05 68 8C }
-	$num_apv = { 1F 83 D9 AB }
-	$num_apw = { 5B E0 CD 19 }
+ 	$num_app = { 67 E6 09 6A }
+	$num_apq = { 85 AE 67 BB }
+	$num_apr = { 72 F3 6E 3C }
+	$num_aps = { 3A F5 4F A5 }
+	$num_apt = { 7F 52 0E 51 }
+	$num_apu = { 8C 68 05 9B }
+	$num_apv = { AB D9 83 1F }
+	$num_apw = { 19 CD E0 5B }
  
   condition: 
 	(
@@ -4572,14 +4572,14 @@ rule capa_hash_data_using_SHA224 {
 	date = "2021-05-15"
 
   strings: 
- 	$num_aqv = { C1 05 9E D8 }
-	$num_aqw = { 36 7C D5 07 }
-	$num_aqx = { 30 70 DD 17 }
-	$num_aqy = { F7 0E 59 39 }
-	$num_aqz = { FF C0 0B 31 }
-	$num_ara = { 68 58 15 11 }
-	$num_arb = { 64 F9 8F A7 }
-	$num_arc = { BE FA 4F A4 }
+ 	$num_aqv = { D8 9E 05 C1 }
+	$num_aqw = { 07 D5 7C 36 }
+	$num_aqx = { 17 DD 70 30 }
+	$num_aqy = { 39 59 0E F7 }
+	$num_aqz = { 31 0B C0 FF }
+	$num_ara = { 11 15 58 68 }
+	$num_arb = { A7 8F F9 64 }
+	$num_arc = { A4 4F FA BE }
  
   condition: 
 	(
@@ -4672,7 +4672,7 @@ rule capa_persist_via_Active_Setup_registry_key {
 	date = "2021-05-15"
 
   strings: 
- 	$num_arm = { 80 00 00 02 }
+ 	$num_arm = { 02 00 00 80 }
 	$arn = /Software\\Microsoft\\Active Setup\\Installed Components/ nocase ascii wide 
 	$str_aro = "StubPath" ascii wide
  
@@ -4701,7 +4701,7 @@ rule capa_persist_via_GinaDLL_registry_key {
 	date = "2021-05-15"
 
   strings: 
- 	$num_arp = { 80 00 00 02 }
+ 	$num_arp = { 02 00 00 80 }
 	$arq = /SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon/ nocase ascii wide 
 	$arr = /GinaDLL/ nocase ascii wide 
  
@@ -4731,7 +4731,7 @@ rule capa_persist_via_AppInit_DLLs_registry_key {
 	date = "2021-05-15"
 
   strings: 
- 	$num_ars = { 80 00 00 02 }
+ 	$num_ars = { 02 00 00 80 }
 	$art = /Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows/ nocase ascii wide 
 	$aru = /Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows/ nocase ascii wide 
 	$arv = /AppInit_DLLs/ nocase ascii wide 
@@ -4764,8 +4764,8 @@ rule capa_persist_via_Run_registry_key {
 	date = "2021-05-15"
 
   strings: 
- 	$num_arx = { 80 00 00 01 }
-	$num_ary = { 80 00 00 02 }
+ 	$num_arx = { 01 00 00 80 }
+	$num_ary = { 02 00 00 80 }
 	$arz = /Software\\Microsoft\\Windows\\CurrentVersion/ nocase ascii wide 
 	$asa = /Run/ nocase ascii wide 
 	$asb = /Explorer\\Shell Folders/ nocase ascii wide 
@@ -4807,8 +4807,8 @@ rule capa_persist_via_Winlogon_Helper_DLL_registry_key {
 	date = "2021-05-15"
 
   strings: 
- 	$num_ash = { 80 00 00 01 }
-	$num_asi = { 80 00 00 02 }
+ 	$num_ash = { 01 00 00 80 }
+	$num_asi = { 02 00 00 80 }
 	$asj = /Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon/ nocase ascii wide 
 	$ask = /Notify/ nocase ascii wide 
 	$asl = /Userinit/ nocase ascii wide 
@@ -5119,10 +5119,10 @@ rule capa_encrypt_data_using_Salsa20_or_ChaCha {
 	$str_atd = "nd 3" ascii wide
 	$str_ate = "2-by" ascii wide
 	$str_atf = "te k" ascii wide
-	$num_atg = { 61 70 78 65 }
-	$num_ath = { 33 20 64 6E }
-	$num_ati = { 79 62 2D 32 }
-	$num_atj = { 6B 20 65 74 }
+	$num_atg = { 65 78 70 61 }
+	$num_ath = { 6E 64 20 33 }
+	$num_ati = { 32 2D 62 79 }
+	$num_atj = { 74 65 20 6B }
  
   condition: 
 	(
@@ -6726,7 +6726,7 @@ rule capa_hook_routines_via_microsoft_detours {
 	date = "2021-05-15"
 
   strings: 
- 	$num_azz = { 52 72 74 64 }
+ 	$num_azz = { 64 74 72 52 }
  
   condition: 
 	(
@@ -7231,14 +7231,14 @@ rule capa_resolve_function_by_hash {
 	date = "2021-05-15"
 
   strings: 
- 	$num_bce = { 6A 4A BC 5B }
-	$num_bcf = { 3C FA 68 5D }
-	$num_bcg = { EC 0E 4E 8E }
-	$num_bch = { 7C 0D FC AA }
-	$num_bci = { 91 AF CA 54 }
-	$num_bcj = { 53 4C 0A B8 }
-	$num_bck = { FF 7F 06 1A }
-	$num_bcl = { 60 E0 CE EF }
+ 	$num_bce = { 5B BC 4A 6A }
+	$num_bcf = { 5D 68 FA 3C }
+	$num_bcg = { 8E 4E 0E EC }
+	$num_bch = { AA FC 0D 7C }
+	$num_bci = { 54 CA AF 91 }
+	$num_bcj = { B8 0A 4C 53 }
+	$num_bck = { 1A 06 7F FF }
+	$num_bcl = { EF CE E0 60 }
  
   condition: 
 	(
