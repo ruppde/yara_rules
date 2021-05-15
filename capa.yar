@@ -2630,36 +2630,6 @@ rule capa_disable_driver_code_integrity {
 	or 	$aon  )  )  ) 
 }
 
-rule capa_interact_with_driver_via_control_codes { 
-  meta: 
- 	description = "interact with driver via control codes (converted from capa rule)"
-	namespace = "host-interaction/driver"
-	author = "moritz.raabe@fireeye.com"
-	scope = "function"
-	attack = "Execution::System Services::Service Execution [T1569.002]"
-	hash = "Practical Malware Analysis Lab 10-03.exe_:0x401000"
-	hash = "9412A66BC81F51A1FA916AC47C77E02AC1A7C9DFF543233ED70AA265EF6A1E76"
-	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/driver/interact-with-driver-via-control-codes.yml"
-	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-15"
-
-  strings: 
- 	$api_aoo = "DeviceIoControl" ascii wide
-	$api_aop = "NtUnloadDriver" ascii wide
-	$api_aoq = "ZwUnloadDriver" ascii wide
- 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
- ( 	$api_aoo 
-	or 	$api_aop 
-	or 	$api_aoq 
-  ) 
-}
-
 rule capa_manipulate_boot_configuration { 
   meta: 
  	description = "manipulate boot configuration (converted from capa rule)"
@@ -3318,31 +3288,6 @@ rule capa_check_Internet_connectivity_via_WinINet {
 	or 	pe.imports(/wininet/i, /InternetCheckConnection/)  )  )  ) 
 }
 
-rule capa_get_local_IPv4_addresses { 
-  meta: 
- 	description = "get local IPv4 addresses (converted from capa rule)"
-	namespace = "host-interaction/network/address"
-	author = "moritz.raabe@fireeye.com"
-	scope = "function"
-	attack = "Discovery::System Network Configuration Discovery [T1016]"
-	hash = "Practical Malware Analysis Lab 05-01.dll_:0x100037e6"
-	hash = "4C0553285D724DCAF5909924B4E3E90A"
-	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/network/address/get-local-ipv4-addresses.yml"
-	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-15"
-
-  strings: 
- 	$api_apx = "GetAdaptersAddresses" ascii wide
- 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
- (  (  ( 	$api_apx  )  )  ) 
-}
-
 rule capa_create_mutex { 
   meta: 
  	description = "create mutex (converted from capa rule)"
@@ -3377,11 +3322,11 @@ rule capa_bypass_UAC_via_token_manipulation {
 	date = "2021-05-15"
 
   strings: 
- 	$str_aqb = "wusa.exe" ascii wide
-	$api_aqc = "ShellExecuteExW" ascii wide
-	$api_aqd = "ImpersonateLoggedOnUser" ascii wide
-	$api_aqe = "GetStartupInfoW" ascii wide
-	$api_aqf = "CreateProcessWithLogonW" ascii wide
+ 	$str_aqa = "wusa.exe" ascii wide
+	$api_aqb = "ShellExecuteExW" ascii wide
+	$api_aqc = "ImpersonateLoggedOnUser" ascii wide
+	$api_aqd = "GetStartupInfoW" ascii wide
+	$api_aqe = "CreateProcessWithLogonW" ascii wide
  
   condition: 
 	(
@@ -3389,11 +3334,11 @@ rule capa_bypass_UAC_via_token_manipulation {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_aqb 
+ ( 	$str_aqa 
+	and 	$api_aqb 
 	and 	$api_aqc 
 	and 	$api_aqd 
-	and 	$api_aqe 
-	and 	$api_aqf  ) 
+	and 	$api_aqe  ) 
 }
 
 rule capa_bypass_UAC_via_AppInfo_ALPC { 
@@ -3409,12 +3354,12 @@ rule capa_bypass_UAC_via_AppInfo_ALPC {
 	date = "2021-05-15"
 
   strings: 
- 	$str_aqg = "winver.exe" ascii wide
-	$str_aqh = "WinSta0\\Default" ascii wide
-	$str_aqi = "taskmgr.exe" ascii wide
-	$api_aqj = "WaitForDebugEvent" ascii wide
-	$api_aqk = "ContinueDebugEvent" ascii wide
-	$api_aql = "TerminateProcess" ascii wide
+ 	$str_aqf = "winver.exe" ascii wide
+	$str_aqg = "WinSta0\\Default" ascii wide
+	$str_aqh = "taskmgr.exe" ascii wide
+	$api_aqi = "WaitForDebugEvent" ascii wide
+	$api_aqj = "ContinueDebugEvent" ascii wide
+	$api_aqk = "TerminateProcess" ascii wide
  
   condition: 
 	(
@@ -3422,12 +3367,12 @@ rule capa_bypass_UAC_via_AppInfo_ALPC {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_aqg 
+ ( 	$str_aqf 
+	and 	$str_aqg 
 	and 	$str_aqh 
-	and 	$str_aqi 
+	and 	$api_aqi 
 	and 	$api_aqj 
-	and 	$api_aqk 
-	and 	$api_aql  ) 
+	and 	$api_aqk  ) 
 }
 
 rule capa_access_the_Windows_event_log { 
@@ -3442,10 +3387,10 @@ rule capa_access_the_Windows_event_log {
 	date = "2021-05-15"
 
   strings: 
- 	$api_aqm = "OpenEventLog" ascii wide
-	$api_aqn = "ClearEventLog" ascii wide
-	$api_aqo = "OpenBackupEventLog" ascii wide
-	$api_aqp = "ReportEvent" ascii wide
+ 	$api_aql = "OpenEventLog" ascii wide
+	$api_aqm = "ClearEventLog" ascii wide
+	$api_aqn = "OpenBackupEventLog" ascii wide
+	$api_aqo = "ReportEvent" ascii wide
  
   condition: 
 	(
@@ -3453,10 +3398,10 @@ rule capa_access_the_Windows_event_log {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$api_aqm 
+ ( 	$api_aql 
+	or 	$api_aqm 
 	or 	$api_aqn 
-	or 	$api_aqo 
-	or 	$api_aqp  ) 
+	or 	$api_aqo  ) 
 }
 
 rule capa_print_debug_messages { 
@@ -3538,8 +3483,8 @@ rule capa_open_registry_key_via_offline_registry_library {
 	date = "2021-05-15"
 
   strings: 
- 	$api_aqq = "OROpenHive" ascii wide
-	$api_aqr = "OROpenKey" ascii wide
+ 	$api_aqp = "OROpenHive" ascii wide
+	$api_aqq = "OROpenKey" ascii wide
  
   condition: 
 	(
@@ -3547,8 +3492,8 @@ rule capa_open_registry_key_via_offline_registry_library {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$api_aqq 
-	or 	$api_aqr  ) 
+ ( 	$api_aqp 
+	or 	$api_aqq  ) 
 }
 
 rule capa_query_or_enumerate_registry_value { 
@@ -3566,25 +3511,25 @@ rule capa_query_or_enumerate_registry_value {
 	date = "2021-05-15"
 
   strings: 
- 	$api_aqs = "ZwQueryValueKey" ascii wide
-	$api_aqt = "ZwEnumerateValueKey" ascii wide
-	$api_aqu = "NtQueryValueKey" ascii wide
-	$api_aqv = "NtEnumerateValueKey" ascii wide
-	$api_aqw = "RtlQueryRegistryValues" ascii wide
-	$api_aqx = "SHGetValue" ascii wide
-	$api_aqy = "SHEnumValue" ascii wide
-	$api_aqz = "SHRegGetInt" ascii wide
-	$api_ara = "SHRegGetPath" ascii wide
-	$api_arb = "SHRegGetValue" ascii wide
-	$api_arc = "SHQueryValueEx" ascii wide
-	$api_ard = "SHRegGetUSValue" ascii wide
-	$api_are = "SHOpenRegStream" ascii wide
-	$api_arf = "SHRegEnumUSValue" ascii wide
-	$api_arg = "SHOpenRegStream2" ascii wide
-	$api_arh = "SHRegQueryUSValue" ascii wide
-	$api_ari = "SHRegGetBoolUSValue" ascii wide
-	$api_arj = "SHRegGetValueFromHKCUHKLM" ascii wide
-	$api_ark = "SHRegGetBoolValueFromHKCUHKLM" ascii wide
+ 	$api_aqr = "ZwQueryValueKey" ascii wide
+	$api_aqs = "ZwEnumerateValueKey" ascii wide
+	$api_aqt = "NtQueryValueKey" ascii wide
+	$api_aqu = "NtEnumerateValueKey" ascii wide
+	$api_aqv = "RtlQueryRegistryValues" ascii wide
+	$api_aqw = "SHGetValue" ascii wide
+	$api_aqx = "SHEnumValue" ascii wide
+	$api_aqy = "SHRegGetInt" ascii wide
+	$api_aqz = "SHRegGetPath" ascii wide
+	$api_ara = "SHRegGetValue" ascii wide
+	$api_arb = "SHQueryValueEx" ascii wide
+	$api_arc = "SHRegGetUSValue" ascii wide
+	$api_ard = "SHOpenRegStream" ascii wide
+	$api_are = "SHRegEnumUSValue" ascii wide
+	$api_arf = "SHOpenRegStream2" ascii wide
+	$api_arg = "SHRegQueryUSValue" ascii wide
+	$api_arh = "SHRegGetBoolUSValue" ascii wide
+	$api_ari = "SHRegGetValueFromHKCUHKLM" ascii wide
+	$api_arj = "SHRegGetBoolValueFromHKCUHKLM" ascii wide
  
   condition: 
 	(
@@ -3597,6 +3542,7 @@ rule capa_query_or_enumerate_registry_value {
 	or 	pe.imports(/advapi32/i, /RegQueryValue/) 
 	or 	pe.imports(/advapi32/i, /RegQueryValueEx/) 
 	or 	pe.imports(/advapi32/i, /RegQueryMultipleValues/) 
+	or 	$api_aqr 
 	or 	$api_aqs 
 	or 	$api_aqt 
 	or 	$api_aqu 
@@ -3614,8 +3560,7 @@ rule capa_query_or_enumerate_registry_value {
 	or 	$api_arg 
 	or 	$api_arh 
 	or 	$api_ari 
-	or 	$api_arj 
-	or 	$api_ark  )  )  ) 
+	or 	$api_arj  )  )  ) 
 }
 
 rule capa_set_registry_key_via_offline_registry_library { 
@@ -3631,7 +3576,7 @@ rule capa_set_registry_key_via_offline_registry_library {
 	date = "2021-05-15"
 
   strings: 
- 	$api_arl = "ORSetValue" ascii wide
+ 	$api_ark = "ORSetValue" ascii wide
  
   condition: 
 	(
@@ -3639,7 +3584,7 @@ rule capa_set_registry_key_via_offline_registry_library {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$api_arl  ) 
+ ( 	$api_ark  ) 
 }
 
 rule capa_query_registry_key_via_offline_registry_library { 
@@ -3655,7 +3600,7 @@ rule capa_query_registry_key_via_offline_registry_library {
 	date = "2021-05-15"
 
   strings: 
- 	$api_arm = "ORGetValue" ascii wide
+ 	$api_arl = "ORGetValue" ascii wide
  
   condition: 
 	(
@@ -3663,7 +3608,7 @@ rule capa_query_registry_key_via_offline_registry_library {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$api_arm  ) 
+ ( 	$api_arl  ) 
 }
 
 rule capa_query_or_enumerate_registry_key { 
@@ -3680,15 +3625,15 @@ rule capa_query_or_enumerate_registry_key {
 	date = "2021-05-15"
 
   strings: 
- 	$api_arn = "ZwQueryKey" ascii wide
-	$api_aro = "ZwEnumerateKey" ascii wide
-	$api_arp = "NtQueryKey" ascii wide
-	$api_arq = "NtEnumerateKey" ascii wide
-	$api_arr = "RtlCheckRegistryKey" ascii wide
-	$api_ars = "SHEnumKeyEx" ascii wide
-	$api_art = "SHQueryInfoKey" ascii wide
-	$api_aru = "SHRegEnumUSKey" ascii wide
-	$api_arv = "SHRegQueryInfoUSKey" ascii wide
+ 	$api_arm = "ZwQueryKey" ascii wide
+	$api_arn = "ZwEnumerateKey" ascii wide
+	$api_aro = "NtQueryKey" ascii wide
+	$api_arp = "NtEnumerateKey" ascii wide
+	$api_arq = "RtlCheckRegistryKey" ascii wide
+	$api_arr = "SHEnumKeyEx" ascii wide
+	$api_ars = "SHQueryInfoKey" ascii wide
+	$api_art = "SHRegEnumUSKey" ascii wide
+	$api_aru = "SHRegQueryInfoUSKey" ascii wide
  
   condition: 
 	(
@@ -3699,6 +3644,7 @@ rule capa_query_or_enumerate_registry_key {
  (  (  ( 	pe.imports(/advapi32/i, /RegEnumKey/) 
 	or 	pe.imports(/advapi32/i, /RegEnumKeyEx/) 
 	or 	pe.imports(/advapi32/i, /RegQueryInfoKeyA/) 
+	or 	$api_arm 
 	or 	$api_arn 
 	or 	$api_aro 
 	or 	$api_arp 
@@ -3706,8 +3652,7 @@ rule capa_query_or_enumerate_registry_key {
 	or 	$api_arr 
 	or 	$api_ars 
 	or 	$api_art 
-	or 	$api_aru 
-	or 	$api_arv  )  )  ) 
+	or 	$api_aru  )  )  ) 
 }
 
 rule capa_create_registry_key_via_offline_registry_library { 
@@ -3723,8 +3668,8 @@ rule capa_create_registry_key_via_offline_registry_library {
 	date = "2021-05-15"
 
   strings: 
- 	$api_arw = "ORCreateHive" ascii wide
-	$api_arx = "ORCreateKey" ascii wide
+ 	$api_arv = "ORCreateHive" ascii wide
+	$api_arw = "ORCreateKey" ascii wide
  
   condition: 
 	(
@@ -3732,8 +3677,8 @@ rule capa_create_registry_key_via_offline_registry_library {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$api_arw 
-	or 	$api_arx  ) 
+ ( 	$api_arv 
+	or 	$api_arw  ) 
 }
 
 rule capa_create_or_open_registry_key { 
@@ -3752,17 +3697,17 @@ rule capa_create_or_open_registry_key {
 	date = "2021-05-15"
 
   strings: 
- 	$api_ary = "ZwOpenKey" ascii wide
-	$api_arz = "ZwOpenKeyEx" ascii wide
-	$api_asa = "ZwCreateKey" ascii wide
-	$api_asb = "ZwOpenKeyTransacted" ascii wide
-	$api_asc = "ZwOpenKeyTransactedEx" ascii wide
-	$api_asd = "ZwCreateKeyTransacted" ascii wide
-	$api_ase = "NtOpenKey" ascii wide
-	$api_asf = "NtCreateKey" ascii wide
-	$api_asg = "SHRegOpenUSKey" ascii wide
-	$api_ash = "SHRegCreateUSKey" ascii wide
-	$api_asi = "RtlCreateRegistryKey" ascii wide
+ 	$api_arx = "ZwOpenKey" ascii wide
+	$api_ary = "ZwOpenKeyEx" ascii wide
+	$api_arz = "ZwCreateKey" ascii wide
+	$api_asa = "ZwOpenKeyTransacted" ascii wide
+	$api_asb = "ZwOpenKeyTransactedEx" ascii wide
+	$api_asc = "ZwCreateKeyTransacted" ascii wide
+	$api_asd = "NtOpenKey" ascii wide
+	$api_ase = "NtCreateKey" ascii wide
+	$api_asf = "SHRegOpenUSKey" ascii wide
+	$api_asg = "SHRegCreateUSKey" ascii wide
+	$api_ash = "RtlCreateRegistryKey" ascii wide
  
   condition: 
 	(
@@ -3778,6 +3723,7 @@ rule capa_create_or_open_registry_key {
 	or 	pe.imports(/advapi32/i, /RegOpenKeyTransacted/) 
 	or 	pe.imports(/advapi32/i, /RegOpenUserClassesRoot/) 
 	or 	pe.imports(/advapi32/i, /RegCreateKeyTransacted/) 
+	or 	$api_arx 
 	or 	$api_ary 
 	or 	$api_arz 
 	or 	$api_asa 
@@ -3787,8 +3733,7 @@ rule capa_create_or_open_registry_key {
 	or 	$api_ase 
 	or 	$api_asf 
 	or 	$api_asg 
-	or 	$api_ash 
-	or 	$api_asi  ) 
+	or 	$api_ash  ) 
 }
 
 rule capa_delete_registry_key { 
@@ -3807,11 +3752,11 @@ rule capa_delete_registry_key {
 	date = "2021-05-15"
 
   strings: 
- 	$api_asj = "ZwDeleteKey" ascii wide
-	$api_ask = "NtDeleteKey" ascii wide
-	$api_asl = "SHDeleteKey" ascii wide
-	$api_asm = "SHDeleteEmptyKey" ascii wide
-	$api_asn = "SHRegDeleteEmptyUSKey" ascii wide
+ 	$api_asi = "ZwDeleteKey" ascii wide
+	$api_asj = "NtDeleteKey" ascii wide
+	$api_ask = "SHDeleteKey" ascii wide
+	$api_asl = "SHDeleteEmptyKey" ascii wide
+	$api_asm = "SHRegDeleteEmptyUSKey" ascii wide
  
   condition: 
 	(
@@ -3823,11 +3768,11 @@ rule capa_delete_registry_key {
 	or 	pe.imports(/advapi32/i, /RegDeleteTree/) 
 	or 	pe.imports(/advapi32/i, /RegDeleteKeyEx/) 
 	or 	pe.imports(/advapi32/i, /RegDeleteKeyTransacted/) 
+	or 	$api_asi 
 	or 	$api_asj 
 	or 	$api_ask 
 	or 	$api_asl 
-	or 	$api_asm 
-	or 	$api_asn  )  )  ) 
+	or 	$api_asm  )  )  ) 
 }
 
 rule capa_delete_registry_value { 
@@ -3843,11 +3788,11 @@ rule capa_delete_registry_value {
 	date = "2021-05-15"
 
   strings: 
- 	$api_aso = "ZwDeleteValueKey" ascii wide
-	$api_asp = "NtDeleteValueKey" ascii wide
-	$api_asq = "RtlDeleteRegistryValue" ascii wide
-	$api_asr = "SHDeleteValue" ascii wide
-	$api_ass = "SHRegDeleteUSValue" ascii wide
+ 	$api_asn = "ZwDeleteValueKey" ascii wide
+	$api_aso = "NtDeleteValueKey" ascii wide
+	$api_asp = "RtlDeleteRegistryValue" ascii wide
+	$api_asq = "SHDeleteValue" ascii wide
+	$api_asr = "SHRegDeleteUSValue" ascii wide
  
   condition: 
 	(
@@ -3857,11 +3802,11 @@ rule capa_delete_registry_value {
 	) and
  (  (  ( 	pe.imports(/advapi32/i, /RegDeleteValue/) 
 	or 	pe.imports(/advapi32/i, /RegDeleteKeyValue/) 
+	or 	$api_asn 
 	or 	$api_aso 
 	or 	$api_asp 
 	or 	$api_asq 
-	or 	$api_asr 
-	or 	$api_ass  )  )  ) 
+	or 	$api_asr  )  )  ) 
 }
 
 rule capa_set_registry_value { 
@@ -3878,15 +3823,15 @@ rule capa_set_registry_value {
 	date = "2021-05-15"
 
   strings: 
- 	$api_ast = "ZwSetValueKey" ascii wide
-	$api_asu = "NtSetValueKey" ascii wide
-	$api_asv = "RtlWriteRegistryValue" ascii wide
-	$api_asw = "SHSetValue" ascii wide
-	$api_asx = "SHRegSetPath" ascii wide
-	$api_asy = "SHRegSetValue" ascii wide
-	$api_asz = "SHRegSetUSValue" ascii wide
-	$api_ata = "SHRegWriteUSValue" ascii wide
-	$atb = /reg(.exe)? add / nocase ascii wide 
+ 	$api_ass = "ZwSetValueKey" ascii wide
+	$api_ast = "NtSetValueKey" ascii wide
+	$api_asu = "RtlWriteRegistryValue" ascii wide
+	$api_asv = "SHSetValue" ascii wide
+	$api_asw = "SHRegSetPath" ascii wide
+	$api_asx = "SHRegSetValue" ascii wide
+	$api_asy = "SHRegSetUSValue" ascii wide
+	$api_asz = "SHRegWriteUSValue" ascii wide
+	$ata = /reg(.exe)? add / nocase ascii wide 
  
   condition: 
 	(
@@ -3897,17 +3842,17 @@ rule capa_set_registry_value {
  (  (  (  (  ( 	pe.imports(/advapi32/i, /RegSetValue/) 
 	or 	pe.imports(/advapi32/i, /RegSetValueEx/) 
 	or 	pe.imports(/advapi32/i, /RegSetKeyValue/) 
+	or 	$api_ass 
 	or 	$api_ast 
 	or 	$api_asu 
 	or 	$api_asv 
 	or 	$api_asw 
 	or 	$api_asx 
 	or 	$api_asy 
-	or 	$api_asz 
-	or 	$api_ata  )  )  )  ) 
+	or 	$api_asz  )  )  )  ) 
 	or  (  ( 	capa_create_process
 
-	and 	$atb  )  )  ) 
+	and 	$ata  )  )  ) 
 }
 
 rule capa_get_logon_sessions { 
@@ -3990,12 +3935,12 @@ rule capa_linked_against_Crypto__ {
 	date = "2021-05-15"
 
   strings: 
- 	$str_atc = "Cryptographic algorithms are disabled after a power-up self test failed." ascii wide
-	$str_atd = ": this object requires an IV" ascii wide
-	$str_ate = "BER decode error" ascii wide
-	$str_atf = ".?AVException@CryptoPP@@" ascii wide
-	$str_atg = "FileStore: error reading file" ascii wide
-	$str_ath = "StreamTransformationFilter: PKCS_PADDING cannot be used with " ascii wide
+ 	$str_atb = "Cryptographic algorithms are disabled after a power-up self test failed." ascii wide
+	$str_atc = ": this object requires an IV" ascii wide
+	$str_atd = "BER decode error" ascii wide
+	$str_ate = ".?AVException@CryptoPP@@" ascii wide
+	$str_atf = "FileStore: error reading file" ascii wide
+	$str_atg = "StreamTransformationFilter: PKCS_PADDING cannot be used with " ascii wide
  
   condition: 
 	(
@@ -4003,12 +3948,12 @@ rule capa_linked_against_Crypto__ {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_atc 
+ ( 	$str_atb 
+	or 	$str_atc 
 	or 	$str_atd 
 	or 	$str_ate 
 	or 	$str_atf 
-	or 	$str_atg 
-	or 	$str_ath  ) 
+	or 	$str_atg  ) 
 }
 
 rule capa_linked_against_OpenSSL { 
@@ -4023,9 +3968,9 @@ rule capa_linked_against_OpenSSL {
 	date = "2021-05-15"
 
   strings: 
- 	$str_ati = "RC4 for x86_64, CRYPTOGAMS by <appro@openssl.org>" ascii wide
-	$str_atj = "AES for x86_64, CRYPTOGAMS by <appro@openssl.org>" ascii wide
-	$str_atk = "DSA-SHA1-old" ascii wide
+ 	$str_ath = "RC4 for x86_64, CRYPTOGAMS by <appro@openssl.org>" ascii wide
+	$str_ati = "AES for x86_64, CRYPTOGAMS by <appro@openssl.org>" ascii wide
+	$str_atj = "DSA-SHA1-old" ascii wide
  
   condition: 
 	(
@@ -4033,9 +3978,9 @@ rule capa_linked_against_OpenSSL {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_ati 
-	or 	$str_atj 
-	or 	$str_atk  ) 
+ ( 	$str_ath 
+	or 	$str_ati 
+	or 	$str_atj  ) 
 }
 
 rule capa_linked_against_PolarSSL_mbed_TLS { 
@@ -4050,11 +3995,11 @@ rule capa_linked_against_PolarSSL_mbed_TLS {
 	date = "2021-05-15"
 
   strings: 
- 	$str_atl = "PolarSSLTest" ascii wide
-	$str_atm = "mbedtls_cipher_setup" ascii wide
-	$str_atn = "mbedtls_pk_verify" ascii wide
-	$str_ato = "mbedtls_ssl_write_record" ascii wide
-	$str_atp = "mbedtls_ssl_fetch_input" ascii wide
+ 	$str_atk = "PolarSSLTest" ascii wide
+	$str_atl = "mbedtls_cipher_setup" ascii wide
+	$str_atm = "mbedtls_pk_verify" ascii wide
+	$str_atn = "mbedtls_ssl_write_record" ascii wide
+	$str_ato = "mbedtls_ssl_fetch_input" ascii wide
  
   condition: 
 	(
@@ -4062,11 +4007,11 @@ rule capa_linked_against_PolarSSL_mbed_TLS {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_atl 
+ ( 	$str_atk 
+	or 	$str_atl 
 	or 	$str_atm 
 	or 	$str_atn 
-	or 	$str_ato 
-	or 	$str_atp  ) 
+	or 	$str_ato  ) 
 }
 
 rule capa_linked_against_libcurl { 
@@ -4080,8 +4025,8 @@ rule capa_linked_against_libcurl {
 	date = "2021-05-15"
 
   strings: 
- 	$atq = /CLIENT libcurl/ ascii wide 
-	$atr = /curl\.haxx\.se/ ascii wide 
+ 	$atp = /CLIENT libcurl/ ascii wide 
+	$atq = /curl\.haxx\.se/ ascii wide 
  
   condition: 
 	(
@@ -4089,8 +4034,8 @@ rule capa_linked_against_libcurl {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$atq 
-	or 	$atr  ) 
+ ( 	$atp 
+	or 	$atq  ) 
 }
 
 rule capa_linked_against_Microsoft_Detours { 
@@ -4111,8 +4056,8 @@ rule capa_linked_against_Microsoft_Detours {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	for any ats in pe.sections : ( ats.name == ".detourc" ) 
-	or 	for any att in pe.sections : ( att.name == ".detourd" )  ) 
+ ( 	for any atr in pe.sections : ( atr.name == ".detourc" ) 
+	or 	for any ats in pe.sections : ( ats.name == ".detourd" )  ) 
 }
 
 rule capa_linked_against_ZLIB { 
@@ -4127,8 +4072,8 @@ rule capa_linked_against_ZLIB {
 	date = "2021-05-15"
 
   strings: 
- 	$atu = /deflate .{,1000} Copyright/ ascii wide 
-	$atv = /inflate .{,1000} Copyright/ ascii wide 
+ 	$att = /deflate .{,1000} Copyright/ ascii wide 
+	$atu = /inflate .{,1000} Copyright/ ascii wide 
  
   condition: 
 	(
@@ -4136,8 +4081,8 @@ rule capa_linked_against_ZLIB {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$atu 
-	or 	$atv  ) 
+ ( 	$att 
+	or 	$atu  ) 
 }
 
 rule capa_reference_Base64_string { 
@@ -4156,7 +4101,7 @@ rule capa_reference_Base64_string {
 	date = "2021-05-15"
 
   strings: 
- 	$atw = /ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/ ascii wide 
+ 	$atv = /ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/ ascii wide 
  
   condition: 
 	(
@@ -4164,7 +4109,7 @@ rule capa_reference_Base64_string {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
-	$atw 
+	$atv 
 }
 
 rule capa_import_public_key { 
@@ -4202,8 +4147,8 @@ rule capa_encrypt_or_decrypt_via_WinCrypt {
 	date = "2021-05-15"
 
   strings: 
- 	$api_atx = "CryptEncrypt" ascii wide
-	$api_aty = "CryptDecrypt" ascii wide
+ 	$api_atw = "CryptEncrypt" ascii wide
+	$api_atx = "CryptDecrypt" ascii wide
  
   condition: 
 	(
@@ -4211,8 +4156,8 @@ rule capa_encrypt_or_decrypt_via_WinCrypt {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- (  (  ( 	$api_atx 
-	or 	$api_aty  )  )  ) 
+ (  (  ( 	$api_atw 
+	or 	$api_atx  )  )  ) 
 }
 
 rule capa_encrypt_data_using_DPAPI { 
@@ -4228,8 +4173,8 @@ rule capa_encrypt_data_using_DPAPI {
 	date = "2021-05-15"
 
   strings: 
- 	$api_atz = "CryptProtectMemory" ascii wide
-	$api_aua = "CryptUnprotectMemory" ascii wide
+ 	$api_aty = "CryptProtectMemory" ascii wide
+	$api_atz = "CryptUnprotectMemory" ascii wide
  
   condition: 
 	(
@@ -4237,8 +4182,8 @@ rule capa_encrypt_data_using_DPAPI {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$api_atz 
-	or 	$api_aua 
+ ( 	$api_aty 
+	or 	$api_atz 
 	or 	pe.imports(/crypt32/i, /CryptProtectData/) 
 	or 	pe.imports(/crypt32/i, /CryptUnprotectData/)  ) 
 }
@@ -4258,35 +4203,35 @@ rule capa_encrypt_data_using_Camellia {
 	date = "2021-05-15"
 
   strings: 
- 	$aub = { 00 70 70 70 00 82 82 82 00 2C 2C 2C 00 EC EC EC 00 B3 B3 B3 00 27 27 27 00 C0 C0 C0 00 E5 E5 E5 00 E4 E4 E4 00 85 85 85 00 57 57 57 00 35 35 35 00 EA EA EA 00 0C 0C 0C 00 AE AE AE 00 41 41 41 00 23 23 23 00 EF EF EF 00 6B 6B 6B 00 93 93 93 00 45 45 45 00 19 19 19 00 A5 A5 A5 00 21 21 21 00 ED ED ED 00 0E 0E 0E 00 4F 4F 4F 00 4E 4E 4E 00 1D 1D 1D 00 65 65 65 00 92 92 92 00 BD BD BD 00 86 86 86 00 B8 B8 B8 00 AF AF AF 00 8F 8F 8F 00 7C 7C 7C 00 EB EB EB 00 1F 1F 1F 00 CE CE CE 00 3E 3E 3E 00 30 30 30 00 DC DC }
-	$auc = { E0 E0 E0 00 05 05 05 00 58 58 58 00 D9 D9 D9 00 67 67 67 00 4E 4E 4E 00 81 81 81 00 CB CB CB 00 C9 C9 C9 00 0B 0B 0B 00 AE AE AE 00 6A 6A 6A 00 D5 D5 D5 00 18 18 18 00 5D 5D 5D 00 82 82 82 00 46 46 46 00 DF DF DF 00 D6 D6 D6 00 27 27 27 00 8A 8A 8A 00 32 32 32 00 4B 4B 4B 00 42 42 42 00 DB DB DB 00 1C 1C 1C 00 9E 9E 9E 00 9C 9C 9C 00 3A 3A 3A 00 CA CA CA 00 25 25 25 00 7B 7B 7B 00 0D 0D 0D 00 71 71 71 00 5F 5F 5F 00 1F 1F 1F 00 F8 F8 F8 00 D7 D7 D7 00 3E 3E 3E 00 9D 9D 9D 00 7C 7C 7C 00 60 60 60 00 B9 B9 B9 }
-	$aud = { 38 38 00 38 41 41 00 41 16 16 00 16 76 76 00 76 D9 D9 00 D9 93 93 00 93 60 60 00 60 F2 F2 00 F2 72 72 00 72 C2 C2 00 C2 AB AB 00 AB 9A 9A 00 9A 75 75 00 75 06 06 00 06 57 57 00 57 A0 A0 00 A0 91 91 00 91 F7 F7 00 F7 B5 B5 00 B5 C9 C9 00 C9 A2 A2 00 A2 8C 8C 00 8C D2 D2 00 D2 90 90 00 90 F6 F6 00 F6 07 07 00 07 A7 A7 00 A7 27 27 00 27 8E 8E 00 8E B2 B2 00 B2 49 49 00 49 DE DE 00 DE 43 43 00 43 5C 5C 00 5C D7 D7 00 D7 C7 C7 00 C7 3E 3E 00 3E F5 F5 00 F5 8F 8F 00 8F 67 67 00 67 1F 1F 00 1F 18 18 00 18 6E 6E 00 }
-	$aue = { 70 00 70 70 2C 00 2C 2C B3 00 B3 B3 C0 00 C0 C0 E4 00 E4 E4 57 00 57 57 EA 00 EA EA AE 00 AE AE 23 00 23 23 6B 00 6B 6B 45 00 45 45 A5 00 A5 A5 ED 00 ED ED 4F 00 4F 4F 1D 00 1D 1D 92 00 92 92 86 00 86 86 AF 00 AF AF 7C 00 7C 7C 1F 00 1F 1F 3E 00 3E 3E DC 00 DC DC 5E 00 5E 5E 0B 00 0B 0B A6 00 A6 A6 39 00 39 39 D5 00 D5 D5 5D 00 5D 5D D9 00 D9 D9 5A 00 5A 5A 51 00 51 51 6C 00 6C 6C 8B 00 8B 8B 9A 00 9A 9A FB 00 FB FB B0 00 B0 B0 74 00 74 74 2B 00 2B 2B F0 00 F0 F0 84 00 84 84 DF 00 DF DF CB 00 CB CB 34 00 34 }
-	$auf = { 70 82 2C EC B3 27 C0 E5 E4 85 57 35 EA 0C AE 41 23 EF 6B 93 45 19 A5 21 ED 0E 4F 4E 1D 65 92 BD 86 B8 AF 8F 7C EB 1F CE 3E 30 DC 5F 5E C5 0B 1A A6 E1 39 CA D5 47 5D 3D D9 01 5A D6 51 56 6C 4D 8B 0D 9A 66 FB CC B0 2D 74 12 2B 20 F0 B1 84 99 DF 4C CB C2 34 7E 76 05 6D B7 A9 31 D1 17 04 D7 14 58 3A 61 DE 1B 11 1C 32 0F 9C 16 53 18 F2 22 FE 44 CF B2 C3 B5 7A 91 24 08 E8 A8 60 FC 69 50 AA D0 A0 7D A1 89 62 97 54 5B 1E 95 E0 FF 64 D2 10 C4 00 48 A3 F7 75 DB 8A 03 E6 DA 09 3F DD 94 87 5C 83 02 CD 4A 90 33 73 67 F6 F3 9D 7F BF E2 52 9B D8 26 C8 37 C6 3B 81 96 6F 4B 13 BE 63 2E E9 79 A7 8C 9F 6E BC 8E 29 F5 F9 B6 2F FD B4 59 78 98 06 6A E7 46 71 BA D4 25 AB 42 88 A2 8D FA 72 07 B9 55 F8 EE AC 0A 36 49 2A 68 3C 38 F1 A4 40 28 D3 7B BB C9 43 C1 15 E3 AD F4 77 C7 80 9E }
-	$num_aug = { 8B 90 CC 3B }
-	$num_auh = { 7F 66 9E A0 }
-	$num_aui = { B2 73 AA 4C }
-	$num_auj = { 58 E8 7A B6 }
-	$num_auk = { 2F 37 EF C6 }
-	$num_aul = { BE 82 4F E9 }
-	$num_aum = { A5 53 FF 54 }
-	$num_aun = { 1C 6F D3 F1 }
-	$num_auo = { FA 27 E5 10 }
-	$num_aup = { 1D 2D 68 DE }
-	$num_auq = { C2 88 56 B0 }
-	$num_aur = { FD C1 E6 B3 }
-	$aus = { 8B 90 CC 3B 7F 66 9E A0 }
-	$aut = { B2 73 AA 4C 58 E8 7A B6 }
-	$auu = { BE 82 4F E9 2F 37 EF C6 }
-	$auv = { 1C 6F D3 F1 A5 53 FF 54 }
-	$auw = { 1D 2D 68 DE FA 27 E5 10 }
-	$aux = { FD C1 E6 B3 C2 88 56 B0 }
-	$auy = /A09E667F3BCC908B/ nocase ascii wide 
-	$str_auz = "/B67AE8584CAA73B" ascii wide
-	$ava = /C6EF372FE94F82BE/ nocase ascii wide 
-	$avb = /54FF53A5F1D36F1C/ nocase ascii wide 
-	$avc = /10E527FADE682D1D/ nocase ascii wide 
-	$avd = /B05688C2B3E6C1FD/ nocase ascii wide 
+ 	$aua = { 00 70 70 70 00 82 82 82 00 2C 2C 2C 00 EC EC EC 00 B3 B3 B3 00 27 27 27 00 C0 C0 C0 00 E5 E5 E5 00 E4 E4 E4 00 85 85 85 00 57 57 57 00 35 35 35 00 EA EA EA 00 0C 0C 0C 00 AE AE AE 00 41 41 41 00 23 23 23 00 EF EF EF 00 6B 6B 6B 00 93 93 93 00 45 45 45 00 19 19 19 00 A5 A5 A5 00 21 21 21 00 ED ED ED 00 0E 0E 0E 00 4F 4F 4F 00 4E 4E 4E 00 1D 1D 1D 00 65 65 65 00 92 92 92 00 BD BD BD 00 86 86 86 00 B8 B8 B8 00 AF AF AF 00 8F 8F 8F 00 7C 7C 7C 00 EB EB EB 00 1F 1F 1F 00 CE CE CE 00 3E 3E 3E 00 30 30 30 00 DC DC }
+	$aub = { E0 E0 E0 00 05 05 05 00 58 58 58 00 D9 D9 D9 00 67 67 67 00 4E 4E 4E 00 81 81 81 00 CB CB CB 00 C9 C9 C9 00 0B 0B 0B 00 AE AE AE 00 6A 6A 6A 00 D5 D5 D5 00 18 18 18 00 5D 5D 5D 00 82 82 82 00 46 46 46 00 DF DF DF 00 D6 D6 D6 00 27 27 27 00 8A 8A 8A 00 32 32 32 00 4B 4B 4B 00 42 42 42 00 DB DB DB 00 1C 1C 1C 00 9E 9E 9E 00 9C 9C 9C 00 3A 3A 3A 00 CA CA CA 00 25 25 25 00 7B 7B 7B 00 0D 0D 0D 00 71 71 71 00 5F 5F 5F 00 1F 1F 1F 00 F8 F8 F8 00 D7 D7 D7 00 3E 3E 3E 00 9D 9D 9D 00 7C 7C 7C 00 60 60 60 00 B9 B9 B9 }
+	$auc = { 38 38 00 38 41 41 00 41 16 16 00 16 76 76 00 76 D9 D9 00 D9 93 93 00 93 60 60 00 60 F2 F2 00 F2 72 72 00 72 C2 C2 00 C2 AB AB 00 AB 9A 9A 00 9A 75 75 00 75 06 06 00 06 57 57 00 57 A0 A0 00 A0 91 91 00 91 F7 F7 00 F7 B5 B5 00 B5 C9 C9 00 C9 A2 A2 00 A2 8C 8C 00 8C D2 D2 00 D2 90 90 00 90 F6 F6 00 F6 07 07 00 07 A7 A7 00 A7 27 27 00 27 8E 8E 00 8E B2 B2 00 B2 49 49 00 49 DE DE 00 DE 43 43 00 43 5C 5C 00 5C D7 D7 00 D7 C7 C7 00 C7 3E 3E 00 3E F5 F5 00 F5 8F 8F 00 8F 67 67 00 67 1F 1F 00 1F 18 18 00 18 6E 6E 00 }
+	$aud = { 70 00 70 70 2C 00 2C 2C B3 00 B3 B3 C0 00 C0 C0 E4 00 E4 E4 57 00 57 57 EA 00 EA EA AE 00 AE AE 23 00 23 23 6B 00 6B 6B 45 00 45 45 A5 00 A5 A5 ED 00 ED ED 4F 00 4F 4F 1D 00 1D 1D 92 00 92 92 86 00 86 86 AF 00 AF AF 7C 00 7C 7C 1F 00 1F 1F 3E 00 3E 3E DC 00 DC DC 5E 00 5E 5E 0B 00 0B 0B A6 00 A6 A6 39 00 39 39 D5 00 D5 D5 5D 00 5D 5D D9 00 D9 D9 5A 00 5A 5A 51 00 51 51 6C 00 6C 6C 8B 00 8B 8B 9A 00 9A 9A FB 00 FB FB B0 00 B0 B0 74 00 74 74 2B 00 2B 2B F0 00 F0 F0 84 00 84 84 DF 00 DF DF CB 00 CB CB 34 00 34 }
+	$aue = { 70 82 2C EC B3 27 C0 E5 E4 85 57 35 EA 0C AE 41 23 EF 6B 93 45 19 A5 21 ED 0E 4F 4E 1D 65 92 BD 86 B8 AF 8F 7C EB 1F CE 3E 30 DC 5F 5E C5 0B 1A A6 E1 39 CA D5 47 5D 3D D9 01 5A D6 51 56 6C 4D 8B 0D 9A 66 FB CC B0 2D 74 12 2B 20 F0 B1 84 99 DF 4C CB C2 34 7E 76 05 6D B7 A9 31 D1 17 04 D7 14 58 3A 61 DE 1B 11 1C 32 0F 9C 16 53 18 F2 22 FE 44 CF B2 C3 B5 7A 91 24 08 E8 A8 60 FC 69 50 AA D0 A0 7D A1 89 62 97 54 5B 1E 95 E0 FF 64 D2 10 C4 00 48 A3 F7 75 DB 8A 03 E6 DA 09 3F DD 94 87 5C 83 02 CD 4A 90 33 73 67 F6 F3 9D 7F BF E2 52 9B D8 26 C8 37 C6 3B 81 96 6F 4B 13 BE 63 2E E9 79 A7 8C 9F 6E BC 8E 29 F5 F9 B6 2F FD B4 59 78 98 06 6A E7 46 71 BA D4 25 AB 42 88 A2 8D FA 72 07 B9 55 F8 EE AC 0A 36 49 2A 68 3C 38 F1 A4 40 28 D3 7B BB C9 43 C1 15 E3 AD F4 77 C7 80 9E }
+	$num_auf = { 8B 90 CC 3B }
+	$num_aug = { 7F 66 9E A0 }
+	$num_auh = { B2 73 AA 4C }
+	$num_aui = { 58 E8 7A B6 }
+	$num_auj = { 2F 37 EF C6 }
+	$num_auk = { BE 82 4F E9 }
+	$num_aul = { A5 53 FF 54 }
+	$num_aum = { 1C 6F D3 F1 }
+	$num_aun = { FA 27 E5 10 }
+	$num_auo = { 1D 2D 68 DE }
+	$num_aup = { C2 88 56 B0 }
+	$num_auq = { FD C1 E6 B3 }
+	$aur = { 8B 90 CC 3B 7F 66 9E A0 }
+	$aus = { B2 73 AA 4C 58 E8 7A B6 }
+	$aut = { BE 82 4F E9 2F 37 EF C6 }
+	$auu = { 1C 6F D3 F1 A5 53 FF 54 }
+	$auv = { 1D 2D 68 DE FA 27 E5 10 }
+	$auw = { FD C1 E6 B3 C2 88 56 B0 }
+	$aux = /A09E667F3BCC908B/ nocase ascii wide 
+	$str_auy = "/B67AE8584CAA73B" ascii wide
+	$auz = /C6EF372FE94F82BE/ nocase ascii wide 
+	$ava = /54FF53A5F1D36F1C/ nocase ascii wide 
+	$avb = /10E527FADE682D1D/ nocase ascii wide 
+	$avc = /B05688C2B3E6C1FD/ nocase ascii wide 
  
   condition: 
 	(
@@ -4294,12 +4239,13 @@ rule capa_encrypt_data_using_Camellia {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$aub 
+ ( 	$aua 
+	or 	$aub 
 	or 	$auc 
 	or 	$aud 
 	or 	$aue 
-	or 	$auf 
-	or  (  (  (  ( $num_aug 
+	or  (  (  (  ( $num_auf 
+	and $num_aug 
 	and $num_auh 
 	and $num_aui 
 	and $num_auj 
@@ -4309,20 +4255,19 @@ rule capa_encrypt_data_using_Camellia {
 	and $num_aun 
 	and $num_auo 
 	and $num_aup 
-	and $num_auq 
-	and $num_aur  )  ) 
-	or  (  ( 	$aus 
+	and $num_auq  )  ) 
+	or  (  ( 	$aur 
+	and 	$aus 
 	and 	$aut 
 	and 	$auu 
 	and 	$auv 
-	and 	$auw 
-	and 	$aux  )  ) 
-	or  (  ( 	$auy 
-	and 	$str_auz 
+	and 	$auw  )  ) 
+	or  (  ( 	$aux 
+	and 	$str_auy 
+	and 	$auz 
 	and 	$ava 
 	and 	$avb 
-	and 	$avc 
-	and 	$avd  )  )  )  )  ) 
+	and 	$avc  )  )  )  )  ) 
 }
 
 rule capa_encrypt_data_using_RC6 { 
@@ -4339,9 +4284,9 @@ rule capa_encrypt_data_using_RC6 {
 	date = "2021-05-15"
 
   strings: 
- 	$num_ave = { 63 51 E1 B7 }
-	$num_avf = { B9 79 37 9E }
-	$num_avg = { 47 86 C8 61 }
+ 	$num_avd = { 63 51 E1 B7 }
+	$num_ave = { B9 79 37 9E }
+	$num_avf = { 47 86 C8 61 }
  
   condition: 
 	(
@@ -4349,9 +4294,9 @@ rule capa_encrypt_data_using_RC6 {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( $num_ave 
-	and  (  ( $num_avf 
-	or $num_avg  )  )  ) 
+ ( $num_avd 
+	and  (  ( $num_ave 
+	or $num_avf  )  )  ) 
 }
 
 rule capa_encrypt_data_using_twofish { 
@@ -4368,14 +4313,14 @@ rule capa_encrypt_data_using_twofish {
 	date = "2021-05-15"
 
   strings: 
- 	$avh = { A9 67 B3 E8 04 FD A3 76 9A 92 80 78 E4 DD D1 38 0D C6 35 98 18 F7 EC 6C 43 75 37 26 FA 13 94 48 F2 D0 8B 30 84 54 DF 23 19 5B 3D 59 F3 AE A2 82 63 01 83 2E D9 51 9B 7C A6 EB A5 BE 16 0C E3 61 C0 8C 3A F5 73 2C 25 0B BB 4E 89 6B 53 6A B4 F1 E1 E6 BD 45 E2 F4 B6 66 CC 95 03 56 D4 1C 1E D7 FB C3 8E B5 E9 CF BF BA EA 77 39 AF 33 C9 62 71 81 79 09 AD 24 CD F9 D8 E5 C5 B9 4D 44 08 86 E7 A1 1D AA ED 06 70 B2 D2 41 7B A0 11 31 C2 27 90 20 F6 60 FF 96 5C B1 AB 9E 9C 52 1B 5F 93 0A EF 91 85 49 EE 2D 4F 8F 3B 47 87 6D }
-	$avi = { 75 F3 C6 F4 DB 7B FB C8 4A D3 E6 6B 45 7D E8 4B D6 32 D8 FD 37 71 F1 E1 30 0F F8 1B 87 FA 06 3F 5E BA AE 5B 8A 00 BC 9D 6D C1 B1 0E 80 5D D2 D5 A0 84 07 14 B5 90 2C A3 B2 73 4C 54 92 74 36 51 38 B0 BD 5A FC 60 62 96 6C 42 F7 10 7C 28 27 8C 13 95 9C C7 24 46 3B 70 CA E3 85 CB 11 D0 93 B8 A6 83 20 FF 9F 77 C3 CC 03 6F 08 BF 40 E7 2B E2 79 0C AA 82 41 3A EA B9 E4 9A A4 97 7E DA 7A 17 66 94 A1 1D 3D F0 DE B3 0B 72 A7 1C EF D1 53 3E 8F 33 26 5F EC 76 2A 49 81 88 EE 21 C4 1A EB D9 C5 39 99 CD AD 31 8B 01 18 23 DD }
-	$avj = { 75 32 BC BC F3 21 EC EC C6 43 20 20 F4 C9 B3 B3 DB 03 DA DA 7B 8B 02 02 FB 2B E2 E2 C8 FA 9E 9E 4A EC C9 C9 D3 09 D4 D4 E6 6B 18 18 6B 9F 1E 1E 45 0E 98 98 7D 38 B2 B2 E8 D2 A6 A6 4B B7 26 26 D6 57 3C 3C 32 8A 93 93 D8 EE 82 82 FD 98 52 52 37 D4 7B 7B 71 37 BB BB F1 97 5B 5B E1 83 47 47 30 3C 24 24 0F E2 51 51 F8 C6 BA BA 1B F3 4A 4A 87 48 BF BF FA 70 0D 0D 06 B3 B0 B0 3F DE 75 75 5E FD D2 D2 BA 20 7D 7D AE 31 66 66 5B A3 3A 3A 8A 1C 59 59 00 00 00 00 BC 93 CD CD 9D E0 1A 1A 6D 2C AE AE C1 AB 7F 7F B1 C7 2B }
-	$avk = { 39 39 D9 A9 17 17 90 67 9C 9C 71 B3 A6 A6 D2 E8 07 07 05 04 52 52 98 FD 80 80 65 A3 E4 E4 DF 76 45 45 08 9A 4B 4B 02 92 E0 E0 A0 80 5A 5A 66 78 AF AF DD E4 6A 6A B0 DD 63 63 BF D1 2A 2A 36 38 E6 E6 54 0D 20 20 43 C6 CC CC 62 35 F2 F2 BE 98 12 12 1E 18 EB EB 24 F7 A1 A1 D7 EC 41 41 77 6C 28 28 BD 43 BC BC 32 75 7B 7B D4 37 88 88 9B 26 0D 0D 70 FA 44 44 F9 13 FB FB B1 94 7E 7E 5A 48 03 03 7A F2 8C 8C E4 D0 B6 B6 47 8B 24 24 3C 30 E7 E7 A5 84 6B 6B 41 54 DD DD 06 DF 60 60 C5 23 FD FD 45 19 3A 3A A3 5B C2 C2 68 }
-	$avl = { 32 BC 75 BC 21 EC F3 EC 43 20 C6 20 C9 B3 F4 B3 03 DA DB DA 8B 02 7B 02 2B E2 FB E2 FA 9E C8 9E EC C9 4A C9 09 D4 D3 D4 6B 18 E6 18 9F 1E 6B 1E 0E 98 45 98 38 B2 7D B2 D2 A6 E8 A6 B7 26 4B 26 57 3C D6 3C 8A 93 32 93 EE 82 D8 82 98 52 FD 52 D4 7B 37 7B 37 BB 71 BB 97 5B F1 5B 83 47 E1 47 3C 24 30 24 E2 51 0F 51 C6 BA F8 BA F3 4A 1B 4A 48 BF 87 BF 70 0D FA 0D B3 B0 06 B0 DE 75 3F 75 FD D2 5E D2 20 7D BA 7D 31 66 AE 66 A3 3A 5B 3A 1C 59 8A 59 00 00 00 00 93 CD BC CD E0 1A 9D 1A 2C AE 6D AE AB 7F C1 7F C7 2B B1 }
-	$avm = { D9 A9 39 D9 90 67 17 90 71 B3 9C 71 D2 E8 A6 D2 05 04 07 05 98 FD 52 98 65 A3 80 65 DF 76 E4 DF 08 9A 45 08 02 92 4B 02 A0 80 E0 A0 66 78 5A 66 DD E4 AF DD B0 DD 6A B0 BF D1 63 BF 36 38 2A 36 54 0D E6 54 43 C6 20 43 62 35 CC 62 BE 98 F2 BE 1E 18 12 1E 24 F7 EB 24 D7 EC A1 D7 77 6C 41 77 BD 43 28 BD 32 75 BC 32 D4 37 7B D4 9B 26 88 9B 70 FA 0D 70 F9 13 44 F9 B1 94 FB B1 5A 48 7E 5A 7A F2 03 7A E4 D0 8C E4 47 8B B6 47 3C 30 24 3C A5 84 E7 A5 41 54 6B 41 06 DF DD 06 C5 23 60 C5 45 19 FD 45 A3 5B 3A A3 68 3D C2 }
-	$avn = { 01 02 04 08 10 20 40 80 4D 9A 79 F2 A9 1F 3E 7C F8 BD 37 6E DC F5 A7 03 06 0C 18 30 60 C0 CD D7 E3 8B 5B B6 21 42 84 45 8A 59 B2 29 52 A4 05 0A 14 28 50 A0 0D 1A 34 68 D0 ED 97 63 C6 C1 CF D3 EB 9B 7B F6 A1 0F 1E 3C 78 F0 AD 17 2E 5C B8 3D 7A F4 A5 07 0E 1C 38 70 E0 8D 57 AE 11 22 44 88 5D BA 39 72 E4 85 47 8E 51 A2 09 12 24 48 90 6D DA F9 BF 33 66 CC D5 E7 83 4B 96 61 C2 C9 DF F3 AB 1B 36 6C D8 FD B7 23 46 8C 55 AA 19 32 64 C8 DD F7 A3 0B 16 2C 58 B0 2D 5A B4 25 4A 94 65 CA D9 FF B3 2B 56 AC 15 2A 54 A8 1D }
-	$avo = { A9 75 67 F3 B3 C6 E8 F4 04 DB FD 7B A3 FB 76 C8 9A 4A 92 D3 80 E6 78 6B E4 45 DD 7D D1 E8 38 4B 0D D6 C6 32 35 D8 98 FD 18 37 F7 71 EC F1 6C E1 43 30 75 0F 37 F8 26 1B FA 87 13 FA 94 06 48 3F F2 5E D0 BA 8B AE 30 5B 84 8A 54 00 DF BC 23 9D 19 6D 5B C1 3D B1 59 0E F3 80 AE 5D A2 D2 82 D5 63 A0 01 84 83 07 2E 14 D9 B5 51 90 9B 2C 7C A3 A6 B2 EB 73 A5 4C BE 54 16 92 0C 74 E3 36 61 51 C0 38 8C B0 3A BD F5 5A 73 FC 2C 60 25 62 0B 96 BB 6C 4E 42 89 F7 6B 10 53 7C 6A 28 B4 27 F1 8C E1 13 E6 95 BD 9C 45 C7 E2 24 F4 }
+ 	$avg = { A9 67 B3 E8 04 FD A3 76 9A 92 80 78 E4 DD D1 38 0D C6 35 98 18 F7 EC 6C 43 75 37 26 FA 13 94 48 F2 D0 8B 30 84 54 DF 23 19 5B 3D 59 F3 AE A2 82 63 01 83 2E D9 51 9B 7C A6 EB A5 BE 16 0C E3 61 C0 8C 3A F5 73 2C 25 0B BB 4E 89 6B 53 6A B4 F1 E1 E6 BD 45 E2 F4 B6 66 CC 95 03 56 D4 1C 1E D7 FB C3 8E B5 E9 CF BF BA EA 77 39 AF 33 C9 62 71 81 79 09 AD 24 CD F9 D8 E5 C5 B9 4D 44 08 86 E7 A1 1D AA ED 06 70 B2 D2 41 7B A0 11 31 C2 27 90 20 F6 60 FF 96 5C B1 AB 9E 9C 52 1B 5F 93 0A EF 91 85 49 EE 2D 4F 8F 3B 47 87 6D }
+	$avh = { 75 F3 C6 F4 DB 7B FB C8 4A D3 E6 6B 45 7D E8 4B D6 32 D8 FD 37 71 F1 E1 30 0F F8 1B 87 FA 06 3F 5E BA AE 5B 8A 00 BC 9D 6D C1 B1 0E 80 5D D2 D5 A0 84 07 14 B5 90 2C A3 B2 73 4C 54 92 74 36 51 38 B0 BD 5A FC 60 62 96 6C 42 F7 10 7C 28 27 8C 13 95 9C C7 24 46 3B 70 CA E3 85 CB 11 D0 93 B8 A6 83 20 FF 9F 77 C3 CC 03 6F 08 BF 40 E7 2B E2 79 0C AA 82 41 3A EA B9 E4 9A A4 97 7E DA 7A 17 66 94 A1 1D 3D F0 DE B3 0B 72 A7 1C EF D1 53 3E 8F 33 26 5F EC 76 2A 49 81 88 EE 21 C4 1A EB D9 C5 39 99 CD AD 31 8B 01 18 23 DD }
+	$avi = { 75 32 BC BC F3 21 EC EC C6 43 20 20 F4 C9 B3 B3 DB 03 DA DA 7B 8B 02 02 FB 2B E2 E2 C8 FA 9E 9E 4A EC C9 C9 D3 09 D4 D4 E6 6B 18 18 6B 9F 1E 1E 45 0E 98 98 7D 38 B2 B2 E8 D2 A6 A6 4B B7 26 26 D6 57 3C 3C 32 8A 93 93 D8 EE 82 82 FD 98 52 52 37 D4 7B 7B 71 37 BB BB F1 97 5B 5B E1 83 47 47 30 3C 24 24 0F E2 51 51 F8 C6 BA BA 1B F3 4A 4A 87 48 BF BF FA 70 0D 0D 06 B3 B0 B0 3F DE 75 75 5E FD D2 D2 BA 20 7D 7D AE 31 66 66 5B A3 3A 3A 8A 1C 59 59 00 00 00 00 BC 93 CD CD 9D E0 1A 1A 6D 2C AE AE C1 AB 7F 7F B1 C7 2B }
+	$avj = { 39 39 D9 A9 17 17 90 67 9C 9C 71 B3 A6 A6 D2 E8 07 07 05 04 52 52 98 FD 80 80 65 A3 E4 E4 DF 76 45 45 08 9A 4B 4B 02 92 E0 E0 A0 80 5A 5A 66 78 AF AF DD E4 6A 6A B0 DD 63 63 BF D1 2A 2A 36 38 E6 E6 54 0D 20 20 43 C6 CC CC 62 35 F2 F2 BE 98 12 12 1E 18 EB EB 24 F7 A1 A1 D7 EC 41 41 77 6C 28 28 BD 43 BC BC 32 75 7B 7B D4 37 88 88 9B 26 0D 0D 70 FA 44 44 F9 13 FB FB B1 94 7E 7E 5A 48 03 03 7A F2 8C 8C E4 D0 B6 B6 47 8B 24 24 3C 30 E7 E7 A5 84 6B 6B 41 54 DD DD 06 DF 60 60 C5 23 FD FD 45 19 3A 3A A3 5B C2 C2 68 }
+	$avk = { 32 BC 75 BC 21 EC F3 EC 43 20 C6 20 C9 B3 F4 B3 03 DA DB DA 8B 02 7B 02 2B E2 FB E2 FA 9E C8 9E EC C9 4A C9 09 D4 D3 D4 6B 18 E6 18 9F 1E 6B 1E 0E 98 45 98 38 B2 7D B2 D2 A6 E8 A6 B7 26 4B 26 57 3C D6 3C 8A 93 32 93 EE 82 D8 82 98 52 FD 52 D4 7B 37 7B 37 BB 71 BB 97 5B F1 5B 83 47 E1 47 3C 24 30 24 E2 51 0F 51 C6 BA F8 BA F3 4A 1B 4A 48 BF 87 BF 70 0D FA 0D B3 B0 06 B0 DE 75 3F 75 FD D2 5E D2 20 7D BA 7D 31 66 AE 66 A3 3A 5B 3A 1C 59 8A 59 00 00 00 00 93 CD BC CD E0 1A 9D 1A 2C AE 6D AE AB 7F C1 7F C7 2B B1 }
+	$avl = { D9 A9 39 D9 90 67 17 90 71 B3 9C 71 D2 E8 A6 D2 05 04 07 05 98 FD 52 98 65 A3 80 65 DF 76 E4 DF 08 9A 45 08 02 92 4B 02 A0 80 E0 A0 66 78 5A 66 DD E4 AF DD B0 DD 6A B0 BF D1 63 BF 36 38 2A 36 54 0D E6 54 43 C6 20 43 62 35 CC 62 BE 98 F2 BE 1E 18 12 1E 24 F7 EB 24 D7 EC A1 D7 77 6C 41 77 BD 43 28 BD 32 75 BC 32 D4 37 7B D4 9B 26 88 9B 70 FA 0D 70 F9 13 44 F9 B1 94 FB B1 5A 48 7E 5A 7A F2 03 7A E4 D0 8C E4 47 8B B6 47 3C 30 24 3C A5 84 E7 A5 41 54 6B 41 06 DF DD 06 C5 23 60 C5 45 19 FD 45 A3 5B 3A A3 68 3D C2 }
+	$avm = { 01 02 04 08 10 20 40 80 4D 9A 79 F2 A9 1F 3E 7C F8 BD 37 6E DC F5 A7 03 06 0C 18 30 60 C0 CD D7 E3 8B 5B B6 21 42 84 45 8A 59 B2 29 52 A4 05 0A 14 28 50 A0 0D 1A 34 68 D0 ED 97 63 C6 C1 CF D3 EB 9B 7B F6 A1 0F 1E 3C 78 F0 AD 17 2E 5C B8 3D 7A F4 A5 07 0E 1C 38 70 E0 8D 57 AE 11 22 44 88 5D BA 39 72 E4 85 47 8E 51 A2 09 12 24 48 90 6D DA F9 BF 33 66 CC D5 E7 83 4B 96 61 C2 C9 DF F3 AB 1B 36 6C D8 FD B7 23 46 8C 55 AA 19 32 64 C8 DD F7 A3 0B 16 2C 58 B0 2D 5A B4 25 4A 94 65 CA D9 FF B3 2B 56 AC 15 2A 54 A8 1D }
+	$avn = { A9 75 67 F3 B3 C6 E8 F4 04 DB FD 7B A3 FB 76 C8 9A 4A 92 D3 80 E6 78 6B E4 45 DD 7D D1 E8 38 4B 0D D6 C6 32 35 D8 98 FD 18 37 F7 71 EC F1 6C E1 43 30 75 0F 37 F8 26 1B FA 87 13 FA 94 06 48 3F F2 5E D0 BA 8B AE 30 5B 84 8A 54 00 DF BC 23 9D 19 6D 5B C1 3D B1 59 0E F3 80 AE 5D A2 D2 82 D5 63 A0 01 84 83 07 2E 14 D9 B5 51 90 9B 2C 7C A3 A6 B2 EB 73 A5 4C BE 54 16 92 0C 74 E3 36 61 51 C0 38 8C B0 3A BD F5 5A 73 FC 2C 60 25 62 0B 96 BB 6C 4E 42 89 F7 6B 10 53 7C 6A 28 B4 27 F1 8C E1 13 E6 95 BD 9C 45 C7 E2 24 F4 }
  
   condition: 
 	(
@@ -4383,102 +4328,14 @@ rule capa_encrypt_data_using_twofish {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$avh 
+ ( 	$avg 
+	or 	$avh 
 	or 	$avi 
 	or 	$avj 
 	or 	$avk 
 	or 	$avl 
 	or 	$avm 
-	or 	$avn 
-	or 	$avo  ) 
-}
-
-rule capa_encrypt_data_using_Sosemanuk { 
-  meta: 
- 	description = "encrypt data using Sosemanuk (converted from capa rule)"
-	namespace = "data-manipulation/encryption/sosemanuk"
-	author = "@recvfrom"
-	description = "Looks for cryptographic constants associated with the Sosemanuk stream cipher"
-	scope = "basic block"
-	attack = "Defense Evasion::Obfuscated Files or Information [T1027]"
-	mbc = "Defense Evasion::Obfuscated Files or Information::Encryption-Standard Algorithm [E1027.m05]"
-	mbc = "Cryptography::Encrypt Data::Sosemanuk [C0027.008]"
-	references = "https://labs.sentinelone.com/enter-the-maze-demystifying-an-affiliate-involved-in-maze-snow/"
-	hash = "ea7bb99e03606702c1cbe543bb32b27e"
-	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/sosemanuk/encrypt-data-using-sosemanuk.yml"
-	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-15"
-
-  strings: 
- 	$avp = { 00 00 00 00 E1 9F CF 13 6B 97 37 26 8A 08 F8 35 D6 87 6E 4C 37 18 A1 5F BD 10 59 6A 5C 8F 96 79 05 A7 DC 98 E4 38 13 8B 6E 30 EB BE 8F AF 24 AD D3 20 B2 D4 32 BF 7D C7 B8 B7 85 F2 59 28 4A E1 0A E7 11 99 EB 78 DE 8A 61 70 26 BF 80 EF E9 AC DC 60 7F D5 3D FF B0 C6 B7 F7 48 F3 56 68 87 E0 0F 40 CD 01 EE DF 02 12 64 D7 FA 27 85 48 35 34 D9 C7 A3 4D 38 58 6C 5E B2 50 94 6B 53 CF 5B 78 }
-	$avq = { 00 00 00 00 13 CF 9F E1 26 37 97 6B 35 F8 08 8A 4C 6E 87 D6 5F A1 18 37 6A 59 10 BD 79 96 8F 5C 98 DC A7 05 8B 13 38 E4 BE EB 30 6E AD 24 AF 8F D4 B2 20 D3 C7 7D BF 32 F2 85 B7 B8 E1 4A 28 59 99 11 E7 0A 8A DE 78 EB BF 26 70 61 AC E9 EF 80 D5 7F 60 DC C6 B0 FF 3D F3 48 F7 B7 E0 87 68 56 01 CD 40 0F 12 02 DF EE 27 FA D7 64 34 35 48 85 4D A3 C7 D9 5E 6C 58 38 6B 94 50 B2 78 5B CF 53 }
-	$avr = { 00 00 00 00 18 0F 40 CD 30 1E 80 33 28 11 C0 FE 60 3C A9 66 78 33 E9 AB 50 22 29 55 48 2D 69 98 C0 78 FB CC D8 77 BB 01 F0 66 7B FF E8 69 3B 32 A0 44 52 AA B8 4B 12 67 90 5A D2 99 88 55 92 54 29 F0 5F 31 31 FF 1F FC 19 EE DF 02 01 E1 9F CF 49 CC F6 57 51 C3 B6 9A 79 D2 76 64 61 DD 36 A9 E9 88 A4 FD F1 87 E4 30 D9 96 24 CE C1 99 64 03 89 B4 0D 9B 91 BB 4D 56 B9 AA 8D A8 A1 A5 CD 65 }
-	$avs = { 00 00 00 00 CD 40 0F 18 33 80 1E 30 FE C0 11 28 66 A9 3C 60 AB E9 33 78 55 29 22 50 98 69 2D 48 CC FB 78 C0 01 BB 77 D8 FF 7B 66 F0 32 3B 69 E8 AA 52 44 A0 67 12 4B B8 99 D2 5A 90 54 92 55 88 31 5F F0 29 FC 1F FF 31 02 DF EE 19 CF 9F E1 01 57 F6 CC 49 9A B6 C3 51 64 76 D2 79 A9 36 DD 61 FD A4 88 E9 30 E4 87 F1 CE 24 96 D9 03 64 99 C1 9B 0D B4 89 56 4D BB 91 A8 8D AA B9 65 CD A5 A1 }
- 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
- ( 	$avp 
-	or 	$avq 
-	or 	$avr 
-	or 	$avs 
-  ) 
-}
-
-rule capa_encrypt_data_using_DES { 
-  meta: 
- 	description = "encrypt data using DES (converted from capa rule)"
-	namespace = "data-manipulation/encryption/des"
-	author = "@_re_fox"
-	scope = "basic block"
-	attack = "Defense Evasion::Obfuscated Files or Information [T1027]"
-	mbc = "Defense Evasion::Obfuscated Files or Information::Encryption-Standard Algorithm [E1027.m05]"
-	mbc = "Cryptography::Encrypt Data::3DES [C0027.004]"
-	hash = "91a12a4cf437589ba70b1687f5acad19"
-	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/des/encrypt-data-using-des.yml"
-	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-15"
-
-  strings: 
- 	$avt = { 0E 04 0D 01 02 0F 0B 08 03 0A 06 0C 05 09 00 07 00 0F 07 04 0E 02 0D 01 0A 06 0C 0B 09 05 03 08 04 01 0E 08 0D 06 02 0B 0F 0C 09 07 03 0A 05 00 0F 0C 08 02 04 09 01 07 05 0B 03 0E 0A 00 06 0D }
-	$avu = { 0F 01 08 0E 06 0B 03 04 09 07 02 0D 0C 00 05 0A 03 0D 04 07 0F 02 08 0E 0C 00 01 0A 06 09 0B 05 00 0E 07 0B 0A 04 0D 01 05 08 0C 06 09 03 02 0F 0D 08 0A 01 03 0F 04 02 0B 06 07 0C 00 05 0E 09 }
-	$avv = { 0A 00 09 0E 06 03 0F 05 01 0D 0C 07 0B 04 02 08 0D 07 00 09 03 04 06 0A 02 08 05 0E 0C 0B 0F 01 0D 06 04 09 08 0F 03 00 0B 01 02 0C 05 0A 0E 07 01 0A 0D 00 06 09 08 07 04 0F 0E 03 0B 05 02 0C }
-	$avw = { 07 0D 0E 03 00 06 09 0A 01 02 08 05 0B 0C 04 0F 0D 08 0B 05 06 0F 00 03 04 07 02 0C 01 0A 0E 09 0A 06 09 00 0C 0B 07 0D 0F 01 03 0E 05 02 08 04 03 0F 00 06 0A 01 0D 08 09 04 05 0B 0C 07 02 0E }
-	$avx = { 02 0C 04 01 07 0A 0B 06 08 05 03 0F 0D 00 0E 09 0E 0B 02 0C 04 07 0D 01 05 00 0F 0A 03 09 08 06 04 02 01 0B 0A 0D 07 08 0F 09 0C 05 06 03 00 0E 0B 08 0C 07 01 0E 02 0D 06 0F 00 09 0A 04 05 03 }
-	$avy = { 0C 01 0A 0F 09 02 06 08 00 0D 03 04 0E 07 05 0B 0A 0F 04 02 07 0C 09 05 06 01 0D 0E 00 0B 03 08 09 0E 0F 05 02 08 0C 03 07 00 04 0A 01 0D 0B 06 04 03 02 0C 09 05 0F 0A 0B 0E 01 07 06 00 08 0D }
-	$avz = { 04 0B 02 0E 0F 00 08 0D 03 0C 09 07 05 0A 06 01 0D 00 0B 07 04 09 01 0A 0E 03 05 0C 02 0F 08 06 01 04 0B 0D 0C 03 07 0E 0A 0F 06 08 00 05 09 02 06 0B 0D 08 01 04 0A 07 09 05 00 0F 0E 02 03 0C }
-	$awa = { 0D 02 08 04 06 0F 0B 01 0A 09 03 0E 05 00 0C 07 01 0F 0D 08 0A 03 07 04 0C 05 06 0B 00 0E 09 02 07 0B 04 01 09 0C 0E 02 00 06 0A 0D 0F 03 05 08 02 01 0E 07 04 0A 08 0D 0F 0C 09 00 03 05 06 0B }
-	$awb = { 39 31 29 21 19 11 09 01 3A 32 2A 22 1A 12 0A 02 3B 33 2B 23 1B 13 0B 03 3C 34 2C 24 3F 37 2F 27 1F 17 0F 07 3E 36 2E 26 1E 16 0E 06 3D 35 2D 25 1D 15 0D 05 1C 14 0C 04 }
-	$awc = { 0E 11 0B 18 01 05 03 1C 0F 06 15 0A 17 13 0C 04 1A 08 10 07 1B 14 0D 02 29 34 1F 25 2F 37 1E 28 33 2D 21 30 2C 31 27 38 22 35 2E 2A 32 24 1D 20 }
-	$awd = { 3A 32 2A 22 1A 12 0A 02 3C 34 2C 24 1C 14 0C 04 3E 36 2E 26 1E 16 0E 06 40 38 30 28 20 18 10 08 39 31 29 21 19 11 09 01 3B 33 2B 23 1B 13 0B 03 3D 35 2D 25 1D 15 0D 05 3F 37 2F 27 1F 17 0F 07 }
-	$awe = { 28 08 30 10 38 18 40 20 27 07 2F 0F 37 17 3F 1F 26 06 2E 0E 36 16 3E 1E 25 05 2D 0D 35 15 3D 1D 24 04 2C 0C 34 14 3C 1C 23 03 2B 0B 33 13 3B 1B 22 02 2A 0A 32 12 3A 1A 21 01 29 09 31 11 39 19 }
-	$awf = { 20 01 02 03 04 05 04 05 06 07 08 09 08 09 0A 0B 0C 0D 0C 0D 0E 0F 10 11 10 11 12 13 14 15 14 15 16 17 18 19 18 19 1A 1B 1C 1D 1C 1D 1E 1F 20 01 }
-	$awg = { 10 07 14 15 1D 0C 1C 11 01 0F 17 1A 05 12 1F 0A 02 08 18 0E 20 1B 03 09 13 0D 1E 06 16 0B 04 19 }
- 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
- ( 	$avt 
-	or 	$avu 
-	or 	$avv 
-	or 	$avw 
-	or 	$avx 
-	or 	$avy 
-	or 	$avz 
-	or 	$awa 
-	or 	$awb 
-	or 	$awc 
-	or 	$awd 
-	or 	$awe 
-	or 	$awf 
-	or 	$awg 
-  ) 
+	or 	$avn  ) 
 }
 
 rule capa_encrypt_data_using_AES_via__NET { 
@@ -4495,9 +4352,9 @@ rule capa_encrypt_data_using_AES_via__NET {
 	date = "2021-05-15"
 
   strings: 
- 	$str_awh = "RijndaelManaged" ascii wide
-	$str_awi = "CryptoStream" ascii wide
-	$str_awj = "System.Security.Cryptography" ascii wide
+ 	$str_awg = "RijndaelManaged" ascii wide
+	$str_awh = "CryptoStream" ascii wide
+	$str_awi = "System.Security.Cryptography" ascii wide
  
   condition: 
 	(
@@ -4505,9 +4362,9 @@ rule capa_encrypt_data_using_AES_via__NET {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_awh 
-	and 	$str_awi 
-	and 	$str_awj  ) 
+ ( 	$str_awg 
+	and 	$str_awh 
+	and 	$str_awi  ) 
 }
 
 rule capa_encrypt_data_using_skipjack { 
@@ -4524,7 +4381,7 @@ rule capa_encrypt_data_using_skipjack {
 	date = "2021-05-15"
 
   strings: 
- 	$awk = { A3 D7 09 83 F8 48 F6 F4 B3 21 15 78 99 B1 AF F9 E7 2D 4D 8A CE 4C CA 2E 52 95 D9 1E 4E 38 44 28 0A DF 02 A0 17 F1 60 68 12 B7 7A C3 E9 FA 3D 53 96 84 6B BA F2 63 9A 19 7C AE E5 F5 F7 16 6A A2 39 B6 7B 0F C1 93 81 1B EE B4 1A EA D0 91 2F B8 55 B9 DA 85 3F 41 BF E0 5A 58 80 5F 66 0B D8 90 35 D5 C0 A7 33 06 65 69 45 00 94 56 6D 98 9B 76 97 FC B2 C2 B0 FE DB 20 E1 EB D6 E4 DD 47 4A 1D 42 ED 9E 6E 49 3C CD 43 27 D2 07 D4 DE C7 67 18 89 CB 30 1F 8D C6 8F AA C8 74 DC C9 5D 5C 31 A4 70 88 61 2C 9F 0D 2B 87 50 82 54 64 26 7D 03 40 34 4B 1C 73 D1 C4 FD 3B CC FB 7F AB E6 3E 5B A5 AD 04 23 9C 14 51 22 F0 29 79 71 7E FF 8C 0E E2 0C EF BC 72 75 6F 37 A1 EC D3 8E 62 8B 86 10 E8 08 77 11 BE 92 4F 24 C5 32 36 9D CF F3 A6 BB AC 5E 6C A9 13 57 25 B5 E3 BD A8 3A 01 05 59 2A 46 }
+ 	$awj = { A3 D7 09 83 F8 48 F6 F4 B3 21 15 78 99 B1 AF F9 E7 2D 4D 8A CE 4C CA 2E 52 95 D9 1E 4E 38 44 28 0A DF 02 A0 17 F1 60 68 12 B7 7A C3 E9 FA 3D 53 96 84 6B BA F2 63 9A 19 7C AE E5 F5 F7 16 6A A2 39 B6 7B 0F C1 93 81 1B EE B4 1A EA D0 91 2F B8 55 B9 DA 85 3F 41 BF E0 5A 58 80 5F 66 0B D8 90 35 D5 C0 A7 33 06 65 69 45 00 94 56 6D 98 9B 76 97 FC B2 C2 B0 FE DB 20 E1 EB D6 E4 DD 47 4A 1D 42 ED 9E 6E 49 3C CD 43 27 D2 07 D4 DE C7 67 18 89 CB 30 1F 8D C6 8F AA C8 74 DC C9 5D 5C 31 A4 70 88 61 2C 9F 0D 2B 87 50 82 54 64 26 7D 03 40 34 4B 1C 73 D1 C4 FD 3B CC FB 7F AB E6 3E 5B A5 AD 04 23 9C 14 51 22 F0 29 79 71 7E FF 8C 0E E2 0C EF BC 72 75 6F 37 A1 EC D3 8E 62 8B 86 10 E8 08 77 11 BE 92 4F 24 C5 32 36 9D CF F3 A6 BB AC 5E 6C A9 13 57 25 B5 E3 BD A8 3A 01 05 59 2A 46 }
  
   condition: 
 	(
@@ -4532,7 +4389,7 @@ rule capa_encrypt_data_using_skipjack {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$awk  ) 
+ ( 	$awj  ) 
 }
 
 rule capa_reference_public_RSA_key { 
@@ -4547,7 +4404,7 @@ rule capa_reference_public_RSA_key {
 	date = "2021-05-15"
 
   strings: 
- 	$awl = { 06 02 00 00 00 A4 00 00 52 53 41 31 }
+ 	$awk = { 06 02 00 00 00 A4 00 00 52 53 41 31 }
  
   condition: 
 	(
@@ -4555,7 +4412,7 @@ rule capa_reference_public_RSA_key {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$awl  ) 
+ ( 	$awk  ) 
 }
 
 rule capa_encrypt_data_using_vest { 
@@ -4573,9 +4430,9 @@ rule capa_encrypt_data_using_vest {
 	date = "2021-05-15"
 
   strings: 
- 	$awm = { 07 56 D2 37 3A F7 0A 52 5D C6 2C 87 DA 05 C1 D7 F4 1F 8C 34 }
-	$awn = { 41 4B 1B DD 0D 65 72 EE 09 E7 A1 93 3F 0E 55 9C 63 89 3F B2 AB 5A 0E CB 2F 13 E3 9A C7 09 C5 8D C9 09 0D D7 59 1F A2 D6 CB B0 61 E5 39 44 F8 C5 8B C6 E5 B2 BD E3 82 D2 AB 04 DD D6 1F 94 CA EC 73 43 E7 94 5D 52 66 86 4F 4B 05 D4 AD 0F 66 A3 F9 15 9C C6 C9 3E 3A B8 9D 31 65 F8 C7 9A CE E0 6D BD 18 8D 63 F5 0A CD 11 B4 B5 EE 9B 28 9C A5 93 78 5B D1 D3 B1 2B 84 17 AB F4 85 EF 22 E1 D1 }
-	$awo = { 4F 70 46 DA E1 8D F6 41 59 E8 5D 26 1E CC 2F 89 26 6D 52 BA BC 11 6B A9 C6 47 E4 9C 1E B6 65 A2 B6 CD 90 47 1C DF F8 10 4B D2 7C C4 72 25 C6 97 25 5D C6 1D 4B 36 BC 38 36 33 F8 89 B4 4C 65 A7 96 CA 1B 63 C3 4B 6A 63 DC 85 4C 57 EE 2A 05 C7 0C E7 39 35 8A C1 BF 13 D9 52 51 3D 2E 41 F5 72 85 23 FE A1 AA 53 61 3B 25 5F 62 B4 36 EE 2A 51 AF 18 8E 9A C6 CF C4 07 4A 9B 25 9B 76 62 0E 3E 96 3A A7 64 23 6B B6 19 BC 2D 40 D7 36 3E E2 85 9A D1 22 9F BC 30 15 9F C2 5D F1 23 E6 3A 73 C0 A6 AD 71 B0 94 1C 9D B6 56 B6 2B }
+ 	$awl = { 07 56 D2 37 3A F7 0A 52 5D C6 2C 87 DA 05 C1 D7 F4 1F 8C 34 }
+	$awm = { 41 4B 1B DD 0D 65 72 EE 09 E7 A1 93 3F 0E 55 9C 63 89 3F B2 AB 5A 0E CB 2F 13 E3 9A C7 09 C5 8D C9 09 0D D7 59 1F A2 D6 CB B0 61 E5 39 44 F8 C5 8B C6 E5 B2 BD E3 82 D2 AB 04 DD D6 1F 94 CA EC 73 43 E7 94 5D 52 66 86 4F 4B 05 D4 AD 0F 66 A3 F9 15 9C C6 C9 3E 3A B8 9D 31 65 F8 C7 9A CE E0 6D BD 18 8D 63 F5 0A CD 11 B4 B5 EE 9B 28 9C A5 93 78 5B D1 D3 B1 2B 84 17 AB F4 85 EF 22 E1 D1 }
+	$awn = { 4F 70 46 DA E1 8D F6 41 59 E8 5D 26 1E CC 2F 89 26 6D 52 BA BC 11 6B A9 C6 47 E4 9C 1E B6 65 A2 B6 CD 90 47 1C DF F8 10 4B D2 7C C4 72 25 C6 97 25 5D C6 1D 4B 36 BC 38 36 33 F8 89 B4 4C 65 A7 96 CA 1B 63 C3 4B 6A 63 DC 85 4C 57 EE 2A 05 C7 0C E7 39 35 8A C1 BF 13 D9 52 51 3D 2E 41 F5 72 85 23 FE A1 AA 53 61 3B 25 5F 62 B4 36 EE 2A 51 AF 18 8E 9A C6 CF C4 07 4A 9B 25 9B 76 62 0E 3E 96 3A A7 64 23 6B B6 19 BC 2D 40 D7 36 3E E2 85 9A D1 22 9F BC 30 15 9F C2 5D F1 23 E6 3A 73 C0 A6 AD 71 B0 94 1C 9D B6 56 B6 2B }
  
   condition: 
 	(
@@ -4583,9 +4440,9 @@ rule capa_encrypt_data_using_vest {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$awm 
-	or 	$awn 
-	or 	$awo  ) 
+ ( 	$awl 
+	or 	$awm 
+	or 	$awn  ) 
 }
 
 rule capa_encrypt_data_using_blowfish { 
@@ -4602,15 +4459,15 @@ rule capa_encrypt_data_using_blowfish {
 	date = "2021-05-15"
 
   strings: 
- 	$num_awr = { 37 CE 39 3A }
-	$num_aws = { 68 5A 3D E9 }
-	$num_awt = { E9 70 7A 4B }
-	$num_awu = { A6 0B 31 D1 }
-	$awv = { 88 6A 3F 24 D3 08 A3 85 2E 8A 19 13 44 73 70 03 22 38 09 A4 D0 31 9F 29 98 FA 2E 08 89 6C 4E EC E6 21 28 45 77 13 D0 38 CF 66 54 BE 6C 0C E9 34 B7 29 AC C0 DD 50 7C C9 B5 D5 84 3F 17 09 47 B5 D9 D5 16 92 1B FB 79 89 }
-	$aww = { A6 0B 31 D1 AC B5 DF 98 DB 72 FD 2F B7 DF 1A D0 ED AF E1 B8 96 7E 26 6A 45 90 7C BA 99 7F 2C F1 47 99 A1 24 F7 6C 91 B3 E2 F2 01 08 16 FC 8E 85 D8 20 69 63 69 4E 57 71 A3 FE 58 A4 7E 3D 93 F4 8F 74 95 0D 58 B6 8E 72 58 CD 8B 71 EE 4A 15 82 1D A4 54 7B B5 59 5A C2 39 D5 30 9C 13 60 F2 2A 23 B0 D1 C5 F0 85 60 28 18 79 41 CA EF 38 DB B8 B0 DC 79 8E 0E 18 3A 60 8B 0E 9E 6C 3E 8A 1E B0 C1 77 15 D7 27 4B 31 BD DA 2F AF 78 60 5C 60 55 F3 25 55 E6 94 AB 55 AA 62 98 48 57 40 14 E8 63 6A 39 CA 55 B6 10 AB 2A 34 5C CC }
-	$awx = { E9 70 7A 4B 44 29 B3 B5 2E 09 75 DB 23 26 19 C4 B0 A6 6E AD 7D DF A7 49 B8 60 EE 9C 66 B2 ED 8F 71 8C AA EC FF 17 9A 69 6C 52 64 56 E1 9E B1 C2 A5 02 36 19 29 4C 09 75 40 13 59 A0 3E 3A 18 E4 9A 98 54 3F 65 9D 42 5B D6 E4 8F 6B D6 3F F7 99 07 9C D2 A1 F5 30 E8 EF E6 38 2D 4D C1 5D 25 F0 86 20 DD 4C 26 EB 70 84 C6 E9 82 63 5E CC 1E 02 3F 6B 68 09 C9 EF BA 3E 14 18 97 3C A1 70 6A 6B 84 35 7F 68 86 E2 A0 52 05 53 9C B7 37 07 50 AA 1C 84 07 3E 5C AE DE 7F EC 44 7D 8E B8 F2 16 57 37 DA 3A B0 0D 0C 50 F0 04 1F 1C }
-	$awy = { 68 5A 3D E9 F7 40 81 94 1C 26 4C F6 34 29 69 94 F7 20 15 41 F7 D4 02 76 2E 6B F4 BC 68 00 A2 D4 71 24 08 D4 6A F4 20 33 B7 D4 B7 43 AF 61 00 50 2E F6 39 1E 46 45 24 97 74 4F 21 14 40 88 8B BF 1D FC 95 4D AF 91 B5 96 D3 DD F4 70 45 2F A0 66 EC 09 BC BF 85 97 BD 03 D0 6D AC 7F 04 85 CB 31 B3 27 EB 96 41 39 FD 55 E6 47 25 DA 9A 0A CA AB 25 78 50 28 F4 29 04 53 DA 86 2C 0A FB 6D B6 E9 62 14 DC 68 00 69 48 D7 A4 C0 0E 68 EE 8D A1 27 A2 FE 3F 4F 8C AD 87 E8 06 E0 8C B5 B6 D6 F4 7A 7C 1E CE AA EC 5F 37 D3 99 A3 78 }
-	$awz = { 37 CE 39 3A CF F5 FA D3 37 77 C2 AB 1B 2D C5 5A 9E 67 B0 5C 42 37 A3 4F 40 27 82 D3 BE 9B BC 99 9D 8E 11 D5 15 73 0F BF 7E 1C 2D D6 7B C4 00 C7 6B 1B 8C B7 45 90 A1 21 BE B1 6E B2 B4 6E 36 6A 2F AB 48 57 79 6E 94 BC D2 76 A3 C6 C8 C2 49 65 EE F8 0F 53 7D DE 8D 46 1D 0A 73 D5 C6 4D D0 4C DB BB 39 29 50 46 BA A9 E8 26 95 AC 04 E3 5E BE F0 D5 FA A1 9A 51 2D 6A E2 8C EF 63 22 EE 86 9A B8 C2 89 C0 F6 2E 24 43 AA 03 1E A5 A4 D0 F2 9C BA 61 C0 83 4D 6A E9 9B 50 15 E5 8F D6 5B 64 BA F9 A2 26 28 E1 3A 3A A7 86 95 A9 }
+ 	$num_awp = { 37 CE 39 3A }
+	$num_awq = { 68 5A 3D E9 }
+	$num_awr = { E9 70 7A 4B }
+	$num_aws = { A6 0B 31 D1 }
+	$awt = { 88 6A 3F 24 D3 08 A3 85 2E 8A 19 13 44 73 70 03 22 38 09 A4 D0 31 9F 29 98 FA 2E 08 89 6C 4E EC E6 21 28 45 77 13 D0 38 CF 66 54 BE 6C 0C E9 34 B7 29 AC C0 DD 50 7C C9 B5 D5 84 3F 17 09 47 B5 D9 D5 16 92 1B FB 79 89 }
+	$awu = { A6 0B 31 D1 AC B5 DF 98 DB 72 FD 2F B7 DF 1A D0 ED AF E1 B8 96 7E 26 6A 45 90 7C BA 99 7F 2C F1 47 99 A1 24 F7 6C 91 B3 E2 F2 01 08 16 FC 8E 85 D8 20 69 63 69 4E 57 71 A3 FE 58 A4 7E 3D 93 F4 8F 74 95 0D 58 B6 8E 72 58 CD 8B 71 EE 4A 15 82 1D A4 54 7B B5 59 5A C2 39 D5 30 9C 13 60 F2 2A 23 B0 D1 C5 F0 85 60 28 18 79 41 CA EF 38 DB B8 B0 DC 79 8E 0E 18 3A 60 8B 0E 9E 6C 3E 8A 1E B0 C1 77 15 D7 27 4B 31 BD DA 2F AF 78 60 5C 60 55 F3 25 55 E6 94 AB 55 AA 62 98 48 57 40 14 E8 63 6A 39 CA 55 B6 10 AB 2A 34 5C CC }
+	$awv = { E9 70 7A 4B 44 29 B3 B5 2E 09 75 DB 23 26 19 C4 B0 A6 6E AD 7D DF A7 49 B8 60 EE 9C 66 B2 ED 8F 71 8C AA EC FF 17 9A 69 6C 52 64 56 E1 9E B1 C2 A5 02 36 19 29 4C 09 75 40 13 59 A0 3E 3A 18 E4 9A 98 54 3F 65 9D 42 5B D6 E4 8F 6B D6 3F F7 99 07 9C D2 A1 F5 30 E8 EF E6 38 2D 4D C1 5D 25 F0 86 20 DD 4C 26 EB 70 84 C6 E9 82 63 5E CC 1E 02 3F 6B 68 09 C9 EF BA 3E 14 18 97 3C A1 70 6A 6B 84 35 7F 68 86 E2 A0 52 05 53 9C B7 37 07 50 AA 1C 84 07 3E 5C AE DE 7F EC 44 7D 8E B8 F2 16 57 37 DA 3A B0 0D 0C 50 F0 04 1F 1C }
+	$aww = { 68 5A 3D E9 F7 40 81 94 1C 26 4C F6 34 29 69 94 F7 20 15 41 F7 D4 02 76 2E 6B F4 BC 68 00 A2 D4 71 24 08 D4 6A F4 20 33 B7 D4 B7 43 AF 61 00 50 2E F6 39 1E 46 45 24 97 74 4F 21 14 40 88 8B BF 1D FC 95 4D AF 91 B5 96 D3 DD F4 70 45 2F A0 66 EC 09 BC BF 85 97 BD 03 D0 6D AC 7F 04 85 CB 31 B3 27 EB 96 41 39 FD 55 E6 47 25 DA 9A 0A CA AB 25 78 50 28 F4 29 04 53 DA 86 2C 0A FB 6D B6 E9 62 14 DC 68 00 69 48 D7 A4 C0 0E 68 EE 8D A1 27 A2 FE 3F 4F 8C AD 87 E8 06 E0 8C B5 B6 D6 F4 7A 7C 1E CE AA EC 5F 37 D3 99 A3 78 }
+	$awx = { 37 CE 39 3A CF F5 FA D3 37 77 C2 AB 1B 2D C5 5A 9E 67 B0 5C 42 37 A3 4F 40 27 82 D3 BE 9B BC 99 9D 8E 11 D5 15 73 0F BF 7E 1C 2D D6 7B C4 00 C7 6B 1B 8C B7 45 90 A1 21 BE B1 6E B2 B4 6E 36 6A 2F AB 48 57 79 6E 94 BC D2 76 A3 C6 C8 C2 49 65 EE F8 0F 53 7D DE 8D 46 1D 0A 73 D5 C6 4D D0 4C DB BB 39 29 50 46 BA A9 E8 26 95 AC 04 E3 5E BE F0 D5 FA A1 9A 51 2D 6A E2 8C EF 63 22 EE 86 9A B8 C2 89 C0 F6 2E 24 43 AA 03 1E A5 A4 D0 F2 9C BA 61 C0 83 4D 6A E9 9B 50 15 E5 8F D6 5B 64 BA F9 A2 26 28 E1 3A 3A A7 86 95 A9 }
  
   condition: 
 	(
@@ -4618,15 +4475,15 @@ rule capa_encrypt_data_using_blowfish {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- (  (  ( $num_awr 
-	and $num_aws 
-	and $num_awt 
-	and $num_awu  )  ) 
-	or  (  ( 	$awv 
+ (  (  ( $num_awp 
+	and $num_awq 
+	and $num_awr 
+	and $num_aws  )  ) 
+	or  (  ( 	$awt 
+	or 	$awu 
+	or 	$awv 
 	or 	$aww 
-	or 	$awx 
-	or 	$awy 
-	or 	$awz  )  )  ) 
+	or 	$awx  )  )  ) 
 }
 
 rule capa_generate_random_numbers_via_WinAPI { 
@@ -4645,8 +4502,8 @@ rule capa_generate_random_numbers_via_WinAPI {
 	date = "2021-05-15"
 
   strings: 
- 	$api_axa = "BCryptGenRandom" ascii wide
-	$api_axb = "CryptGenRandom" ascii wide
+ 	$api_awy = "BCryptGenRandom" ascii wide
+	$api_awz = "CryptGenRandom" ascii wide
  
   condition: 
 	(
@@ -4654,8 +4511,8 @@ rule capa_generate_random_numbers_via_WinAPI {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- (  (  ( 	$api_axa 
-	or 	$api_axb  )  )  ) 
+ (  (  ( 	$api_awy 
+	or 	$api_awz  )  )  ) 
 }
 
 rule capa_generate_random_numbers_using_a_Mersenne_Twister { 
@@ -4670,13 +4527,13 @@ rule capa_generate_random_numbers_using_a_Mersenne_Twister {
 	date = "2021-05-15"
 
   strings: 
- 	$num_axc = { 65 89 07 6C }
-	$num_axd = { DF B0 08 99 }
-	$num_axe = { 80 56 2C 9D }
-	$num_axf = { 00 00 C6 EF }
-	$num_axg = { AD 58 3A FF }
-	$num_axh = { E9 19 66 A9 5A 6F 02 B5 }
-	$num_axi = { 00 00 A6 ED FF 7F D6 71 }
+ 	$num_axa = { 65 89 07 6C }
+	$num_axb = { DF B0 08 99 }
+	$num_axc = { 80 56 2C 9D }
+	$num_axd = { 00 00 C6 EF }
+	$num_axe = { AD 58 3A FF }
+	$num_axf = { E9 19 66 A9 5A 6F 02 B5 }
+	$num_axg = { 00 00 A6 ED FF 7F D6 71 }
  
   condition: 
 	(
@@ -4684,13 +4541,13 @@ rule capa_generate_random_numbers_using_a_Mersenne_Twister {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( $num_axc 
+ ( $num_axa 
+	or $num_axb 
+	or $num_axc 
 	or $num_axd 
 	or $num_axe 
 	or $num_axf 
-	or $num_axg 
-	or $num_axh 
-	or $num_axi  ) 
+	or $num_axg  ) 
 }
 
 rule capa_compress_data_via_WinAPI { 
@@ -4706,16 +4563,16 @@ rule capa_compress_data_via_WinAPI {
 	date = "2021-05-15"
 
   strings: 
- 	$api_axl = "RtlDecompressBuffer" ascii wide
-	$str_axm = "RtlDecompressBuffer" ascii wide
-	$api_axn = "RtlDecompressBufferEx" ascii wide
-	$str_axo = "RtlDecompressBufferEx" ascii wide
-	$api_axp = "RtlDecompressBufferEx2" ascii wide
-	$str_axq = "RtlDecompressBufferEx2" ascii wide
-	$api_axr = "RtlCompressBuffer" ascii wide
-	$str_axs = "RtlCompressBuffer" ascii wide
-	$api_axt = "RtlCompressBufferLZNT1" ascii wide
-	$str_axu = "RtlCompressBufferLZNT1" ascii wide
+ 	$api_axj = "RtlDecompressBuffer" ascii wide
+	$str_axk = "RtlDecompressBuffer" ascii wide
+	$api_axl = "RtlDecompressBufferEx" ascii wide
+	$str_axm = "RtlDecompressBufferEx" ascii wide
+	$api_axn = "RtlDecompressBufferEx2" ascii wide
+	$str_axo = "RtlDecompressBufferEx2" ascii wide
+	$api_axp = "RtlCompressBuffer" ascii wide
+	$str_axq = "RtlCompressBuffer" ascii wide
+	$api_axr = "RtlCompressBufferLZNT1" ascii wide
+	$str_axs = "RtlCompressBufferLZNT1" ascii wide
  
   condition: 
 	(
@@ -4723,42 +4580,16 @@ rule capa_compress_data_via_WinAPI {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$api_axl 
+ ( 	$api_axj 
+	or 	$str_axk 
+	or 	$api_axl 
 	or 	$str_axm 
 	or 	$api_axn 
 	or 	$str_axo 
 	or 	$api_axp 
 	or 	$str_axq 
 	or 	$api_axr 
-	or 	$str_axs 
-	or 	$api_axt 
-	or 	$str_axu  ) 
-}
-
-rule capa_hash_data_with_CRC32 { 
-  meta: 
- 	description = "hash data with CRC32 (converted from capa rule)"
-	namespace = "data-manipulation/checksum/crc32"
-	author = "moritz.raabe@fireeye.com"
-	scope = "function"
-	mbc = "Data::Checksum::CRC32 [C0032.001]"
-	hash = "2D3EDC218A90F03089CC01715A9F047F"
-	hash = "7D28CB106CB54876B2A5C111724A07CD"
-	hash = "7EFF498DE13CC734262F87E6B3EF38AB"
-	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/checksum/crc32/hash-data-with-crc32.yml"
-	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-15"
-
-  strings: 
- 	$api_axv = "RtlComputeCrc32" ascii wide
- 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
- ( 	$api_axv  ) 
+	or 	$str_axs  ) 
 }
 
 rule capa_hash_data_via_WinCrypt { 
@@ -4794,14 +4625,14 @@ rule capa_hash_data_using_SHA256 {
 	date = "2021-05-15"
 
   strings: 
- 	$num_axw = { 67 E6 09 6A }
-	$num_axx = { 85 AE 67 BB }
-	$num_axy = { 72 F3 6E 3C }
-	$num_axz = { 3A F5 4F A5 }
-	$num_aya = { 7F 52 0E 51 }
-	$num_ayb = { 8C 68 05 9B }
-	$num_ayc = { AB D9 83 1F }
-	$num_ayd = { 19 CD E0 5B }
+ 	$num_axt = { 67 E6 09 6A }
+	$num_axu = { 85 AE 67 BB }
+	$num_axv = { 72 F3 6E 3C }
+	$num_axw = { 3A F5 4F A5 }
+	$num_axx = { 7F 52 0E 51 }
+	$num_axy = { 8C 68 05 9B }
+	$num_axz = { AB D9 83 1F }
+	$num_aya = { 19 CD E0 5B }
  
   condition: 
 	(
@@ -4809,45 +4640,14 @@ rule capa_hash_data_using_SHA256 {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( $num_axw 
+ ( $num_axt 
+	and $num_axu 
+	and $num_axv 
+	and $num_axw 
 	and $num_axx 
 	and $num_axy 
 	and $num_axz 
-	and $num_aya 
-	and $num_ayb 
-	and $num_ayc 
-	and $num_ayd  ) 
-}
-
-rule capa_hash_data_using_tiger { 
-  meta: 
- 	description = "hash data using tiger (converted from capa rule)"
-	namespace = "data-manipulation/hashing/tiger"
-	author = "@_re_fox"
-	scope = "basic block"
-	mbc = "Cryptography::Cryptographic Hash::Tiger [C0029.005]"
-	hash = "0761142efbda6c4b1e801223de723578"
-	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/hashing/tiger/hash-data-using-tiger.yml"
-	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-15"
-
-  strings: 
- 	$ayk = { 5E 0C E9 F7 7C B1 AA 02 EC A8 43 E2 03 4B 42 AC D3 FC D5 0D E3 5B CD 72 3A 7F F9 F6 93 9B 01 6D 93 91 1F D2 FF 78 99 CD E2 29 80 70 C9 A1 73 75 C3 83 2A 92 6B 32 64 B1 70 58 91 04 EE 3E 88 46 E6 EC 03 71 05 E3 AC EA 5C 53 A3 08 B8 69 41 C5 7C C4 DE 8D 91 54 E7 4C 0C F4 0D DC DF F4 A2 0A FA BE 4D A7 18 6F B7 10 6A AB D1 5A 23 B6 CC C6 FF E2 2F 57 21 61 72 13 1E 92 9D 19 6F 8C 48 1A CA 07 00 DA F4 F9 C9 4B C7 41 52 E8 F6 E6 F5 26 B6 47 59 EA DB 79 90 85 92 8C 9E C9 C5 85 18 4F 4B 86 6F A9 1E 76 8E D7 7D C1 B5 }
-	$ayl = { 38 21 A1 05 5A BE A6 E6 98 7C F8 B4 A5 22 A1 B5 90 69 0B 14 89 60 3C 56 D5 5D 1F 39 2E CB 46 4C 34 94 B7 C9 DB AD 32 D9 F5 AF 15 20 E4 70 EA 08 F1 8C 47 3E 67 A6 65 D7 99 8D 27 AB 7E 75 FB C4 92 06 6E 2D 86 C6 11 DF 16 3B 7F 0D F1 84 EB DD 04 EA 65 A6 04 F6 2E 6F B3 DF E0 F0 0F 0F 8E 4A 51 BA BC 3D F8 EE ED A5 1E 37 A4 0E 2A 0A 4F FC 29 84 B3 5C A8 1D 3E E8 E2 1C 1B BA 82 F8 8F DC 0D E8 53 83 5E 50 45 CD 17 07 DB D4 00 9A D1 18 01 81 F3 A5 ED CF A0 34 F2 CA 87 88 51 7E E7 0B 36 51 C4 B3 38 14 34 1E F9 CC 89 }
-	$aym = { 9B F3 DA F1 2F CC 9F F4 81 92 F2 6F C6 D5 7F 48 3F A8 DC FC 67 06 A3 E8 63 CE FC D2 E3 4B 9B 2C C2 BB FB 93 4B F7 3F DA 66 BA 70 FE D2 65 A1 2F D4 93 0E 97 79 E2 03 A1 71 5E E4 B0 77 EC CD BE 97 E4 85 39 72 1E B4 CF 17 50 F7 5E 02 AA 0A B7 E0 B8 40 38 F0 09 23 D4 79 85 89 35 D0 1A FC 8E C5 AB B2 E2 0B 92 C6 96 72 91 5A 37 63 41 AF 66 FB 27 71 CA DC AB 74 21 41 FF 72 4A A6 CE 3C B3 A5 66 30 08 33 49 4A F0 F5 9A 28 D7 CD 0A 97 8D 5E C2 C8 31 E0 E8 96 8F 47 5D 87 76 22 C0 FE F3 DD 90 61 05 10 F3 7B EC 91 14 0F }
-	$ayn = { 55 3C 32 26 85 60 0E 5B F5 59 1B FA A9 C1 46 1A FA 8F 4C 7C A1 45 E2 A9 D7 55 29 DB 59 51 CA 65 C2 AF 35 CE 76 0A DB 05 45 3D 11 A9 7E C7 EA 81 0D 0A AC B6 8A F8 8E 52 FF E3 7B 59 53 A2 9E A0 56 CD 48 AC B3 DF 0D 43 6F E4 5C F4 7A A6 B3 C4 5E D0 E2 FB D8 CF CE 4E F0 35 99 B3 10 6F F5 3E C6 19 D6 9C 82 D6 22 0B 69 20 DF 74 0A 46 FD 17 40 ED 10 85 8E CC F8 6C A7 CA 6E 3A BF 24 C8 D6 49 70 81 1A 58 3D 24 61 A2 63 C1 BB B6 AC 8B 04 32 CC 44 7D C2 8A A3 D9 AB 10 F4 AA 5B FF DD 7F 4B 82 04 A8 5A 49 6D AD 94 9F 8C }
- 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
- ( 	$ayk 
-	or 	$ayl 
-	or 	$aym 
-	or 	$ayn 
-  ) 
+	and $num_aya  ) 
 }
 
 rule capa_hash_data_using_SHA224 { 
@@ -4862,14 +4662,14 @@ rule capa_hash_data_using_SHA224 {
 	date = "2021-05-15"
 
   strings: 
- 	$num_azc = { D8 9E 05 C1 }
-	$num_azd = { 07 D5 7C 36 }
-	$num_aze = { 17 DD 70 30 }
-	$num_azf = { 39 59 0E F7 }
-	$num_azg = { 31 0B C0 FF }
-	$num_azh = { 11 15 58 68 }
-	$num_azi = { A7 8F F9 64 }
-	$num_azj = { A4 4F FA BE }
+ 	$num_ayz = { D8 9E 05 C1 }
+	$num_aza = { 07 D5 7C 36 }
+	$num_azb = { 17 DD 70 30 }
+	$num_azc = { 39 59 0E F7 }
+	$num_azd = { 31 0B C0 FF }
+	$num_aze = { 11 15 58 68 }
+	$num_azf = { A7 8F F9 64 }
+	$num_azg = { A4 4F FA BE }
  
   condition: 
 	(
@@ -4877,14 +4677,14 @@ rule capa_hash_data_using_SHA224 {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( $num_azc 
+ ( $num_ayz 
+	and $num_aza 
+	and $num_azb 
+	and $num_azc 
 	and $num_azd 
 	and $num_aze 
 	and $num_azf 
-	and $num_azg 
-	and $num_azh 
-	and $num_azi 
-	and $num_azj  ) 
+	and $num_azg  ) 
 }
 
 rule capa_schedule_task_via_command_line { 
@@ -4899,9 +4699,9 @@ rule capa_schedule_task_via_command_line {
 	date = "2021-05-15"
 
   strings: 
- 	$azk = /schtasks/ nocase ascii wide 
-	$azl = /\/create / nocase ascii wide 
-	$azm = /Register-ScheduledTask / nocase ascii wide 
+ 	$azh = /schtasks/ nocase ascii wide 
+	$azi = /\/create / nocase ascii wide 
+	$azj = /Register-ScheduledTask / nocase ascii wide 
  
   condition: 
 	(
@@ -4911,42 +4711,9 @@ rule capa_schedule_task_via_command_line {
 	) and
  ( 	capa_create_process
 
-	and  (  (  (  ( 	$azk 
-	and 	$azl  )  ) 
-	or 	$azm  )  )  ) 
-}
-
-rule capa_persist_via_Windows_service { 
-  meta: 
- 	description = "persist via Windows service (converted from capa rule)"
-	namespace = "persistence/service"
-	author = "moritz.raabe@fireeye.com"
-	scope = "function"
-	attack = "Persistence::Create or Modify System Process::Windows Service [T1543.003]"
-	attack = "Execution::System Services::Service Execution [T1569.002]"
-	hash = "Practical Malware Analysis Lab 03-02.dll_:0x10004706"
-	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/persistence/service/persist-via-windows-service.yml"
-	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-15"
-
-  strings: 
- 	$azp = /\bsc(\.exe)?$/ nocase ascii wide 
-	$azq = /create / nocase ascii wide 
-	$azr = /\bsc(\.exe)? create/ nocase ascii wide 
-	$azs = /New-Service / nocase ascii wide 
- 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
- (  (  ( 	capa_create_process
-
-	and  (  (  (  ( 	$azp 
-	and 	$azq  )  ) 
-	or 	$azr 
-	or 	$azs  )  )  )  )  ) 
+	and  (  (  (  ( 	$azh 
+	and 	$azi  )  ) 
+	or 	$azj  )  )  ) 
 }
 
 rule capa_persist_via_Active_Setup_registry_key { 
@@ -4962,9 +4729,9 @@ rule capa_persist_via_Active_Setup_registry_key {
 	date = "2021-05-15"
 
   strings: 
- 	$num_azt = { 02 00 00 80 }
-	$azu = /Software\\Microsoft\\Active Setup\\Installed Components/ nocase ascii wide 
-	$str_azv = "StubPath" ascii wide
+ 	$num_azm = { 02 00 00 80 }
+	$azn = /Software\\Microsoft\\Active Setup\\Installed Components/ nocase ascii wide 
+	$str_azo = "StubPath" ascii wide
  
   condition: 
 	(
@@ -4974,9 +4741,9 @@ rule capa_persist_via_Active_Setup_registry_key {
 	) and
  (  (  ( 	capa_set_registry_value
 
-	or $num_azt  )  ) 
-	and 	$azu 
-	and 	$str_azv  ) 
+	or $num_azm  )  ) 
+	and 	$azn 
+	and 	$str_azo  ) 
 }
 
 rule capa_persist_via_GinaDLL_registry_key { 
@@ -4991,9 +4758,9 @@ rule capa_persist_via_GinaDLL_registry_key {
 	date = "2021-05-15"
 
   strings: 
- 	$num_azw = { 02 00 00 80 }
-	$azx = /SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon/ nocase ascii wide 
-	$azy = /GinaDLL/ nocase ascii wide 
+ 	$num_azp = { 02 00 00 80 }
+	$azq = /SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon/ nocase ascii wide 
+	$azr = /GinaDLL/ nocase ascii wide 
  
   condition: 
 	(
@@ -5003,9 +4770,9 @@ rule capa_persist_via_GinaDLL_registry_key {
 	) and
  (  (  ( 	capa_set_registry_value
 
-	or $num_azw  )  ) 
-	and 	$azx 
-	and 	$azy  ) 
+	or $num_azp  )  ) 
+	and 	$azq 
+	and 	$azr  ) 
 }
 
 rule capa_persist_via_AppInit_DLLs_registry_key { 
@@ -5021,10 +4788,10 @@ rule capa_persist_via_AppInit_DLLs_registry_key {
 	date = "2021-05-15"
 
   strings: 
- 	$num_azz = { 02 00 00 80 }
-	$baa = /Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows/ nocase ascii wide 
-	$bab = /Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows/ nocase ascii wide 
-	$bac = /AppInit_DLLs/ nocase ascii wide 
+ 	$num_azs = { 02 00 00 80 }
+	$azt = /Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows/ nocase ascii wide 
+	$azu = /Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows/ nocase ascii wide 
+	$azv = /AppInit_DLLs/ nocase ascii wide 
  
   condition: 
 	(
@@ -5034,10 +4801,10 @@ rule capa_persist_via_AppInit_DLLs_registry_key {
 	) and
  (  (  ( 	capa_set_registry_value
 
-	or $num_azz  )  ) 
-	and  (  ( 	$baa 
-	or 	$bab  )  ) 
-	and 	$bac  ) 
+	or $num_azs  )  ) 
+	and  (  ( 	$azt 
+	or 	$azu  )  ) 
+	and 	$azv  ) 
 }
 
 rule capa_persist_via_Run_registry_key { 
@@ -5054,16 +4821,16 @@ rule capa_persist_via_Run_registry_key {
 	date = "2021-05-15"
 
   strings: 
- 	$num_bae = { 01 00 00 80 }
-	$num_baf = { 02 00 00 80 }
-	$bag = /Software\\Microsoft\\Windows\\CurrentVersion/ nocase ascii wide 
-	$bah = /Run/ nocase ascii wide 
-	$bai = /Explorer\\Shell Folders/ nocase ascii wide 
-	$baj = /User Shell Folders/ nocase ascii wide 
-	$bak = /RunServices/ nocase ascii wide 
-	$bal = /Policies\\Explorer\\Run/ nocase ascii wide 
-	$bam = /Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows\\load/ nocase ascii wide 
-	$ban = /System\\CurrentControlSet\\Control\\Session Manager\\BootExecute/ nocase ascii wide 
+ 	$num_azx = { 01 00 00 80 }
+	$num_azy = { 02 00 00 80 }
+	$azz = /Software\\Microsoft\\Windows\\CurrentVersion/ nocase ascii wide 
+	$baa = /Run/ nocase ascii wide 
+	$bab = /Explorer\\Shell Folders/ nocase ascii wide 
+	$bac = /User Shell Folders/ nocase ascii wide 
+	$bad = /RunServices/ nocase ascii wide 
+	$bae = /Policies\\Explorer\\Run/ nocase ascii wide 
+	$baf = /Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows\\load/ nocase ascii wide 
+	$bag = /System\\CurrentControlSet\\Control\\Session Manager\\BootExecute/ nocase ascii wide 
  
   condition: 
 	(
@@ -5073,16 +4840,16 @@ rule capa_persist_via_Run_registry_key {
 	) and
  (  (  ( 	capa_set_registry_value
 
-	or $num_bae 
-	or $num_baf  )  ) 
-	and  (  (  (  ( 	$bag 
-	and  (  ( 	$bah 
-	or 	$bai 
-	or 	$baj 
-	or 	$bak 
-	or 	$bal  )  )  )  ) 
-	or 	$bam 
-	or 	$ban  )  )  ) 
+	or $num_azx 
+	or $num_azy  )  ) 
+	and  (  (  (  ( 	$azz 
+	and  (  ( 	$baa 
+	or 	$bab 
+	or 	$bac 
+	or 	$bad 
+	or 	$bae  )  )  )  ) 
+	or 	$baf 
+	or 	$bag  )  )  ) 
 }
 
 rule capa_persist_via_Winlogon_Helper_DLL_registry_key { 
@@ -5097,12 +4864,12 @@ rule capa_persist_via_Winlogon_Helper_DLL_registry_key {
 	date = "2021-05-15"
 
   strings: 
- 	$num_bao = { 01 00 00 80 }
-	$num_bap = { 02 00 00 80 }
-	$baq = /Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon/ nocase ascii wide 
-	$bar = /Notify/ nocase ascii wide 
-	$bas = /Userinit/ nocase ascii wide 
-	$bat = /Shell/ nocase ascii wide 
+ 	$num_bah = { 01 00 00 80 }
+	$num_bai = { 02 00 00 80 }
+	$baj = /Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon/ nocase ascii wide 
+	$bak = /Notify/ nocase ascii wide 
+	$bal = /Userinit/ nocase ascii wide 
+	$bam = /Shell/ nocase ascii wide 
  
   condition: 
 	(
@@ -5112,12 +4879,12 @@ rule capa_persist_via_Winlogon_Helper_DLL_registry_key {
 	) and
  (  (  ( 	capa_set_registry_value
 
-	or $num_bao 
-	or $num_bap  )  ) 
-	and 	$baq 
-	and  (  ( 	$bar 
-	or 	$bas 
-	or 	$bat  )  )  ) 
+	or $num_bah 
+	or $num_bai  )  ) 
+	and 	$baj 
+	and  (  ( 	$bak 
+	or 	$bal 
+	or 	$bam  )  )  ) 
 }
 
 rule capa_compiled_to_the__NET_platform { 
@@ -5153,8 +4920,8 @@ rule capa_get_COMSPEC_environment_variable {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bau = "COMSPEC" ascii wide
-	$str_bav = "%COMSPEC%" ascii wide
+ 	$str_ban = "COMSPEC" ascii wide
+	$str_bao = "%COMSPEC%" ascii wide
  
   condition: 
 	(
@@ -5164,8 +4931,8 @@ rule capa_get_COMSPEC_environment_variable {
 	) and
  ( 	capa_query_environment_variable
 
-	and  (  ( 	$str_bau 
-	or 	$str_bav  )  )  ) 
+	and  (  ( 	$str_ban 
+	or 	$str_bao  )  )  ) 
 }
 
 rule capa_packed_with_MaskPE { 
@@ -5187,7 +4954,7 @@ rule capa_packed_with_MaskPE {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	for any baw in pe.sections : ( baw.name == ".MaskPE" )  ) 
+ ( 	for any bap in pe.sections : ( bap.name == ".MaskPE" )  ) 
 }
 
 rule capa_add_file_to_cabinet_file { 
@@ -5222,8 +4989,8 @@ rule capa_reference_Quad9_DNS_server {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bax = "9.9.9.9" ascii wide
-	$str_bay = "149.112.112.112" ascii wide
+ 	$str_baq = "9.9.9.9" ascii wide
+	$str_bar = "149.112.112.112" ascii wide
  
   condition: 
 	(
@@ -5231,8 +4998,8 @@ rule capa_reference_Quad9_DNS_server {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bax 
-	or 	$str_bay  ) 
+ ( 	$str_baq 
+	or 	$str_bar  ) 
 }
 
 rule capa_run_PowerShell_expression { 
@@ -5247,9 +5014,9 @@ rule capa_run_PowerShell_expression {
 	date = "2021-05-15"
 
   strings: 
- 	$baz = / iex\(/ nocase ascii wide 
-	$bba = / iex / nocase ascii wide 
-	$bbb = /Invoke-Expression/ nocase ascii wide 
+ 	$bas = / iex\(/ nocase ascii wide 
+	$bat = / iex / nocase ascii wide 
+	$bau = /Invoke-Expression/ nocase ascii wide 
  
   condition: 
 	(
@@ -5257,9 +5024,9 @@ rule capa_run_PowerShell_expression {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- (  (  ( 	$baz 
-	or 	$bba 
-	or 	$bbb  )  )  ) 
+ (  (  ( 	$bas 
+	or 	$bat 
+	or 	$bau  )  )  ) 
 }
 
 rule capa_get_file_size { 
@@ -5322,7 +5089,7 @@ rule capa_packed_with_Dragon_Armor {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	for any bbc in pe.sections : ( bbc.name == "DAStub" )  ) 
+ ( 	for any bav in pe.sections : ( bav.name == "DAStub" )  ) 
 }
 
 rule capa_hooked_by_API_Override { 
@@ -5343,7 +5110,7 @@ rule capa_hooked_by_API_Override {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	for any bbd in pe.sections : ( bbd.name == ".winapi" )  ) 
+ ( 	for any baw in pe.sections : ( baw.name == ".winapi" )  ) 
 }
 
 rule capa_get_service_handle { 
@@ -5385,8 +5152,8 @@ rule capa_packed_with_Neolite {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	for any bbe in pe.sections : ( bbe.name == ".neolite" ) 
-	or 	for any bbf in pe.sections : ( bbf.name == ".neolit" )  ) 
+ ( 	for any bax in pe.sections : ( bax.name == ".neolite" ) 
+	or 	for any bay in pe.sections : ( bay.name == ".neolit" )  ) 
 }
 
 rule capa_encrypt_data_using_Salsa20_or_ChaCha { 
@@ -5402,17 +5169,17 @@ rule capa_encrypt_data_using_Salsa20_or_ChaCha {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bbg = "expand 32-byte k = sigma" ascii wide
-	$str_bbh = "expand 16-byte k = tau" ascii wide
-	$str_bbi = "expand 32-byte kexpand 16-byte k" ascii wide
-	$str_bbj = "expa" ascii wide
-	$str_bbk = "nd 3" ascii wide
-	$str_bbl = "2-by" ascii wide
-	$str_bbm = "te k" ascii wide
-	$num_bbn = { 65 78 70 61 }
-	$num_bbo = { 6E 64 20 33 }
-	$num_bbp = { 32 2D 62 79 }
-	$num_bbq = { 74 65 20 6B }
+ 	$str_baz = "expand 32-byte k = sigma" ascii wide
+	$str_bba = "expand 16-byte k = tau" ascii wide
+	$str_bbb = "expand 32-byte kexpand 16-byte k" ascii wide
+	$str_bbc = "expa" ascii wide
+	$str_bbd = "nd 3" ascii wide
+	$str_bbe = "2-by" ascii wide
+	$str_bbf = "te k" ascii wide
+	$num_bbg = { 65 78 70 61 }
+	$num_bbh = { 6E 64 20 33 }
+	$num_bbi = { 32 2D 62 79 }
+	$num_bbj = { 74 65 20 6B }
  
   condition: 
 	(
@@ -5420,45 +5187,17 @@ rule capa_encrypt_data_using_Salsa20_or_ChaCha {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bbg 
-	or 	$str_bbh 
-	or 	$str_bbi 
-	or  (  ( 	$str_bbj 
-	and 	$str_bbk 
-	and 	$str_bbl 
-	and 	$str_bbm  )  ) 
-	or  (  ( $num_bbn 
-	and $num_bbo 
-	and $num_bbp 
-	and $num_bbq  )  )  ) 
-}
-
-rule capa_create_container { 
-  meta: 
- 	description = "create container (converted from capa rule)"
-	namespace = "host-interaction/container/docker"
-	author = "william.ballenthin@fireeye.com"
-	scope = "function"
-	attack = "Execution::Deploy Container [T1610]"
-	references = "https://docs.docker.com/engine/api/v1.24/"
-	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/create-container.yml"
-	capa_nursery = "True"
-	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-15"
-
-  strings: 
- 	$bbr = /\bdocker(\.exe)? create/ ascii wide 
-	$bbs = /\bdocker(\.exe)? start/ ascii wide 
- 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
- ( 	$bbr 
-	or 	$bbs 
-  ) 
+ ( 	$str_baz 
+	or 	$str_bba 
+	or 	$str_bbb 
+	or  (  ( 	$str_bbc 
+	and 	$str_bbd 
+	and 	$str_bbe 
+	and 	$str_bbf  )  ) 
+	or  (  ( $num_bbg 
+	and $num_bbh 
+	and $num_bbi 
+	and $num_bbj  )  )  ) 
 }
 
 rule capa_listen_for_remote_procedure_calls { 
@@ -5511,8 +5250,8 @@ rule capa_reference_Verisign_DNS_server {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bbt = "64.6.64.6" ascii wide
-	$str_bbu = "64.6.65.6" ascii wide
+ 	$str_bbm = "64.6.64.6" ascii wide
+	$str_bbn = "64.6.65.6" ascii wide
  
   condition: 
 	(
@@ -5520,8 +5259,8 @@ rule capa_reference_Verisign_DNS_server {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bbt 
-	or 	$str_bbu  ) 
+ ( 	$str_bbm 
+	or 	$str_bbn  ) 
 }
 
 rule capa_packaged_as_a_NSIS_installer { 
@@ -5536,7 +5275,7 @@ rule capa_packaged_as_a_NSIS_installer {
 	date = "2021-05-15"
 
   strings: 
- 	$bbv = /http:\/\/nsis\.sf\.net/ ascii wide 
+ 	$bbo = /http:\/\/nsis\.sf\.net/ ascii wide 
  
   condition: 
 	(
@@ -5544,7 +5283,7 @@ rule capa_packaged_as_a_NSIS_installer {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$bbv  ) 
+ ( 	$bbo  ) 
 }
 
 rule capa_reference_AliDNS_DNS_server { 
@@ -5559,10 +5298,10 @@ rule capa_reference_AliDNS_DNS_server {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bbw = "223.5.5.5" ascii wide
-	$str_bbx = "223.6.6.6" ascii wide
-	$str_bby = "2400:3200::1" ascii wide
-	$str_bbz = "2400:3200:baba::1" ascii wide
+ 	$str_bbp = "223.5.5.5" ascii wide
+	$str_bbq = "223.6.6.6" ascii wide
+	$str_bbr = "2400:3200::1" ascii wide
+	$str_bbs = "2400:3200:baba::1" ascii wide
  
   condition: 
 	(
@@ -5570,10 +5309,10 @@ rule capa_reference_AliDNS_DNS_server {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bbw 
-	or 	$str_bbx 
-	or 	$str_bby 
-	or 	$str_bbz  ) 
+ ( 	$str_bbp 
+	or 	$str_bbq 
+	or 	$str_bbr 
+	or 	$str_bbs  ) 
 }
 
 rule capa_get_networking_parameters { 
@@ -5615,8 +5354,8 @@ rule capa_packed_with_TSULoader {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	for any bce in pe.sections : ( bce.name == ".tsuarch" ) 
-	or 	for any bcf in pe.sections : ( bcf.name == ".tsustub" )  ) 
+ ( 	for any bbx in pe.sections : ( bbx.name == ".tsuarch" ) 
+	or 	for any bby in pe.sections : ( bby.name == ".tsustub" )  ) 
 }
 
 rule capa_packaged_as_a_WinZip_self_extracting_archive { 
@@ -5636,33 +5375,7 @@ rule capa_packaged_as_a_WinZip_self_extracting_archive {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	for any bcg in pe.sections : ( bcg.name == "_winzip_" )  ) 
-}
-
-rule capa_list_containers { 
-  meta: 
- 	description = "list containers (converted from capa rule)"
-	namespace = "host-interaction/container/docker"
-	author = "william.ballenthin@fireeye.com"
-	scope = "function"
-	attack = "Discovery::Container and Resource Discovery [T1609]"
-	references = "https://docs.docker.com/engine/api/v1.24/"
-	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/list-containers.yml"
-	capa_nursery = "True"
-	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-15"
-
-  strings: 
- 	$bch = /\bdocker(\.exe)? ps/ ascii wide 
- 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
- ( 	$bch 
-  ) 
+ ( 	for any bbz in pe.sections : ( bbz.name == "_winzip_" )  ) 
 }
 
 rule capa_get_file_version_info { 
@@ -5705,8 +5418,8 @@ rule capa_packed_with_RPCrypt {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	for any bck in pe.sections : ( bck.name == "RCryptor" ) 
-	or 	for any bcl in pe.sections : ( bcl.name == ".RCrypt" )  ) 
+ ( 	for any bcd in pe.sections : ( bcd.name == "RCryptor" ) 
+	or 	for any bce in pe.sections : ( bce.name == ".RCrypt" )  ) 
 }
 
 rule capa_get_proxy { 
@@ -5721,7 +5434,7 @@ rule capa_get_proxy {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bcm = "ProxyServer" ascii wide
+ 	$str_bcf = "ProxyServer" ascii wide
  
   condition: 
 	(
@@ -5731,7 +5444,7 @@ rule capa_get_proxy {
 	) and
  ( 	capa_create_or_open_registry_key
 
-	and 	$str_bcm  ) 
+	and 	$str_bcf  ) 
 }
 
 rule capa_reference_DNS_over_HTTPS_endpoints { 
@@ -5747,69 +5460,69 @@ rule capa_reference_DNS_over_HTTPS_endpoints {
 	date = "2021-05-15"
 
   strings: 
- 	$bcn = /https:\/\/doh.seby.io:8443\/dns-query.{,1000}/ nocase ascii wide 
-	$bco = /https:\/\/family.cloudflare-dns.com\/dns-query.{,1000}/ nocase ascii wide 
-	$bcp = /https:\/\/free.bravedns.com\/dns-query.{,1000}/ nocase ascii wide 
-	$bcq = /https:\/\/doh.familyshield.opendns.com\/dns-query.{,1000}/ nocase ascii wide 
-	$bcr = /https:\/\/doh-de.blahdns.com\/dns-query.{,1000}/ nocase ascii wide 
-	$bcs = /https:\/\/adblock.mydns.network\/dns-query.{,1000}/ nocase ascii wide 
-	$bct = /https:\/\/bravedns.com\/configure.{,1000}/ nocase ascii wide 
-	$bcu = /https:\/\/cloudflare-dns.com\/dns-query.{,1000}/ nocase ascii wide 
-	$bcv = /https:\/\/commons.host.{,1000}/ nocase ascii wide 
-	$bcw = /https:\/\/dns.aa.net.uk\/dns-query.{,1000}/ nocase ascii wide 
-	$bcx = /https:\/\/dns.alidns.com\/dns-query.{,1000}/ nocase ascii wide 
-	$bcy = /https:\/\/dns-asia.wugui.zone\/dns-query.{,1000}/ nocase ascii wide 
-	$bcz = /https:\/\/dns.containerpi.com\/dns-query.{,1000}/ nocase ascii wide 
-	$bda = /https:\/\/dns.containerpi.com\/doh\/family-filter\/.{,1000}/ nocase ascii wide 
-	$bdb = /https:\/\/dns.containerpi.com\/doh\/secure-filter\/.{,1000}/ nocase ascii wide 
-	$bdc = /https:\/\/dns.digitale-gesellschaft.ch\/dns-query.{,1000}/ nocase ascii wide 
-	$bdd = /https:\/\/dns.dnshome.de\/dns-query.{,1000}/ nocase ascii wide 
-	$bde = /https:\/\/dns.dns-over-https.com\/dns-query.{,1000}/ nocase ascii wide 
-	$bdf = /https:\/\/dns.dnsoverhttps.net\/dns-query.{,1000}/ nocase ascii wide 
-	$bdg = /https:\/\/dns.flatuslifir.is\/dns-query.{,1000}/ nocase ascii wide 
-	$bdh = /https:\/\/dnsforge.de\/dns-query.{,1000}/ nocase ascii wide 
-	$bdi = /https:\/\/dns.google\/dns-query.{,1000}/ nocase ascii wide 
-	$bdj = /https:\/\/dns.nextdns.io\/<config_id>.{,1000}/ nocase ascii wide 
-	$bdk = /https:\/\/dns.rubyfish.cn\/dns-query.{,1000}/ nocase ascii wide 
-	$bdl = /https:\/\/dns.switch.ch\/dns-query.{,1000}/ nocase ascii wide 
-	$bdm = /https:\/\/dns.twnic.tw\/dns-query.{,1000}/ nocase ascii wide 
-	$bdn = /https:\/\/dns.wugui.zone\/dns-query.{,1000}/ nocase ascii wide 
-	$bdo = /https:\/\/doh-2.seby.io\/dns-query.{,1000}/ nocase ascii wide 
-	$bdp = /https:\/\/doh.42l.fr\/dns-query.{,1000}/ nocase ascii wide 
-	$bdq = /https:\/\/doh.applied-privacy.net\/query.{,1000}/ nocase ascii wide 
-	$bdr = /https:\/\/doh.armadillodns.net\/dns-query.{,1000}/ nocase ascii wide 
-	$bds = /https:\/\/doh.captnemo.in\/dns-query.{,1000}/ nocase ascii wide 
-	$bdt = /https:\/\/doh.centraleu.pi-dns.com\/dns-query.{,1000}/ nocase ascii wide 
-	$bdu = /https:\/\/doh.cleanbrowsing.org\/doh\/family-filter\/.{,1000}/ nocase ascii wide 
-	$bdv = /https:\/\/doh.crypto.sx\/dns-query.{,1000}/ nocase ascii wide 
-	$bdw = /https:\/\/doh.dnslify.com\/dns-query.{,1000}/ nocase ascii wide 
-	$bdx = /https:\/\/doh.dns.sb\/dns-query.{,1000}/ nocase ascii wide 
-	$bdy = /https:\/\/dohdot.coxlab.net\/dns-query.{,1000}/ nocase ascii wide 
-	$bdz = /https:\/\/doh.eastas.pi-dns.com\/dns-query.{,1000}/ nocase ascii wide 
-	$bea = /https:\/\/doh.eastau.pi-dns.com\/dns-query.{,1000}/ nocase ascii wide 
-	$beb = /https:\/\/doh.eastus.pi-dns.com\/dns-query.{,1000}/ nocase ascii wide 
-	$bec = /https:\/\/doh.ffmuc.net\/dns-query.{,1000}/ nocase ascii wide 
-	$bed = /https:\/\/doh.libredns.gr\/dns-query.{,1000}/ nocase ascii wide 
-	$bee = /https:\/\/doh.li\/dns-query.{,1000}/ nocase ascii wide 
-	$bef = /https:\/\/doh.northeu.pi-dns.com\/dns-query.{,1000}/ nocase ascii wide 
-	$beg = /https:\/\/doh.pi-dns.com\/dns-query.{,1000}/ nocase ascii wide 
-	$beh = /https:\/\/doh.powerdns.org.{,1000}/ nocase ascii wide 
-	$bei = /https:\/\/doh.tiarap.org\/dns-query.{,1000}/ nocase ascii wide 
-	$bej = /https:\/\/doh.tiar.app\/dns-query.{,1000}/ nocase ascii wide 
-	$bek = /https:\/\/doh.westus.pi-dns.com\/dns-query.{,1000}/ nocase ascii wide 
-	$bel = /https:\/\/doh.xfinity.com\/dns-query.{,1000}/ nocase ascii wide 
-	$bem = /https:\/\/example.doh.blockerdns.com\/dns-query.{,1000}/ nocase ascii wide 
-	$ben = /https:\/\/fi.doh.dns.snopyta.org\/dns-query.{,1000}/ nocase ascii wide 
-	$beo = /https:\/\/ibksturm.synology.me\/dns-query.{,1000}/ nocase ascii wide 
-	$bep = /https:\/\/ibuki.cgnat.net\/dns-query.{,1000}/ nocase ascii wide 
-	$beq = /https:\/\/jcdns.fun\/dns-query.{,1000}/ nocase ascii wide 
-	$ber = /https:\/\/jp.tiarap.org\/dns-query.{,1000}/ nocase ascii wide 
-	$bes = /https:\/\/jp.tiar.app\/dns-query.{,1000}/ nocase ascii wide 
-	$bet = /https:\/\/odvr.nic.cz\/doh.{,1000}/ nocase ascii wide 
-	$beu = /https:\/\/ordns.he.net\/dns-query.{,1000}/ nocase ascii wide 
-	$bev = /https:\/\/rdns.faelix.net\/.{,1000}/ nocase ascii wide 
-	$bew = /https:\/\/resolver-eu.lelux.fi\/dns-query.{,1000}/ nocase ascii wide 
-	$bex = /https:\/\/doh-jp.blahdns.com\/dns-query.{,1000}/ nocase ascii wide 
+ 	$bcg = /https:\/\/doh.seby.io:8443\/dns-query.{,1000}/ nocase ascii wide 
+	$bch = /https:\/\/family.cloudflare-dns.com\/dns-query.{,1000}/ nocase ascii wide 
+	$bci = /https:\/\/free.bravedns.com\/dns-query.{,1000}/ nocase ascii wide 
+	$bcj = /https:\/\/doh.familyshield.opendns.com\/dns-query.{,1000}/ nocase ascii wide 
+	$bck = /https:\/\/doh-de.blahdns.com\/dns-query.{,1000}/ nocase ascii wide 
+	$bcl = /https:\/\/adblock.mydns.network\/dns-query.{,1000}/ nocase ascii wide 
+	$bcm = /https:\/\/bravedns.com\/configure.{,1000}/ nocase ascii wide 
+	$bcn = /https:\/\/cloudflare-dns.com\/dns-query.{,1000}/ nocase ascii wide 
+	$bco = /https:\/\/commons.host.{,1000}/ nocase ascii wide 
+	$bcp = /https:\/\/dns.aa.net.uk\/dns-query.{,1000}/ nocase ascii wide 
+	$bcq = /https:\/\/dns.alidns.com\/dns-query.{,1000}/ nocase ascii wide 
+	$bcr = /https:\/\/dns-asia.wugui.zone\/dns-query.{,1000}/ nocase ascii wide 
+	$bcs = /https:\/\/dns.containerpi.com\/dns-query.{,1000}/ nocase ascii wide 
+	$bct = /https:\/\/dns.containerpi.com\/doh\/family-filter\/.{,1000}/ nocase ascii wide 
+	$bcu = /https:\/\/dns.containerpi.com\/doh\/secure-filter\/.{,1000}/ nocase ascii wide 
+	$bcv = /https:\/\/dns.digitale-gesellschaft.ch\/dns-query.{,1000}/ nocase ascii wide 
+	$bcw = /https:\/\/dns.dnshome.de\/dns-query.{,1000}/ nocase ascii wide 
+	$bcx = /https:\/\/dns.dns-over-https.com\/dns-query.{,1000}/ nocase ascii wide 
+	$bcy = /https:\/\/dns.dnsoverhttps.net\/dns-query.{,1000}/ nocase ascii wide 
+	$bcz = /https:\/\/dns.flatuslifir.is\/dns-query.{,1000}/ nocase ascii wide 
+	$bda = /https:\/\/dnsforge.de\/dns-query.{,1000}/ nocase ascii wide 
+	$bdb = /https:\/\/dns.google\/dns-query.{,1000}/ nocase ascii wide 
+	$bdc = /https:\/\/dns.nextdns.io\/<config_id>.{,1000}/ nocase ascii wide 
+	$bdd = /https:\/\/dns.rubyfish.cn\/dns-query.{,1000}/ nocase ascii wide 
+	$bde = /https:\/\/dns.switch.ch\/dns-query.{,1000}/ nocase ascii wide 
+	$bdf = /https:\/\/dns.twnic.tw\/dns-query.{,1000}/ nocase ascii wide 
+	$bdg = /https:\/\/dns.wugui.zone\/dns-query.{,1000}/ nocase ascii wide 
+	$bdh = /https:\/\/doh-2.seby.io\/dns-query.{,1000}/ nocase ascii wide 
+	$bdi = /https:\/\/doh.42l.fr\/dns-query.{,1000}/ nocase ascii wide 
+	$bdj = /https:\/\/doh.applied-privacy.net\/query.{,1000}/ nocase ascii wide 
+	$bdk = /https:\/\/doh.armadillodns.net\/dns-query.{,1000}/ nocase ascii wide 
+	$bdl = /https:\/\/doh.captnemo.in\/dns-query.{,1000}/ nocase ascii wide 
+	$bdm = /https:\/\/doh.centraleu.pi-dns.com\/dns-query.{,1000}/ nocase ascii wide 
+	$bdn = /https:\/\/doh.cleanbrowsing.org\/doh\/family-filter\/.{,1000}/ nocase ascii wide 
+	$bdo = /https:\/\/doh.crypto.sx\/dns-query.{,1000}/ nocase ascii wide 
+	$bdp = /https:\/\/doh.dnslify.com\/dns-query.{,1000}/ nocase ascii wide 
+	$bdq = /https:\/\/doh.dns.sb\/dns-query.{,1000}/ nocase ascii wide 
+	$bdr = /https:\/\/dohdot.coxlab.net\/dns-query.{,1000}/ nocase ascii wide 
+	$bds = /https:\/\/doh.eastas.pi-dns.com\/dns-query.{,1000}/ nocase ascii wide 
+	$bdt = /https:\/\/doh.eastau.pi-dns.com\/dns-query.{,1000}/ nocase ascii wide 
+	$bdu = /https:\/\/doh.eastus.pi-dns.com\/dns-query.{,1000}/ nocase ascii wide 
+	$bdv = /https:\/\/doh.ffmuc.net\/dns-query.{,1000}/ nocase ascii wide 
+	$bdw = /https:\/\/doh.libredns.gr\/dns-query.{,1000}/ nocase ascii wide 
+	$bdx = /https:\/\/doh.li\/dns-query.{,1000}/ nocase ascii wide 
+	$bdy = /https:\/\/doh.northeu.pi-dns.com\/dns-query.{,1000}/ nocase ascii wide 
+	$bdz = /https:\/\/doh.pi-dns.com\/dns-query.{,1000}/ nocase ascii wide 
+	$bea = /https:\/\/doh.powerdns.org.{,1000}/ nocase ascii wide 
+	$beb = /https:\/\/doh.tiarap.org\/dns-query.{,1000}/ nocase ascii wide 
+	$bec = /https:\/\/doh.tiar.app\/dns-query.{,1000}/ nocase ascii wide 
+	$bed = /https:\/\/doh.westus.pi-dns.com\/dns-query.{,1000}/ nocase ascii wide 
+	$bee = /https:\/\/doh.xfinity.com\/dns-query.{,1000}/ nocase ascii wide 
+	$bef = /https:\/\/example.doh.blockerdns.com\/dns-query.{,1000}/ nocase ascii wide 
+	$beg = /https:\/\/fi.doh.dns.snopyta.org\/dns-query.{,1000}/ nocase ascii wide 
+	$beh = /https:\/\/ibksturm.synology.me\/dns-query.{,1000}/ nocase ascii wide 
+	$bei = /https:\/\/ibuki.cgnat.net\/dns-query.{,1000}/ nocase ascii wide 
+	$bej = /https:\/\/jcdns.fun\/dns-query.{,1000}/ nocase ascii wide 
+	$bek = /https:\/\/jp.tiarap.org\/dns-query.{,1000}/ nocase ascii wide 
+	$bel = /https:\/\/jp.tiar.app\/dns-query.{,1000}/ nocase ascii wide 
+	$bem = /https:\/\/odvr.nic.cz\/doh.{,1000}/ nocase ascii wide 
+	$ben = /https:\/\/ordns.he.net\/dns-query.{,1000}/ nocase ascii wide 
+	$beo = /https:\/\/rdns.faelix.net\/.{,1000}/ nocase ascii wide 
+	$bep = /https:\/\/resolver-eu.lelux.fi\/dns-query.{,1000}/ nocase ascii wide 
+	$beq = /https:\/\/doh-jp.blahdns.com\/dns-query.{,1000}/ nocase ascii wide 
  
   condition: 
 	(
@@ -5817,7 +5530,14 @@ rule capa_reference_DNS_over_HTTPS_endpoints {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$bcn 
+ ( 	$bcg 
+	or 	$bch 
+	or 	$bci 
+	or 	$bcj 
+	or 	$bck 
+	or 	$bcl 
+	or 	$bcm 
+	or 	$bcn 
 	or 	$bco 
 	or 	$bcp 
 	or 	$bcq 
@@ -5872,14 +5592,7 @@ rule capa_reference_DNS_over_HTTPS_endpoints {
 	or 	$ben 
 	or 	$beo 
 	or 	$bep 
-	or 	$beq 
-	or 	$ber 
-	or 	$bes 
-	or 	$bet 
-	or 	$beu 
-	or 	$bev 
-	or 	$bew 
-	or 	$bex  ) 
+	or 	$beq  ) 
 }
 
 rule capa_packed_with_Crunch { 
@@ -5901,7 +5614,7 @@ rule capa_packed_with_Crunch {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	for any bey in pe.sections : ( bey.name == "BitArts" )  ) 
+ ( 	for any ber in pe.sections : ( ber.name == "BitArts" )  ) 
 }
 
 rule capa_delete_registry_key_via_offline_registry_library { 
@@ -5918,8 +5631,8 @@ rule capa_delete_registry_key_via_offline_registry_library {
 	date = "2021-05-15"
 
   strings: 
- 	$api_bez = "ORDeleteKey" ascii wide
-	$api_bfa = "ORDeleteValue" ascii wide
+ 	$api_bes = "ORDeleteKey" ascii wide
+	$api_bet = "ORDeleteValue" ascii wide
  
   condition: 
 	(
@@ -5927,8 +5640,8 @@ rule capa_delete_registry_key_via_offline_registry_library {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$api_bez 
-	or 	$api_bfa  ) 
+ ( 	$api_bes 
+	or 	$api_bet  ) 
 }
 
 rule capa_get_token_membership { 
@@ -5970,16 +5683,16 @@ rule capa_packed_with_PECompact {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	for any bfb in pe.sections : ( bfb.name == "PEC2TO" ) 
-	or 	for any bfc in pe.sections : ( bfc.name == "PEC2" ) 
-	or 	for any bfd in pe.sections : ( bfd.name == "pec" ) 
-	or 	for any bfe in pe.sections : ( bfe.name == "pec1" ) 
-	or 	for any bff in pe.sections : ( bff.name == "pec2" ) 
-	or 	for any bfg in pe.sections : ( bfg.name == "pec3" ) 
-	or 	for any bfh in pe.sections : ( bfh.name == "pec4" ) 
-	or 	for any bfi in pe.sections : ( bfi.name == "pec5" ) 
-	or 	for any bfj in pe.sections : ( bfj.name == "pec6" ) 
-	or 	for any bfk in pe.sections : ( bfk.name == "PEC2MO" )  ) 
+ ( 	for any beu in pe.sections : ( beu.name == "PEC2TO" ) 
+	or 	for any bev in pe.sections : ( bev.name == "PEC2" ) 
+	or 	for any bew in pe.sections : ( bew.name == "pec" ) 
+	or 	for any bex in pe.sections : ( bex.name == "pec1" ) 
+	or 	for any bey in pe.sections : ( bey.name == "pec2" ) 
+	or 	for any bez in pe.sections : ( bez.name == "pec3" ) 
+	or 	for any bfa in pe.sections : ( bfa.name == "pec4" ) 
+	or 	for any bfb in pe.sections : ( bfb.name == "pec5" ) 
+	or 	for any bfc in pe.sections : ( bfc.name == "pec6" ) 
+	or 	for any bfd in pe.sections : ( bfd.name == "PEC2MO" )  ) 
 }
 
 rule capa_packaged_as_a_CreateInstall_installer { 
@@ -6000,7 +5713,7 @@ rule capa_packaged_as_a_CreateInstall_installer {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	for any bfm in pe.sections : ( bfm.name == ".gentee" )  ) 
+ ( 	for any bff in pe.sections : ( bff.name == ".gentee" )  ) 
 }
 
 rule capa_packed_with_Pepack { 
@@ -6022,7 +5735,7 @@ rule capa_packed_with_Pepack {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	for any bfn in pe.sections : ( bfn.name == "PEPACK!!" )  ) 
+ ( 	for any bfg in pe.sections : ( bfg.name == "PEPACK!!" )  ) 
 }
 
 rule capa_reference_Google_Public_DNS_server { 
@@ -6038,10 +5751,10 @@ rule capa_reference_Google_Public_DNS_server {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bfs = "8.8.8.8" ascii wide
-	$str_bft = "8.8.4.4" ascii wide
-	$str_bfu = "2001:4860:4860::8888" ascii wide
-	$str_bfv = "2001:4860:4860::8844" ascii wide
+ 	$str_bfl = "8.8.8.8" ascii wide
+	$str_bfm = "8.8.4.4" ascii wide
+	$str_bfn = "2001:4860:4860::8888" ascii wide
+	$str_bfo = "2001:4860:4860::8844" ascii wide
  
   condition: 
 	(
@@ -6049,10 +5762,10 @@ rule capa_reference_Google_Public_DNS_server {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bfs 
-	or 	$str_bft 
-	or 	$str_bfu 
-	or 	$str_bfv  ) 
+ ( 	$str_bfl 
+	or 	$str_bfm 
+	or 	$str_bfn 
+	or 	$str_bfo  ) 
 }
 
 rule capa_linked_against_C___regex_library { 
@@ -6066,8 +5779,8 @@ rule capa_linked_against_C___regex_library {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bfw = "regex_error(error_syntax)" ascii wide
-	$str_bfx = "regex_error(error_collate): The expression contained an invalid collating element name." ascii wide
+ 	$str_bfp = "regex_error(error_syntax)" ascii wide
+	$str_bfq = "regex_error(error_collate): The expression contained an invalid collating element name." ascii wide
  
   condition: 
 	(
@@ -6075,8 +5788,8 @@ rule capa_linked_against_C___regex_library {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bfw 
-	or 	$str_bfx  ) 
+ ( 	$str_bfp 
+	or 	$str_bfq  ) 
 }
 
 rule capa_packed_with_MEW { 
@@ -6098,7 +5811,7 @@ rule capa_packed_with_MEW {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	for any bgc in pe.sections : ( bgc.name == "MEW" )  ) 
+ ( 	for any bfv in pe.sections : ( bfv.name == "MEW" )  ) 
 }
 
 rule capa_reference_114DNS_DNS_server { 
@@ -6114,12 +5827,12 @@ rule capa_reference_114DNS_DNS_server {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bgd = "114.114.114.114" ascii wide
-	$str_bge = "114.114.115.115" ascii wide
-	$str_bgf = "114.114.114.119" ascii wide
-	$str_bgg = "114.114.115.119" ascii wide
-	$str_bgh = "114.114.114.110" ascii wide
-	$str_bgi = "114.114.115.110" ascii wide
+ 	$str_bfw = "114.114.114.114" ascii wide
+	$str_bfx = "114.114.115.115" ascii wide
+	$str_bfy = "114.114.114.119" ascii wide
+	$str_bfz = "114.114.115.119" ascii wide
+	$str_bga = "114.114.114.110" ascii wide
+	$str_bgb = "114.114.115.110" ascii wide
  
   condition: 
 	(
@@ -6127,12 +5840,12 @@ rule capa_reference_114DNS_DNS_server {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bgd 
-	or 	$str_bge 
-	or 	$str_bgf 
-	or 	$str_bgg 
-	or 	$str_bgh 
-	or 	$str_bgi  ) 
+ ( 	$str_bfw 
+	or 	$str_bfx 
+	or 	$str_bfy 
+	or 	$str_bfz 
+	or 	$str_bga 
+	or 	$str_bgb  ) 
 }
 
 rule capa_migrate_process_to_active_window_station { 
@@ -6150,12 +5863,12 @@ rule capa_migrate_process_to_active_window_station {
 	date = "2021-05-15"
 
   strings: 
- 	$api_bgk = "OpenWindowStation" ascii wide
-	$str_bgl = "winsta0" ascii wide
-	$str_bgm = "WinSta0" ascii wide
-	$api_bgn = "SetProcessWindowStation" ascii wide
-	$api_bgo = "OpenInputDesktop" ascii wide
-	$api_bgp = "SetThreadDesktop" ascii wide
+ 	$api_bgd = "OpenWindowStation" ascii wide
+	$str_bge = "winsta0" ascii wide
+	$str_bgf = "WinSta0" ascii wide
+	$api_bgg = "SetProcessWindowStation" ascii wide
+	$api_bgh = "OpenInputDesktop" ascii wide
+	$api_bgi = "SetThreadDesktop" ascii wide
  
   condition: 
 	(
@@ -6163,12 +5876,12 @@ rule capa_migrate_process_to_active_window_station {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$api_bgk 
-	and  (  ( 	$str_bgl 
-	or 	$str_bgm  )  ) 
-	and 	$api_bgn 
-	and 	$api_bgo 
-	and 	$api_bgp  ) 
+ ( 	$api_bgd 
+	and  (  ( 	$str_bge 
+	or 	$str_bgf  )  ) 
+	and 	$api_bgg 
+	and 	$api_bgh 
+	and 	$api_bgi  ) 
 }
 
 rule capa_packed_with_Epack { 
@@ -6190,7 +5903,7 @@ rule capa_packed_with_Epack {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	for any bgq in pe.sections : ( bgq.name == "!Epack" )  ) 
+ ( 	for any bgj in pe.sections : ( bgj.name == "!Epack" )  ) 
 }
 
 rule capa_packaged_as_a_Pintool { 
@@ -6212,8 +5925,8 @@ rule capa_packaged_as_a_Pintool {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	for any bgr in pe.sections : ( bgr.name == ".charmve" ) 
-	or 	for any bgs in pe.sections : ( bgs.name == ".pinclie" )  ) 
+ ( 	for any bgk in pe.sections : ( bgk.name == ".charmve" ) 
+	or 	for any bgl in pe.sections : ( bgl.name == ".pinclie" )  ) 
 }
 
 rule capa_get_thread_local_storage_value { 
@@ -6252,7 +5965,7 @@ rule capa_rebuilt_by_ImpRec {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	for any bgu in pe.sections : ( bgu.name == ".mackt" )  ) 
+ ( 	for any bgn in pe.sections : ( bgn.name == ".mackt" )  ) 
 }
 
 rule capa_enumerate_threads { 
@@ -6287,8 +6000,8 @@ rule capa_reference_Comodo_Secure_DNS_server {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bgv = "8.26.56.26" ascii wide
-	$str_bgw = "8.20.247.20" ascii wide
+ 	$str_bgo = "8.26.56.26" ascii wide
+	$str_bgp = "8.20.247.20" ascii wide
  
   condition: 
 	(
@@ -6296,34 +6009,8 @@ rule capa_reference_Comodo_Secure_DNS_server {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bgv 
-	or 	$str_bgw  ) 
-}
-
-rule capa_build_Docker_image { 
-  meta: 
- 	description = "build Docker image (converted from capa rule)"
-	namespace = "host-interaction/container/docker"
-	author = "william.ballenthin@fireeye.com"
-	scope = "function"
-	attack = "Defense Evasion::Build Image on Host [T1612]"
-	references = "https://docs.docker.com/engine/api/v1.24/"
-	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/build-docker-image.yml"
-	capa_nursery = "True"
-	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-15"
-
-  strings: 
- 	$bgx = /\bdocker(\.exe)? build/ ascii wide 
- 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
- ( 	$bgx 
-  ) 
+ ( 	$str_bgo 
+	or 	$str_bgp  ) 
 }
 
 rule capa_decrypt_data_via_SSPI { 
@@ -6359,12 +6046,12 @@ rule capa_reference_L3_DNS_server {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bgy = "4.2.2.1" ascii wide
-	$str_bgz = "4.2.2.2" ascii wide
-	$str_bha = "4.2.2.3" ascii wide
-	$str_bhb = "4.2.2.4" ascii wide
-	$str_bhc = "4.2.2.5" ascii wide
-	$str_bhd = "4.2.2.6" ascii wide
+ 	$str_bgr = "4.2.2.1" ascii wide
+	$str_bgs = "4.2.2.2" ascii wide
+	$str_bgt = "4.2.2.3" ascii wide
+	$str_bgu = "4.2.2.4" ascii wide
+	$str_bgv = "4.2.2.5" ascii wide
+	$str_bgw = "4.2.2.6" ascii wide
  
   condition: 
 	(
@@ -6372,12 +6059,12 @@ rule capa_reference_L3_DNS_server {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bgy 
-	or 	$str_bgz 
-	or 	$str_bha 
-	or 	$str_bhb 
-	or 	$str_bhc 
-	or 	$str_bhd  ) 
+ ( 	$str_bgr 
+	or 	$str_bgs 
+	or 	$str_bgt 
+	or 	$str_bgu 
+	or 	$str_bgv 
+	or 	$str_bgw  ) 
 }
 
 rule capa_packaged_as_a_Wise_installer { 
@@ -6391,8 +6078,8 @@ rule capa_packaged_as_a_Wise_installer {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bhe = "WiseMain" ascii wide
-	$bhf = /Wise Installation Wizard/ ascii wide 
+ 	$str_bgx = "WiseMain" ascii wide
+	$bgy = /Wise Installation Wizard/ ascii wide 
  
   condition: 
 	(
@@ -6400,38 +6087,8 @@ rule capa_packaged_as_a_Wise_installer {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bhe 
-	or 	$bhf  ) 
-}
-
-rule capa_run_in_container { 
-  meta: 
- 	description = "run in container (converted from capa rule)"
-	namespace = "host-interaction/container/docker"
-	author = "william.ballenthin@fireeye.com"
-	scope = "function"
-	attack = "Execution::Container Administration Command [T1609]"
-	references = "https://docs.docker.com/engine/api/v1.24/"
-	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/run-in-container.yml"
-	capa_nursery = "True"
-	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-15"
-
-  strings: 
- 	$bhg = /\bdocker(\.exe)? exec/ ascii wide 
-	$bhh = /\bkubectl(\.exe)? exec/ ascii wide 
-	$bhi = /\bkubectl(\.exe)? run/ ascii wide 
- 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
- ( 	$bhg 
-	or 	$bhh 
-	or 	$bhi 
-  ) 
+ ( 	$str_bgx 
+	or 	$bgy  ) 
 }
 
 rule capa_acquire_debug_privileges { 
@@ -6446,7 +6103,7 @@ rule capa_acquire_debug_privileges {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bhj = "SeDebugPrivilege" ascii wide
+ 	$str_bhc = "SeDebugPrivilege" ascii wide
  
   condition: 
 	(
@@ -6454,7 +6111,7 @@ rule capa_acquire_debug_privileges {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bhj  ) 
+ ( 	$str_bhc  ) 
 }
 
 rule capa_empty_the_recycle_bin { 
@@ -6468,7 +6125,7 @@ rule capa_empty_the_recycle_bin {
 	date = "2021-05-15"
 
   strings: 
- 	$api_bhk = "SHEmptyRecycleBin" ascii wide
+ 	$api_bhd = "SHEmptyRecycleBin" ascii wide
  
   condition: 
 	(
@@ -6476,7 +6133,7 @@ rule capa_empty_the_recycle_bin {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$api_bhk  ) 
+ ( 	$api_bhd  ) 
 }
 
 rule capa_compare_security_identifiers { 
@@ -6536,8 +6193,8 @@ rule capa_packed_with_enigma {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	for any bhl in pe.sections : ( bhl.name == ".enigma1" ) 
-	or 	for any bhm in pe.sections : ( bhm.name == ".enigma2" )  ) 
+ ( 	for any bhe in pe.sections : ( bhe.name == ".enigma1" ) 
+	or 	for any bhf in pe.sections : ( bhf.name == ".enigma2" )  ) 
 }
 
 rule capa_initialize_hashing_via_WinCrypt { 
@@ -6578,7 +6235,7 @@ rule capa_packed_with_StarForce {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	for any bhn in pe.sections : ( bhn.name == ".sforce3" )  ) 
+ ( 	for any bhg in pe.sections : ( bhg.name == ".sforce3" )  ) 
 }
 
 rule capa_encrypt_data_via_SSPI { 
@@ -6621,7 +6278,7 @@ rule capa_packed_with_ProCrypt {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	for any bho in pe.sections : ( bho.name == "ProCrypt" )  ) 
+ ( 	for any bhh in pe.sections : ( bhh.name == "ProCrypt" )  ) 
 }
 
 rule capa_packed_with_WWPACK { 
@@ -6643,8 +6300,8 @@ rule capa_packed_with_WWPACK {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	for any bhp in pe.sections : ( bhp.name == ".WWPACK" ) 
-	or 	for any bhq in pe.sections : ( bhq.name == ".WWP32" )  ) 
+ ( 	for any bhi in pe.sections : ( bhi.name == ".WWPACK" ) 
+	or 	for any bhj in pe.sections : ( bhj.name == ".WWP32" )  ) 
 }
 
 rule capa_reference_Cloudflare_DNS_server { 
@@ -6659,8 +6316,8 @@ rule capa_reference_Cloudflare_DNS_server {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bhr = "1.1.1.1" ascii wide
-	$str_bhs = "1.0.0.1" ascii wide
+ 	$str_bhk = "1.1.1.1" ascii wide
+	$str_bhl = "1.0.0.1" ascii wide
  
   condition: 
 	(
@@ -6668,8 +6325,8 @@ rule capa_reference_Cloudflare_DNS_server {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bhr 
-	or 	$str_bhs  ) 
+ ( 	$str_bhk 
+	or 	$str_bhl  ) 
 }
 
 rule capa_get_system_firmware_table { 
@@ -6725,8 +6382,8 @@ rule capa_check_license_value {
 	date = "2021-05-15"
 
   strings: 
- 	$api_bht = "NtQueryLicenseValue" ascii wide
-	$str_bhu = "Kernel-VMDetection-Private" ascii wide
+ 	$api_bhm = "NtQueryLicenseValue" ascii wide
+	$str_bhn = "Kernel-VMDetection-Private" ascii wide
  
   condition: 
 	(
@@ -6734,8 +6391,8 @@ rule capa_check_license_value {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$api_bht 
-	and 	$str_bhu  ) 
+ ( 	$api_bhm 
+	and 	$str_bhn  ) 
 }
 
 rule capa_bypass_UAC_via_ICMLuaUtil { 
@@ -6751,9 +6408,9 @@ rule capa_bypass_UAC_via_ICMLuaUtil {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bhv = "{3E5FC7F9-9A51-4367-9063-A120244FBEC7}" ascii wide
-	$bhw = { F9 C7 5F 3E 51 9A 67 43 90 63 A1 20 24 4F BE C7 }
-	$str_bhx = "{3E5FC7F9-9A51-4367-9063-A120244FBEC7}" ascii wide
+ 	$str_bho = "{3E5FC7F9-9A51-4367-9063-A120244FBEC7}" ascii wide
+	$bhp = { F9 C7 5F 3E 51 9A 67 43 90 63 A1 20 24 4F BE C7 }
+	$str_bhq = "{3E5FC7F9-9A51-4367-9063-A120244FBEC7}" ascii wide
  
   condition: 
 	(
@@ -6761,9 +6418,9 @@ rule capa_bypass_UAC_via_ICMLuaUtil {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- (  (  ( 	$str_bhv 
-	or 	$bhw  )  ) 
-	and 	$str_bhx  ) 
+ (  (  ( 	$str_bho 
+	or 	$bhp  )  ) 
+	and 	$str_bhq  ) 
 }
 
 rule capa_reference_screen_saver_executable { 
@@ -6779,7 +6436,7 @@ rule capa_reference_screen_saver_executable {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bhy = "SCRNSAVE.EXE" ascii wide
+ 	$str_bhr = "SCRNSAVE.EXE" ascii wide
  
   condition: 
 	(
@@ -6787,7 +6444,7 @@ rule capa_reference_screen_saver_executable {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bhy  ) 
+ ( 	$str_bhr  ) 
 }
 
 rule capa_create_Restart_Manager_session { 
@@ -6823,7 +6480,7 @@ rule capa_reference_kornet_DNS_server {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bhz = "168.126.63.1" ascii wide
+ 	$str_bhs = "168.126.63.1" ascii wide
  
   condition: 
 	(
@@ -6831,7 +6488,7 @@ rule capa_reference_kornet_DNS_server {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bhz  ) 
+ ( 	$str_bhs  ) 
 }
 
 rule capa_packed_with_Themida { 
@@ -6853,9 +6510,9 @@ rule capa_packed_with_Themida {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	for any bia in pe.sections : ( bia.name == "Themida" ) 
-	or 	for any bib in pe.sections : ( bib.name == ".Themida" ) 
-	or 	for any bic in pe.sections : ( bic.name == "WinLicen" )  ) 
+ ( 	for any bht in pe.sections : ( bht.name == "Themida" ) 
+	or 	for any bhu in pe.sections : ( bhu.name == ".Themida" ) 
+	or 	for any bhv in pe.sections : ( bhv.name == "WinLicen" )  ) 
 }
 
 rule capa_impersonate_user { 
@@ -6912,8 +6569,8 @@ rule capa_read_raw_disk_data {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bid = "\\\\.\\PhysicalDrive0" ascii wide
-	$str_bie = "\\\\.\\C:" ascii wide
+ 	$str_bhw = "\\\\.\\PhysicalDrive0" ascii wide
+	$str_bhx = "\\\\.\\C:" ascii wide
  
   condition: 
 	(
@@ -6921,8 +6578,8 @@ rule capa_read_raw_disk_data {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bid 
-	or 	$str_bie  ) 
+ ( 	$str_bhw 
+	or 	$str_bhx  ) 
 }
 
 rule capa_bypass_UAC_via_scheduled_task_environment_variable { 
@@ -6939,8 +6596,8 @@ rule capa_bypass_UAC_via_scheduled_task_environment_variable {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bif = "schtasks.exe" ascii wide
-	$big = /Microsoft\\Windows\\DiskCleanup\\SilentCleanup/ nocase ascii wide 
+ 	$str_bhy = "schtasks.exe" ascii wide
+	$bhz = /Microsoft\\Windows\\DiskCleanup\\SilentCleanup/ nocase ascii wide 
  
   condition: 
 	(
@@ -6948,8 +6605,8 @@ rule capa_bypass_UAC_via_scheduled_task_environment_variable {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bif 
-	and 	$big 
+ ( 	$str_bhy 
+	and 	$bhz 
 	and 	capa_create_process
  ) 
 }
@@ -6966,9 +6623,9 @@ rule capa_reference_AES_constants {
 	date = "2021-05-15"
 
   strings: 
- 	$bil = { 50 A7 F4 51 53 65 41 7E }
-	$bim = { 63 7C 77 7B F2 6B 6F C5 }
-	$bin = { 52 09 6A D5 30 36 A5 38 }
+ 	$bie = { 50 A7 F4 51 53 65 41 7E }
+	$bif = { 63 7C 77 7B F2 6B 6F C5 }
+	$big = { 52 09 6A D5 30 36 A5 38 }
  
   condition: 
 	(
@@ -6976,9 +6633,9 @@ rule capa_reference_AES_constants {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$bil 
-	or 	$bim 
-	or 	$bin  ) 
+ ( 	$bie 
+	or 	$bif 
+	or 	$big  ) 
 }
 
 rule capa_compiled_with_Nim { 
@@ -6992,14 +6649,14 @@ rule capa_compiled_with_Nim {
 	date = "2021-05-15"
 
   strings: 
- 	$bio = /NimMain/ ascii wide 
-	$bip = /NimMainModule/ ascii wide 
-	$biq = /NimMainInner/ ascii wide 
-	$bir = /io.nim$/ ascii wide 
-	$bis = /fatal.nim$/ ascii wide 
-	$bit = /system.nim$/ ascii wide 
-	$biu = /alloc.nim$/ ascii wide 
-	$biv = /osalloc.nim$/ ascii wide 
+ 	$bih = /NimMain/ ascii wide 
+	$bii = /NimMainModule/ ascii wide 
+	$bij = /NimMainInner/ ascii wide 
+	$bik = /io.nim$/ ascii wide 
+	$bil = /fatal.nim$/ ascii wide 
+	$bim = /system.nim$/ ascii wide 
+	$bin = /alloc.nim$/ ascii wide 
+	$bio = /osalloc.nim$/ ascii wide 
  
   condition: 
 	(
@@ -7007,14 +6664,14 @@ rule capa_compiled_with_Nim {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$bio 
-	or 	$bip 
-	or 	$biq 
-	or 	$bir 
-	or 	$bis 
-	or 	$bit 
-	or 	$biu 
-	or 	$biv  ) 
+ ( 	$bih 
+	or 	$bii 
+	or 	$bij 
+	or 	$bik 
+	or 	$bil 
+	or 	$bim 
+	or 	$bin 
+	or 	$bio  ) 
 }
 
 rule capa_hook_routines_via_microsoft_detours { 
@@ -7028,7 +6685,7 @@ rule capa_hook_routines_via_microsoft_detours {
 	date = "2021-05-15"
 
   strings: 
- 	$num_biw = { 64 74 72 52 }
+ 	$num_bip = { 64 74 72 52 }
  
   condition: 
 	(
@@ -7036,7 +6693,7 @@ rule capa_hook_routines_via_microsoft_detours {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( $num_biw  ) 
+ ( $num_bip  ) 
 }
 
 rule capa_packed_with_SVKP { 
@@ -7058,7 +6715,7 @@ rule capa_packed_with_SVKP {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	for any bix in pe.sections : ( bix.name == ".svkp" )  ) 
+ ( 	for any biq in pe.sections : ( biq.name == ".svkp" )  ) 
 }
 
 rule capa_flush_cabinet_file { 
@@ -7114,7 +6771,7 @@ rule capa_reference_startup_folder {
 	date = "2021-05-15"
 
   strings: 
- 	$biy = /Start Menu\\Programs\\Startup/ nocase ascii wide 
+ 	$bir = /Start Menu\\Programs\\Startup/ nocase ascii wide 
  
   condition: 
 	(
@@ -7122,7 +6779,7 @@ rule capa_reference_startup_folder {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$biy  ) 
+ ( 	$bir  ) 
 }
 
 rule capa_encrypt_or_decrypt_data_via_BCrypt { 
@@ -7139,8 +6796,8 @@ rule capa_encrypt_or_decrypt_data_via_BCrypt {
 	date = "2021-05-15"
 
   strings: 
- 	$api_biz = "BCryptDecrypt" ascii wide
-	$api_bja = "BCryptEncrypt" ascii wide
+ 	$api_bis = "BCryptDecrypt" ascii wide
+	$api_bit = "BCryptEncrypt" ascii wide
  
   condition: 
 	(
@@ -7148,8 +6805,8 @@ rule capa_encrypt_or_decrypt_data_via_BCrypt {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- (  (  ( 	$api_biz 
-	or 	$api_bja  )  )  ) 
+ (  (  ( 	$api_bis 
+	or 	$api_bit  )  )  ) 
 }
 
 rule capa_connect_network_resource { 
@@ -7193,9 +6850,9 @@ rule capa_packed_with_Shrinker {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	for any bjc in pe.sections : ( bjc.name == ".shrink1" ) 
-	or 	for any bjd in pe.sections : ( bjd.name == ".shrink2" ) 
-	or 	for any bje in pe.sections : ( bje.name == ".shrink3" )  ) 
+ ( 	for any biv in pe.sections : ( biv.name == ".shrink1" ) 
+	or 	for any biw in pe.sections : ( biw.name == ".shrink2" ) 
+	or 	for any bix in pe.sections : ( bix.name == ".shrink3" )  ) 
 }
 
 rule capa_packed_with_VProtect { 
@@ -7217,7 +6874,7 @@ rule capa_packed_with_VProtect {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	for any bjf in pe.sections : ( bjf.name == "VProtect" )  ) 
+ ( 	for any biy in pe.sections : ( biy.name == "VProtect" )  ) 
 }
 
 rule capa_packed_with_CCG { 
@@ -7239,7 +6896,7 @@ rule capa_packed_with_CCG {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	for any bjg in pe.sections : ( bjg.name == ".ccg" )  ) 
+ ( 	for any biz in pe.sections : ( biz.name == ".ccg" )  ) 
 }
 
 rule capa_set_console_window_title { 
@@ -7295,11 +6952,11 @@ rule capa_reference_Hurricane_Electric_DNS_server {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bjh = "216.218.130.2" ascii wide
-	$str_bji = "216.218.131.2" ascii wide
-	$str_bjj = "216.218.132.2" ascii wide
-	$str_bjk = "216.66.1.2" ascii wide
-	$str_bjl = "216.66.80.18" ascii wide
+ 	$str_bja = "216.218.130.2" ascii wide
+	$str_bjb = "216.218.131.2" ascii wide
+	$str_bjc = "216.218.132.2" ascii wide
+	$str_bjd = "216.66.1.2" ascii wide
+	$str_bje = "216.66.80.18" ascii wide
  
   condition: 
 	(
@@ -7307,11 +6964,11 @@ rule capa_reference_Hurricane_Electric_DNS_server {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bjh 
-	or 	$str_bji 
-	or 	$str_bjj 
-	or 	$str_bjk 
-	or 	$str_bjl  ) 
+ ( 	$str_bja 
+	or 	$str_bjb 
+	or 	$str_bjc 
+	or 	$str_bjd 
+	or 	$str_bje  ) 
 }
 
 rule capa_packed_with_Mpress { 
@@ -7333,8 +6990,8 @@ rule capa_packed_with_Mpress {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	for any bjm in pe.sections : ( bjm.name == ".MPRESS1" ) 
-	or 	for any bjn in pe.sections : ( bjn.name == ".MPRESS2" )  ) 
+ ( 	for any bjf in pe.sections : ( bjf.name == ".MPRESS1" ) 
+	or 	for any bjg in pe.sections : ( bjg.name == ".MPRESS2" )  ) 
 }
 
 rule capa_packaged_as_an_InstallShield_installer { 
@@ -7348,7 +7005,7 @@ rule capa_packaged_as_an_InstallShield_installer {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bjo = "InstallShield" ascii wide
+ 	$str_bjh = "InstallShield" ascii wide
  
   condition: 
 	(
@@ -7356,7 +7013,7 @@ rule capa_packaged_as_an_InstallShield_installer {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bjo  ) 
+ ( 	$str_bjh  ) 
 }
 
 rule capa_mine_cryptocurrency { 
@@ -7372,43 +7029,43 @@ rule capa_mine_cryptocurrency {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bjp = "stratum+tcp://" ascii wide
-	$str_bjq = "xmrig" ascii wide
-	$str_bjr = "xmr-stak" ascii wide
-	$str_bjs = "supportxmr.com:" ascii wide
-	$str_bjt = "dwarfpool.com:" ascii wide
-	$str_bju = "minergate" ascii wide
-	$str_bjv = "xmr." ascii wide
-	$str_bjw = "monero." ascii wide
-	$str_bjx = "Bitcoin" ascii wide
-	$str_bjy = "Bitcoin" ascii wide
-	$str_bjz = "BitcoinGold" ascii wide
-	$str_bka = "BtcCash" ascii wide
-	$str_bkb = "Ethereum" ascii wide
-	$str_bkc = "BlackCoin" ascii wide
-	$str_bkd = "ByteCoin" ascii wide
-	$str_bke = "EmerCoin" ascii wide
-	$str_bkf = "ReddCoin" ascii wide
-	$str_bkg = "Peercoin" ascii wide
-	$str_bkh = "Ripple" ascii wide
-	$str_bki = "Miota" ascii wide
-	$str_bkj = "Cardano" ascii wide
-	$str_bkk = "Lisk" ascii wide
-	$str_bkl = "Stratis" ascii wide
-	$str_bkm = "Waves" ascii wide
-	$str_bkn = "Qtum" ascii wide
-	$str_bko = "Stellar" ascii wide
-	$str_bkp = "ViaCoin" ascii wide
-	$str_bkq = "Electroneum" ascii wide
-	$str_bkr = "Dash" ascii wide
-	$str_bks = "Doge" ascii wide
-	$str_bkt = "Monero" ascii wide
-	$str_bku = "Graft" ascii wide
-	$str_bkv = "Zcash" ascii wide
-	$str_bkw = "Ya.money" ascii wide
-	$str_bkx = "Ya.disc" ascii wide
-	$str_bky = "Steam" ascii wide
-	$str_bkz = "vk.cc" ascii wide
+ 	$str_bji = "stratum+tcp://" ascii wide
+	$str_bjj = "xmrig" ascii wide
+	$str_bjk = "xmr-stak" ascii wide
+	$str_bjl = "supportxmr.com:" ascii wide
+	$str_bjm = "dwarfpool.com:" ascii wide
+	$str_bjn = "minergate" ascii wide
+	$str_bjo = "xmr." ascii wide
+	$str_bjp = "monero." ascii wide
+	$str_bjq = "Bitcoin" ascii wide
+	$str_bjr = "Bitcoin" ascii wide
+	$str_bjs = "BitcoinGold" ascii wide
+	$str_bjt = "BtcCash" ascii wide
+	$str_bju = "Ethereum" ascii wide
+	$str_bjv = "BlackCoin" ascii wide
+	$str_bjw = "ByteCoin" ascii wide
+	$str_bjx = "EmerCoin" ascii wide
+	$str_bjy = "ReddCoin" ascii wide
+	$str_bjz = "Peercoin" ascii wide
+	$str_bka = "Ripple" ascii wide
+	$str_bkb = "Miota" ascii wide
+	$str_bkc = "Cardano" ascii wide
+	$str_bkd = "Lisk" ascii wide
+	$str_bke = "Stratis" ascii wide
+	$str_bkf = "Waves" ascii wide
+	$str_bkg = "Qtum" ascii wide
+	$str_bkh = "Stellar" ascii wide
+	$str_bki = "ViaCoin" ascii wide
+	$str_bkj = "Electroneum" ascii wide
+	$str_bkk = "Dash" ascii wide
+	$str_bkl = "Doge" ascii wide
+	$str_bkm = "Monero" ascii wide
+	$str_bkn = "Graft" ascii wide
+	$str_bko = "Zcash" ascii wide
+	$str_bkp = "Ya.money" ascii wide
+	$str_bkq = "Ya.disc" ascii wide
+	$str_bkr = "Steam" ascii wide
+	$str_bks = "vk.cc" ascii wide
  
   condition: 
 	(
@@ -7416,7 +7073,14 @@ rule capa_mine_cryptocurrency {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bjp 
+ ( 	$str_bji 
+	or 	$str_bjj 
+	or 	$str_bjk 
+	or 	$str_bjl 
+	or 	$str_bjm 
+	or 	$str_bjn 
+	or 	$str_bjo 
+	or 	$str_bjp 
 	or 	$str_bjq 
 	or 	$str_bjr 
 	or 	$str_bjs 
@@ -7445,14 +7109,7 @@ rule capa_mine_cryptocurrency {
 	or 	$str_bkp 
 	or 	$str_bkq 
 	or 	$str_bkr 
-	or 	$str_bks 
-	or 	$str_bkt 
-	or 	$str_bku 
-	or 	$str_bkv 
-	or 	$str_bkw 
-	or 	$str_bkx 
-	or 	$str_bky 
-	or 	$str_bkz  ) 
+	or 	$str_bks  ) 
 }
 
 rule capa_packed_with_SeauSFX { 
@@ -7474,7 +7131,7 @@ rule capa_packed_with_SeauSFX {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	for any bla in pe.sections : ( bla.name == ".seau" )  ) 
+ ( 	for any bkt in pe.sections : ( bkt.name == ".seau" )  ) 
 }
 
 rule capa_debug_build { 
@@ -7488,8 +7145,8 @@ rule capa_debug_build {
 	date = "2021-05-15"
 
   strings: 
- 	$str_blb = "Assertion failed!" ascii wide
-	$str_blc = "Assertion failed:" ascii wide
+ 	$str_bku = "Assertion failed!" ascii wide
+	$str_bkv = "Assertion failed:" ascii wide
  
   condition: 
 	(
@@ -7497,8 +7154,8 @@ rule capa_debug_build {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_blb 
-	or 	$str_blc  ) 
+ ( 	$str_bku 
+	or 	$str_bkv  ) 
 }
 
 rule capa_packed_with_Simple_Pack { 
@@ -7520,7 +7177,7 @@ rule capa_packed_with_Simple_Pack {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	for any bld in pe.sections : ( bld.name == ".spack" )  ) 
+ ( 	for any bkw in pe.sections : ( bkw.name == ".spack" )  ) 
 }
 
 rule capa_resolve_function_by_hash { 
@@ -7537,14 +7194,14 @@ rule capa_resolve_function_by_hash {
 	date = "2021-05-15"
 
   strings: 
- 	$num_ble = { 5B BC 4A 6A }
-	$num_blf = { 5D 68 FA 3C }
-	$num_blg = { 8E 4E 0E EC }
-	$num_blh = { AA FC 0D 7C }
-	$num_bli = { 54 CA AF 91 }
-	$num_blj = { B8 0A 4C 53 }
-	$num_blk = { 1A 06 7F FF }
-	$num_bll = { EF CE E0 60 }
+ 	$num_bkx = { 5B BC 4A 6A }
+	$num_bky = { 5D 68 FA 3C }
+	$num_bkz = { 8E 4E 0E EC }
+	$num_bla = { AA FC 0D 7C }
+	$num_blb = { 54 CA AF 91 }
+	$num_blc = { B8 0A 4C 53 }
+	$num_bld = { 1A 06 7F FF }
+	$num_ble = { EF CE E0 60 }
  
   condition: 
 	(
@@ -7552,14 +7209,14 @@ rule capa_resolve_function_by_hash {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( $num_ble 
-	or $num_blf 
-	or $num_blg 
-	or $num_blh 
-	or $num_bli 
-	or $num_blj 
-	or $num_blk 
-	or $num_bll  ) 
+ ( $num_bkx 
+	or $num_bky 
+	or $num_bkz 
+	or $num_bla 
+	or $num_blb 
+	or $num_blc 
+	or $num_bld 
+	or $num_ble  ) 
 }
 
 rule capa_hash_data_via_BCrypt { 
@@ -7575,8 +7232,8 @@ rule capa_hash_data_via_BCrypt {
 	date = "2021-05-15"
 
   strings: 
- 	$api_blm = "BCryptHash" ascii wide
-	$api_bln = "BCryptHashData" ascii wide
+ 	$api_blf = "BCryptHash" ascii wide
+	$api_blg = "BCryptHashData" ascii wide
  
   condition: 
 	(
@@ -7584,8 +7241,8 @@ rule capa_hash_data_via_BCrypt {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- (  (  ( 	$api_blm 
-	or  (  ( 	$api_bln  )  )  )  )  ) 
+ (  (  ( 	$api_blf 
+	or  (  ( 	$api_blg  )  )  )  )  ) 
 }
 
 rule capa_delete_internet_cache { 
@@ -7621,8 +7278,8 @@ rule capa_reference_OpenDNS_DNS_server {
 	date = "2021-05-15"
 
   strings: 
- 	$str_blp = "208.67.222.222" ascii wide
-	$str_blq = "208.67.220.220" ascii wide
+ 	$str_bli = "208.67.222.222" ascii wide
+	$str_blj = "208.67.220.220" ascii wide
  
   condition: 
 	(
@@ -7630,8 +7287,8 @@ rule capa_reference_OpenDNS_DNS_server {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_blp 
-	or 	$str_blq  ) 
+ ( 	$str_bli 
+	or 	$str_blj  ) 
 }
 
 rule capa_read_process_memory { 
@@ -7667,24 +7324,24 @@ rule capa_linked_against_XZip {
 	date = "2021-05-15"
 
   strings: 
- 	$str_blr = "ct_init: length != 256" ascii wide
-	$str_bls = "ct_init: dist != 256" ascii wide
-	$str_blt = "ct_init: 256+dist != 512" ascii wide
-	$str_blu = "bit length overflow" ascii wide
-	$str_blv = "code %d bits %d->%d" ascii wide
-	$str_blw = "inconsistent bit counts" ascii wide
-	$str_blx = "gen_codes: max_code %d " ascii wide
-	$str_bly = "dyn trees: dyn %ld, stat %ld" ascii wide
-	$str_blz = "bad pack level" ascii wide
-	$str_bma = "Code too clever" ascii wide
-	$str_bmb = "unknown zip result code" ascii wide
-	$str_bmc = "Culdn't duplicate handle" ascii wide
-	$str_bmd = "File not found in the zipfile" ascii wide
-	$str_bme = "Still more data to unzip" ascii wide
-	$str_bmf = "Caller: the file had already been partially unzipped" ascii wide
-	$str_bmg = "Caller: can only get memory of a memory zipfile" ascii wide
-	$str_bmh = "Zip-bug: internal initialisation not completed" ascii wide
-	$str_bmi = "Zip-bug: an internal error during flation" ascii wide
+ 	$str_blk = "ct_init: length != 256" ascii wide
+	$str_bll = "ct_init: dist != 256" ascii wide
+	$str_blm = "ct_init: 256+dist != 512" ascii wide
+	$str_bln = "bit length overflow" ascii wide
+	$str_blo = "code %d bits %d->%d" ascii wide
+	$str_blp = "inconsistent bit counts" ascii wide
+	$str_blq = "gen_codes: max_code %d " ascii wide
+	$str_blr = "dyn trees: dyn %ld, stat %ld" ascii wide
+	$str_bls = "bad pack level" ascii wide
+	$str_blt = "Code too clever" ascii wide
+	$str_blu = "unknown zip result code" ascii wide
+	$str_blv = "Culdn't duplicate handle" ascii wide
+	$str_blw = "File not found in the zipfile" ascii wide
+	$str_blx = "Still more data to unzip" ascii wide
+	$str_bly = "Caller: the file had already been partially unzipped" ascii wide
+	$str_blz = "Caller: can only get memory of a memory zipfile" ascii wide
+	$str_bma = "Zip-bug: internal initialisation not completed" ascii wide
+	$str_bmb = "Zip-bug: an internal error during flation" ascii wide
  
   condition: 
 	(
@@ -7692,7 +7349,14 @@ rule capa_linked_against_XZip {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_blr 
+ ( 	$str_blk 
+	or 	$str_bll 
+	or 	$str_blm 
+	or 	$str_bln 
+	or 	$str_blo 
+	or 	$str_blp 
+	or 	$str_blq 
+	or 	$str_blr 
 	or 	$str_bls 
 	or 	$str_blt 
 	or 	$str_blu 
@@ -7702,14 +7366,7 @@ rule capa_linked_against_XZip {
 	or 	$str_bly 
 	or 	$str_blz 
 	or 	$str_bma 
-	or 	$str_bmb 
-	or 	$str_bmc 
-	or 	$str_bmd 
-	or 	$str_bme 
-	or 	$str_bmf 
-	or 	$str_bmg 
-	or 	$str_bmh 
-	or 	$str_bmi  ) 
+	or 	$str_bmb  ) 
 }
 
 rule capa_compiled_from_EPL { 
@@ -7724,11 +7381,11 @@ rule capa_compiled_from_EPL {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bmj = "GetNewSock" ascii wide
-	$str_bmk = "Software\\FlySky\\E\\Install" ascii wide
-	$str_bml = "Not found the kernel library or the kernel library is invalid!" ascii wide
-	$str_bmm = "Failed to allocate memory!" ascii wide
-	$str_bmn = "/ MADE BY E COMPILER – WUTAO" ascii wide
+ 	$str_bmc = "GetNewSock" ascii wide
+	$str_bmd = "Software\\FlySky\\E\\Install" ascii wide
+	$str_bme = "Not found the kernel library or the kernel library is invalid!" ascii wide
+	$str_bmf = "Failed to allocate memory!" ascii wide
+	$str_bmg = "/ MADE BY E COMPILER – WUTAO" ascii wide
  
   condition: 
 	(
@@ -7736,13 +7393,13 @@ rule capa_compiled_from_EPL {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bmj 
-	or 	$str_bmk 
-	or 	$str_bml 
-	or 	$str_bmm 
-	or 	$str_bmn 
-	or 	for any bmo in pe.sections : ( bmo.name == ".ecode" ) 
-	or 	for any bmp in pe.sections : ( bmp.name == ".edata" ) 
+ ( 	$str_bmc 
+	or 	$str_bmd 
+	or 	$str_bme 
+	or 	$str_bmf 
+	or 	$str_bmg 
+	or 	for any bmh in pe.sections : ( bmh.name == ".ecode" ) 
+	or 	for any bmi in pe.sections : ( bmi.name == ".edata" ) 
 	or 	pe.imports(/krnln/i, /fne/) 
 	or 	pe.imports(/krnln/i, /fnr/) 
 	or 	pe.imports(/eAPI/i, /fne/) 
@@ -7788,7 +7445,7 @@ rule capa_packed_with_Perplex {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	for any bmq in pe.sections : ( bmq.name == ".perplex" )  ) 
+ ( 	for any bmj in pe.sections : ( bmj.name == ".perplex" )  ) 
 }
 
 rule capa_compiled_with_Go { 
@@ -7802,9 +7459,9 @@ rule capa_compiled_with_Go {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bmr = "Go build ID:" ascii wide
-	$str_bms = "go.buildid" ascii wide
-	$str_bmt = "Go buildinf:" ascii wide
+ 	$str_bmk = "Go build ID:" ascii wide
+	$str_bml = "go.buildid" ascii wide
+	$str_bmm = "Go buildinf:" ascii wide
  
   condition: 
 	(
@@ -7812,9 +7469,9 @@ rule capa_compiled_with_Go {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bmr 
-	or 	$str_bms 
-	or 	$str_bmt  ) 
+ ( 	$str_bmk 
+	or 	$str_bml 
+	or 	$str_bmm  ) 
 }
 
 rule capa_compiled_with_ps2exe { 
@@ -7829,9 +7486,9 @@ rule capa_compiled_with_ps2exe {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bmu = "PS2EXEApp" ascii wide
-	$str_bmv = "PS2EXE" ascii wide
-	$str_bmw = "PS2EXE_Host" ascii wide
+ 	$str_bmn = "PS2EXEApp" ascii wide
+	$str_bmo = "PS2EXE" ascii wide
+	$str_bmp = "PS2EXE_Host" ascii wide
  
   condition: 
 	(
@@ -7841,9 +7498,9 @@ rule capa_compiled_with_ps2exe {
 	) and
  ( 	capa_compiled_to_the__NET_platform
 
-	and 	$str_bmu 
-	and 	$str_bmv 
-	and 	$str_bmw  ) 
+	and 	$str_bmn 
+	and 	$str_bmo 
+	and 	$str_bmp  ) 
 }
 
 rule capa_compiled_with_MinGW_for_Windows { 
@@ -7857,8 +7514,8 @@ rule capa_compiled_with_MinGW_for_Windows {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bmx = "Mingw runtime failure:" ascii wide
-	$str_bmy = "_Jv_RegisterClasses" ascii wide
+ 	$str_bmq = "Mingw runtime failure:" ascii wide
+	$str_bmr = "_Jv_RegisterClasses" ascii wide
  
   condition: 
 	(
@@ -7866,8 +7523,8 @@ rule capa_compiled_with_MinGW_for_Windows {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bmx 
-	and 	$str_bmy  ) 
+ ( 	$str_bmq 
+	and 	$str_bmr  ) 
 }
 
 rule capa_compiled_from_Visual_Basic { 
@@ -7881,7 +7538,7 @@ rule capa_compiled_from_Visual_Basic {
 	date = "2021-05-15"
 
   strings: 
- 	$bmz = /VB5!.{,1000}/ ascii wide 
+ 	$bms = /VB5!.{,1000}/ ascii wide 
  
   condition: 
 	(
@@ -7889,7 +7546,7 @@ rule capa_compiled_from_Visual_Basic {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$bmz 
+ ( 	$bms 
 	and 	pe.imports(/msvbvm60/i, /ThunRTMain/)  ) 
 }
 
@@ -7907,10 +7564,10 @@ rule capa_compiled_with_pyarmor {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bnd = "pyarmor_runtimesh" ascii wide
-	$str_bne = "PYARMOR" ascii wide
-	$str_bnf = "__pyarmor__" ascii wide
-	$str_bng = "PYARMOR_SIGNATURE" ascii wide
+ 	$str_bmw = "pyarmor_runtimesh" ascii wide
+	$str_bmx = "PYARMOR" ascii wide
+	$str_bmy = "__pyarmor__" ascii wide
+	$str_bmz = "PYARMOR_SIGNATURE" ascii wide
  
   condition: 
 	(
@@ -7918,10 +7575,10 @@ rule capa_compiled_with_pyarmor {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bnd 
-	or 	$str_bne 
-	or 	$str_bnf 
-	or 	$str_bng  ) 
+ ( 	$str_bmw 
+	or 	$str_bmx 
+	or 	$str_bmy 
+	or 	$str_bmz  ) 
 }
 
 rule capa_compiled_with_exe4j { 
@@ -7935,18 +7592,18 @@ rule capa_compiled_with_exe4j {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bnh = "exe4j_log" ascii wide
-	$str_bni = "install4j_log" ascii wide
-	$str_bnj = "exe4j_java_home" ascii wide
-	$str_bnk = "install4j" ascii wide
-	$str_bnl = "exe4j.isinstall4j" ascii wide
-	$bnm = /com\/exe4j\/runtime\/exe4jcontroller/ nocase ascii wide 
-	$bnn = /com\/exe4j\/runtime\/winlauncher/ nocase ascii wide 
-	$str_bno = "EXE4J_LOG" ascii wide
-	$str_bnp = "INSTALL4J_LOG" ascii wide
-	$str_bnq = "EXE4J_JAVA_HOME" ascii wide
-	$str_bnr = "INSTALL4J" ascii wide
-	$str_bns = "EXE4J.ISINSTALL4J" ascii wide
+ 	$str_bna = "exe4j_log" ascii wide
+	$str_bnb = "install4j_log" ascii wide
+	$str_bnc = "exe4j_java_home" ascii wide
+	$str_bnd = "install4j" ascii wide
+	$str_bne = "exe4j.isinstall4j" ascii wide
+	$bnf = /com\/exe4j\/runtime\/exe4jcontroller/ nocase ascii wide 
+	$bng = /com\/exe4j\/runtime\/winlauncher/ nocase ascii wide 
+	$str_bnh = "EXE4J_LOG" ascii wide
+	$str_bni = "INSTALL4J_LOG" ascii wide
+	$str_bnj = "EXE4J_JAVA_HOME" ascii wide
+	$str_bnk = "INSTALL4J" ascii wide
+	$str_bnl = "EXE4J.ISINSTALL4J" ascii wide
  
   condition: 
 	(
@@ -7954,18 +7611,18 @@ rule capa_compiled_with_exe4j {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bnh 
+ ( 	$str_bna 
+	or 	$str_bnb 
+	or 	$str_bnc 
+	or 	$str_bnd 
+	or 	$str_bne 
+	or 	$bnf 
+	or 	$bng 
+	or 	$str_bnh 
 	or 	$str_bni 
 	or 	$str_bnj 
 	or 	$str_bnk 
-	or 	$str_bnl 
-	or 	$bnm 
-	or 	$bnn 
-	or 	$str_bno 
-	or 	$str_bnp 
-	or 	$str_bnq 
-	or 	$str_bnr 
-	or 	$str_bns  ) 
+	or 	$str_bnl  ) 
 }
 
 rule capa_compiled_with_AutoIt { 
@@ -7980,12 +7637,12 @@ rule capa_compiled_with_AutoIt {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bnt = "AutoIt has detected the stack has become corrupt.\n\nStack corruption typically occurs when either the wrong calling convention is used or when the function is called with the wrong number of arguments.\n\nAutoIt supports the __stdcall (WINAPI) and __cdecl calling conventions.  The __stdcall (WINAPI) convention is used by default but __cdecl can be used instead.  See the DllCall() documentation for details on changing the calling convention." ascii wide
-	$str_bnu = "AutoIt Error" ascii wide
-	$bnv = />>>AUTOIT SCRIPT<<</ ascii wide 
-	$str_bnw = ">>>AUTOIT NO CMDEXECUTE<<<" ascii wide
-	$str_bnx = "#requireadmin" ascii wide
-	$str_bny = "#OnAutoItStartRegister" ascii wide
+ 	$str_bnm = "AutoIt has detected the stack has become corrupt.\n\nStack corruption typically occurs when either the wrong calling convention is used or when the function is called with the wrong number of arguments.\n\nAutoIt supports the __stdcall (WINAPI) and __cdecl calling conventions.  The __stdcall (WINAPI) convention is used by default but __cdecl can be used instead.  See the DllCall() documentation for details on changing the calling convention." ascii wide
+	$str_bnn = "AutoIt Error" ascii wide
+	$bno = />>>AUTOIT SCRIPT<<</ ascii wide 
+	$str_bnp = ">>>AUTOIT NO CMDEXECUTE<<<" ascii wide
+	$str_bnq = "#requireadmin" ascii wide
+	$str_bnr = "#OnAutoItStartRegister" ascii wide
  
   condition: 
 	(
@@ -7993,12 +7650,12 @@ rule capa_compiled_with_AutoIt {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bnt 
-	or 	$str_bnu 
-	or 	$bnv 
-	or 	$str_bnw 
-	or 	$str_bnx 
-	or 	$str_bny  ) 
+ ( 	$str_bnm 
+	or 	$str_bnn 
+	or 	$bno 
+	or 	$str_bnp 
+	or 	$str_bnq 
+	or 	$str_bnr  ) 
 }
 
 rule capa_compiled_with_Borland_Delphi { 
@@ -8012,10 +7669,10 @@ rule capa_compiled_with_Borland_Delphi {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bnz = "Borland C++ - Copyright 2002 Borland Corporation" ascii wide
-	$boa = /SOFTWARE\\Borland\\Delphi\\RTL/ ascii wide 
-	$str_bob = "Sysutils::Exception" ascii wide
-	$str_boc = "TForm1" ascii wide
+ 	$str_bns = "Borland C++ - Copyright 2002 Borland Corporation" ascii wide
+	$bnt = /SOFTWARE\\Borland\\Delphi\\RTL/ ascii wide 
+	$str_bnu = "Sysutils::Exception" ascii wide
+	$str_bnv = "TForm1" ascii wide
  
   condition: 
 	(
@@ -8023,10 +7680,10 @@ rule capa_compiled_with_Borland_Delphi {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bnz 
-	or 	$boa 
-	or 	$str_bob 
-	or 	$str_boc 
+ ( 	$str_bns 
+	or 	$bnt 
+	or 	$str_bnu 
+	or 	$str_bnv 
 	or 	pe.imports(/BORLNDMM/i, /DLL/)  ) 
 }
 
@@ -8047,10 +7704,10 @@ rule capa_compiled_with_dmd {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	for any bod in pe.sections : ( bod.name == "._deh" ) 
-	and 	for any boe in pe.sections : ( boe.name == ".tp" ) 
-	and 	for any bof in pe.sections : ( bof.name == ".dp" ) 
-	and 	for any bog in pe.sections : ( bog.name == ".minfo" )  ) 
+ ( 	for any bnw in pe.sections : ( bnw.name == "._deh" ) 
+	and 	for any bnx in pe.sections : ( bnx.name == ".tp" ) 
+	and 	for any bny in pe.sections : ( bny.name == ".dp" ) 
+	and 	for any bnz in pe.sections : ( bnz.name == ".minfo" )  ) 
 }
 
 rule capa_compiled_with_py2exe { 
@@ -8064,8 +7721,8 @@ rule capa_compiled_with_py2exe {
 	date = "2021-05-15"
 
   strings: 
- 	$str_boh = "PY2EXE_VERBOSE" ascii wide
-	$api_boi = "getenv" ascii wide
+ 	$str_boa = "PY2EXE_VERBOSE" ascii wide
+	$api_bob = "getenv" ascii wide
  
   condition: 
 	(
@@ -8073,8 +7730,8 @@ rule capa_compiled_with_py2exe {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_boh 
-	and 	$api_boi  ) 
+ ( 	$str_boa 
+	and 	$api_bob  ) 
 }
 
 rule capa_identify_ATM_dispenser_service_provider { 
@@ -8090,9 +7747,9 @@ rule capa_identify_ATM_dispenser_service_provider {
 	date = "2021-05-15"
 
   strings: 
- 	$str_boj = "CurrencyDispenser1" ascii wide
-	$str_bok = "CDM30" ascii wide
-	$str_bol = "DBD_AdvFuncDisp" ascii wide
+ 	$str_boc = "CurrencyDispenser1" ascii wide
+	$str_bod = "CDM30" ascii wide
+	$str_boe = "DBD_AdvFuncDisp" ascii wide
  
   condition: 
 	(
@@ -8100,9 +7757,9 @@ rule capa_identify_ATM_dispenser_service_provider {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_boj 
-	or 	$str_bok 
-	or 	$str_bol  ) 
+ ( 	$str_boc 
+	or 	$str_bod 
+	or 	$str_boe  ) 
 }
 
 rule capa_load_NCR_ATM_library { 
@@ -8122,8 +7779,8 @@ rule capa_load_NCR_ATM_library {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bom = "MSXFS.dll" ascii wide
-	$str_bon = "msxfs.dll" ascii wide
+ 	$str_bof = "MSXFS.dll" ascii wide
+	$str_bog = "msxfs.dll" ascii wide
  
   condition: 
 	(
@@ -8132,8 +7789,8 @@ rule capa_load_NCR_ATM_library {
 		uint16be(0) == 0x5649
 	) and
  ( 	pe.imports(/msxfs/i, /dll/) 
-	or 	$str_bom 
-	or 	$str_bon  ) 
+	or 	$str_bof 
+	or 	$str_bog  ) 
 }
 
 rule capa_reference_NCR_ATM_library_routines { 
@@ -8148,17 +7805,17 @@ rule capa_reference_NCR_ATM_library_routines {
 	date = "2021-05-15"
 
   strings: 
- 	$str_boo = "msxfs.dll" ascii wide
-	$str_bop = "WFSCleanUp" ascii wide
-	$str_boq = "WFSClose" ascii wide
-	$str_bor = "WFSExecute" ascii wide
-	$str_bos = "WFSFreeResult" ascii wide
-	$str_bot = "WFSGetInfo" ascii wide
-	$str_bou = "WFSLock" ascii wide
-	$str_bov = "WFSOpen" ascii wide
-	$str_bow = "WFSRegister" ascii wide
-	$str_box = "WFSStartUp" ascii wide
-	$str_boy = "WFSUnlock" ascii wide
+ 	$str_boh = "msxfs.dll" ascii wide
+	$str_boi = "WFSCleanUp" ascii wide
+	$str_boj = "WFSClose" ascii wide
+	$str_bok = "WFSExecute" ascii wide
+	$str_bol = "WFSFreeResult" ascii wide
+	$str_bom = "WFSGetInfo" ascii wide
+	$str_bon = "WFSLock" ascii wide
+	$str_boo = "WFSOpen" ascii wide
+	$str_bop = "WFSRegister" ascii wide
+	$str_boq = "WFSStartUp" ascii wide
+	$str_bor = "WFSUnlock" ascii wide
  
   condition: 
 	(
@@ -8166,27 +7823,27 @@ rule capa_reference_NCR_ATM_library_routines {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_boo 
+ ( 	$str_boh 
 	or 	pe.imports(/msxfs/i, /WFSCleanUp/) 
-	or 	$str_bop 
+	or 	$str_boi 
 	or 	pe.imports(/msxfs/i, /WFSClose/) 
-	or 	$str_boq 
+	or 	$str_boj 
 	or 	pe.imports(/msxfs/i, /WFSExecute/) 
-	or 	$str_bor 
+	or 	$str_bok 
 	or 	pe.imports(/msxfs/i, /WFSFreeResult/) 
-	or 	$str_bos 
+	or 	$str_bol 
 	or 	pe.imports(/msxfs/i, /WFSGetInfo/) 
-	or 	$str_bot 
+	or 	$str_bom 
 	or 	pe.imports(/msxfs/i, /WFSLock/) 
-	or 	$str_bou 
+	or 	$str_bon 
 	or 	pe.imports(/msxfs/i, /WFSOpen/) 
-	or 	$str_bov 
+	or 	$str_boo 
 	or 	pe.imports(/msxfs/i, /WFSRegister/) 
-	or 	$str_bow 
+	or 	$str_bop 
 	or 	pe.imports(/msxfs/i, /WFSStartUp/) 
-	or 	$str_box 
+	or 	$str_boq 
 	or 	pe.imports(/msxfs/i, /WFSUnlock/) 
-	or 	$str_boy  ) 
+	or 	$str_bor  ) 
 }
 
 rule capa_reference_Diebold_ATM_routines { 
@@ -8201,8 +7858,8 @@ rule capa_reference_Diebold_ATM_routines {
 	date = "2021-05-15"
 
   strings: 
- 	$str_boz = "DBD_AdvFuncDisp" ascii wide
-	$str_bpa = "DBD_EPP4" ascii wide
+ 	$str_bos = "DBD_AdvFuncDisp" ascii wide
+	$str_bot = "DBD_EPP4" ascii wide
  
   condition: 
 	(
@@ -8210,8 +7867,8 @@ rule capa_reference_Diebold_ATM_routines {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_boz 
-	or 	$str_bpa  ) 
+ ( 	$str_bos 
+	or 	$str_bot  ) 
 }
 
 rule capa_load_Diebold_Nixdorf_ATM_library { 
@@ -8228,34 +7885,34 @@ rule capa_load_Diebold_Nixdorf_ATM_library {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bpb = "CSCWCNG.dll" ascii wide
-	$str_bpc = "CscCngStatusWrite" ascii wide
-	$str_bpd = "CscCngCasRefInit" ascii wide
-	$str_bpe = "CscCngEncryption" ascii wide
-	$str_bpf = "CscCngRecovery" ascii wide
-	$str_bpg = "CscCngService" ascii wide
-	$str_bph = "CscCngOpen" ascii wide
-	$str_bpi = "CscCngReset" ascii wide
-	$str_bpj = "CscCngClose" ascii wide
-	$str_bpk = "CscCngDispense" ascii wide
-	$str_bpl = "CscCngTransport" ascii wide
-	$str_bpm = "CscCngStatusRead" ascii wide
-	$str_bpn = "CscCngInit" ascii wide
-	$str_bpo = "CscCngGetRelease" ascii wide
-	$str_bpp = "CscCngLock" ascii wide
-	$str_bpq = "CscCngUnlock" ascii wide
-	$str_bpr = "CscCngShutter" ascii wide
-	$str_bps = "CscCngPowerOff" ascii wide
-	$str_bpt = "CscCngSelStatus" ascii wide
-	$str_bpu = "CscCngBim" ascii wide
-	$str_bpv = "CscCngConfigure" ascii wide
-	$str_bpw = "CscCngStatistics" ascii wide
-	$str_bpx = "CscCngControl" ascii wide
-	$str_bpy = "CscCngPsm" ascii wide
-	$str_bpz = "CscCngGetTrace" ascii wide
-	$str_bqa = "CscCngOptimization" ascii wide
-	$str_bqb = "CscCngSelftest" ascii wide
-	$str_bqc = "CscCngEco" ascii wide
+ 	$str_bou = "CSCWCNG.dll" ascii wide
+	$str_bov = "CscCngStatusWrite" ascii wide
+	$str_bow = "CscCngCasRefInit" ascii wide
+	$str_box = "CscCngEncryption" ascii wide
+	$str_boy = "CscCngRecovery" ascii wide
+	$str_boz = "CscCngService" ascii wide
+	$str_bpa = "CscCngOpen" ascii wide
+	$str_bpb = "CscCngReset" ascii wide
+	$str_bpc = "CscCngClose" ascii wide
+	$str_bpd = "CscCngDispense" ascii wide
+	$str_bpe = "CscCngTransport" ascii wide
+	$str_bpf = "CscCngStatusRead" ascii wide
+	$str_bpg = "CscCngInit" ascii wide
+	$str_bph = "CscCngGetRelease" ascii wide
+	$str_bpi = "CscCngLock" ascii wide
+	$str_bpj = "CscCngUnlock" ascii wide
+	$str_bpk = "CscCngShutter" ascii wide
+	$str_bpl = "CscCngPowerOff" ascii wide
+	$str_bpm = "CscCngSelStatus" ascii wide
+	$str_bpn = "CscCngBim" ascii wide
+	$str_bpo = "CscCngConfigure" ascii wide
+	$str_bpp = "CscCngStatistics" ascii wide
+	$str_bpq = "CscCngControl" ascii wide
+	$str_bpr = "CscCngPsm" ascii wide
+	$str_bps = "CscCngGetTrace" ascii wide
+	$str_bpt = "CscCngOptimization" ascii wide
+	$str_bpu = "CscCngSelftest" ascii wide
+	$str_bpv = "CscCngEco" ascii wide
  
   condition: 
 	(
@@ -8264,7 +7921,7 @@ rule capa_load_Diebold_Nixdorf_ATM_library {
 		uint16be(0) == 0x5649
 	) and
  ( 	pe.imports(/cscwcng/i, /dll/) 
-	or 	$str_bpb 
+	or 	$str_bou 
 	or 	pe.imports(/cscwcng/i, /CscCngStatusWrite/) 
 	or 	pe.imports(/cscwcng/i, /CscCngCasRefInit/) 
 	or 	pe.imports(/cscwcng/i, /CscCngEncryption/) 
@@ -8292,6 +7949,13 @@ rule capa_load_Diebold_Nixdorf_ATM_library {
 	or 	pe.imports(/cscwcng/i, /CscCngOptimization/) 
 	or 	pe.imports(/cscwcng/i, /CscCngSelftest/) 
 	or 	pe.imports(/cscwcng/i, /CscCngEco/) 
+	or 	$str_bov 
+	or 	$str_bow 
+	or 	$str_box 
+	or 	$str_boy 
+	or 	$str_boz 
+	or 	$str_bpa 
+	or 	$str_bpb 
 	or 	$str_bpc 
 	or 	$str_bpd 
 	or 	$str_bpe 
@@ -8311,14 +7975,7 @@ rule capa_load_Diebold_Nixdorf_ATM_library {
 	or 	$str_bps 
 	or 	$str_bpt 
 	or 	$str_bpu 
-	or 	$str_bpv 
-	or 	$str_bpw 
-	or 	$str_bpx 
-	or 	$str_bpy 
-	or 	$str_bpz 
-	or 	$str_bqa 
-	or 	$str_bqb 
-	or 	$str_bqc  ) 
+	or 	$str_bpv  ) 
 }
 
 rule capa_initialize_WinHTTP_library { 
@@ -8373,8 +8030,8 @@ rule capa_initialize_IWebBrowser2 {
 	date = "2021-05-15"
 
   strings: 
- 	$bqd = { 01 DF 02 00 00 00 00 00 C0 00 00 00 00 00 00 46 }
-	$bqe = { 61 16 0C D3 AF CD D0 11 8A 3E 00 C0 4F C9 E2 6E }
+ 	$bpw = { 01 DF 02 00 00 00 00 00 C0 00 00 00 00 00 00 46 }
+	$bpx = { 61 16 0C D3 AF CD D0 11 8A 3E 00 C0 4F C9 E2 6E }
  
   condition: 
 	(
@@ -8383,8 +8040,8 @@ rule capa_initialize_IWebBrowser2 {
 		uint16be(0) == 0x5649
 	) and
  ( 	pe.imports(/ole32/i, /CoCreateInstance/) 
-	and 	$bqd 
-	and 	$bqe  ) 
+	and 	$bpw 
+	and 	$bpx  ) 
 }
 
 rule capa_read_HTTP_header { 
@@ -8550,34 +8207,6 @@ rule capa_download_URL_to_file {
 	or 	pe.imports(/urlmon/i, /URLDownloadToCacheFile/)  ) 
 }
 
-rule capa_send_HTTP_request { 
-  meta: 
- 	description = "send HTTP request (converted from capa rule)"
-	namespace = "communication/http/client"
-	author = "moritz.raabe@fireeye.com"
-	scope = "function"
-	mbc = "Communication::HTTP Communication::Send Request [C0002.003]"
-	hash = "BFB9B5391A13D0AFD787E87AB90F14F5"
-	hash = "6A352C3E55E8AE5ED39DC1BE7FB964B1"
-	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/http/client/send-http-request.yml"
-	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-15"
-
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
- (  (  (  (  ( 	pe.imports(/wininet/i, /HttpOpenRequest/) 
-	or 	pe.imports(/wininet/i, /InternetConnect/)  )  ) 
-	and  (  ( 	pe.imports(/wininet/i, /HttpSendRequest/) 
-	or 	pe.imports(/wininet/i, /HttpSendRequestEx/)  )  )  )  ) 
-	or  (  ( 	pe.imports(/winhttp/i, /WinHttpSendRequest/) 
-	and 	pe.imports(/winhttp/i, /WinHttpWriteData/)  )  ) 
-  ) 
-}
-
 rule capa_prepare_HTTP_request { 
   meta: 
  	description = "prepare HTTP request (converted from capa rule)"
@@ -8673,10 +8302,10 @@ rule capa_send_ICMP_echo_request {
 	date = "2021-05-15"
 
   strings: 
- 	$api_bqh = "IcmpSendEcho" ascii wide
-	$api_bqi = "IcmpSendEcho2" ascii wide
-	$api_bqj = "IcmpSendEcho2Ex" ascii wide
-	$api_bqk = "Icmp6SendEcho2" ascii wide
+ 	$api_bqa = "IcmpSendEcho" ascii wide
+	$api_bqb = "IcmpSendEcho2" ascii wide
+	$api_bqc = "IcmpSendEcho2Ex" ascii wide
+	$api_bqd = "Icmp6SendEcho2" ascii wide
  
   condition: 
 	(
@@ -8684,10 +8313,10 @@ rule capa_send_ICMP_echo_request {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- (  (  ( 	$api_bqh 
-	or 	$api_bqi 
-	or 	$api_bqj 
-	or 	$api_bqk  )  )  ) 
+ (  (  ( 	$api_bqa 
+	or 	$api_bqb 
+	or 	$api_bqc 
+	or 	$api_bqd  )  )  ) 
 }
 
 rule capa_initialize_Winsock_library { 
@@ -8823,29 +8452,6 @@ rule capa_create_pipe {
 	or 	pe.imports(/kernel32/i, /CreateNamedPipe/)  ) 
 }
 
-rule capa_write_pipe { 
-  meta: 
- 	description = "write pipe (converted from capa rule)"
-	namespace = "communication/named-pipe/write"
-	author = "moritz.raabe@fireeye.com"
-	author = "michael.hunhoff@fireeye.com"
-	scope = "function"
-	mbc = "Communication::Interprocess Communication::Write Pipe [C0003.004]"
-	hash = "C91887D861D9BD4A5872249B641BC9F9"
-	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/named-pipe/write/write-pipe.yml"
-	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-15"
-
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
- ( 	pe.imports(/kernel32/i, /TransactNamedPipe/) 
-	or 	pe.imports(/kernel32/i, /CallNamedPipe/)  ) 
-}
-
 rule capa_connect_pipe { 
   meta: 
  	description = "connect pipe (converted from capa rule)"
@@ -8905,7 +8511,7 @@ rule capa_access_PE_header {
 	date = "2021-05-15"
 
   strings: 
- 	$api_bql = "RtlImageNtHeader" ascii wide
+ 	$api_bqe = "RtlImageNtHeader" ascii wide
  
   condition: 
 	(
@@ -8913,7 +8519,7 @@ rule capa_access_PE_header {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$api_bql 
+ ( 	$api_bqe 
 	or 	pe.imports(/ntdll/i, /RtlImageNtHeaderEx/)  ) 
 }
 
@@ -8929,14 +8535,14 @@ rule capa_acquire_credentials_from_Windows_Credential_Manager {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bqm = ".vcrd" ascii wide
-	$str_bqn = "*.vcrd" ascii wide
-	$str_bqo = "Policy.vpol" ascii wide
-	$bqp = /AppData\\Local\\Microsoft\\(Vault|Credentials)/ ascii wide 
-	$api_bqq = "CredEnumerate" ascii wide
-	$bqr = /vaultcmd(\.exe)?/ ascii wide 
-	$bqs = /\/listcreds:/ ascii wide 
-	$bqt = /"Windows Credentials"/ ascii wide 
+ 	$str_bqf = ".vcrd" ascii wide
+	$str_bqg = "*.vcrd" ascii wide
+	$str_bqh = "Policy.vpol" ascii wide
+	$bqi = /AppData\\Local\\Microsoft\\(Vault|Credentials)/ ascii wide 
+	$api_bqj = "CredEnumerate" ascii wide
+	$bqk = /vaultcmd(\.exe)?/ ascii wide 
+	$bql = /\/listcreds:/ ascii wide 
+	$bqm = /"Windows Credentials"/ ascii wide 
  
   condition: 
 	(
@@ -8944,14 +8550,14 @@ rule capa_acquire_credentials_from_Windows_Credential_Manager {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bqm 
-	or 	$str_bqn 
-	or 	$str_bqo 
-	or 	$bqp 
-	or 	$api_bqq 
-	or  (  (  (  ( 	$bqr 
-	or 	$bqs 
-	or 	$bqt  )  )  )  )  ) 
+ ( 	$str_bqf 
+	or 	$str_bqg 
+	or 	$str_bqh 
+	or 	$bqi 
+	or 	$api_bqj 
+	or  (  (  (  ( 	$bqk 
+	or 	$bql 
+	or 	$bqm  )  )  )  )  ) 
 }
 
 rule capa_get_geographical_location { 
@@ -8966,21 +8572,21 @@ rule capa_get_geographical_location {
 	date = "2021-05-15"
 
   strings: 
- 	$api_bqu = "GetLocaleInfo" ascii wide
-	$api_bqv = "GetLocaleInfoEx" ascii wide
-	$bqw = /geolocation/ nocase ascii wide 
-	$bqx = /geo-location/ nocase ascii wide 
-	$bqy = /\bcity/ nocase ascii wide 
-	$bqz = /region_code/ nocase ascii wide 
-	$bra = /region_name/ nocase ascii wide 
-	$brb = /\bcountry/ nocase ascii wide 
-	$brc = /country_code/ nocase ascii wide 
-	$brd = /countrycode/ nocase ascii wide 
-	$bre = /country_name/ nocase ascii wide 
-	$brf = /continent_code/ nocase ascii wide 
-	$brg = /continent_name/ nocase ascii wide 
-	$brh = /\blatitude/ nocase ascii wide 
-	$bri = /\blongitude/ nocase ascii wide 
+ 	$api_bqn = "GetLocaleInfo" ascii wide
+	$api_bqo = "GetLocaleInfoEx" ascii wide
+	$bqp = /geolocation/ nocase ascii wide 
+	$bqq = /geo-location/ nocase ascii wide 
+	$bqr = /\bcity/ nocase ascii wide 
+	$bqs = /region_code/ nocase ascii wide 
+	$bqt = /region_name/ nocase ascii wide 
+	$bqu = /\bcountry/ nocase ascii wide 
+	$bqv = /country_code/ nocase ascii wide 
+	$bqw = /countrycode/ nocase ascii wide 
+	$bqx = /country_name/ nocase ascii wide 
+	$bqy = /continent_code/ nocase ascii wide 
+	$bqz = /continent_name/ nocase ascii wide 
+	$bra = /\blatitude/ nocase ascii wide 
+	$brb = /\blongitude/ nocase ascii wide 
  
   condition: 
 	(
@@ -8988,21 +8594,21 @@ rule capa_get_geographical_location {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$api_bqu 
-	or 	$api_bqv 
+ ( 	$api_bqn 
+	or 	$api_bqo 
+	or 	$bqp 
+	or 	$bqq 
+	or 	$bqr 
+	or 	$bqs 
+	or 	$bqt 
+	or 	$bqu 
+	or 	$bqv 
 	or 	$bqw 
 	or 	$bqx 
 	or 	$bqy 
 	or 	$bqz 
 	or 	$bra 
-	or 	$brb 
-	or 	$brc 
-	or 	$brd 
-	or 	$bre 
-	or 	$brf 
-	or 	$brg 
-	or 	$brh 
-	or 	$bri  ) 
+	or 	$brb  ) 
 }
 
 rule capa_log_keystrokes_via_polling { 
@@ -9043,11 +8649,11 @@ rule capa_log_keystrokes {
 	date = "2021-05-15"
 
   strings: 
- 	$api_brk = "SetWindowsHookEx" ascii wide
-	$api_brl = "GetKeyState" ascii wide
-	$api_brm = "RegisterHotKey" ascii wide
-	$api_brn = "UnregisterHotKey" ascii wide
-	$api_bro = "CallNextHookEx" ascii wide
+ 	$api_brd = "SetWindowsHookEx" ascii wide
+	$api_bre = "GetKeyState" ascii wide
+	$api_brf = "RegisterHotKey" ascii wide
+	$api_brg = "UnregisterHotKey" ascii wide
+	$api_brh = "CallNextHookEx" ascii wide
  
   condition: 
 	(
@@ -9055,12 +8661,12 @@ rule capa_log_keystrokes {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- (  (  ( 	$api_brk 
-	and 	$api_brl  )  ) 
-	or  (  ( 	$api_brm 
+ (  (  ( 	$api_brd 
+	and 	$api_bre  )  ) 
+	or  (  ( 	$api_brf 
 	and 	pe.imports(/user32/i, /keybd_event/) 
-	and 	$api_brn  )  ) 
-	or  (  ( 	$api_bro 
+	and 	$api_brg  )  ) 
+	or  (  ( 	$api_brh 
 	and 	pe.imports(/user32/i, /GetKeyNameText/) 
 	and 	pe.imports(/user32/i, /GetAsyncKeyState/) 
 	and 	pe.imports(/user32/i, /GetForgroundWindow/)  )  ) 
@@ -9080,10 +8686,10 @@ rule capa_capture_microphone_audio {
 	date = "2021-05-15"
 
   strings: 
- 	$api_brp = "mciSendString" ascii wide
-	$brq = /\bopen/ nocase ascii wide 
-	$brr = /waveaudio/ nocase ascii wide 
-	$brs = /\brecord/ nocase ascii wide 
+ 	$api_bri = "mciSendString" ascii wide
+	$brj = /\bopen/ nocase ascii wide 
+	$brk = /waveaudio/ nocase ascii wide 
+	$brl = /\brecord/ nocase ascii wide 
  
   condition: 
 	(
@@ -9091,10 +8697,10 @@ rule capa_capture_microphone_audio {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$api_brp 
-	and 	$brq 
-	and 	$brr 
-	and 	$brs  ) 
+ ( 	$api_bri 
+	and 	$brj 
+	and 	$brk 
+	and 	$brl  ) 
 }
 
 rule capa_get_domain_trust_relationships { 
@@ -9110,11 +8716,11 @@ rule capa_get_domain_trust_relationships {
 	date = "2021-05-15"
 
   strings: 
- 	$brt = /nltest/ nocase ascii wide 
-	$bru = /\/domain_trusts/ nocase ascii wide 
-	$brv = /\/dclist/ nocase ascii wide 
-	$brw = /\/all_trusts/ nocase ascii wide 
-	$api_brx = "DsEnumerateDomainTrusts" ascii wide
+ 	$brm = /nltest/ nocase ascii wide 
+	$brn = /\/domain_trusts/ nocase ascii wide 
+	$bro = /\/dclist/ nocase ascii wide 
+	$brp = /\/all_trusts/ nocase ascii wide 
+	$api_brq = "DsEnumerateDomainTrusts" ascii wide
  
   condition: 
 	(
@@ -9122,11 +8728,11 @@ rule capa_get_domain_trust_relationships {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- (  (  ( 	$brt 
-	and  (  ( 	$bru 
-	or 	$brv 
-	or 	$brw  )  )  )  ) 
-	or 	$api_brx  ) 
+ (  (  ( 	$brm 
+	and  (  ( 	$brn 
+	or 	$bro 
+	or 	$brp  )  )  )  ) 
+	or 	$api_brq  ) 
 }
 
 rule capa_capture_network_configuration_via_ipconfig { 
@@ -9141,7 +8747,7 @@ rule capa_capture_network_configuration_via_ipconfig {
 	date = "2021-05-15"
 
   strings: 
- 	$bry = /ipconfig(\.exe)?/ nocase ascii wide 
+ 	$brr = /ipconfig(\.exe)?/ nocase ascii wide 
  
   condition: 
 	(
@@ -9149,7 +8755,7 @@ rule capa_capture_network_configuration_via_ipconfig {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$bry 
+ ( 	$brr 
 	and 	pe.imports(/msvcr100/i, /system/)  ) 
 }
 
@@ -9165,20 +8771,20 @@ rule capa_capture_public_ip {
 	date = "2021-05-15"
 
   strings: 
- 	$api_brz = "InternetOpen" ascii wide
-	$api_bsa = "InternetOpenUrl" ascii wide
-	$api_bsb = "InternetReadFile" ascii wide
-	$bsc = /bot\.whatismyipaddress\.com/ ascii wide 
-	$bsd = /ipinfo\.io\/ip/ ascii wide 
-	$bse = /checkip\.dyndns\.org/ ascii wide 
-	$bsf = /ifconfig\.me/ ascii wide 
-	$bsg = /ipecho\.net\/plain/ ascii wide 
-	$bsh = /api\.ipify\.org/ ascii wide 
-	$bsi = /checkip\.amazonaws\.com/ ascii wide 
-	$bsj = /icanhazip\.com/ ascii wide 
-	$bsk = /wtfismyip\.com\/text/ ascii wide 
-	$bsl = /api\.myip\.com/ ascii wide 
-	$bsm = /ip\-api\.com\/line/ ascii wide 
+ 	$api_brs = "InternetOpen" ascii wide
+	$api_brt = "InternetOpenUrl" ascii wide
+	$api_bru = "InternetReadFile" ascii wide
+	$brv = /bot\.whatismyipaddress\.com/ ascii wide 
+	$brw = /ipinfo\.io\/ip/ ascii wide 
+	$brx = /checkip\.dyndns\.org/ ascii wide 
+	$bry = /ifconfig\.me/ ascii wide 
+	$brz = /ipecho\.net\/plain/ ascii wide 
+	$bsa = /api\.ipify\.org/ ascii wide 
+	$bsb = /checkip\.amazonaws\.com/ ascii wide 
+	$bsc = /icanhazip\.com/ ascii wide 
+	$bsd = /wtfismyip\.com\/text/ ascii wide 
+	$bse = /api\.myip\.com/ ascii wide 
+	$bsf = /ip\-api\.com\/line/ ascii wide 
  
   condition: 
 	(
@@ -9186,20 +8792,20 @@ rule capa_capture_public_ip {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$api_brz 
-	and 	$api_bsa 
-	and 	$api_bsb 
-	and  (  ( 	$bsc 
+ ( 	$api_brs 
+	and 	$api_brt 
+	and 	$api_bru 
+	and  (  ( 	$brv 
+	or 	$brw 
+	or 	$brx 
+	or 	$bry 
+	or 	$brz 
+	or 	$bsa 
+	or 	$bsb 
+	or 	$bsc 
 	or 	$bsd 
 	or 	$bse 
-	or 	$bsf 
-	or 	$bsg 
-	or 	$bsh 
-	or 	$bsi 
-	or 	$bsj 
-	or 	$bsk 
-	or 	$bsl 
-	or 	$bsm  )  )  ) 
+	or 	$bsf  )  )  ) 
 }
 
 rule capa_gather_cuteftp_information { 
@@ -9216,10 +8822,10 @@ rule capa_gather_cuteftp_information {
 	date = "2021-05-15"
 
   strings: 
- 	$bsn = /\\sm\.dat/ ascii wide 
-	$bso = /\\GlobalSCAPE\\CuteFTP/ nocase ascii wide 
-	$bsp = /\\GlobalSCAPE\\CuteFTP Pro/ nocase ascii wide 
-	$bsq = /\\CuteFTP/ ascii wide 
+ 	$bsg = /\\sm\.dat/ ascii wide 
+	$bsh = /\\GlobalSCAPE\\CuteFTP/ nocase ascii wide 
+	$bsi = /\\GlobalSCAPE\\CuteFTP Pro/ nocase ascii wide 
+	$bsj = /\\CuteFTP/ ascii wide 
  
   condition: 
 	(
@@ -9227,10 +8833,10 @@ rule capa_gather_cuteftp_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$bsn 
-	and  (  ( 	$bso 
-	or 	$bsp 
-	or 	$bsq  )  )  ) 
+ ( 	$bsg 
+	and  (  ( 	$bsh 
+	or 	$bsi 
+	or 	$bsj  )  )  ) 
 }
 
 rule capa_gather_ftprush_information { 
@@ -9246,8 +8852,8 @@ rule capa_gather_ftprush_information {
 	date = "2021-05-15"
 
   strings: 
- 	$bsr = /\\FTPRush/ ascii wide 
-	$bss = /RushSite\.xml/ ascii wide 
+ 	$bsk = /\\FTPRush/ ascii wide 
+	$bsl = /RushSite\.xml/ ascii wide 
  
   condition: 
 	(
@@ -9255,8 +8861,8 @@ rule capa_gather_ftprush_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$bsr 
-	and 	$bss  ) 
+ ( 	$bsk 
+	and 	$bsl  ) 
 }
 
 rule capa_gather_smart_ftp_information { 
@@ -9272,10 +8878,10 @@ rule capa_gather_smart_ftp_information {
 	date = "2021-05-15"
 
   strings: 
- 	$bst = /\\SmartFTP/ ascii wide 
-	$str_bsu = ".xml" ascii wide
-	$bsv = /Favorites\.dat/ nocase ascii wide 
-	$bsw = /History\.dat/ nocase ascii wide 
+ 	$bsm = /\\SmartFTP/ ascii wide 
+	$str_bsn = ".xml" ascii wide
+	$bso = /Favorites\.dat/ nocase ascii wide 
+	$bsp = /History\.dat/ nocase ascii wide 
  
   condition: 
 	(
@@ -9283,10 +8889,10 @@ rule capa_gather_smart_ftp_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- (  (  ( 	$bst 
-	and 	$str_bsu 
-	and 	$bsv 
-	and 	$bsw  )  )  ) 
+ (  (  ( 	$bsm 
+	and 	$str_bsn 
+	and 	$bso 
+	and 	$bsp  )  )  ) 
 }
 
 rule capa_gather_cyberduck_information { 
@@ -9302,9 +8908,9 @@ rule capa_gather_cyberduck_information {
 	date = "2021-05-15"
 
   strings: 
- 	$bsx = /\\Cyberduck/ ascii wide 
-	$str_bsy = "user.config" ascii wide
-	$str_bsz = ".duck" ascii wide
+ 	$bsq = /\\Cyberduck/ ascii wide 
+	$str_bsr = "user.config" ascii wide
+	$str_bss = ".duck" ascii wide
  
   condition: 
 	(
@@ -9312,9 +8918,9 @@ rule capa_gather_cyberduck_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$bsx 
-	and  (  ( 	$str_bsy 
-	or 	$str_bsz  )  )  ) 
+ ( 	$bsq 
+	and  (  ( 	$str_bsr 
+	or 	$str_bss  )  )  ) 
 }
 
 rule capa_gather_ws_ftp_information { 
@@ -9330,9 +8936,9 @@ rule capa_gather_ws_ftp_information {
 	date = "2021-05-15"
 
   strings: 
- 	$bta = /\\Ipswitch\\WS_FTP/ ascii wide 
-	$btb = /\\win\.ini/ ascii wide 
-	$btc = /WS_FTP/ ascii wide 
+ 	$bst = /\\Ipswitch\\WS_FTP/ ascii wide 
+	$bsu = /\\win\.ini/ ascii wide 
+	$bsv = /WS_FTP/ ascii wide 
  
   condition: 
 	(
@@ -9340,9 +8946,9 @@ rule capa_gather_ws_ftp_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$bta 
-	and 	$btb 
-	and 	$btc  ) 
+ ( 	$bst 
+	and 	$bsu 
+	and 	$bsv  ) 
 }
 
 rule capa_gather_fling_ftp_information { 
@@ -9358,12 +8964,12 @@ rule capa_gather_fling_ftp_information {
 	date = "2021-05-15"
 
   strings: 
- 	$btd = /SOFTWARE\\NCH Software\\Fling\\Accounts/ ascii wide 
-	$str_bte = "FtpPassword" ascii wide
-	$str_btf = "_FtpPassword" ascii wide
-	$str_btg = "FtpServer" ascii wide
-	$str_bth = "FtpUserName" ascii wide
-	$str_bti = "FtpDirectory" ascii wide
+ 	$bsw = /SOFTWARE\\NCH Software\\Fling\\Accounts/ ascii wide 
+	$str_bsx = "FtpPassword" ascii wide
+	$str_bsy = "_FtpPassword" ascii wide
+	$str_bsz = "FtpServer" ascii wide
+	$str_bta = "FtpUserName" ascii wide
+	$str_btb = "FtpDirectory" ascii wide
  
   condition: 
 	(
@@ -9371,12 +8977,12 @@ rule capa_gather_fling_ftp_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$btd 
-	or  (  ( 	$str_bte 
-	and 	$str_btf 
-	and 	$str_btg 
-	and 	$str_bth 
-	and 	$str_bti  )  )  ) 
+ ( 	$bsw 
+	or  (  ( 	$str_bsx 
+	and 	$str_bsy 
+	and 	$str_bsz 
+	and 	$str_bta 
+	and 	$str_btb  )  )  ) 
 }
 
 rule capa_gather_directory_opus_information { 
@@ -9392,10 +8998,10 @@ rule capa_gather_directory_opus_information {
 	date = "2021-05-15"
 
   strings: 
- 	$btj = /\\GPSoftware\\Directory Opus/ ascii wide 
-	$str_btk = ".oxc" ascii wide
-	$str_btl = ".oll" ascii wide
-	$str_btm = "ftplast.osd" ascii wide
+ 	$btc = /\\GPSoftware\\Directory Opus/ ascii wide 
+	$str_btd = ".oxc" ascii wide
+	$str_bte = ".oll" ascii wide
+	$str_btf = "ftplast.osd" ascii wide
  
   condition: 
 	(
@@ -9403,10 +9009,10 @@ rule capa_gather_directory_opus_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$btj 
-	and 	$str_btk 
-	and 	$str_btl 
-	and 	$str_btm  ) 
+ ( 	$btc 
+	and 	$str_btd 
+	and 	$str_bte 
+	and 	$str_btf  ) 
 }
 
 rule capa_gather_coreftp_information { 
@@ -9422,11 +9028,11 @@ rule capa_gather_coreftp_information {
 	date = "2021-05-15"
 
   strings: 
- 	$btn = /Software\\FTPWare\\COREFTP\\Sites/ ascii wide 
-	$str_bto = "Host" ascii wide
-	$str_btp = "User" ascii wide
-	$str_btq = "Port" ascii wide
-	$str_btr = "PthR" ascii wide
+ 	$btg = /Software\\FTPWare\\COREFTP\\Sites/ ascii wide 
+	$str_bth = "Host" ascii wide
+	$str_bti = "User" ascii wide
+	$str_btj = "Port" ascii wide
+	$str_btk = "PthR" ascii wide
  
   condition: 
 	(
@@ -9434,11 +9040,11 @@ rule capa_gather_coreftp_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$btn 
-	or  (  ( 	$str_bto 
-	and 	$str_btp 
-	and 	$str_btq 
-	and 	$str_btr  )  )  ) 
+ ( 	$btg 
+	or  (  ( 	$str_bth 
+	and 	$str_bti 
+	and 	$str_btj 
+	and 	$str_btk  )  )  ) 
 }
 
 rule capa_gather_wise_ftp_information { 
@@ -9454,12 +9060,12 @@ rule capa_gather_wise_ftp_information {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bts = "wiseftpsrvs.ini" ascii wide
-	$str_btt = "wiseftp.ini" ascii wide
-	$str_btu = "wiseftpsrvs.bin" ascii wide
-	$str_btv = "wiseftpsrvs.bin" ascii wide
-	$btw = /\\AceBIT/ ascii wide 
-	$btx = /Software\\AceBIT/ ascii wide 
+ 	$str_btl = "wiseftpsrvs.ini" ascii wide
+	$str_btm = "wiseftp.ini" ascii wide
+	$str_btn = "wiseftpsrvs.bin" ascii wide
+	$str_bto = "wiseftpsrvs.bin" ascii wide
+	$btp = /\\AceBIT/ ascii wide 
+	$btq = /Software\\AceBIT/ ascii wide 
  
   condition: 
 	(
@@ -9467,12 +9073,12 @@ rule capa_gather_wise_ftp_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- (  (  ( 	$str_bts 
-	and 	$str_btt 
-	and 	$str_btu  )  ) 
-	or  (  ( 	$str_btv 
-	and  (  ( 	$btw 
-	or 	$btx  )  )  )  )  ) 
+ (  (  ( 	$str_btl 
+	and 	$str_btm 
+	and 	$str_btn  )  ) 
+	or  (  ( 	$str_bto 
+	and  (  ( 	$btp 
+	or 	$btq  )  )  )  )  ) 
 }
 
 rule capa_gather_winzip_information { 
@@ -9488,13 +9094,13 @@ rule capa_gather_winzip_information {
 	date = "2021-05-15"
 
   strings: 
- 	$bty = /Software\\Nico Mak Computing\\WinZip\\FTP/ ascii wide 
-	$btz = /Software\\Nico Mak Computing\\WinZip\\mru\\jobs/ ascii wide 
-	$str_bua = "Site" ascii wide
-	$str_bub = "UserID" ascii wide
-	$str_buc = "xflags" ascii wide
-	$str_bud = "Port" ascii wide
-	$str_bue = "Folder" ascii wide
+ 	$btr = /Software\\Nico Mak Computing\\WinZip\\FTP/ ascii wide 
+	$bts = /Software\\Nico Mak Computing\\WinZip\\mru\\jobs/ ascii wide 
+	$str_btt = "Site" ascii wide
+	$str_btu = "UserID" ascii wide
+	$str_btv = "xflags" ascii wide
+	$str_btw = "Port" ascii wide
+	$str_btx = "Folder" ascii wide
  
   condition: 
 	(
@@ -9502,13 +9108,13 @@ rule capa_gather_winzip_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- (  (  ( 	$bty 
-	and 	$btz  )  ) 
-	or  (  ( 	$str_bua 
-	and 	$str_bub 
-	and 	$str_buc 
-	and 	$str_bud 
-	and 	$str_bue  )  )  ) 
+ (  (  ( 	$btr 
+	and 	$bts  )  ) 
+	or  (  ( 	$str_btt 
+	and 	$str_btu 
+	and 	$str_btv 
+	and 	$str_btw 
+	and 	$str_btx  )  )  ) 
 }
 
 rule capa_gather_southriver_webdrive_information { 
@@ -9524,12 +9130,12 @@ rule capa_gather_southriver_webdrive_information {
 	date = "2021-05-15"
 
   strings: 
- 	$buf = /Software\\South River Technologies\\WebDrive\\Connections/ ascii wide 
-	$str_bug = "PassWord" ascii wide
-	$str_buh = "UserName" ascii wide
-	$str_bui = "RootDirectory" ascii wide
-	$str_buj = "Port" ascii wide
-	$str_buk = "ServerType" ascii wide
+ 	$bty = /Software\\South River Technologies\\WebDrive\\Connections/ ascii wide 
+	$str_btz = "PassWord" ascii wide
+	$str_bua = "UserName" ascii wide
+	$str_bub = "RootDirectory" ascii wide
+	$str_buc = "Port" ascii wide
+	$str_bud = "ServerType" ascii wide
  
   condition: 
 	(
@@ -9537,12 +9143,12 @@ rule capa_gather_southriver_webdrive_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$buf 
-	or  (  ( 	$str_bug 
-	and 	$str_buh 
-	and 	$str_bui 
-	and 	$str_buj 
-	and 	$str_buk  )  )  ) 
+ ( 	$bty 
+	or  (  ( 	$str_btz 
+	and 	$str_bua 
+	and 	$str_bub 
+	and 	$str_buc 
+	and 	$str_bud  )  )  ) 
 }
 
 rule capa_gather_freshftp_information { 
@@ -9557,8 +9163,8 @@ rule capa_gather_freshftp_information {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bul = "FreshFTP" ascii wide
-	$str_bum = ".SMF" ascii wide
+ 	$str_bue = "FreshFTP" ascii wide
+	$str_buf = ".SMF" ascii wide
  
   condition: 
 	(
@@ -9566,8 +9172,8 @@ rule capa_gather_freshftp_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bul 
-	and 	$str_bum  ) 
+ ( 	$str_bue 
+	and 	$str_buf  ) 
 }
 
 rule capa_gather_fasttrack_ftp_information { 
@@ -9583,8 +9189,8 @@ rule capa_gather_fasttrack_ftp_information {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bun = "FastTrack" ascii wide
-	$str_buo = "ftplist.txt" ascii wide
+ 	$str_bug = "FastTrack" ascii wide
+	$str_buh = "ftplist.txt" ascii wide
  
   condition: 
 	(
@@ -9592,8 +9198,8 @@ rule capa_gather_fasttrack_ftp_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- (  (  ( 	$str_bun 
-	and 	$str_buo  )  )  ) 
+ (  (  ( 	$str_bug 
+	and 	$str_buh  )  )  ) 
 }
 
 rule capa_gather_classicftp_information { 
@@ -9609,7 +9215,7 @@ rule capa_gather_classicftp_information {
 	date = "2021-05-15"
 
   strings: 
- 	$bup = /Software\\NCH Software\\ClassicFTP\\FTPAccounts/ ascii wide 
+ 	$bui = /Software\\NCH Software\\ClassicFTP\\FTPAccounts/ ascii wide 
  
   condition: 
 	(
@@ -9617,7 +9223,7 @@ rule capa_gather_classicftp_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$bup  ) 
+ ( 	$bui  ) 
 }
 
 rule capa_gather_softx_ftp_information { 
@@ -9633,8 +9239,8 @@ rule capa_gather_softx_ftp_information {
 	date = "2021-05-15"
 
   strings: 
- 	$buq = /Software\\FTPClient\\Sites/ ascii wide 
-	$bur = /Software\\SoftX.org\\FTPClient\\Sites/ ascii wide 
+ 	$buj = /Software\\FTPClient\\Sites/ ascii wide 
+	$buk = /Software\\SoftX.org\\FTPClient\\Sites/ ascii wide 
  
   condition: 
 	(
@@ -9642,8 +9248,8 @@ rule capa_gather_softx_ftp_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$buq 
-	or 	$bur  ) 
+ ( 	$buj 
+	or 	$buk  ) 
 }
 
 rule capa_gather_ffftp_information { 
@@ -9659,15 +9265,15 @@ rule capa_gather_ffftp_information {
 	date = "2021-05-15"
 
   strings: 
- 	$bus = /Software\\Sota\\FFFTP\\Options/ ascii wide 
-	$but = /Software\\Sota\\FFFTP/ ascii wide 
-	$buu = /CredentialSalt/ ascii wide 
-	$buv = /CredentialCheck/ ascii wide 
-	$str_buw = "Password" ascii wide
-	$str_bux = "UserName" ascii wide
-	$str_buy = "HostAdrs" ascii wide
-	$str_buz = "RemoteDir" ascii wide
-	$str_bva = "Port" ascii wide
+ 	$bul = /Software\\Sota\\FFFTP\\Options/ ascii wide 
+	$bum = /Software\\Sota\\FFFTP/ ascii wide 
+	$bun = /CredentialSalt/ ascii wide 
+	$buo = /CredentialCheck/ ascii wide 
+	$str_bup = "Password" ascii wide
+	$str_buq = "UserName" ascii wide
+	$str_bur = "HostAdrs" ascii wide
+	$str_bus = "RemoteDir" ascii wide
+	$str_but = "Port" ascii wide
  
   condition: 
 	(
@@ -9675,15 +9281,15 @@ rule capa_gather_ffftp_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- (  (  (  (  ( 	$bus 
-	or 	$but  )  ) 
-	and  (  ( 	$buu 
-	or 	$buv  )  )  )  ) 
-	or  (  ( 	$str_buw 
-	and 	$str_bux 
-	and 	$str_buy 
-	and 	$str_buz 
-	and 	$str_bva  )  )  ) 
+ (  (  (  (  ( 	$bul 
+	or 	$bum  )  ) 
+	and  (  ( 	$bun 
+	or 	$buo  )  )  )  ) 
+	or  (  ( 	$str_bup 
+	and 	$str_buq 
+	and 	$str_bur 
+	and 	$str_bus 
+	and 	$str_but  )  )  ) 
 }
 
 rule capa_gather_ftpshell_information { 
@@ -9699,8 +9305,8 @@ rule capa_gather_ftpshell_information {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bvb = "FTPShell" ascii wide
-	$str_bvc = "ftpshell.fsi" ascii wide
+ 	$str_buu = "FTPShell" ascii wide
+	$str_buv = "ftpshell.fsi" ascii wide
  
   condition: 
 	(
@@ -9708,8 +9314,8 @@ rule capa_gather_ftpshell_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bvb 
-	and 	$str_bvc  ) 
+ ( 	$str_buu 
+	and 	$str_buv  ) 
 }
 
 rule capa_gather_winscp_information { 
@@ -9725,12 +9331,12 @@ rule capa_gather_winscp_information {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bvd = "Password" ascii wide
-	$str_bve = "HostName" ascii wide
-	$str_bvf = "UserName" ascii wide
-	$str_bvg = "RemoteDirectory" ascii wide
-	$str_bvh = "PortNumber" ascii wide
-	$str_bvi = "FSProtocol" ascii wide
+ 	$str_buw = "Password" ascii wide
+	$str_bux = "HostName" ascii wide
+	$str_buy = "UserName" ascii wide
+	$str_buz = "RemoteDirectory" ascii wide
+	$str_bva = "PortNumber" ascii wide
+	$str_bvb = "FSProtocol" ascii wide
  
   condition: 
 	(
@@ -9738,12 +9344,12 @@ rule capa_gather_winscp_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bvd 
-	and 	$str_bve 
-	and 	$str_bvf 
-	and 	$str_bvg 
-	and 	$str_bvh 
-	and 	$str_bvi  ) 
+ ( 	$str_buw 
+	and 	$str_bux 
+	and 	$str_buy 
+	and 	$str_buz 
+	and 	$str_bva 
+	and 	$str_bvb  ) 
 }
 
 rule capa_gather_frigate3_information { 
@@ -9759,8 +9365,8 @@ rule capa_gather_frigate3_information {
 	date = "2021-05-15"
 
   strings: 
- 	$bvj = /FtpSite\.xml/ ascii wide 
-	$bvk = /\\Frigate3/ ascii wide 
+ 	$bvc = /FtpSite\.xml/ ascii wide 
+	$bvd = /\\Frigate3/ ascii wide 
  
   condition: 
 	(
@@ -9768,8 +9374,8 @@ rule capa_gather_frigate3_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$bvj 
-	and 	$bvk  ) 
+ ( 	$bvc 
+	and 	$bvd  ) 
 }
 
 rule capa_gather_staff_ftp_information { 
@@ -9785,8 +9391,8 @@ rule capa_gather_staff_ftp_information {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bvl = "Staff-FTP" ascii wide
-	$str_bvm = "sites.ini" ascii wide
+ 	$str_bve = "Staff-FTP" ascii wide
+	$str_bvf = "sites.ini" ascii wide
  
   condition: 
 	(
@@ -9794,8 +9400,8 @@ rule capa_gather_staff_ftp_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bvl 
-	and 	$str_bvm  ) 
+ ( 	$str_bve 
+	and 	$str_bvf  ) 
 }
 
 rule capa_gather_xftp_information { 
@@ -9811,8 +9417,8 @@ rule capa_gather_xftp_information {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bvn = ".xfp" ascii wide
-	$bvo = /\\NetSarang/ ascii wide 
+ 	$str_bvg = ".xfp" ascii wide
+	$bvh = /\\NetSarang/ ascii wide 
  
   condition: 
 	(
@@ -9820,39 +9426,8 @@ rule capa_gather_xftp_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bvn 
-	and 	$bvo  ) 
-}
-
-rule capa_gather_leapftp_information { 
-  meta: 
- 	description = "gather leapftp information (converted from capa rule)"
-	namespace = "collection/file-managers"
-	author = "@_re_fox"
-	scope = "function"
-	attack = "Credential Access::Credentials from Password Stores [T1555]"
-	hash = "5a2f620f29ca2f44fc22df67b674198f"
-	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-leapftp-information.yml"
-	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-15"
-
-  strings: 
- 	$str_bvp = "InstallPath" ascii wide
-	$str_bvq = "DataDir" ascii wide
-	$str_bvr = "sites.dat" ascii wide
-	$str_bvs = "sites.ini" ascii wide
- 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
- (  (  ( 	$str_bvp 
-	and 	$str_bvq 
-	and 	$str_bvr 
-	and 	$str_bvs  )  ) 
-  ) 
+ ( 	$str_bvg 
+	and 	$bvh  ) 
 }
 
 rule capa_gather_ftpnow_information { 
@@ -9867,9 +9442,9 @@ rule capa_gather_ftpnow_information {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bvv = "FTPNow" ascii wide
-	$str_bvw = "FTP Now" ascii wide
-	$str_bvx = "sites.xml" ascii wide
+ 	$str_bvo = "FTPNow" ascii wide
+	$str_bvp = "FTP Now" ascii wide
+	$str_bvq = "sites.xml" ascii wide
  
   condition: 
 	(
@@ -9877,9 +9452,9 @@ rule capa_gather_ftpnow_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bvv 
-	and 	$str_bvw 
-	and 	$str_bvx  ) 
+ ( 	$str_bvo 
+	and 	$str_bvp 
+	and 	$str_bvq  ) 
 }
 
 rule capa_gather_ftpgetter_information { 
@@ -9895,8 +9470,8 @@ rule capa_gather_ftpgetter_information {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bvy = "servers.xml" ascii wide
-	$bvz = /\\FTPGetter/ ascii wide 
+ 	$str_bvr = "servers.xml" ascii wide
+	$bvs = /\\FTPGetter/ ascii wide 
  
   condition: 
 	(
@@ -9904,8 +9479,8 @@ rule capa_gather_ftpgetter_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bvy 
-	and 	$bvz  ) 
+ ( 	$str_bvr 
+	and 	$bvs  ) 
 }
 
 rule capa_gather_nova_ftp_information { 
@@ -9920,8 +9495,8 @@ rule capa_gather_nova_ftp_information {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bwa = "NovaFTP.db" ascii wide
-	$bwb = /\\INSoftware\\NovaFTP/ ascii wide 
+ 	$str_bvt = "NovaFTP.db" ascii wide
+	$bvu = /\\INSoftware\\NovaFTP/ ascii wide 
  
   condition: 
 	(
@@ -9929,8 +9504,8 @@ rule capa_gather_nova_ftp_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- (  (  ( 	$str_bwa 
-	and 	$bwb  )  )  ) 
+ (  (  ( 	$str_bvt 
+	and 	$bvu  )  )  ) 
 }
 
 rule capa_gather_ftp_explorer_information { 
@@ -9946,16 +9521,16 @@ rule capa_gather_ftp_explorer_information {
 	date = "2021-05-15"
 
   strings: 
- 	$bwc = /profiles\.xml/ ascii wide 
-	$bwd = /Software\\FTP Explorer\\FTP Explorer\\Workspace\\MFCToolBar-224/ ascii wide 
-	$bwe = /Software\\FTP Explorer\\Profiles/ ascii wide 
-	$bwf = /\\FTP Explorer/ ascii wide 
-	$str_bwg = "Password" ascii wide
-	$str_bwh = "Host" ascii wide
-	$str_bwi = "Login" ascii wide
-	$str_bwj = "InitialPath" ascii wide
-	$str_bwk = "PasswordType" ascii wide
-	$str_bwl = "Port" ascii wide
+ 	$bvv = /profiles\.xml/ ascii wide 
+	$bvw = /Software\\FTP Explorer\\FTP Explorer\\Workspace\\MFCToolBar-224/ ascii wide 
+	$bvx = /Software\\FTP Explorer\\Profiles/ ascii wide 
+	$bvy = /\\FTP Explorer/ ascii wide 
+	$str_bvz = "Password" ascii wide
+	$str_bwa = "Host" ascii wide
+	$str_bwb = "Login" ascii wide
+	$str_bwc = "InitialPath" ascii wide
+	$str_bwd = "PasswordType" ascii wide
+	$str_bwe = "Port" ascii wide
  
   condition: 
 	(
@@ -9963,16 +9538,16 @@ rule capa_gather_ftp_explorer_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- (  (  ( 	$bwc 
-	and  (  ( 	$bwd 
-	or 	$bwe 
-	or 	$bwf  )  )  )  ) 
-	or  (  ( 	$str_bwg 
-	and 	$str_bwh 
-	and 	$str_bwi 
-	and 	$str_bwj 
-	and 	$str_bwk 
-	and 	$str_bwl  )  )  ) 
+ (  (  ( 	$bvv 
+	and  (  ( 	$bvw 
+	or 	$bvx 
+	or 	$bvy  )  )  )  ) 
+	or  (  ( 	$str_bvz 
+	and 	$str_bwa 
+	and 	$str_bwb 
+	and 	$str_bwc 
+	and 	$str_bwd 
+	and 	$str_bwe  )  )  ) 
 }
 
 rule capa_gather_bitkinex_information { 
@@ -9988,8 +9563,8 @@ rule capa_gather_bitkinex_information {
 	date = "2021-05-15"
 
   strings: 
- 	$bwm = /bitkinex\.ds/ ascii wide 
-	$bwn = /\\BitKinex/ ascii wide 
+ 	$bwf = /bitkinex\.ds/ ascii wide 
+	$bwg = /\\BitKinex/ ascii wide 
  
   condition: 
 	(
@@ -9997,8 +9572,8 @@ rule capa_gather_bitkinex_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$bwm 
-	and 	$bwn  ) 
+ ( 	$bwf 
+	and 	$bwg  ) 
 }
 
 rule capa_gather_turbo_ftp_information { 
@@ -10014,11 +9589,11 @@ rule capa_gather_turbo_ftp_information {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bwo = "addrbk.dat" ascii wide
-	$str_bwp = "quick.dat" ascii wide
-	$bwq = /installpath/ ascii wide 
-	$bwr = /Software\\TurboFTP/ ascii wide 
-	$bws = /\\TurboFTP/ ascii wide 
+ 	$str_bwh = "addrbk.dat" ascii wide
+	$str_bwi = "quick.dat" ascii wide
+	$bwj = /installpath/ ascii wide 
+	$bwk = /Software\\TurboFTP/ ascii wide 
+	$bwl = /\\TurboFTP/ ascii wide 
  
   condition: 
 	(
@@ -10026,11 +9601,11 @@ rule capa_gather_turbo_ftp_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- (  (  ( 	$str_bwo 
-	and 	$str_bwp  )  ) 
-	or  (  ( 	$bwq 
-	and  (  ( 	$bwr 
-	or 	$bws  )  )  )  )  ) 
+ (  (  ( 	$str_bwh 
+	and 	$str_bwi  )  ) 
+	or  (  ( 	$bwj 
+	and  (  ( 	$bwk 
+	or 	$bwl  )  )  )  )  ) 
 }
 
 rule capa_gather_nexusfile_information { 
@@ -10046,8 +9621,8 @@ rule capa_gather_nexusfile_information {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bwt = "NexusFile" ascii wide
-	$str_bwu = "ftpsite.ini" ascii wide
+ 	$str_bwm = "NexusFile" ascii wide
+	$str_bwn = "ftpsite.ini" ascii wide
  
   condition: 
 	(
@@ -10055,8 +9630,8 @@ rule capa_gather_nexusfile_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bwt 
-	and 	$str_bwu  ) 
+ ( 	$str_bwm 
+	and 	$str_bwn  ) 
 }
 
 rule capa_gather_ftp_voyager_information { 
@@ -10072,9 +9647,9 @@ rule capa_gather_ftp_voyager_information {
 	date = "2021-05-15"
 
   strings: 
- 	$bwv = /\\RhinoSoft.com/ ascii wide 
-	$str_bww = "FTPVoyager.ftp" ascii wide
-	$str_bwx = "FTPVoyager.qc" ascii wide
+ 	$bwo = /\\RhinoSoft.com/ ascii wide 
+	$str_bwp = "FTPVoyager.ftp" ascii wide
+	$str_bwq = "FTPVoyager.qc" ascii wide
  
   condition: 
 	(
@@ -10082,9 +9657,9 @@ rule capa_gather_ftp_voyager_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$bwv 
-	and 	$str_bww 
-	and 	$str_bwx  ) 
+ ( 	$bwo 
+	and 	$str_bwp 
+	and 	$str_bwq  ) 
 }
 
 rule capa_gather_blazeftp_information { 
@@ -10100,13 +9675,13 @@ rule capa_gather_blazeftp_information {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bwy = "BlazeFtp" ascii wide
-	$str_bwz = "site.dat" ascii wide
-	$str_bxa = "LastPassword" ascii wide
-	$str_bxb = "LastAddress" ascii wide
-	$str_bxc = "LastUser" ascii wide
-	$str_bxd = "LastPort" ascii wide
-	$bxe = /Software\\FlashPeak\\BlazeFtp\\Settings/ ascii wide 
+ 	$str_bwr = "BlazeFtp" ascii wide
+	$str_bws = "site.dat" ascii wide
+	$str_bwt = "LastPassword" ascii wide
+	$str_bwu = "LastAddress" ascii wide
+	$str_bwv = "LastUser" ascii wide
+	$str_bww = "LastPort" ascii wide
+	$bwx = /Software\\FlashPeak\\BlazeFtp\\Settings/ ascii wide 
  
   condition: 
 	(
@@ -10114,13 +9689,13 @@ rule capa_gather_blazeftp_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bwy 
-	and 	$str_bwz 
-	and  (  ( 	$str_bxa 
-	or 	$str_bxb 
-	or 	$str_bxc 
-	or 	$str_bxd 
-	or 	$bxe  )  )  ) 
+ ( 	$str_bwr 
+	and 	$str_bws 
+	and  (  ( 	$str_bwt 
+	or 	$str_bwu 
+	or 	$str_bwv 
+	or 	$str_bww 
+	or 	$bwx  )  )  ) 
 }
 
 rule capa_gather_ftp_commander_information { 
@@ -10136,9 +9711,9 @@ rule capa_gather_ftp_commander_information {
 	date = "2021-05-15"
 
   strings: 
- 	$bxf = /FTP Navigator/ ascii wide 
-	$bxg = /FTP Commander/ ascii wide 
-	$str_bxh = "ftplist.txt" ascii wide
+ 	$bwy = /FTP Navigator/ ascii wide 
+	$bwz = /FTP Commander/ ascii wide 
+	$str_bxa = "ftplist.txt" ascii wide
  
   condition: 
 	(
@@ -10146,9 +9721,9 @@ rule capa_gather_ftp_commander_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- (  (  ( 	$bxf 
-	or 	$bxg  )  ) 
-	and  (  ( 	$str_bxh  )  )  ) 
+ (  (  ( 	$bwy 
+	or 	$bwz  )  ) 
+	and  (  ( 	$str_bxa  )  )  ) 
 }
 
 rule capa_gather_global_downloader_information { 
@@ -10164,8 +9739,8 @@ rule capa_gather_global_downloader_information {
 	date = "2021-05-15"
 
   strings: 
- 	$bxo = /\\Global Downloader/ ascii wide 
-	$str_bxp = "SM.arch" ascii wide
+ 	$bxh = /\\Global Downloader/ ascii wide 
+	$str_bxi = "SM.arch" ascii wide
  
   condition: 
 	(
@@ -10173,8 +9748,8 @@ rule capa_gather_global_downloader_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$bxo 
-	and 	$str_bxp  ) 
+ ( 	$bxh 
+	and 	$str_bxi  ) 
 }
 
 rule capa_gather_faststone_browser_information { 
@@ -10190,8 +9765,8 @@ rule capa_gather_faststone_browser_information {
 	date = "2021-05-15"
 
   strings: 
- 	$bxx = /FastStone Browser/ ascii wide 
-	$str_bxy = "FTPList.db" ascii wide
+ 	$bxq = /FastStone Browser/ ascii wide 
+	$str_bxr = "FTPList.db" ascii wide
  
   condition: 
 	(
@@ -10199,8 +9774,8 @@ rule capa_gather_faststone_browser_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$bxx 
-	and 	$str_bxy  ) 
+ ( 	$bxq 
+	and 	$str_bxr  ) 
 }
 
 rule capa_gather_ultrafxp_information { 
@@ -10215,8 +9790,8 @@ rule capa_gather_ultrafxp_information {
 	date = "2021-05-15"
 
   strings: 
- 	$bxz = /UltraFXP/ ascii wide 
-	$bya = /\\sites\.xml/ ascii wide 
+ 	$bxs = /UltraFXP/ ascii wide 
+	$bxt = /\\sites\.xml/ ascii wide 
  
   condition: 
 	(
@@ -10224,8 +9799,8 @@ rule capa_gather_ultrafxp_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$bxz 
-	and 	$bya  ) 
+ ( 	$bxs 
+	and 	$bxt  ) 
 }
 
 rule capa_gather_netdrive_information { 
@@ -10241,8 +9816,8 @@ rule capa_gather_netdrive_information {
 	date = "2021-05-15"
 
   strings: 
- 	$str_byb = "NDSites.ini" ascii wide
-	$byc = /\\NetDrive/ ascii wide 
+ 	$str_bxu = "NDSites.ini" ascii wide
+	$bxv = /\\NetDrive/ ascii wide 
  
   condition: 
 	(
@@ -10250,8 +9825,8 @@ rule capa_gather_netdrive_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_byb 
-	and 	$byc  ) 
+ ( 	$str_bxu 
+	and 	$bxv  ) 
 }
 
 rule capa_gather_total_commander_information { 
@@ -10267,12 +9842,12 @@ rule capa_gather_total_commander_information {
 	date = "2021-05-15"
 
   strings: 
- 	$byd = /Software\\Ghisler\\Total Commander/ ascii wide 
-	$bye = /Software\\Ghisler\\Windows Commander/ ascii wide 
-	$str_byf = "FtpIniName" ascii wide
-	$str_byg = "wcx_ftp.ini" ascii wide
-	$byh = /\\GHISLER/ ascii wide 
-	$str_byi = "InstallDir" ascii wide
+ 	$bxw = /Software\\Ghisler\\Total Commander/ ascii wide 
+	$bxx = /Software\\Ghisler\\Windows Commander/ ascii wide 
+	$str_bxy = "FtpIniName" ascii wide
+	$str_bxz = "wcx_ftp.ini" ascii wide
+	$bya = /\\GHISLER/ ascii wide 
+	$str_byb = "InstallDir" ascii wide
  
   condition: 
 	(
@@ -10280,12 +9855,12 @@ rule capa_gather_total_commander_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- (  (  ( 	$byd 
-	or 	$bye  )  ) 
-	and  (  ( 	$str_byf 
-	or 	$str_byg 
-	or 	$byh 
-	or 	$str_byi  )  )  ) 
+ (  (  ( 	$bxw 
+	or 	$bxx  )  ) 
+	and  (  ( 	$str_bxy 
+	or 	$str_bxz 
+	or 	$bya 
+	or 	$str_byb  )  )  ) 
 }
 
 rule capa_gather_ftpinfo_information { 
@@ -10301,10 +9876,10 @@ rule capa_gather_ftpinfo_information {
 	date = "2021-05-15"
 
   strings: 
- 	$str_byj = "ServerList.xml" ascii wide
-	$str_byk = "DataDir" ascii wide
-	$byl = /Software\\MAS-Soft\\FTPInfo\\Setup/ ascii wide 
-	$bym = /FTPInfo/ ascii wide 
+ 	$str_byc = "ServerList.xml" ascii wide
+	$str_byd = "DataDir" ascii wide
+	$bye = /Software\\MAS-Soft\\FTPInfo\\Setup/ ascii wide 
+	$byf = /FTPInfo/ ascii wide 
  
   condition: 
 	(
@@ -10312,10 +9887,10 @@ rule capa_gather_ftpinfo_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_byj 
-	and 	$str_byk 
-	and  (  ( 	$byl 
-	or 	$bym  )  )  ) 
+ ( 	$str_byc 
+	and 	$str_byd 
+	and  (  ( 	$bye 
+	or 	$byf  )  )  ) 
 }
 
 rule capa_gather_flashfxp_information { 
@@ -10331,12 +9906,12 @@ rule capa_gather_flashfxp_information {
 	date = "2021-05-15"
 
   strings: 
- 	$byn = /Software\\FlashFXP/ ascii wide 
-	$byo = /DataFolder/ ascii wide 
-	$byp = /Install Path/ ascii wide 
-	$byq = /\\Sites.dat/ ascii wide 
-	$byr = /\\Quick.dat/ ascii wide 
-	$bys = /\\History.dat/ ascii wide 
+ 	$byg = /Software\\FlashFXP/ ascii wide 
+	$byh = /DataFolder/ ascii wide 
+	$byi = /Install Path/ ascii wide 
+	$byj = /\\Sites.dat/ ascii wide 
+	$byk = /\\Quick.dat/ ascii wide 
+	$byl = /\\History.dat/ ascii wide 
  
   condition: 
 	(
@@ -10344,12 +9919,12 @@ rule capa_gather_flashfxp_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- (  (  ( 	$byn 
-	and 	$byo 
-	and 	$byp  )  ) 
-	or  (  ( 	$byq 
-	and 	$byr 
-	and 	$bys  )  )  ) 
+ (  (  ( 	$byg 
+	and 	$byh 
+	and 	$byi  )  ) 
+	or  (  ( 	$byj 
+	and 	$byk 
+	and 	$byl  )  )  ) 
 }
 
 rule capa_gather_securefx_information { 
@@ -10365,11 +9940,11 @@ rule capa_gather_securefx_information {
 	date = "2021-05-15"
 
   strings: 
- 	$byt = /\\Sessions/ ascii wide 
-	$str_byu = ".ini" ascii wide
-	$byv = /Config Path/ ascii wide 
-	$byw = /_VanDyke\\Config\\Sessions/ ascii wide 
-	$byx = /Software\\VanDyke\\SecureFX/ ascii wide 
+ 	$bym = /\\Sessions/ ascii wide 
+	$str_byn = ".ini" ascii wide
+	$byo = /Config Path/ ascii wide 
+	$byp = /_VanDyke\\Config\\Sessions/ ascii wide 
+	$byq = /Software\\VanDyke\\SecureFX/ ascii wide 
  
   condition: 
 	(
@@ -10377,11 +9952,11 @@ rule capa_gather_securefx_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$byt 
-	and 	$str_byu 
-	and 	$byv 
-	and  (  ( 	$byw 
-	or 	$byx  )  )  ) 
+ ( 	$bym 
+	and 	$str_byn 
+	and 	$byo 
+	and  (  ( 	$byp 
+	or 	$byq  )  )  ) 
 }
 
 rule capa_gather_robo_ftp_information { 
@@ -10397,16 +9972,16 @@ rule capa_gather_robo_ftp_information {
 	date = "2021-05-15"
 
   strings: 
- 	$byy = /SOFTWARE\\Robo-FTP/ ascii wide 
-	$byz = /\\FTPServers/ ascii wide 
-	$bza = /FTP File/ ascii wide 
-	$str_bzb = "FTP Count" ascii wide
-	$str_bzc = "Password" ascii wide
-	$str_bzd = "ServerName" ascii wide
-	$str_bze = "UserID" ascii wide
-	$str_bzf = "PortNumber" ascii wide
-	$str_bzg = "InitialDirectory" ascii wide
-	$str_bzh = "ServerType" ascii wide
+ 	$byr = /SOFTWARE\\Robo-FTP/ ascii wide 
+	$bys = /\\FTPServers/ ascii wide 
+	$byt = /FTP File/ ascii wide 
+	$str_byu = "FTP Count" ascii wide
+	$str_byv = "Password" ascii wide
+	$str_byw = "ServerName" ascii wide
+	$str_byx = "UserID" ascii wide
+	$str_byy = "PortNumber" ascii wide
+	$str_byz = "InitialDirectory" ascii wide
+	$str_bza = "ServerType" ascii wide
  
   condition: 
 	(
@@ -10414,16 +9989,16 @@ rule capa_gather_robo_ftp_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- (  (  ( 	$byy 
-	and  (  ( 	$byz 
-	or 	$bza 
-	or 	$str_bzb  )  )  )  ) 
-	or  (  ( 	$str_bzc 
-	and 	$str_bzd 
-	and 	$str_bze 
-	and 	$str_bzf 
-	and 	$str_bzg 
-	and 	$str_bzh  )  )  ) 
+ (  (  ( 	$byr 
+	and  (  ( 	$bys 
+	or 	$byt 
+	or 	$str_byu  )  )  )  ) 
+	or  (  ( 	$str_byv 
+	and 	$str_byw 
+	and 	$str_byx 
+	and 	$str_byy 
+	and 	$str_byz 
+	and 	$str_bza  )  )  ) 
 }
 
 rule capa_gather_bulletproof_ftp_information { 
@@ -10439,15 +10014,15 @@ rule capa_gather_bulletproof_ftp_information {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bzi = ".dat" ascii wide
-	$str_bzj = ".bps" ascii wide
-	$bzk = /Software\\BPFTP\\Bullet Proof FTP\\Main/ ascii wide 
-	$bzl = /Software\\BulletProof Software\\BulletProof FTP Client\\Main/ ascii wide 
-	$bzm = /Software\\BulletProof Software\\BulletProof FTP Client\\Options/ ascii wide 
-	$bzn = /Software\\BPFTP\\Bullet Proof FTP\\Options/ ascii wide 
-	$bzo = /Software\\BPFTP/ ascii wide 
-	$str_bzp = "LastSessionFile" ascii wide
-	$str_bzq = "SitesDir" ascii wide
+ 	$str_bzb = ".dat" ascii wide
+	$str_bzc = ".bps" ascii wide
+	$bzd = /Software\\BPFTP\\Bullet Proof FTP\\Main/ ascii wide 
+	$bze = /Software\\BulletProof Software\\BulletProof FTP Client\\Main/ ascii wide 
+	$bzf = /Software\\BulletProof Software\\BulletProof FTP Client\\Options/ ascii wide 
+	$bzg = /Software\\BPFTP\\Bullet Proof FTP\\Options/ ascii wide 
+	$bzh = /Software\\BPFTP/ ascii wide 
+	$str_bzi = "LastSessionFile" ascii wide
+	$str_bzj = "SitesDir" ascii wide
  
   condition: 
 	(
@@ -10455,15 +10030,15 @@ rule capa_gather_bulletproof_ftp_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- (  (  ( 	$str_bzi 
-	and 	$str_bzj  )  ) 
-	or  (  (  (  ( 	$bzk 
-	or 	$bzl 
-	or 	$bzm 
-	or 	$bzn 
-	or 	$bzo  )  ) 
-	and  (  ( 	$str_bzp 
-	or 	$str_bzq  )  )  )  )  ) 
+ (  (  ( 	$str_bzb 
+	and 	$str_bzc  )  ) 
+	or  (  (  (  ( 	$bzd 
+	or 	$bze 
+	or 	$bzf 
+	or 	$bzg 
+	or 	$bzh  )  ) 
+	and  (  ( 	$str_bzi 
+	or 	$str_bzj  )  )  )  )  ) 
 }
 
 rule capa_gather_alftp_information { 
@@ -10480,9 +10055,9 @@ rule capa_gather_alftp_information {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bzr = "ESTdb2.dat" ascii wide
-	$str_bzs = "QData.dat" ascii wide
-	$bzt = /\\Estsoft\\ALFTP/ ascii wide 
+ 	$str_bzk = "ESTdb2.dat" ascii wide
+	$str_bzl = "QData.dat" ascii wide
+	$bzm = /\\Estsoft\\ALFTP/ ascii wide 
  
   condition: 
 	(
@@ -10490,9 +10065,9 @@ rule capa_gather_alftp_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bzr 
-	and 	$str_bzs 
-	and 	$bzt  ) 
+ ( 	$str_bzk 
+	and 	$str_bzl 
+	and 	$bzm  ) 
 }
 
 rule capa_gather_expandrive_information { 
@@ -10508,10 +10083,10 @@ rule capa_gather_expandrive_information {
 	date = "2021-05-15"
 
   strings: 
- 	$bzu = /Software\\ExpanDrive\\Sessions/ ascii wide 
-	$bzv = /Software\\ExpanDrive/ ascii wide 
-	$bzw = /ExpanDrive_Home/ ascii wide 
-	$bzx = /\\drives\.js/ ascii wide 
+ 	$bzn = /Software\\ExpanDrive\\Sessions/ ascii wide 
+	$bzo = /Software\\ExpanDrive/ ascii wide 
+	$bzp = /ExpanDrive_Home/ ascii wide 
+	$bzq = /\\drives\.js/ ascii wide 
  
   condition: 
 	(
@@ -10519,10 +10094,10 @@ rule capa_gather_expandrive_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- (  (  ( 	$bzu 
-	or 	$bzv  )  ) 
-	and  (  ( 	$bzw 
-	or 	$bzx  )  )  ) 
+ (  (  ( 	$bzn 
+	or 	$bzo  )  ) 
+	and  (  ( 	$bzp 
+	or 	$bzq  )  )  ) 
 }
 
 rule capa_gather_goftp_information { 
@@ -10538,8 +10113,8 @@ rule capa_gather_goftp_information {
 	date = "2021-05-15"
 
   strings: 
- 	$str_bzy = "GoFTP" ascii wide
-	$str_bzz = "Connections.txt" ascii wide
+ 	$str_bzr = "GoFTP" ascii wide
+	$str_bzs = "Connections.txt" ascii wide
  
   condition: 
 	(
@@ -10547,8 +10122,8 @@ rule capa_gather_goftp_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_bzy 
-	and 	$str_bzz  ) 
+ ( 	$str_bzr 
+	and 	$str_bzs  ) 
 }
 
 rule capa_gather_3d_ftp_information { 
@@ -10564,8 +10139,8 @@ rule capa_gather_3d_ftp_information {
 	date = "2021-05-15"
 
   strings: 
- 	$str_caa = "3D-FTP" ascii wide
-	$str_cab = "sites.ini" ascii wide
+ 	$str_bzt = "3D-FTP" ascii wide
+	$str_bzu = "sites.ini" ascii wide
  
   condition: 
 	(
@@ -10573,8 +10148,8 @@ rule capa_gather_3d_ftp_information {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_caa 
-	and 	$str_cab  ) 
+ ( 	$str_bzt 
+	and 	$str_bzu  ) 
 }
 
 rule capa_reference_SQL_statements { 
@@ -10589,7 +10164,7 @@ rule capa_reference_SQL_statements {
 	date = "2021-05-15"
 
   strings: 
- 	$cah = /SELECT.{,1000}FROM.{,1000}WHERE/ ascii wide 
+ 	$caa = /SELECT.{,1000}FROM.{,1000}WHERE/ ascii wide 
  
   condition: 
 	(
@@ -10597,7 +10172,7 @@ rule capa_reference_SQL_statements {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$cah  ) 
+ ( 	$caa  ) 
 }
 
 rule capa_reference_WMI_statements { 
@@ -10612,9 +10187,9 @@ rule capa_reference_WMI_statements {
 	date = "2021-05-15"
 
   strings: 
- 	$cai = /SELECT\s+\*\s+FROM\s+CIM_./ ascii wide 
-	$caj = /SELECT\s+\*\s+FROM\s+Win32_./ ascii wide 
-	$cak = /SELECT\s+\*\s+FROM\s+MSAcpi_./ ascii wide 
+ 	$cab = /SELECT\s+\*\s+FROM\s+CIM_./ ascii wide 
+	$cac = /SELECT\s+\*\s+FROM\s+Win32_./ ascii wide 
+	$cad = /SELECT\s+\*\s+FROM\s+MSAcpi_./ ascii wide 
  
   condition: 
 	(
@@ -10622,43 +10197,9 @@ rule capa_reference_WMI_statements {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$cai 
-	or 	$caj 
-	or 	$cak  ) 
-}
-
-rule capa_create_reverse_shell { 
-  meta: 
- 	description = "create reverse shell (converted from capa rule)"
-	namespace = "c2/shell"
-	author = "moritz.raabe@fireeye.com"
-	scope = "function"
-	attack = "Execution::Command and Scripting Interpreter::Windows Command Shell [T1059.003]"
-	mbc = "Impact::Remote Access::Reverse Shell [B0022.001]"
-	hash = "C91887D861D9BD4A5872249B641BC9F9"
-	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/c2/shell/create-reverse-shell.yml"
-	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-15"
-
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
- (  (  ( 	capa_create_pipe
-
-	and 	pe.imports(/kernel32/i, /PeekNamedPipe/) 
-	and 	pe.imports(/kernel32/i, /CreateProcess/) 
-	and 	pe.imports(/kernel32/i, /ReadFile/) 
-	and 	pe.imports(/kernel32/i, /WriteFile/)  )  ) 
-	or  (  ( 	capa_create_process
-
-	and 	capa_read_pipe
-
-	and 	capa_write_pipe
- )  ) 
-  ) 
+ ( 	$cab 
+	or 	$cac 
+	or 	$cad  ) 
 }
 
 rule capa_write_and_execute_a_file { 
@@ -10699,7 +10240,7 @@ rule capa_self_delete_via_COMSPEC_environment_variable {
 	date = "2021-05-15"
 
   strings: 
- 	$cam = /\/c\s*del\s*/ ascii wide 
+ 	$caf = /\/c\s*del\s*/ ascii wide 
  
   condition: 
 	(
@@ -10711,7 +10252,7 @@ rule capa_self_delete_via_COMSPEC_environment_variable {
 
 	and 	capa_create_process
 
-	and 	$cam  ) 
+	and 	$caf  ) 
 }
 
 rule capa_check_for_windows_sandbox_via_process_name { 
@@ -10728,7 +10269,7 @@ rule capa_check_for_windows_sandbox_via_process_name {
 	date = "2021-05-15"
 
   strings: 
- 	$str_cap = "CExecSvc.exe" ascii wide
+ 	$str_cai = "CExecSvc.exe" ascii wide
  
   condition: 
 	(
@@ -10738,7 +10279,7 @@ rule capa_check_for_windows_sandbox_via_process_name {
 	) and
  ( 	capa_enumerate_processes
 
-	and 	$str_cap  ) 
+	and 	$str_cai  ) 
 }
 
 rule capa_get_CPU_information { 
@@ -10753,7 +10294,7 @@ rule capa_get_CPU_information {
 	date = "2021-05-15"
 
   strings: 
- 	$cbe = /Hardware\\Description\\System\\CentralProcessor/ nocase ascii wide 
+ 	$cax = /Hardware\\Description\\System\\CentralProcessor/ nocase ascii wide 
  
   condition: 
 	(
@@ -10763,7 +10304,7 @@ rule capa_get_CPU_information {
 	) and
  ( 	capa_query_or_enumerate_registry_value
 
-	and 	$cbe  ) 
+	and 	$cax  ) 
 }
 
 rule capa_disable_code_signing { 
@@ -10778,7 +10319,7 @@ rule capa_disable_code_signing {
 	date = "2021-05-15"
 
   strings: 
- 	$cbf = /\bbcdedit(\.exe)? -set TESTSIGNING ON/ nocase ascii wide 
+ 	$cbb = /\bbcdedit(\.exe)? -set TESTSIGNING ON/ nocase ascii wide 
  
   condition: 
 	(
@@ -10788,7 +10329,7 @@ rule capa_disable_code_signing {
 	) and
  ( 	capa_create_process
 
-	and 	$cbf  ) 
+	and 	$cbb  ) 
 }
 
 rule capa_find_taskbar { 
@@ -10803,7 +10344,7 @@ rule capa_find_taskbar {
 	date = "2021-05-15"
 
   strings: 
- 	$str_cbg = "Shell_TrayWnd" ascii wide
+ 	$str_cbc = "Shell_TrayWnd" ascii wide
  
   condition: 
 	(
@@ -10811,7 +10352,7 @@ rule capa_find_taskbar {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	$str_cbg 
+ ( 	$str_cbc 
 	and 	capa_find_graphical_window
  ) 
 }
@@ -10853,8 +10394,8 @@ rule capa_linked_against_Go_process_enumeration_library {
 	date = "2021-05-15"
 
   strings: 
- 	$str_ccq = "github.com/mitchellh/go-ps.FindProcess" ascii wide
-	$str_ccr = "github.com/mitchellh/go-ps.Processes" ascii wide
+ 	$str_cdn = "github.com/mitchellh/go-ps.FindProcess" ascii wide
+	$str_cdo = "github.com/mitchellh/go-ps.Processes" ascii wide
  
   condition: 
 	(
@@ -10864,8 +10405,8 @@ rule capa_linked_against_Go_process_enumeration_library {
 	) and
  ( 	capa_compiled_with_Go
 
-	and  (  (  (  ( 	$str_ccq 
-	or 	$str_ccr  )  )  )  )  ) 
+	and  (  (  (  ( 	$str_cdn 
+	or 	$str_cdo  )  )  )  )  ) 
 }
 
 rule capa_linked_against_Go_WMI_library { 
@@ -10882,8 +10423,8 @@ rule capa_linked_against_Go_WMI_library {
 	date = "2021-05-15"
 
   strings: 
- 	$str_cdd = "github.com/StackExchange/wmi.CreateQuery" ascii wide
-	$str_cde = "github.com/StackExchange/wmi.Query" ascii wide
+ 	$str_cea = "github.com/StackExchange/wmi.CreateQuery" ascii wide
+	$str_ceb = "github.com/StackExchange/wmi.Query" ascii wide
  
   condition: 
 	(
@@ -10893,32 +10434,8 @@ rule capa_linked_against_Go_WMI_library {
 	) and
  ( 	capa_compiled_with_Go
 
-	and  (  (  (  ( 	$str_cdd 
-	or 	$str_cde  )  )  )  )  ) 
-}
-
-rule capa_send_HTTP_request_with_Host_header { 
-  meta: 
- 	description = "send HTTP request with Host header (converted from capa rule)"
-	namespace = "communication/http"
-	author = "anamaria.martinezgom@fireeye.com"
-	scope = "function"
-	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/send-http-request-with-host-header.yml"
-	capa_nursery = "True"
-	date = "2021-05-15"
-
-  strings: 
- 	$cdf = /Host:/ nocase ascii wide 
- 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
- ( 	capa_send_HTTP_request
-
-	and 	$cdf  ) 
+	and  (  (  (  ( 	$str_cea 
+	or 	$str_ceb  )  )  )  )  ) 
 }
 
 rule capa_check_for_windows_sandbox_via_mutex { 
@@ -10935,7 +10452,7 @@ rule capa_check_for_windows_sandbox_via_mutex {
 	date = "2021-05-15"
 
   strings: 
- 	$str_cdg = "WindowsSandboxMutex" ascii wide
+ 	$str_ceg = "WindowsSandboxMutex" ascii wide
  
   condition: 
 	(
@@ -10945,7 +10462,7 @@ rule capa_check_for_windows_sandbox_via_mutex {
 	) and
  ( 	capa_check_mutex
 
-	and 	$str_cdg  ) 
+	and 	$str_ceg  ) 
 }
 
 rule capa_linked_against_Go_registry_library { 
@@ -10961,8 +10478,8 @@ rule capa_linked_against_Go_registry_library {
 	date = "2021-05-15"
 
   strings: 
- 	$str_cdh = "golang.org/x/sys/windows/registry.Key.Close" ascii wide
-	$str_cdi = "github.com/golang/sys/windows/registry.Key.Close" ascii wide
+ 	$str_ceh = "golang.org/x/sys/windows/registry.Key.Close" ascii wide
+	$str_cei = "github.com/golang/sys/windows/registry.Key.Close" ascii wide
  
   condition: 
 	(
@@ -10972,8 +10489,8 @@ rule capa_linked_against_Go_registry_library {
 	) and
  ( 	capa_compiled_with_Go
 
-	and  (  ( 	$str_cdh 
-	or 	$str_cdi  )  )  ) 
+	and  (  ( 	$str_ceh 
+	or 	$str_cei  )  )  ) 
 }
 
 rule capa_capture_screenshot_in_Go { 
@@ -10990,14 +10507,14 @@ rule capa_capture_screenshot_in_Go {
 	date = "2021-05-15"
 
   strings: 
- 	$str_cdn = "syscall.NewLazyDLL" ascii wide
-	$cdo = /user32.dll/ ascii wide 
-	$cdp = /GetWindowDC/ ascii wide 
-	$cdq = /GetDC/ ascii wide 
-	$cdr = /gdi32.dll/ ascii wide 
-	$cds = /BitBlt/ ascii wide 
-	$cdt = /GetDIBits/ ascii wide 
-	$cdu = /CreateCompatibleDC/ ascii wide 
+ 	$str_cen = "syscall.NewLazyDLL" ascii wide
+	$ceo = /user32.dll/ ascii wide 
+	$cep = /GetWindowDC/ ascii wide 
+	$ceq = /GetDC/ ascii wide 
+	$cer = /gdi32.dll/ ascii wide 
+	$ces = /BitBlt/ ascii wide 
+	$cet = /GetDIBits/ ascii wide 
+	$ceu = /CreateCompatibleDC/ ascii wide 
  
   condition: 
 	(
@@ -11007,14 +10524,14 @@ rule capa_capture_screenshot_in_Go {
 	) and
  ( 	capa_compiled_with_Go
 
-	and  (  (  (  ( 	$str_cdn 
-	and  (  (  (  ( 	$cdo 
-	and  (  ( 	$cdp 
-	or 	$cdq  )  )  )  ) 
-	or  (  ( 	$cdr 
-	and  (  ( 	$cds 
-	or 	$cdt  )  )  )  )  )  ) 
-	and 	$cdu  )  )  )  )  ) 
+	and  (  (  (  ( 	$str_cen 
+	and  (  (  (  ( 	$ceo 
+	and  (  ( 	$cep 
+	or 	$ceq  )  )  )  ) 
+	or  (  ( 	$cer 
+	and  (  ( 	$ces 
+	or 	$cet  )  )  )  )  )  ) 
+	and 	$ceu  )  )  )  )  ) 
 }
 
 rule capa_linked_against_Go_static_asset_library { 
@@ -11036,21 +10553,21 @@ rule capa_linked_against_Go_static_asset_library {
 	date = "2021-05-15"
 
   strings: 
- 	$str_cdw = "github.com/rakyll/statik/fs.IsDefaultNamespace" ascii wide
-	$str_cdx = "github.com/rakyll/statik/fs.RegisterWithNamespace" ascii wide
-	$str_cdy = "github.com/rakyll/statik/fs.NewWithNamespace" ascii wide
-	$str_cdz = "github.com/rakyll/statik/fs.Register" ascii wide
-	$str_cea = "github.com/gobuffalo/packr.NewBox" ascii wide
-	$str_ceb = "github.com/markbates/pkger.Open" ascii wide
-	$str_cec = "github.com/markbates/pkger.Include" ascii wide
-	$str_ced = "github.com/markbates/pkger.Parse" ascii wide
-	$str_cee = "github.com/GeertJohan/go.rice.FindBox" ascii wide
-	$str_cef = "github.com/GeertJohan/go.rice.MustFindBox" ascii wide
-	$ceg = /\/bindata\.go/ ascii wide 
-	$ceh = /\.Asset/ ascii wide 
-	$str_cei = "github.com/lu4p/binclude.Include" ascii wide
-	$str_cej = "github.com/omeid/go-resources" ascii wide
-	$str_cek = "github.com/pyros2097/go-embed" ascii wide
+ 	$str_cew = "github.com/rakyll/statik/fs.IsDefaultNamespace" ascii wide
+	$str_cex = "github.com/rakyll/statik/fs.RegisterWithNamespace" ascii wide
+	$str_cey = "github.com/rakyll/statik/fs.NewWithNamespace" ascii wide
+	$str_cez = "github.com/rakyll/statik/fs.Register" ascii wide
+	$str_cfa = "github.com/gobuffalo/packr.NewBox" ascii wide
+	$str_cfb = "github.com/markbates/pkger.Open" ascii wide
+	$str_cfc = "github.com/markbates/pkger.Include" ascii wide
+	$str_cfd = "github.com/markbates/pkger.Parse" ascii wide
+	$str_cfe = "github.com/GeertJohan/go.rice.FindBox" ascii wide
+	$str_cff = "github.com/GeertJohan/go.rice.MustFindBox" ascii wide
+	$cfg = /\/bindata\.go/ ascii wide 
+	$cfh = /\.Asset/ ascii wide 
+	$str_cfi = "github.com/lu4p/binclude.Include" ascii wide
+	$str_cfj = "github.com/omeid/go-resources" ascii wide
+	$str_cfk = "github.com/pyros2097/go-embed" ascii wide
  
   condition: 
 	(
@@ -11060,45 +10577,21 @@ rule capa_linked_against_Go_static_asset_library {
 	) and
  ( 	capa_compiled_with_Go
 
-	and  (  (  (  ( 	$str_cdw 
-	or 	$str_cdx 
-	or 	$str_cdy 
-	or 	$str_cdz  )  ) 
-	or  (  ( 	$str_cea  )  ) 
-	or  (  ( 	$str_ceb 
-	or 	$str_cec 
-	or 	$str_ced  )  ) 
-	or  (  ( 	$str_cee 
-	or 	$str_cef  )  ) 
-	or  (  ( 	$ceg 
-	and 	$ceh  )  ) 
-	or  (  ( 	$str_cei  )  ) 
-	or  (  ( 	$str_cej  )  ) 
-	or  (  ( 	$str_cek  )  )  )  )  ) 
-}
-
-rule capa_make_an_HTTP_request_with_a_Cookie { 
-  meta: 
- 	description = "make an HTTP request with a Cookie (converted from capa rule)"
-	namespace = "communication/http/client"
-	author = "anamaria.martinezgom@fireeye.com"
-	scope = "function"
-	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/make-an-http-request-with-a-cookie.yml"
-	capa_nursery = "True"
-	date = "2021-05-15"
-
-  strings: 
- 	$cel = /Cookie:/ nocase ascii wide 
- 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
- ( 	capa_send_HTTP_request
-
-	and 	$cel  ) 
+	and  (  (  (  ( 	$str_cew 
+	or 	$str_cex 
+	or 	$str_cey 
+	or 	$str_cez  )  ) 
+	or  (  ( 	$str_cfa  )  ) 
+	or  (  ( 	$str_cfb 
+	or 	$str_cfc 
+	or 	$str_cfd  )  ) 
+	or  (  ( 	$str_cfe 
+	or 	$str_cff  )  ) 
+	or  (  ( 	$cfg 
+	and 	$cfh  )  ) 
+	or  (  ( 	$str_cfi  )  ) 
+	or  (  ( 	$str_cfj  )  ) 
+	or  (  ( 	$str_cfk  )  )  )  )  ) 
 }
 
 rule capa_receive_data { 
@@ -11127,16 +10620,48 @@ rule capa_receive_data {
  ) 
 }
 
-rule capa_send_data { 
+rule capa_send_HTTP_request { 
   meta: 
- 	description = "send data (converted from capa rule)"
-	namespace = "communication"
-	author = "william.ballenthin@fireeye.com"
-	description = "all known techniques for sending data to a potential C2 server"
+ 	description = "send HTTP request (converted from capa rule)"
+	namespace = "communication/http/client"
+	author = "moritz.raabe@fireeye.com"
 	scope = "function"
-	mbc = "Command and Control::C2 Communication::Send Data [B0030.001]"
+	mbc = "Communication::HTTP Communication::Send Request [C0002.003]"
 	hash = "BFB9B5391A13D0AFD787E87AB90F14F5"
-	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/send-data.yml"
+	hash = "6A352C3E55E8AE5ED39DC1BE7FB964B1"
+	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/http/client/send-http-request.yml"
+	date = "2021-05-15"
+
+  strings: 
+ 	$cfq = /HTTP/ nocase ascii wide 
+ 
+  condition: 
+	(
+		uint16be(0) == 0x4d5a or
+		uint16be(0) == 0x558b or
+		uint16be(0) == 0x5649
+	) and
+ (  (  (  (  ( 	pe.imports(/wininet/i, /HttpOpenRequest/) 
+	or 	pe.imports(/wininet/i, /InternetConnect/)  )  ) 
+	and  (  ( 	pe.imports(/wininet/i, /HttpSendRequest/) 
+	or 	pe.imports(/wininet/i, /HttpSendRequestEx/)  )  )  )  ) 
+	or  (  ( 	pe.imports(/winhttp/i, /WinHttpSendRequest/) 
+	and 	pe.imports(/winhttp/i, /WinHttpWriteData/)  )  ) 
+	or  (  ( 	capa_send_data_on_socket
+
+	and 	$cfq  )  )  ) 
+}
+
+rule capa_write_pipe { 
+  meta: 
+ 	description = "write pipe (converted from capa rule)"
+	namespace = "communication/named-pipe/write"
+	author = "moritz.raabe@fireeye.com"
+	author = "michael.hunhoff@fireeye.com"
+	scope = "function"
+	mbc = "Communication::Interprocess Communication::Write Pipe [C0003.004]"
+	hash = "C91887D861D9BD4A5872249B641BC9F9"
+	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/named-pipe/write/write-pipe.yml"
 	date = "2021-05-15"
 
   condition: 
@@ -11145,12 +10670,13 @@ rule capa_send_data {
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	capa_send_HTTP_request
+ (  (  (  (  ( 	capa_create_pipe
 
-	or 	capa_send_data_on_socket
-
-	or 	capa_send_file_via_HTTP
- ) 
+	or 	capa_connect_pipe
+ )  ) 
+	and 	pe.imports(/kernel32/i, /WriteFile/)  )  ) 
+	or 	pe.imports(/kernel32/i, /TransactNamedPipe/) 
+	or 	pe.imports(/kernel32/i, /CallNamedPipe/)  ) 
 }
 
 rule capa_download_and_write_a_file { 
@@ -11178,26 +10704,66 @@ rule capa_download_and_write_a_file {
  ) 
 }
 
-rule capa_read_and_send_data_from_client_to_server { 
+rule capa_create_container { 
   meta: 
- 	description = "read and send data from client to server (converted from capa rule)"
-	namespace = "c2/file-transfer"
+ 	description = "create container (converted from capa rule)"
+	namespace = "host-interaction/container/docker"
 	author = "william.ballenthin@fireeye.com"
 	scope = "function"
-	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/read-and-send-data-from-client-to-server.yml"
+	attack = "Execution::Deploy Container [T1610]"
+	references = "https://docs.docker.com/engine/api/v1.24/"
+	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/create-container.yml"
 	capa_nursery = "True"
 	date = "2021-05-15"
 
+  strings: 
+ 	$cjm = /\bdocker(\.exe)? create/ ascii wide 
+	$cjn = /\bdocker(\.exe)? start/ ascii wide 
+	$cjo = /\/v1\.[0-9]{1,2}\/containers\/create/ ascii wide 
+	$cjp = /\/v1\.[0-9]{1,2}\/containers\/[0-9a-fA-F]+\/start/ ascii wide 
+ 
   condition: 
 	(
 		uint16be(0) == 0x4d5a or
 		uint16be(0) == 0x558b or
 		uint16be(0) == 0x5649
 	) and
- ( 	capa_read_file
+ ( 	$cjm 
+	or 	$cjn 
+	or  (  ( 	capa_send_HTTP_request
 
-	and 	capa_send_data
- ) 
+	and 	$cjo  )  ) 
+	or  (  ( 	capa_send_HTTP_request
+
+	and 	$cjp  )  )  ) 
+}
+
+rule capa_list_containers { 
+  meta: 
+ 	description = "list containers (converted from capa rule)"
+	namespace = "host-interaction/container/docker"
+	author = "william.ballenthin@fireeye.com"
+	scope = "function"
+	attack = "Discovery::Container and Resource Discovery [T1609]"
+	references = "https://docs.docker.com/engine/api/v1.24/"
+	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/list-containers.yml"
+	capa_nursery = "True"
+	date = "2021-05-15"
+
+  strings: 
+ 	$cju = /\bdocker(\.exe)? ps/ ascii wide 
+	$cjv = /\/v1\.[0-9]{1,2}\/containers\/json/ ascii wide 
+ 
+  condition: 
+	(
+		uint16be(0) == 0x4d5a or
+		uint16be(0) == 0x558b or
+		uint16be(0) == 0x5649
+	) and
+ ( 	$cju 
+	or  (  ( 	capa_send_HTTP_request
+
+	and 	$cjv  )  )  ) 
 }
 
 rule capa_receive_and_write_data_from_server_to_client { 
@@ -11222,9 +10788,467 @@ rule capa_receive_and_write_data_from_server_to_client {
  ) 
 }
 
+rule capa_build_Docker_image { 
+  meta: 
+ 	description = "build Docker image (converted from capa rule)"
+	namespace = "host-interaction/container/docker"
+	author = "william.ballenthin@fireeye.com"
+	scope = "function"
+	attack = "Defense Evasion::Build Image on Host [T1612]"
+	references = "https://docs.docker.com/engine/api/v1.24/"
+	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/build-docker-image.yml"
+	capa_nursery = "True"
+	date = "2021-05-15"
+
+  strings: 
+ 	$ckj = /\bdocker(\.exe)? build/ ascii wide 
+	$ckk = /\/v1\.[0-9]{1,2}\/build/ ascii wide 
+ 
+  condition: 
+	(
+		uint16be(0) == 0x4d5a or
+		uint16be(0) == 0x558b or
+		uint16be(0) == 0x5649
+	) and
+ ( 	$ckj 
+	or  (  ( 	capa_send_HTTP_request
+
+	and 	$ckk  )  )  ) 
+}
+
+rule capa_run_in_container { 
+  meta: 
+ 	description = "run in container (converted from capa rule)"
+	namespace = "host-interaction/container/docker"
+	author = "william.ballenthin@fireeye.com"
+	scope = "function"
+	attack = "Execution::Container Administration Command [T1609]"
+	references = "https://docs.docker.com/engine/api/v1.24/"
+	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/run-in-container.yml"
+	capa_nursery = "True"
+	date = "2021-05-15"
+
+  strings: 
+ 	$ckl = /\bdocker(\.exe)? exec/ ascii wide 
+	$ckm = /\bkubectl(\.exe)? exec/ ascii wide 
+	$ckn = /\bkubectl(\.exe)? run/ ascii wide 
+	$cko = /\/v1\.[0-9]{1,2}\/containers\/[0-9a-fA-F]+\/exec/ ascii wide 
+	$ckp = /\/v1\.[0-9]{1,2}\/exec\/[0-9a-fA-F]+\/start/ ascii wide 
+ 
+  condition: 
+	(
+		uint16be(0) == 0x4d5a or
+		uint16be(0) == 0x558b or
+		uint16be(0) == 0x5649
+	) and
+ ( 	$ckl 
+	or 	$ckm 
+	or 	$ckn 
+	or  (  ( 	capa_send_HTTP_request
+
+	and 	$cko  )  ) 
+	or  (  ( 	capa_send_HTTP_request
+
+	and 	$ckp  )  )  ) 
+}
+
+rule capa_send_HTTP_request_with_Host_header { 
+  meta: 
+ 	description = "send HTTP request with Host header (converted from capa rule)"
+	namespace = "communication/http"
+	author = "anamaria.martinezgom@fireeye.com"
+	scope = "function"
+	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/send-http-request-with-host-header.yml"
+	capa_nursery = "True"
+	date = "2021-05-15"
+
+  strings: 
+ 	$ckq = /Host:/ nocase ascii wide 
+ 
+  condition: 
+	(
+		uint16be(0) == 0x4d5a or
+		uint16be(0) == 0x558b or
+		uint16be(0) == 0x5649
+	) and
+ ( 	capa_send_HTTP_request
+
+	and 	$ckq  ) 
+}
+
+rule capa_make_an_HTTP_request_with_a_Cookie { 
+  meta: 
+ 	description = "make an HTTP request with a Cookie (converted from capa rule)"
+	namespace = "communication/http/client"
+	author = "anamaria.martinezgom@fireeye.com"
+	scope = "function"
+	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/make-an-http-request-with-a-cookie.yml"
+	capa_nursery = "True"
+	date = "2021-05-15"
+
+  strings: 
+ 	$ckw = /Cookie:/ nocase ascii wide 
+ 
+  condition: 
+	(
+		uint16be(0) == 0x4d5a or
+		uint16be(0) == 0x558b or
+		uint16be(0) == 0x5649
+	) and
+ ( 	capa_send_HTTP_request
+
+	and 	$ckw  ) 
+}
+
+rule capa_send_data { 
+  meta: 
+ 	description = "send data (converted from capa rule)"
+	namespace = "communication"
+	author = "william.ballenthin@fireeye.com"
+	description = "all known techniques for sending data to a potential C2 server"
+	scope = "function"
+	mbc = "Command and Control::C2 Communication::Send Data [B0030.001]"
+	hash = "BFB9B5391A13D0AFD787E87AB90F14F5"
+	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/send-data.yml"
+	date = "2021-05-15"
+
+  condition: 
+	(
+		uint16be(0) == 0x4d5a or
+		uint16be(0) == 0x558b or
+		uint16be(0) == 0x5649
+	) and
+ ( 	capa_send_HTTP_request
+
+	or 	capa_send_data_on_socket
+
+	or 	capa_send_file_via_HTTP
+ ) 
+}
+
+rule capa_read_and_send_data_from_client_to_server { 
+  meta: 
+ 	description = "read and send data from client to server (converted from capa rule)"
+	namespace = "c2/file-transfer"
+	author = "william.ballenthin@fireeye.com"
+	scope = "function"
+	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/read-and-send-data-from-client-to-server.yml"
+	capa_nursery = "True"
+	date = "2021-05-15"
+
+  condition: 
+	(
+		uint16be(0) == 0x4d5a or
+		uint16be(0) == 0x558b or
+		uint16be(0) == 0x5649
+	) and
+ ( 	capa_read_file
+
+	and 	capa_send_data
+ ) 
+}
+
+rule capa_create_reverse_shell { 
+  meta: 
+ 	description = "create reverse shell (converted from capa rule)"
+	namespace = "c2/shell"
+	author = "moritz.raabe@fireeye.com"
+	scope = "function"
+	attack = "Execution::Command and Scripting Interpreter::Windows Command Shell [T1059.003]"
+	mbc = "Impact::Remote Access::Reverse Shell [B0022.001]"
+	hash = "C91887D861D9BD4A5872249B641BC9F9"
+	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/c2/shell/create-reverse-shell.yml"
+	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
+	date = "2021-05-15"
+
+  condition: 
+	(
+		uint16be(0) == 0x4d5a or
+		uint16be(0) == 0x558b or
+		uint16be(0) == 0x5649
+	) and
+ (  (  ( 	capa_create_pipe
+
+	and 	pe.imports(/kernel32/i, /PeekNamedPipe/) 
+	and 	pe.imports(/kernel32/i, /CreateProcess/) 
+	and 	pe.imports(/kernel32/i, /ReadFile/) 
+	and 	pe.imports(/kernel32/i, /WriteFile/)  )  ) 
+	or  (  ( 	capa_create_process
+
+	and 	capa_read_pipe
+
+	and 	capa_write_pipe
+ )  ) 
+  ) 
+}
+
+rule capa_interact_with_driver_via_control_codes { 
+  meta: 
+ 	description = "interact with driver via control codes (converted from capa rule)"
+	namespace = "host-interaction/driver"
+	author = "moritz.raabe@fireeye.com"
+	scope = "function"
+	attack = "Execution::System Services::Service Execution [T1569.002]"
+	hash = "Practical Malware Analysis Lab 10-03.exe_:0x401000"
+	hash = "9412A66BC81F51A1FA916AC47C77E02AC1A7C9DFF543233ED70AA265EF6A1E76"
+	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/driver/interact-with-driver-via-control-codes.yml"
+	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
+	date = "2021-05-15"
+
+  strings: 
+ 	$api_crp = "DeviceIoControl" ascii wide
+	$api_crq = "NtUnloadDriver" ascii wide
+	$api_crr = "ZwUnloadDriver" ascii wide
+ 
+  condition: 
+	(
+		uint16be(0) == 0x4d5a or
+		uint16be(0) == 0x558b or
+		uint16be(0) == 0x5649
+	) and
+ ( 	$api_crp 
+	or 	$api_crq 
+	or 	$api_crr 
+  ) 
+}
+
+rule capa_get_local_IPv4_addresses { 
+  meta: 
+ 	description = "get local IPv4 addresses (converted from capa rule)"
+	namespace = "host-interaction/network/address"
+	author = "moritz.raabe@fireeye.com"
+	scope = "function"
+	attack = "Discovery::System Network Configuration Discovery [T1016]"
+	hash = "Practical Malware Analysis Lab 05-01.dll_:0x100037e6"
+	hash = "4C0553285D724DCAF5909924B4E3E90A"
+	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/network/address/get-local-ipv4-addresses.yml"
+	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
+	date = "2021-05-15"
+
+  strings: 
+ 	$api_cru = "GetAdaptersAddresses" ascii wide
+ 
+  condition: 
+	(
+		uint16be(0) == 0x4d5a or
+		uint16be(0) == 0x558b or
+		uint16be(0) == 0x5649
+	) and
+ (  (  ( 	$api_cru  )  )  ) 
+}
+
+rule capa_encrypt_data_using_Sosemanuk { 
+  meta: 
+ 	description = "encrypt data using Sosemanuk (converted from capa rule)"
+	namespace = "data-manipulation/encryption/sosemanuk"
+	author = "@recvfrom"
+	description = "Looks for cryptographic constants associated with the Sosemanuk stream cipher"
+	scope = "basic block"
+	attack = "Defense Evasion::Obfuscated Files or Information [T1027]"
+	mbc = "Defense Evasion::Obfuscated Files or Information::Encryption-Standard Algorithm [E1027.m05]"
+	mbc = "Cryptography::Encrypt Data::Sosemanuk [C0027.008]"
+	references = "https://labs.sentinelone.com/enter-the-maze-demystifying-an-affiliate-involved-in-maze-snow/"
+	hash = "ea7bb99e03606702c1cbe543bb32b27e"
+	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/sosemanuk/encrypt-data-using-sosemanuk.yml"
+	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
+	date = "2021-05-15"
+
+  strings: 
+ 	$cry = { 00 00 00 00 E1 9F CF 13 6B 97 37 26 8A 08 F8 35 D6 87 6E 4C 37 18 A1 5F BD 10 59 6A 5C 8F 96 79 05 A7 DC 98 E4 38 13 8B 6E 30 EB BE 8F AF 24 AD D3 20 B2 D4 32 BF 7D C7 B8 B7 85 F2 59 28 4A E1 0A E7 11 99 EB 78 DE 8A 61 70 26 BF 80 EF E9 AC DC 60 7F D5 3D FF B0 C6 B7 F7 48 F3 56 68 87 E0 0F 40 CD 01 EE DF 02 12 64 D7 FA 27 85 48 35 34 D9 C7 A3 4D 38 58 6C 5E B2 50 94 6B 53 CF 5B 78 }
+	$crz = { 00 00 00 00 13 CF 9F E1 26 37 97 6B 35 F8 08 8A 4C 6E 87 D6 5F A1 18 37 6A 59 10 BD 79 96 8F 5C 98 DC A7 05 8B 13 38 E4 BE EB 30 6E AD 24 AF 8F D4 B2 20 D3 C7 7D BF 32 F2 85 B7 B8 E1 4A 28 59 99 11 E7 0A 8A DE 78 EB BF 26 70 61 AC E9 EF 80 D5 7F 60 DC C6 B0 FF 3D F3 48 F7 B7 E0 87 68 56 01 CD 40 0F 12 02 DF EE 27 FA D7 64 34 35 48 85 4D A3 C7 D9 5E 6C 58 38 6B 94 50 B2 78 5B CF 53 }
+	$csa = { 00 00 00 00 18 0F 40 CD 30 1E 80 33 28 11 C0 FE 60 3C A9 66 78 33 E9 AB 50 22 29 55 48 2D 69 98 C0 78 FB CC D8 77 BB 01 F0 66 7B FF E8 69 3B 32 A0 44 52 AA B8 4B 12 67 90 5A D2 99 88 55 92 54 29 F0 5F 31 31 FF 1F FC 19 EE DF 02 01 E1 9F CF 49 CC F6 57 51 C3 B6 9A 79 D2 76 64 61 DD 36 A9 E9 88 A4 FD F1 87 E4 30 D9 96 24 CE C1 99 64 03 89 B4 0D 9B 91 BB 4D 56 B9 AA 8D A8 A1 A5 CD 65 }
+	$csb = { 00 00 00 00 CD 40 0F 18 33 80 1E 30 FE C0 11 28 66 A9 3C 60 AB E9 33 78 55 29 22 50 98 69 2D 48 CC FB 78 C0 01 BB 77 D8 FF 7B 66 F0 32 3B 69 E8 AA 52 44 A0 67 12 4B B8 99 D2 5A 90 54 92 55 88 31 5F F0 29 FC 1F FF 31 02 DF EE 19 CF 9F E1 01 57 F6 CC 49 9A B6 C3 51 64 76 D2 79 A9 36 DD 61 FD A4 88 E9 30 E4 87 F1 CE 24 96 D9 03 64 99 C1 9B 0D B4 89 56 4D BB 91 A8 8D AA B9 65 CD A5 A1 }
+ 
+  condition: 
+	(
+		uint16be(0) == 0x4d5a or
+		uint16be(0) == 0x558b or
+		uint16be(0) == 0x5649
+	) and
+ ( 	$cry 
+	or 	$crz 
+	or 	$csa 
+	or 	$csb 
+  ) 
+}
+
+rule capa_encrypt_data_using_DES { 
+  meta: 
+ 	description = "encrypt data using DES (converted from capa rule)"
+	namespace = "data-manipulation/encryption/des"
+	author = "@_re_fox"
+	scope = "basic block"
+	attack = "Defense Evasion::Obfuscated Files or Information [T1027]"
+	mbc = "Defense Evasion::Obfuscated Files or Information::Encryption-Standard Algorithm [E1027.m05]"
+	mbc = "Cryptography::Encrypt Data::3DES [C0027.004]"
+	hash = "91a12a4cf437589ba70b1687f5acad19"
+	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/des/encrypt-data-using-des.yml"
+	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
+	date = "2021-05-15"
+
+  strings: 
+ 	$csc = { 0E 04 0D 01 02 0F 0B 08 03 0A 06 0C 05 09 00 07 00 0F 07 04 0E 02 0D 01 0A 06 0C 0B 09 05 03 08 04 01 0E 08 0D 06 02 0B 0F 0C 09 07 03 0A 05 00 0F 0C 08 02 04 09 01 07 05 0B 03 0E 0A 00 06 0D }
+	$csd = { 0F 01 08 0E 06 0B 03 04 09 07 02 0D 0C 00 05 0A 03 0D 04 07 0F 02 08 0E 0C 00 01 0A 06 09 0B 05 00 0E 07 0B 0A 04 0D 01 05 08 0C 06 09 03 02 0F 0D 08 0A 01 03 0F 04 02 0B 06 07 0C 00 05 0E 09 }
+	$cse = { 0A 00 09 0E 06 03 0F 05 01 0D 0C 07 0B 04 02 08 0D 07 00 09 03 04 06 0A 02 08 05 0E 0C 0B 0F 01 0D 06 04 09 08 0F 03 00 0B 01 02 0C 05 0A 0E 07 01 0A 0D 00 06 09 08 07 04 0F 0E 03 0B 05 02 0C }
+	$csf = { 07 0D 0E 03 00 06 09 0A 01 02 08 05 0B 0C 04 0F 0D 08 0B 05 06 0F 00 03 04 07 02 0C 01 0A 0E 09 0A 06 09 00 0C 0B 07 0D 0F 01 03 0E 05 02 08 04 03 0F 00 06 0A 01 0D 08 09 04 05 0B 0C 07 02 0E }
+	$csg = { 02 0C 04 01 07 0A 0B 06 08 05 03 0F 0D 00 0E 09 0E 0B 02 0C 04 07 0D 01 05 00 0F 0A 03 09 08 06 04 02 01 0B 0A 0D 07 08 0F 09 0C 05 06 03 00 0E 0B 08 0C 07 01 0E 02 0D 06 0F 00 09 0A 04 05 03 }
+	$csh = { 0C 01 0A 0F 09 02 06 08 00 0D 03 04 0E 07 05 0B 0A 0F 04 02 07 0C 09 05 06 01 0D 0E 00 0B 03 08 09 0E 0F 05 02 08 0C 03 07 00 04 0A 01 0D 0B 06 04 03 02 0C 09 05 0F 0A 0B 0E 01 07 06 00 08 0D }
+	$csi = { 04 0B 02 0E 0F 00 08 0D 03 0C 09 07 05 0A 06 01 0D 00 0B 07 04 09 01 0A 0E 03 05 0C 02 0F 08 06 01 04 0B 0D 0C 03 07 0E 0A 0F 06 08 00 05 09 02 06 0B 0D 08 01 04 0A 07 09 05 00 0F 0E 02 03 0C }
+	$csj = { 0D 02 08 04 06 0F 0B 01 0A 09 03 0E 05 00 0C 07 01 0F 0D 08 0A 03 07 04 0C 05 06 0B 00 0E 09 02 07 0B 04 01 09 0C 0E 02 00 06 0A 0D 0F 03 05 08 02 01 0E 07 04 0A 08 0D 0F 0C 09 00 03 05 06 0B }
+	$csk = { 39 31 29 21 19 11 09 01 3A 32 2A 22 1A 12 0A 02 3B 33 2B 23 1B 13 0B 03 3C 34 2C 24 3F 37 2F 27 1F 17 0F 07 3E 36 2E 26 1E 16 0E 06 3D 35 2D 25 1D 15 0D 05 1C 14 0C 04 }
+	$csl = { 0E 11 0B 18 01 05 03 1C 0F 06 15 0A 17 13 0C 04 1A 08 10 07 1B 14 0D 02 29 34 1F 25 2F 37 1E 28 33 2D 21 30 2C 31 27 38 22 35 2E 2A 32 24 1D 20 }
+	$csm = { 3A 32 2A 22 1A 12 0A 02 3C 34 2C 24 1C 14 0C 04 3E 36 2E 26 1E 16 0E 06 40 38 30 28 20 18 10 08 39 31 29 21 19 11 09 01 3B 33 2B 23 1B 13 0B 03 3D 35 2D 25 1D 15 0D 05 3F 37 2F 27 1F 17 0F 07 }
+	$csn = { 28 08 30 10 38 18 40 20 27 07 2F 0F 37 17 3F 1F 26 06 2E 0E 36 16 3E 1E 25 05 2D 0D 35 15 3D 1D 24 04 2C 0C 34 14 3C 1C 23 03 2B 0B 33 13 3B 1B 22 02 2A 0A 32 12 3A 1A 21 01 29 09 31 11 39 19 }
+	$cso = { 20 01 02 03 04 05 04 05 06 07 08 09 08 09 0A 0B 0C 0D 0C 0D 0E 0F 10 11 10 11 12 13 14 15 14 15 16 17 18 19 18 19 1A 1B 1C 1D 1C 1D 1E 1F 20 01 }
+	$csp = { 10 07 14 15 1D 0C 1C 11 01 0F 17 1A 05 12 1F 0A 02 08 18 0E 20 1B 03 09 13 0D 1E 06 16 0B 04 19 }
+ 
+  condition: 
+	(
+		uint16be(0) == 0x4d5a or
+		uint16be(0) == 0x558b or
+		uint16be(0) == 0x5649
+	) and
+ ( 	$csc 
+	or 	$csd 
+	or 	$cse 
+	or 	$csf 
+	or 	$csg 
+	or 	$csh 
+	or 	$csi 
+	or 	$csj 
+	or 	$csk 
+	or 	$csl 
+	or 	$csm 
+	or 	$csn 
+	or 	$cso 
+	or 	$csp 
+  ) 
+}
+
+rule capa_hash_data_with_CRC32 { 
+  meta: 
+ 	description = "hash data with CRC32 (converted from capa rule)"
+	namespace = "data-manipulation/checksum/crc32"
+	author = "moritz.raabe@fireeye.com"
+	scope = "function"
+	mbc = "Data::Checksum::CRC32 [C0032.001]"
+	hash = "2D3EDC218A90F03089CC01715A9F047F"
+	hash = "7D28CB106CB54876B2A5C111724A07CD"
+	hash = "7EFF498DE13CC734262F87E6B3EF38AB"
+	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/checksum/crc32/hash-data-with-crc32.yml"
+	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
+	date = "2021-05-15"
+
+  strings: 
+ 	$api_csu = "RtlComputeCrc32" ascii wide
+ 
+  condition: 
+	(
+		uint16be(0) == 0x4d5a or
+		uint16be(0) == 0x558b or
+		uint16be(0) == 0x5649
+	) and
+ ( 	$api_csu  ) 
+}
+
+rule capa_hash_data_using_tiger { 
+  meta: 
+ 	description = "hash data using tiger (converted from capa rule)"
+	namespace = "data-manipulation/hashing/tiger"
+	author = "@_re_fox"
+	scope = "basic block"
+	mbc = "Cryptography::Cryptographic Hash::Tiger [C0029.005]"
+	hash = "0761142efbda6c4b1e801223de723578"
+	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/hashing/tiger/hash-data-using-tiger.yml"
+	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
+	date = "2021-05-15"
+
+  strings: 
+ 	$ctb = { 5E 0C E9 F7 7C B1 AA 02 EC A8 43 E2 03 4B 42 AC D3 FC D5 0D E3 5B CD 72 3A 7F F9 F6 93 9B 01 6D 93 91 1F D2 FF 78 99 CD E2 29 80 70 C9 A1 73 75 C3 83 2A 92 6B 32 64 B1 70 58 91 04 EE 3E 88 46 E6 EC 03 71 05 E3 AC EA 5C 53 A3 08 B8 69 41 C5 7C C4 DE 8D 91 54 E7 4C 0C F4 0D DC DF F4 A2 0A FA BE 4D A7 18 6F B7 10 6A AB D1 5A 23 B6 CC C6 FF E2 2F 57 21 61 72 13 1E 92 9D 19 6F 8C 48 1A CA 07 00 DA F4 F9 C9 4B C7 41 52 E8 F6 E6 F5 26 B6 47 59 EA DB 79 90 85 92 8C 9E C9 C5 85 18 4F 4B 86 6F A9 1E 76 8E D7 7D C1 B5 }
+	$ctc = { 38 21 A1 05 5A BE A6 E6 98 7C F8 B4 A5 22 A1 B5 90 69 0B 14 89 60 3C 56 D5 5D 1F 39 2E CB 46 4C 34 94 B7 C9 DB AD 32 D9 F5 AF 15 20 E4 70 EA 08 F1 8C 47 3E 67 A6 65 D7 99 8D 27 AB 7E 75 FB C4 92 06 6E 2D 86 C6 11 DF 16 3B 7F 0D F1 84 EB DD 04 EA 65 A6 04 F6 2E 6F B3 DF E0 F0 0F 0F 8E 4A 51 BA BC 3D F8 EE ED A5 1E 37 A4 0E 2A 0A 4F FC 29 84 B3 5C A8 1D 3E E8 E2 1C 1B BA 82 F8 8F DC 0D E8 53 83 5E 50 45 CD 17 07 DB D4 00 9A D1 18 01 81 F3 A5 ED CF A0 34 F2 CA 87 88 51 7E E7 0B 36 51 C4 B3 38 14 34 1E F9 CC 89 }
+	$ctd = { 9B F3 DA F1 2F CC 9F F4 81 92 F2 6F C6 D5 7F 48 3F A8 DC FC 67 06 A3 E8 63 CE FC D2 E3 4B 9B 2C C2 BB FB 93 4B F7 3F DA 66 BA 70 FE D2 65 A1 2F D4 93 0E 97 79 E2 03 A1 71 5E E4 B0 77 EC CD BE 97 E4 85 39 72 1E B4 CF 17 50 F7 5E 02 AA 0A B7 E0 B8 40 38 F0 09 23 D4 79 85 89 35 D0 1A FC 8E C5 AB B2 E2 0B 92 C6 96 72 91 5A 37 63 41 AF 66 FB 27 71 CA DC AB 74 21 41 FF 72 4A A6 CE 3C B3 A5 66 30 08 33 49 4A F0 F5 9A 28 D7 CD 0A 97 8D 5E C2 C8 31 E0 E8 96 8F 47 5D 87 76 22 C0 FE F3 DD 90 61 05 10 F3 7B EC 91 14 0F }
+	$cte = { 55 3C 32 26 85 60 0E 5B F5 59 1B FA A9 C1 46 1A FA 8F 4C 7C A1 45 E2 A9 D7 55 29 DB 59 51 CA 65 C2 AF 35 CE 76 0A DB 05 45 3D 11 A9 7E C7 EA 81 0D 0A AC B6 8A F8 8E 52 FF E3 7B 59 53 A2 9E A0 56 CD 48 AC B3 DF 0D 43 6F E4 5C F4 7A A6 B3 C4 5E D0 E2 FB D8 CF CE 4E F0 35 99 B3 10 6F F5 3E C6 19 D6 9C 82 D6 22 0B 69 20 DF 74 0A 46 FD 17 40 ED 10 85 8E CC F8 6C A7 CA 6E 3A BF 24 C8 D6 49 70 81 1A 58 3D 24 61 A2 63 C1 BB B6 AC 8B 04 32 CC 44 7D C2 8A A3 D9 AB 10 F4 AA 5B FF DD 7F 4B 82 04 A8 5A 49 6D AD 94 9F 8C }
+ 
+  condition: 
+	(
+		uint16be(0) == 0x4d5a or
+		uint16be(0) == 0x558b or
+		uint16be(0) == 0x5649
+	) and
+ ( 	$ctb 
+	or 	$ctc 
+	or 	$ctd 
+	or 	$cte 
+  ) 
+}
+
+rule capa_persist_via_Windows_service { 
+  meta: 
+ 	description = "persist via Windows service (converted from capa rule)"
+	namespace = "persistence/service"
+	author = "moritz.raabe@fireeye.com"
+	scope = "function"
+	attack = "Persistence::Create or Modify System Process::Windows Service [T1543.003]"
+	attack = "Execution::System Services::Service Execution [T1569.002]"
+	hash = "Practical Malware Analysis Lab 03-02.dll_:0x10004706"
+	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/persistence/service/persist-via-windows-service.yml"
+	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
+	date = "2021-05-15"
+
+  strings: 
+ 	$ctv = /\bsc(\.exe)?$/ nocase ascii wide 
+	$ctw = /create / nocase ascii wide 
+	$ctx = /\bsc(\.exe)? create/ nocase ascii wide 
+	$cty = /New-Service / nocase ascii wide 
+ 
+  condition: 
+	(
+		uint16be(0) == 0x4d5a or
+		uint16be(0) == 0x558b or
+		uint16be(0) == 0x5649
+	) and
+ (  (  ( 	capa_create_process
+
+	and  (  (  (  ( 	$ctv 
+	and 	$ctw  )  ) 
+	or 	$ctx 
+	or 	$cty  )  )  )  )  ) 
+}
+
+rule capa_gather_leapftp_information { 
+  meta: 
+ 	description = "gather leapftp information (converted from capa rule)"
+	namespace = "collection/file-managers"
+	author = "@_re_fox"
+	scope = "function"
+	attack = "Credential Access::Credentials from Password Stores [T1555]"
+	hash = "5a2f620f29ca2f44fc22df67b674198f"
+	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-leapftp-information.yml"
+	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
+	date = "2021-05-15"
+
+  strings: 
+ 	$str_cvd = "InstallPath" ascii wide
+	$str_cve = "DataDir" ascii wide
+	$str_cvf = "sites.dat" ascii wide
+	$str_cvg = "sites.ini" ascii wide
+ 
+  condition: 
+	(
+		uint16be(0) == 0x4d5a or
+		uint16be(0) == 0x558b or
+		uint16be(0) == 0x5649
+	) and
+ (  (  ( 	$str_cvd 
+	and 	$str_cve 
+	and 	$str_cvf 
+	and 	$str_cvg  )  ) 
+  ) 
+}
+
 
 // converted rules          : 390
-//   among those incomplete : 65
-// unconverted rules        : 155
+//   among those incomplete : 9
+// unconverted rules        : 170
 
 
