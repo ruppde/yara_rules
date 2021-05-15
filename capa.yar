@@ -931,7 +931,7 @@ rule capa_check_for_sandbox_username {
 	$afv = /MALTEST/ nocase ascii wide 
 	$afw = /TEQUILABOOMBOOM/ nocase ascii wide 
 	$afx = /SANDBOX/ nocase ascii wide 
-	$afy = /^VIRUS/ nocase ascii wide 
+	$afy = /\bVIRUS/ nocase ascii wide 
 	$afz = /MALWARE/ nocase ascii wide 
 	$aga = /SAND\sBOX/ nocase ascii wide 
 	$agb = /Test\sUser/ nocase ascii wide 
@@ -1205,7 +1205,7 @@ rule capa_reference_anti_VM_strings_targeting_Xen {
 	date = "2021-05-15"
 
   strings: 
- 	$ajj = /^Xen/ nocase ascii wide 
+ 	$ajj = /\bXen/ nocase ascii wide 
 	$ajk = /XenVMMXenVMM/ nocase ascii wide 
 	$ajl = /xenservice.exe/ nocase ascii wide 
 	$ajm = /XenVMMXenVMM/ nocase ascii wide 
@@ -4930,9 +4930,9 @@ rule capa_persist_via_Windows_service {
 	date = "2021-05-15"
 
   strings: 
- 	$azp = /^sc(\.exe)?$/ nocase ascii wide 
+ 	$azp = /\bsc(\.exe)?$/ nocase ascii wide 
 	$azq = /create / nocase ascii wide 
-	$azr = /^sc(\.exe)? create/ nocase ascii wide 
+	$azr = /\bsc(\.exe)? create/ nocase ascii wide 
 	$azs = /New-Service / nocase ascii wide 
  
   condition: 
@@ -5447,8 +5447,8 @@ rule capa_create_container {
 	date = "2021-05-15"
 
   strings: 
- 	$bbr = /^docker(\.exe)? create/ ascii wide 
-	$bbs = /^docker(\.exe)? start/ ascii wide 
+ 	$bbr = /\bdocker(\.exe)? create/ ascii wide 
+	$bbs = /\bdocker(\.exe)? start/ ascii wide 
  
   condition: 
 	(
@@ -5653,7 +5653,7 @@ rule capa_list_containers {
 	date = "2021-05-15"
 
   strings: 
- 	$bch = /^docker(\.exe)? ps/ ascii wide 
+ 	$bch = /\bdocker(\.exe)? ps/ ascii wide 
  
   condition: 
 	(
@@ -6314,7 +6314,7 @@ rule capa_build_Docker_image {
 	date = "2021-05-15"
 
   strings: 
- 	$bgx = /^docker(\.exe)? build/ ascii wide 
+ 	$bgx = /\bdocker(\.exe)? build/ ascii wide 
  
   condition: 
 	(
@@ -6418,9 +6418,9 @@ rule capa_run_in_container {
 	date = "2021-05-15"
 
   strings: 
- 	$bhg = /^docker(\.exe)? exec/ ascii wide 
-	$bhh = /^kubectl(\.exe)? exec/ ascii wide 
-	$bhi = /^kubectl(\.exe)? run/ ascii wide 
+ 	$bhg = /\bdocker(\.exe)? exec/ ascii wide 
+	$bhh = /\bkubectl(\.exe)? exec/ ascii wide 
+	$bhi = /\bkubectl(\.exe)? run/ ascii wide 
  
   condition: 
 	(
@@ -8970,17 +8970,17 @@ rule capa_get_geographical_location {
 	$api_bqv = "GetLocaleInfoEx" ascii wide
 	$bqw = /geolocation/ nocase ascii wide 
 	$bqx = /geo-location/ nocase ascii wide 
-	$bqy = /^city/ nocase ascii wide 
+	$bqy = /\bcity/ nocase ascii wide 
 	$bqz = /region_code/ nocase ascii wide 
 	$bra = /region_name/ nocase ascii wide 
-	$brb = /^country/ nocase ascii wide 
+	$brb = /\bcountry/ nocase ascii wide 
 	$brc = /country_code/ nocase ascii wide 
 	$brd = /countrycode/ nocase ascii wide 
 	$bre = /country_name/ nocase ascii wide 
 	$brf = /continent_code/ nocase ascii wide 
 	$brg = /continent_name/ nocase ascii wide 
-	$brh = /^latitude/ nocase ascii wide 
-	$bri = /^longitude/ nocase ascii wide 
+	$brh = /\blatitude/ nocase ascii wide 
+	$bri = /\blongitude/ nocase ascii wide 
  
   condition: 
 	(
@@ -9081,9 +9081,9 @@ rule capa_capture_microphone_audio {
 
   strings: 
  	$api_brp = "mciSendString" ascii wide
-	$brq = /^open/ nocase ascii wide 
+	$brq = /\bopen/ nocase ascii wide 
 	$brr = /waveaudio/ nocase ascii wide 
-	$brs = /^record/ nocase ascii wide 
+	$brs = /\brecord/ nocase ascii wide 
  
   condition: 
 	(
@@ -10778,7 +10778,7 @@ rule capa_disable_code_signing {
 	date = "2021-05-15"
 
   strings: 
- 	$cbf = /^bcdedit(\.exe)? -set TESTSIGNING ON/ nocase ascii wide 
+ 	$cbf = /\bbcdedit(\.exe)? -set TESTSIGNING ON/ nocase ascii wide 
  
   condition: 
 	(
