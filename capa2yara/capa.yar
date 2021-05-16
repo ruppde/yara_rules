@@ -1,19 +1,30 @@
-// POC: rules from Fireeyes https://github.com/fireeye/capa-rules converted to YARA using capa2yara.py by Arnim Rupp (not published yet)
+// Rules from Fireeyes https://github.com/fireeye/capa-rules converted to YARA using capa2yara.py by Arnim Rupp (not published yet)
 
-// License is the same as the original rules: Apache-2.0 License
+// Beware: These are less rules than capa (because not all fit into YARA, stats at EOF) and is less precise because e.g. capas function scopes are applied to the whole file
 
-// Beware: This has less rules than capa (because not all fit into YARA) and is less precise because e.g. capas function scopes are applied to the whole file
+// Beware: Some rules are incomplete because an optional branch was not supported by YARA. These rules are marked in a comment in meta: (search for "incomplete")
 
-// Beware: Some rules are incomplete because an optional branch was not supported by yara. These rules are marked in a comment in meta: (search for incomplete)
+// Rule authors and license stay the same
 
-// att&ck and MBC tags are in YARA rule tags. All rules are tagged with CAPA for easy filtering
-
-// Minimum yara version is 3.8.0 plus PE module
+// att&ck and MBC tags are put into YARA rule tags. All rules are tagged with "CAPA" for easy filtering
 
 // The date = in meta: is the date of converting (there is no date in capa rules)
 
+// Minimum YARA version is 3.8.0 plus PE module
+
 
 import "pe"
+
+
+private rule capa_pe_file : CAPA {
+    meta:
+        description = "match in PE files. used by all further CAPA rules"
+        author = "Arnim Rupp"
+    condition:
+        uint16be(0) == 0x4d5a
+        or uint16be(0) == 0x558b
+        or uint16be(0) == 0x5649
+}
 
 
 rule capa_create_or_open_file : CAPA C0016  { 
@@ -39,12 +50,8 @@ rule capa_create_or_open_file : CAPA C0016  {
 	$api_aag = /\bNtOpenFile(A|W)?\b/ ascii wide
 	$api_aah = /\bNtCreateFile(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$api_aaa 
 		or 	$api_aab 
@@ -73,12 +80,8 @@ rule capa_open_thread : CAPA  {
  	$api_aai = /\bNtOpenThread(A|W)?\b/ ascii wide
 	$api_aaj = /\bZwOpenThread(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /OpenThread/) 
 		or 	$api_aai 
@@ -106,12 +109,8 @@ rule capa_allocate_memory : CAPA C0007  {
 	$api_aam = /\bNtMapViewOfSection(A|W)?\b/ ascii wide
 	$api_aan = /\bZwMapViewOfSection(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /VirtualAlloc/) 
 		or 	pe.imports(/kernel32/i, /VirtualAllocEx/) 
@@ -147,12 +146,8 @@ rule capa_delay_execution : CAPA B0003_003  {
 	$api_aaq = /\bKeWaitForSingleObject(A|W)?\b/ ascii wide
 	$api_aar = /\bKeDelayExecutionThread(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /Sleep/) 
 		or 	pe.imports(/kernel32/i, /SleepEx/) 
@@ -187,12 +182,8 @@ rule capa_write_process_memory : CAPA T1055  {
   strings: 
  	$api_aas = /\bNtWow64WriteVirtualMemory64(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /WriteProcessMemory/) 
 		or 	pe.imports(/ntdll/i, /NtWriteVirtualMemory/) 
@@ -217,12 +208,8 @@ rule capa_open_process : CAPA  {
  	$api_aat = /\bNtOpenProcess(A|W)?\b/ ascii wide
 	$api_aau = /\bZwOpenProcess(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /OpenProcess/) 
 		or 	$api_aat 
@@ -250,12 +237,8 @@ rule capa_delete_volume_shadow_copies : CAPA T1490 T1070_004 F0014_001  {
 	$re_aax = /vssadmin.{,1000} resize shadowstorage/ nocase ascii wide 
 	$re_aay = /wmic.{,1000} shadowcopy delete/ nocase ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_aaw 
 		or 	$re_aax 
@@ -313,12 +296,8 @@ rule capa_reference_analysis_tools_strings : CAPA B0013_001  {
 	$re_acf = /WPE PRO.exe/ nocase ascii wide 
 	$re_acg = /decompile.exe/ nocase ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_aaz 
 		or 	$re_aba 
@@ -370,12 +349,8 @@ rule capa_timestomp_file : CAPA T1070_006  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			pe.imports(/kernel32/i, /GetSystemTime/) 
@@ -401,12 +376,8 @@ rule capa_clear_the_Windows_event_log : CAPA T1070_001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/advapi32/i, /ElfClearEventLogFile/)  
 	) 
@@ -428,44 +399,40 @@ rule capa_check_for_sandbox_and_av_modules : CAPA B0009 B0007  {
 
   strings: 
  	$api_ach = /\bGetModuleHandle(A|W)?\b/ ascii wide
-		$re_aci = /avghook(x|a)\.dll/ nocase ascii wide  // AVG
-		$re_acj = /snxhk\.dll/ nocase ascii wide  // Avast
-		$re_ack = /sf2\.dll/ nocase ascii wide  // Avast
-		$re_acl = /sbiedll\.dll/ nocase ascii wide  // Sandboxie
-		$re_acm = /dbghelp\.dll/ nocase ascii wide  // WindBG
-		$re_acn = /api_log\.dll/ nocase ascii wide  // iDefense Lab
-		$re_aco = /dir_watch\.dll/ ascii wide  // iDefense Lab
-		$re_acp = /pstorec\.dll/ nocase ascii wide  // SunBelt Sandbox
-		$re_acq = /vmcheck\.dll/ nocase ascii wide  // Virtual PC
-		$re_acr = /wpespy\.dll/ nocase ascii wide  // WPE Pro
-		$re_acs = /cmdvrt(64|32).dll/ nocase ascii wide  // Comodo Container
-		$re_act = /sxin.dll/ nocase ascii wide  // 360 SOFTWARE
-		$re_acu = /dbghelp\.dll/ nocase ascii wide  // WINE
-		$re_acv = /printfhelp\.dll/ nocase ascii wide  // Unknown Sandbox
+	$re_aci = /avghook(x|a)\.dll/ nocase ascii wide  // AVG
+	$re_acj = /snxhk\.dll/ nocase ascii wide  // Avast
+	$re_ack = /sf2\.dll/ nocase ascii wide  // Avast
+	$re_acl = /sbiedll\.dll/ nocase ascii wide  // Sandboxie
+	$re_acm = /dbghelp\.dll/ nocase ascii wide  // WindBG
+	$re_acn = /api_log\.dll/ nocase ascii wide  // iDefense Lab
+	$re_aco = /dir_watch\.dll/ ascii wide  // iDefense Lab
+	$re_acp = /pstorec\.dll/ nocase ascii wide  // SunBelt Sandbox
+	$re_acq = /vmcheck\.dll/ nocase ascii wide  // Virtual PC
+	$re_acr = /wpespy\.dll/ nocase ascii wide  // WPE Pro
+	$re_acs = /cmdvrt(64|32).dll/ nocase ascii wide  // Comodo Container
+	$re_act = /sxin.dll/ nocase ascii wide  // 360 SOFTWARE
+	$re_acu = /dbghelp\.dll/ nocase ascii wide  // WINE
+	$re_acv = /printfhelp\.dll/ nocase ascii wide  // Unknown Sandbox
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$api_ach 
 		and  (
-				$re_aci 
-		or 		$re_acj 
-		or 		$re_ack 
-		or 		$re_acl 
-		or 		$re_acm 
-		or 		$re_acn 
-		or 		$re_aco 
-		or 		$re_acp 
-		or 		$re_acq 
-		or 		$re_acr 
-		or 		$re_acs 
-		or 		$re_act 
-		or 		$re_acu 
-		or 		$re_acv  
+			$re_aci 
+		or 	$re_acj 
+		or 	$re_ack 
+		or 	$re_acl 
+		or 	$re_acm 
+		or 	$re_acn 
+		or 	$re_aco 
+		or 	$re_acp 
+		or 	$re_acq 
+		or 	$re_acr 
+		or 	$re_acs 
+		or 	$re_act 
+		or 	$re_acu 
+		or 	$re_acv  
 	)  
 	) 
 }
@@ -485,12 +452,8 @@ rule capa_packed_with_pebundle : CAPA T1027_002 F0001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any acw in pe.sections : ( acw.name == "pebundle" ) 
 		or 	for any acx in pe.sections : ( acx.name == "PEBundle" )  
@@ -517,12 +480,8 @@ rule capa_packed_with_ASPack : CAPA T1027_002 F0001  {
  	$str_adc = "The procedure entry point %s could not be located in the dynamic link library %s" ascii wide
 	$str_add = "The ordinal %u could not be located in the dynamic link library %s" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any acy in pe.sections : ( acy.name == ".aspack" ) 
 		or 	for any acz in pe.sections : ( acz.name == ".adata" ) 
@@ -548,12 +507,8 @@ rule capa_packed_with_nspack : CAPA T1027_002 F0001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any ade in pe.sections : ( ade.name == ".nsp0" ) 
 		or 	for any adf in pe.sections : ( adf.name == ".nsp1" ) 
@@ -577,12 +532,8 @@ rule capa_packed_with_kkrunchy : CAPA T1027_002 F0001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any adh in pe.sections : ( adh.name == "kkrunchy" )  
 	) 
@@ -603,12 +554,8 @@ rule capa_packed_with_petite : CAPA T1027_002 F0001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any adi in pe.sections : ( adi.name == ".petite" )  
 	) 
@@ -629,12 +576,8 @@ rule capa_packed_with_pelocknt : CAPA T1027_002 F0001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any adj in pe.sections : ( adj.name == "PELOCKnt" )  
 	) 
@@ -658,12 +601,8 @@ rule capa_packed_with_upack : CAPA T1027_002 F0001  {
   strings: 
  	$str_adm = "UpackByDwing@" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any adk in pe.sections : ( adk.name == ".Upack" ) 
 		or 	for any adl in pe.sections : ( adl.name == ".ByDwing" ) 
@@ -686,12 +625,8 @@ rule capa_packed_with_y0da_crypter : CAPA T1027_002 F0001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any adn in pe.sections : ( adn.name == ".y0da" ) 
 		or 	for any ado in pe.sections : ( ado.name == ".y0da_1" ) 
@@ -716,12 +651,8 @@ rule capa_packed_with_Confuser : CAPA T1027_002 F0001_009  {
   strings: 
  	$str_adq = "ConfusedByAttribute" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_adq  
 	) 
@@ -745,12 +676,8 @@ rule capa_packed_with_amber : CAPA T1027_002 F0001  {
   strings: 
  	$str_adr = "Amber - Reflective PE Packer" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_adr  
 	) 
@@ -778,12 +705,8 @@ rule capa_packed_with_VMProtect : CAPA T1027_002 F0001_010  {
 	$str_adu = "File corrupted!. This program has been manipulated and maybe" ascii wide
 	$str_adv = "it's infected by a Virus or cracked. This file won't work anymore." ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_ads 
 		or 	$str_adt 
@@ -810,12 +733,8 @@ rule capa_packed_with_rlpack : CAPA T1027_002 F0001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any adz in pe.sections : ( adz.name == ".RLPack" ) 
 		or 	for any aea in pe.sections : ( aea.name == ".packed" )  
@@ -837,12 +756,8 @@ rule capa_packed_with_UPX : CAPA T1027_002 F0001_008  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any aeb in pe.sections : ( aeb.name == "UPX0" ) 
 		or 	for any aec in pe.sections : ( aec.name == "UPX1" )  
@@ -867,12 +782,8 @@ rule capa_packed_with_peshield : CAPA T1027_002 F0001  {
   strings: 
  	$re_aef = / PE-SHiELD v[0-9]\.[0-9]/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any aed in pe.sections : ( aed.name == "PESHiELD" ) 
 		or 	for any aee in pe.sections : ( aee.name == "PESHiELD_1" ) 
@@ -931,12 +842,8 @@ rule capa_reference_anti_VM_strings_targeting_VMWare : CAPA T1497_001 B0009  {
 	$re_afo = /VMwareVMware/ nocase ascii wide 
 	$re_afp = /vmGuestLib.dll/ nocase ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_aei 
 		or 	$re_aej 
@@ -994,12 +901,8 @@ rule capa_check_for_windows_sandbox_via_device : CAPA T1497_001 B0009  {
  	$api_afq = /\bCreateFile(A|W)?\b/ ascii wide
 	$str_afr = "\\\\.\\GLOBALROOT\\device\\vmsmb" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$api_afq 
 		and 	$str_afr  
@@ -1025,12 +928,8 @@ rule capa_check_for_microsoft_office_emulation : CAPA T1497_001 B0007_005  {
  	$re_afs = /OfficePackagesForWDAG/ ascii wide 
 	$api_aft = /\bGetWindowsDirectory(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_afs 
 		and 	$api_aft  
@@ -1054,66 +953,62 @@ rule capa_check_for_sandbox_username : CAPA T1497 B0009  {
 
   strings: 
  	$api_afu = /\bGetUserName(A|W)?\b/ ascii wide
-		$re_afv = /MALTEST/ nocase ascii wide  // Betabot Username Check
-		$re_afw = /TEQUILABOOMBOOM/ nocase ascii wide  // VirusTotal Sandbox
-		$re_afx = /SANDBOX/ nocase ascii wide  // Gookit Username Check
-		$re_afy = /\bVIRUS/ nocase ascii wide  // Satan Username Check
-		$re_afz = /MALWARE/ nocase ascii wide  // Betabot Username Check
-		$re_aga = /SAND\sBOX/ nocase ascii wide  // Betabot Username Check
-		$re_agb = /Test\sUser/ nocase ascii wide  // Betabot Username Check
-		$re_agc = /CurrentUser/ nocase ascii wide  // Gookit Username Check
-		$re_agd = /7SILVIA/ nocase ascii wide  // Gookit Username Check
-		$re_age = /FORTINET/ nocase ascii wide  // Shifu Username Check
-		$re_agf = /John\sDoe/ nocase ascii wide  // Emotet Username Check
-		$re_agg = /Emily/ nocase ascii wide  // Trickbot Downloader Username Check
-		$re_agh = /HANSPETER\-PC/ nocase ascii wide  // Trickbot Downloader Username Check
-		$re_agi = /HAPUBWS/ nocase ascii wide  // Trickbot Downloader Username Check
-		$re_agj = /Hong\sLee/ nocase ascii wide  // Trickbot Downloader Username Check
-		$re_agk = /IT\-ADMIN/ nocase ascii wide  // Trickbot Downloader Username Check
-		$re_agl = /JOHN\-PC/ nocase ascii wide  // Trickbot Downloader Username Check
-		$re_agm = /Johnson/ nocase ascii wide  // Trickbot Downloader Username Check
-		$re_agn = /Miller/ nocase ascii wide  // Trickbot Downloader Username Check
-		$re_ago = /MUELLER\-PC/ nocase ascii wide  // Trickbot Downloader Username Check
-		$re_agp = /Peter\sWilson/ nocase ascii wide  // Trickbot Downloader Username Check
-		$re_agq = /SystemIT/ nocase ascii wide  // Trickbot Downloader Username Check
-		$re_agr = /Timmy/ nocase ascii wide  // Trickbot Downloader Username Check
-		$re_ags = /WIN7\-TRAPS/ nocase ascii wide  // Trickbot Downloader Username Check
-		$re_agt = /WDAGUtilityAccount/ nocase ascii wide  // Windows Defender Application Guard
+	$re_afv = /MALTEST/ nocase ascii wide  // Betabot Username Check
+	$re_afw = /TEQUILABOOMBOOM/ nocase ascii wide  // VirusTotal Sandbox
+	$re_afx = /SANDBOX/ nocase ascii wide  // Gookit Username Check
+	$re_afy = /\bVIRUS/ nocase ascii wide  // Satan Username Check
+	$re_afz = /MALWARE/ nocase ascii wide  // Betabot Username Check
+	$re_aga = /SAND\sBOX/ nocase ascii wide  // Betabot Username Check
+	$re_agb = /Test\sUser/ nocase ascii wide  // Betabot Username Check
+	$re_agc = /CurrentUser/ nocase ascii wide  // Gookit Username Check
+	$re_agd = /7SILVIA/ nocase ascii wide  // Gookit Username Check
+	$re_age = /FORTINET/ nocase ascii wide  // Shifu Username Check
+	$re_agf = /John\sDoe/ nocase ascii wide  // Emotet Username Check
+	$re_agg = /Emily/ nocase ascii wide  // Trickbot Downloader Username Check
+	$re_agh = /HANSPETER\-PC/ nocase ascii wide  // Trickbot Downloader Username Check
+	$re_agi = /HAPUBWS/ nocase ascii wide  // Trickbot Downloader Username Check
+	$re_agj = /Hong\sLee/ nocase ascii wide  // Trickbot Downloader Username Check
+	$re_agk = /IT\-ADMIN/ nocase ascii wide  // Trickbot Downloader Username Check
+	$re_agl = /JOHN\-PC/ nocase ascii wide  // Trickbot Downloader Username Check
+	$re_agm = /Johnson/ nocase ascii wide  // Trickbot Downloader Username Check
+	$re_agn = /Miller/ nocase ascii wide  // Trickbot Downloader Username Check
+	$re_ago = /MUELLER\-PC/ nocase ascii wide  // Trickbot Downloader Username Check
+	$re_agp = /Peter\sWilson/ nocase ascii wide  // Trickbot Downloader Username Check
+	$re_agq = /SystemIT/ nocase ascii wide  // Trickbot Downloader Username Check
+	$re_agr = /Timmy/ nocase ascii wide  // Trickbot Downloader Username Check
+	$re_ags = /WIN7\-TRAPS/ nocase ascii wide  // Trickbot Downloader Username Check
+	$re_agt = /WDAGUtilityAccount/ nocase ascii wide  // Windows Defender Application Guard
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$api_afu 
 		and  (
-				$re_afv 
-		or 		$re_afw 
-		or 		$re_afx 
-		or 		$re_afy 
-		or 		$re_afz 
-		or 		$re_aga 
-		or 		$re_agb 
-		or 		$re_agc 
-		or 		$re_agd 
-		or 		$re_age 
-		or 		$re_agf 
-		or 		$re_agg 
-		or 		$re_agh 
-		or 		$re_agi 
-		or 		$re_agj 
-		or 		$re_agk 
-		or 		$re_agl 
-		or 		$re_agm 
-		or 		$re_agn 
-		or 		$re_ago 
-		or 		$re_agp 
-		or 		$re_agq 
-		or 		$re_agr 
-		or 		$re_ags 
-		or 		$re_agt  
+			$re_afv 
+		or 	$re_afw 
+		or 	$re_afx 
+		or 	$re_afy 
+		or 	$re_afz 
+		or 	$re_aga 
+		or 	$re_agb 
+		or 	$re_agc 
+		or 	$re_agd 
+		or 	$re_age 
+		or 	$re_agf 
+		or 	$re_agg 
+		or 	$re_agh 
+		or 	$re_agi 
+		or 	$re_agj 
+		or 	$re_agk 
+		or 	$re_agl 
+		or 	$re_agm 
+		or 	$re_agn 
+		or 	$re_ago 
+		or 	$re_agp 
+		or 	$re_agq 
+		or 	$re_agr 
+		or 	$re_ags 
+		or 	$re_agt  
 	)  
 	) 
 }
@@ -1139,12 +1034,8 @@ rule capa_reference_anti_VM_strings_targeting_Parallels : CAPA T1497_001 B0009  
 	$re_agw = /prl_tools.exe/ nocase ascii wide 
 	$re_agx = /prl hyperv/ nocase ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_agu 
 		or 	$re_agv 
@@ -1229,12 +1120,8 @@ rule capa_reference_anti_VM_strings_targeting_VirtualBox : CAPA T1497_001 B0009 
 	$re_ajd = /innotek GmbH/ nocase ascii wide 
 	$re_aje = /drivers\\vboxdrv/ nocase ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_agy 
 		or 	$re_agz 
@@ -1319,12 +1206,8 @@ rule capa_check_for_windows_sandbox_via_registry : CAPA T1497_001 B0009  {
 	$re_ajh = /\\Microsoft\\Windows\\CurrentVersion\\RunOnce/ ascii wide 
 	$re_aji = /wmic useraccount where \"name='WDAGUtilityAccount'\"/ nocase ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$api_ajf 
 		and 	$api_ajg 
@@ -1355,12 +1238,8 @@ rule capa_reference_anti_VM_strings_targeting_Xen : CAPA T1497_001 B0009  {
 	$re_ajm = /XenVMMXenVMM/ nocase ascii wide 
 	$re_ajn = /HVM domU/ nocase ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_ajj 
 		or 	$re_ajk 
@@ -1416,12 +1295,8 @@ rule capa_reference_anti_VM_strings : CAPA T1497_001 B0009  {
 	$re_ako = /myapp.exe/ nocase ascii wide 
 	$re_akp = /testapp.exe/ nocase ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_ajo 
 		or 	$re_ajp 
@@ -1475,12 +1350,8 @@ rule capa_reference_anti_VM_strings_targeting_Qemu : CAPA T1497_001 B0009  {
 	$re_aks = /BOCHS/ nocase ascii wide 
 	$re_akt = /BXPC/ nocase ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_akq 
 		or 	$re_akr 
@@ -1510,12 +1381,8 @@ rule capa_reference_anti_VM_strings_targeting_VirtualPC : CAPA T1497_001 B0009  
 	$re_akw = /VMUSrvc.exe/ nocase ascii wide 
 	$re_akx = /SOFTWARE\\Microsoft\\Virtual Machine\\Guest\\Parameters/ nocase ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_aku 
 		or 	$re_akv 
@@ -1547,12 +1414,8 @@ rule capa_check_if_process_is_running_under_wine : CAPA T1497_001 B0004  {
 	$str_alc = "kernel32.dll" ascii wide
 	$str_ald = "ntdll.dll" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_aky 
 		or  (
@@ -1582,12 +1445,8 @@ rule capa_check_for_debugger_via_API : CAPA B0001_002 B0001_031  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /CheckRemoteDebuggerPresent/) 
 		or 	pe.imports(/wudfplatform/i, /WudfIsAnyDebuggerPresent/) 
@@ -1609,12 +1468,8 @@ rule capa_check_for_OutputDebugString_error : CAPA B0001_016  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /SetLastError/) 
 		and 	pe.imports(/kernel32/i, /GetLastError/) 
@@ -1638,12 +1493,8 @@ rule capa_contains_PDB_path : CAPA  {
  
 		$re_alf = /:\\.{,1000}\.pdb/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
 
 		$re_alf 
 }
@@ -1660,12 +1511,8 @@ rule capa_contain_a_resource___rsrc__section : CAPA  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
 
 		for any alg in pe.sections : ( alg.name == ".rsrc" ) 
 }
@@ -1682,12 +1529,8 @@ rule capa_contain_a_thread_local_storage___tls__section : CAPA  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
 
 		for any alh in pe.sections : ( alh.name == ".tls" ) 
 }
@@ -1709,12 +1552,8 @@ rule capa_extract_resource_via_kernel32_functions : CAPA  {
   strings: 
  	$api_ali = /\bLdrAccessResource(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 		 (
@@ -1745,12 +1584,8 @@ rule capa_packaged_as_an_IExpress_self_extracting_archive : CAPA  {
 	$str_alk = "Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce" ascii wide
 	$str_all = "  <description>IExpress extraction tool</description>" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			$str_alj 
@@ -1782,12 +1617,8 @@ rule capa_create_thread : CAPA C0038  {
 	$api_alp = /\bSHCreateThread(A|W)?\b/ ascii wide
 	$api_alq = /\bSHCreateThreadWithHandle(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /CreateThread/) 
 		or 	$api_alm 
@@ -1819,12 +1650,8 @@ rule capa_resume_thread : CAPA C0054  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /ResumeThread/) 
 		or 	pe.imports(/ntdll/i, /NtResumeThread/) 
@@ -1845,12 +1672,8 @@ rule capa_suspend_thread : CAPA C0055  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /SuspendThread/) 
 		or 	pe.imports(/ntdll/i, /NtSuspendThread/) 
@@ -1876,12 +1699,8 @@ rule capa_terminate_thread : CAPA C0039  {
   strings: 
  	$api_alr = /\bPsTerminateSystemThread(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /TerminateThread/) 
 		or 	$api_alr  
@@ -1902,12 +1721,8 @@ rule capa_manipulate_console : CAPA C0033  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			pe.imports(/kernel32/i, /SetConsoleCursorPosition/) 
@@ -1937,12 +1752,8 @@ rule capa_access_firewall_settings_via_INetFwMgr : CAPA T1518_001 T1562_004  {
  	$als = { 42 E9 4C 30 39 6E D8 40 94 3A B9 13 C4 0C 9C D4 } // CLSID_NetFwMgr
 	$alt = { F5 8A 89 F7 C4 CA 32 46 A2 EC DA 06 E5 11 1A F2 } // IID_INetFwMgr
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/ole32/i, /CoCreateInstance/) 
 		and 	$als 
@@ -1966,12 +1777,8 @@ rule capa_start_minifilter_driver : CAPA  {
   strings: 
  	$api_alu = /\bFltStartFiltering(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$api_alu  
 	) 
@@ -1993,12 +1800,8 @@ rule capa_register_minifilter_driver : CAPA  {
   strings: 
  	$api_alv = /\bFltRegisterFilter(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$api_alv  
 	) 
@@ -2027,12 +1830,8 @@ rule capa_get_common_file_path : CAPA T1083  {
 	$api_amb = /\bGetUserProfileDirectory(A|W)?\b/ ascii wide
 	$api_amc = /\bSHGetFolderPathAndSubDir(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /GetTempPath/) 
 		or 	pe.imports(/kernel32/i, /GetTempFileName/) 
@@ -2071,12 +1870,8 @@ rule capa_bypass_Mark_of_the_Web : CAPA T1553_005  {
 	$str_ame = ":Zone.Identifier" ascii wide // NTFS ADS name recognized by Windows Defender SmartScreen
 	$str_amf = "%s:Zone.Identifier" ascii wide // NTFS ADS name recognized by Windows Defender SmartScreen
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$api_amd 
 		and  (
@@ -2102,12 +1897,8 @@ rule capa_get_file_system_object_information : CAPA T1083  {
   strings: 
  	$api_amg = /\bSHGetFileInfo(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$api_amg  
 	) 
@@ -2133,12 +1924,8 @@ rule capa_delete_directory : CAPA C0048  {
 	$api_amo = /\b_rmdir(A|W)?\b/ ascii wide
 	$api_amp = /\b_wrmdir(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$api_amm 
 		or 	$api_amn 
@@ -2168,12 +1955,8 @@ rule capa_create_directory : CAPA C0046  {
 	$api_amu = /\b_mkdir(A|W)?\b/ ascii wide
 	$api_amv = /\b_wmkdir(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /CreateDirectory/) 
 		or 	pe.imports(/kernel32/i, /CreateDirectoryEx/) 
@@ -2207,12 +1990,8 @@ rule capa_write_file : CAPA C0052  {
 	$api_amy = /\b_fwrite(A|W)?\b/ ascii wide
 	$api_amz = /\bfwrite(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			pe.imports(/kernel32/i, /WriteFile/) 
@@ -2245,12 +2024,8 @@ rule capa_get_file_attributes : CAPA C0049  {
 	$api_anc = /\bNtQueryDirectoryFile(A|W)?\b/ ascii wide
 	$api_and = /\bNtQueryInformationFile(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /GetFileAttributes/) 
 		or 	$api_ana 
@@ -2280,12 +2055,8 @@ rule capa_set_file_attributes : CAPA T1222 C0050  {
  	$api_ane = /\bZwSetInformationFile(A|W)?\b/ ascii wide
 	$api_anf = /\bNtSetInformationFile(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /SetFileAttributes/) 
 		or 	$api_ane 
@@ -2313,12 +2084,8 @@ rule capa_read_virtual_disk : CAPA C0056  {
 	$api_ani = /\bAttachVirtualDisk(A|W)?\b/ ascii wide
 	$api_anj = /\bGetVirtualDiskPhysicalPath(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$api_anh 
 		and 	$api_ani 
@@ -2346,12 +2113,8 @@ rule capa_read_file : CAPA C0051  {
 	$api_ann = /\b_read(A|W)?\b/ ascii wide
 	$api_ano = /\bfread(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 		 (
@@ -2388,12 +2151,8 @@ rule capa_read__ini_file : CAPA C0051  {
 	$api_ans = /\bGetPrivateProfileSection(A|W)?\b/ ascii wide
 	$api_ant = /\bGetPrivateProfileSectionNames(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			$api_anp 
@@ -2419,12 +2178,8 @@ rule capa_enumerate_files_via_kernel32_functions : CAPA T1083  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			pe.imports(/kernel32/i, /FindFirstFile/) 
@@ -2453,12 +2208,8 @@ rule capa_shutdown_system : CAPA T1529  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/user32/i, /ExitWindowsEx/) 
 		or 	pe.imports(/user32/i, /ExitWindows/)  
@@ -2484,12 +2235,8 @@ rule capa_get_system_information : CAPA T1082  {
 	$api_any = /\bZwQuerySystemInformation(A|W)?\b/ ascii wide
 	$api_anz = /\bZwQuerySystemInformationEx(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /GetSystemInfo/) 
 		or 	pe.imports(/kernel32/i, /GetNativeSystemInfo/) 
@@ -2517,12 +2264,8 @@ rule capa_get_hostname : CAPA T1082  {
   strings: 
  	$api_aof = /\bGetComputerObjectName(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /GetComputerName/) 
 		or 	pe.imports(/kernel32/i, /GetComputerNameEx/) 
@@ -2544,12 +2287,8 @@ rule capa_query_service_status : CAPA T1007  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/advapi32/i, /QueryServiceStatusEx/) 
 		or 	pe.imports(/advapi32/i, /QueryServiceStatus/)  
@@ -2570,12 +2309,8 @@ rule capa_delete_service : CAPA T1543_003  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/advapi32/i, /DeleteService/)  
 	) 
@@ -2594,12 +2329,8 @@ rule capa_enumerate_services : CAPA T1007  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/advapi32/i, /EnumServicesStatus/) 
 		or 	pe.imports(/advapi32/i, /EnumServicesStatusEx/)  
@@ -2620,12 +2351,8 @@ rule capa_create_service : CAPA T1543_003 T1569_002  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/advapi32/i, /CreateService/)  
 	) 
@@ -2645,12 +2372,8 @@ rule capa_modify_service : CAPA T1543_003 T1569_002  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			pe.imports(/advapi32/i, /ChangeServiceConfig/) 
@@ -2672,12 +2395,8 @@ rule capa_start_service : CAPA T1543_003  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/advapi32/i, /StartService/)  
 	) 
@@ -2701,12 +2420,8 @@ rule capa_get_number_of_processor_cores : CAPA T1082  {
  	$re_aog = /SELECT\s+\*\s+FROM\s+Win32_Processor/ ascii wide 
 	$str_aoh = "NumberOfCores" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_aog 
 		and 	$str_aoh  
@@ -2727,12 +2442,8 @@ rule capa_get_disk_information : CAPA T1082  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /GetDriveType/) 
 		or 	pe.imports(/kernel32/i, /GetLogicalDrives/) 
@@ -2761,12 +2472,8 @@ rule capa_manipulate_CD_ROM_drive : CAPA B0042_001  {
  	$str_aoi = "set cdaudio door closed wait" ascii wide
 	$str_aoj = "set cdaudio door open" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/winmm/i, /mciSendString/) 
 		and  (
@@ -2789,12 +2496,8 @@ rule capa_get_memory_capacity : CAPA T1082  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /GlobalMemoryStatus/) 
 		or 	pe.imports(/kernel32/i, /GlobalMemoryStatusEx/)  
@@ -2814,12 +2517,8 @@ rule capa_swap_mouse_buttons : CAPA B0042_002  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/user32/i, /SwapMouseButton/)  
 	) 
@@ -2839,12 +2538,8 @@ rule capa_get_keyboard_layout : CAPA T1082  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			pe.imports(/user32/i, /GetKeyboardLayoutList/) 
@@ -2867,12 +2562,8 @@ rule capa_open_clipboard : CAPA T1115  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/user32/i, /OpenClipboard/)  
 	) 
@@ -2891,12 +2582,8 @@ rule capa_write_clipboard_data : CAPA E1510  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/user32/i, /SetClipboardData/)  
 	) 
@@ -2916,12 +2603,8 @@ rule capa_read_clipboard_data : CAPA T1115  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/user32/i, /GetClipboardData/)  
 	) 
@@ -2940,12 +2623,8 @@ rule capa_replace_clipboard_data : CAPA E1510  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			capa_write_clipboard_data
 
@@ -2970,12 +2649,8 @@ rule capa_install_driver : CAPA T1543_003 C0037  {
   strings: 
  	$api_aok = /\bZwLoadDriver(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/ntdll/i, /NtLoadDriver/) 
 		or 	$api_aok  
@@ -2998,20 +2673,16 @@ rule capa_disable_driver_code_integrity : CAPA  {
 
   strings: 
  	$str_aol = "CiInitialize" ascii wide // exported symbol name used to resolve code integrity configuration
-		$re_aom = /g_CiEnabled/ ascii wide  // non-exported name for code integrity flag
-		$re_aon = /g_CiOptions/ ascii wide  // non-exported name for code integrity settings
+	$re_aom = /g_CiEnabled/ ascii wide  // non-exported name for code integrity flag
+	$re_aon = /g_CiOptions/ ascii wide  // non-exported name for code integrity settings
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			$str_aol 
-		or 		$re_aom 
-		or 		$re_aon  
+		or 	$re_aom 
+		or 	$re_aon  
 	)  
 	) 
 }
@@ -3030,21 +2701,17 @@ rule capa_manipulate_boot_configuration : CAPA  {
 	license = "Apache-2.0 License"
 
   strings: 
- 		$re_aor = /bcdedit.exe/ nocase ascii wide 
-		$re_aos = /boot.ini/ nocase ascii wide 
+ 	$re_aor = /bcdedit.exe/ nocase ascii wide 
+	$re_aos = /boot.ini/ nocase ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
-				$re_aor  
+			$re_aor  
 	) 
 		or  (
-				$re_aos  
+			$re_aos  
 	)  
 	) 
 }
@@ -3061,12 +2728,8 @@ rule capa_set_application_hook : CAPA  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			pe.imports(/user32/i, /SetWindowsHookEx/) 
@@ -3097,12 +2760,8 @@ rule capa_enumerate_gui_resources : CAPA T1010  {
 	$api_aov = /\bEnumDesktops(A|W)?\b/ ascii wide
 	$api_aow = /\bEnumWindows(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$api_aot 
 		or 	$api_aou 
@@ -3124,12 +2783,8 @@ rule capa_find_graphical_window : CAPA T1010  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/user32/i, /FindWindow/) 
 		or 	pe.imports(/user32/i, /FindWindowEx/)  
@@ -3150,20 +2805,16 @@ rule capa_references_logon_banner : CAPA  {
 
   strings: 
  	$re_aoy = /\\Microsoft\\Windows\\CurrentVersion\\Policies\\System/ ascii wide 
-		$re_aoz = /LegalNoticeCaption/ ascii wide 
-		$re_apa = /LegalNoticeText/ ascii wide 
+	$re_aoz = /LegalNoticeCaption/ ascii wide 
+	$re_apa = /LegalNoticeText/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_aoy 
 		and  (
-				$re_aoz 
-		or 		$re_apa  
+			$re_aoz 
+		or 	$re_apa  
 	)  
 	) 
 }
@@ -3181,12 +2832,8 @@ rule capa_lock_the_desktop : CAPA T1499  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
 
 		pe.imports(/user32/i, /LockWorkStation/) 
 }
@@ -3204,12 +2851,8 @@ rule capa_resolve_path_using_msvcrt : CAPA T1083  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/msvcrt/i, /__p__pgmptr/) 
 		or 	pe.imports(/msvcrt/i, /__p__wpgmptr/) 
@@ -3238,12 +2881,8 @@ rule capa_accept_command_line_arguments : CAPA T1059  {
  	$api_apc = /\bGetCommandLine(A|W)?\b/ ascii wide
 	$api_apd = /\bCommandLineToArgv(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$api_apc 
 		or 	$api_apd  
@@ -3263,12 +2902,8 @@ rule capa_set_thread_local_storage_value : CAPA C0041  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /TlsSetValue/)  
 	) 
@@ -3287,12 +2922,8 @@ rule capa_allocate_thread_local_storage : CAPA C0040  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /TlsAlloc/)  
 	) 
@@ -3311,12 +2942,8 @@ rule capa_attach_user_process_memory : CAPA T1055  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/ntoskrnl/i, /KeStackAttachProcess/) 
 		and 	pe.imports(/ntoskrnl/i, /KeUnstackDetachProcess/)  
@@ -3342,12 +2969,8 @@ rule capa_use_process_doppelganging : CAPA T1055_013  {
 	$str_apg = "NtCreateSection" ascii wide
 	$str_aph = "RollbackTransaction" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_ape 
 		and  (
@@ -3374,12 +2997,8 @@ rule capa_inject_APC : CAPA T1055_004  {
   strings: 
  	$api_api = /\bNtMapViewOfSection(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			capa_write_process_memory
@@ -3411,12 +3030,8 @@ rule capa_enumerate_processes : CAPA T1057 T1518  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /Process32First/) 
 		and 	pe.imports(/kernel32/i, /Process32Next/)  
@@ -3436,12 +3051,8 @@ rule capa_enumerate_processes_on_remote_desktop_session_host : CAPA T1057  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			pe.imports(/wtsapi32/i, /WTSEnumerateProcesses/) 
@@ -3468,12 +3079,8 @@ rule capa_get_Explorer_PID : CAPA T1057  {
  	$api_apj = /\bGetShellWindow(A|W)?\b/ ascii wide
 	$api_apk = /\bGetWindowThreadProcessId(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$api_apj 
 		and 	$api_apk  
@@ -3493,12 +3100,8 @@ rule capa_find_process_by_PID : CAPA T1057  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/ntoskrnl/i, /PsLookupProcessByProcessId/)  
 	) 
@@ -3521,12 +3124,8 @@ rule capa_create_process : CAPA C0017  {
   strings: 
  	$api_apl = /\bZwCreateProcessEx(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /WinExec/) 
 		or 	pe.imports(/kernel32/i, /CreateProcess/) 
@@ -3559,12 +3158,8 @@ rule capa_modify_access_privileges : CAPA T1134  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/advapi32/i, /AdjustTokenPrivileges/)  
 	) 
@@ -3584,12 +3179,8 @@ rule capa_terminate_process : CAPA C0018  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			pe.imports(/kernel32/i, /TerminateProcess/) 
@@ -3618,12 +3209,8 @@ rule capa_enumerate_process_modules : CAPA T1057  {
 	$api_apn = /\bEnumProcessModulesEx(A|W)?\b/ ascii wide
 	$api_apo = /\bEnumProcesses(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			pe.imports(/kernel32/i, /K32EnumProcessModules/) 
@@ -3650,12 +3237,8 @@ rule capa_get_domain_information : CAPA T1016  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
 
 		pe.imports(/netapi32/i, /DsRoleGetPrimaryDomainInformation/) 
 }
@@ -3673,12 +3256,8 @@ rule capa_get_networking_interfaces : CAPA T1016  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/iphlpapi/i, /GetIfTable/) 
 		or 	pe.imports(/iphlpapi/i, /GetAdaptersInfo/)  
@@ -3698,12 +3277,8 @@ rule capa_register_network_filter_via_WFP_API : CAPA T1565  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/fwpkclnt/i, /FwpmFilterAdd0/)  
 	) 
@@ -3722,12 +3297,8 @@ rule capa_copy_network_traffic : CAPA T1040  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/fwpkclnt/i, /FwpsCopyStreamDataToBuffer0/)  
 	) 
@@ -3756,12 +3327,8 @@ rule capa_resolve_DNS : CAPA C0011_001  {
 	$api_apu = /\bGetAddrInfo(A|W)?\b/ ascii wide
 	$api_apv = /\bGetAddrInfoEx(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/ws2_32/i, /gethostbyname/) 
 		or 	$api_app 
@@ -3788,12 +3355,8 @@ rule capa_check_Internet_connectivity_via_WinINet : CAPA T1016_001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			pe.imports(/wininet/i, /InternetGetConnectedState/) 
@@ -3815,12 +3378,8 @@ rule capa_create_mutex : CAPA C0042  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /CreateMutex/) 
 		or 	pe.imports(/kernel32/i, /CreateMutexEx/)  
@@ -3848,12 +3407,8 @@ rule capa_bypass_UAC_via_token_manipulation : CAPA T1548_002  {
 	$api_aqd = /\bGetStartupInfoW(A|W)?\b/ ascii wide
 	$api_aqe = /\bCreateProcessWithLogonW(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_aqa 
 		and 	$api_aqb 
@@ -3885,12 +3440,8 @@ rule capa_bypass_UAC_via_AppInfo_ALPC : CAPA T1548_002  {
 	$api_aqj = /\bContinueDebugEvent(A|W)?\b/ ascii wide
 	$api_aqk = /\bTerminateProcess(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_aqf 
 		and 	$str_aqg 
@@ -3920,12 +3471,8 @@ rule capa_access_the_Windows_event_log : CAPA E1083_m01  {
 	$api_aqn = /\bOpenBackupEventLog(A|W)?\b/ ascii wide
 	$api_aqo = /\bReportEvent(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$api_aql 
 		or 	$api_aqm 
@@ -3946,12 +3493,8 @@ rule capa_print_debug_messages : CAPA  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/ntoskrnl/i, /DbgPrint/) 
 		or 	pe.imports(/kernel32/i, /OutputDebugString/)  
@@ -3971,12 +3514,8 @@ rule capa_set_environment_variable : CAPA C0034_001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /SetEnvironmentStrings/) 
 		or 	pe.imports(/kernel32/i, /SetEnvironmentVariable/)  
@@ -3998,12 +3537,8 @@ rule capa_query_environment_variable : CAPA T1082  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /GetEnvironmentVariable/) 
 		or 	pe.imports(/kernel32/i, /GetEnvironmentStrings/) 
@@ -4030,12 +3565,8 @@ rule capa_open_registry_key_via_offline_registry_library : CAPA C0036_003  {
  	$api_aqp = /\bOROpenHive(A|W)?\b/ ascii wide
 	$api_aqq = /\bOROpenKey(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$api_aqp 
 		or 	$api_aqq  
@@ -4079,12 +3610,8 @@ rule capa_query_or_enumerate_registry_value : CAPA T1012 C0036_006  {
 	$api_ari = /\bSHRegGetValueFromHKCUHKLM(A|W)?\b/ ascii wide
 	$api_arj = /\bSHRegGetBoolValueFromHKCUHKLM(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			pe.imports(/advapi32/i, /RegGetValue/) 
@@ -4132,12 +3659,8 @@ rule capa_set_registry_key_via_offline_registry_library : CAPA T1112 C0036_001  
   strings: 
  	$api_ark = /\bORSetValue(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$api_ark  
 	) 
@@ -4160,12 +3683,8 @@ rule capa_query_registry_key_via_offline_registry_library : CAPA T1012 C0036_006
   strings: 
  	$api_arl = /\bORGetValue(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$api_arl  
 	) 
@@ -4197,12 +3716,8 @@ rule capa_query_or_enumerate_registry_key : CAPA T1012 C0036_005  {
 	$api_art = /\bSHRegEnumUSKey(A|W)?\b/ ascii wide
 	$api_aru = /\bSHRegQueryInfoUSKey(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			pe.imports(/advapi32/i, /RegEnumKey/) 
@@ -4239,12 +3754,8 @@ rule capa_create_registry_key_via_offline_registry_library : CAPA T1112 C0036_00
  	$api_arv = /\bORCreateHive(A|W)?\b/ ascii wide
 	$api_arw = /\bORCreateKey(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$api_arv 
 		or 	$api_arw  
@@ -4281,12 +3792,8 @@ rule capa_create_or_open_registry_key : CAPA C0036_004 C0036_003  {
 	$api_asg = /\bSHRegCreateUSKey(A|W)?\b/ ascii wide
 	$api_ash = /\bRtlCreateRegistryKey(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/advapi32/i, /RegOpenKey/) 
 		or 	pe.imports(/advapi32/i, /RegOpenKeyEx/) 
@@ -4334,12 +3841,8 @@ rule capa_delete_registry_key : CAPA T1112 C0036_002  {
 	$api_asl = /\bSHDeleteEmptyKey(A|W)?\b/ ascii wide
 	$api_asm = /\bSHRegDeleteEmptyUSKey(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			pe.imports(/advapi32/i, /RegDeleteKey/) 
@@ -4376,12 +3879,8 @@ rule capa_delete_registry_value : CAPA T1112 C0036_007  {
 	$api_asq = /\bSHDeleteValue(A|W)?\b/ ascii wide
 	$api_asr = /\bSHRegDeleteUSValue(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			pe.imports(/advapi32/i, /RegDeleteValue/) 
@@ -4419,14 +3918,10 @@ rule capa_set_registry_value : CAPA C0036_001  {
 	$api_asx = /\bSHRegSetValue(A|W)?\b/ ascii wide
 	$api_asy = /\bSHRegSetUSValue(A|W)?\b/ ascii wide
 	$api_asz = /\bSHRegWriteUSValue(A|W)?\b/ ascii wide
-		$re_ata = /reg(.exe)? add / nocase ascii wide 
+	$re_ata = /reg(.exe)? add / nocase ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 		 (
@@ -4446,7 +3941,7 @@ rule capa_set_registry_value : CAPA C0036_001  {
 		or  (
 			capa_create_process
 
-		and 		$re_ata  
+		and 	$re_ata  
 	)  
 	) 
 }
@@ -4465,12 +3960,8 @@ rule capa_get_logon_sessions : CAPA T1087  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/secur32/i, /LsaEnumerateLogonSessions/)  
 	) 
@@ -4489,12 +3980,8 @@ rule capa_get_session_integrity_level : CAPA T1033  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/shell32/i, /IsUserAnAdmin/)  
 	) 
@@ -4514,12 +4001,8 @@ rule capa_link_function_at_runtime : CAPA T1129  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			pe.imports(/kernel32/i, /LoadLibrary/) 
@@ -4556,12 +4039,8 @@ rule capa_linked_against_Crypto__ : CAPA C0059  {
 	$str_atf = "FileStore: error reading file" ascii wide
 	$str_atg = "StreamTransformationFilter: PKCS_PADDING cannot be used with " ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_atb 
 		or 	$str_atc 
@@ -4590,12 +4069,8 @@ rule capa_linked_against_OpenSSL : CAPA C0059  {
 	$str_ati = "AES for x86_64, CRYPTOGAMS by <appro@openssl.org>" ascii wide
 	$str_atj = "DSA-SHA1-old" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_ath 
 		or 	$str_ati 
@@ -4623,12 +4098,8 @@ rule capa_linked_against_PolarSSL_mbed_TLS : CAPA C0059  {
 	$str_atn = "mbedtls_ssl_write_record" ascii wide
 	$str_ato = "mbedtls_ssl_fetch_input" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_atk 
 		or 	$str_atl 
@@ -4654,12 +4125,8 @@ rule capa_linked_against_libcurl : CAPA  {
  	$re_atp = /CLIENT libcurl/ ascii wide 
 	$re_atq = /curl\.haxx\.se/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_atp 
 		or 	$re_atq  
@@ -4680,12 +4147,8 @@ rule capa_linked_against_Microsoft_Detours : CAPA T1574  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any atr in pe.sections : ( atr.name == ".detourc" ) 
 		or 	for any ats in pe.sections : ( ats.name == ".detourd" )  
@@ -4709,12 +4172,8 @@ rule capa_linked_against_ZLIB : CAPA C0060  {
  	$re_att = /deflate .{,1000} Copyright/ ascii wide 
 	$re_atu = /inflate .{,1000} Copyright/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_att 
 		or 	$re_atu  
@@ -4742,12 +4201,8 @@ rule capa_reference_Base64_string : CAPA T1027 C0026_001 C0019  {
  
 		$re_atv = /ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
 
 		$re_atv 
 }
@@ -4765,12 +4220,8 @@ rule capa_import_public_key : CAPA C0028_001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/advapi32/i, /CryptAcquireContext/) 
 		and 	pe.imports(/crypt32/i, /CryptImportPublicKeyInfo/)  
@@ -4796,12 +4247,8 @@ rule capa_encrypt_or_decrypt_via_WinCrypt : CAPA T1027 C0031 C0027  {
  	$api_atw = /\bCryptEncrypt(A|W)?\b/ ascii wide
 	$api_atx = /\bCryptDecrypt(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			$api_atw 
@@ -4828,12 +4275,8 @@ rule capa_encrypt_data_using_DPAPI : CAPA T1027 C0027  {
  	$api_aty = /\bCryptProtectMemory(A|W)?\b/ ascii wide
 	$api_atz = /\bCryptUnprotectMemory(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$api_aty 
 		or 	$api_atz 
@@ -4882,19 +4325,15 @@ rule capa_encrypt_data_using_Camellia : CAPA T1027 E1027_m05 C0027_003  {
 	$auu = { 1C 6F D3 F1 A5 53 FF 54 } // sigma4
 	$auv = { 1D 2D 68 DE FA 27 E5 10 } // sigma5
 	$auw = { FD C1 E6 B3 C2 88 56 B0 } // sigma6
-			$re_aux = /A09E667F3BCC908B/ nocase ascii wide  // sigma1_str
+	$re_aux = /A09E667F3BCC908B/ nocase ascii wide  // sigma1_str
 	$str_auy = "/B67AE8584CAA73B" ascii wide // sigma2_str
-			$re_auz = /C6EF372FE94F82BE/ nocase ascii wide  // sigma3_str
-			$re_ava = /54FF53A5F1D36F1C/ nocase ascii wide  // sigma4_str
-			$re_avb = /10E527FADE682D1D/ nocase ascii wide  // sigma5_str
-			$re_avc = /B05688C2B3E6C1FD/ nocase ascii wide  // sigma6_str
+	$re_auz = /C6EF372FE94F82BE/ nocase ascii wide  // sigma3_str
+	$re_ava = /54FF53A5F1D36F1C/ nocase ascii wide  // sigma4_str
+	$re_avb = /10E527FADE682D1D/ nocase ascii wide  // sigma5_str
+	$re_avc = /B05688C2B3E6C1FD/ nocase ascii wide  // sigma6_str
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$aua 
 		or 	$aub 
@@ -4925,12 +4364,12 @@ rule capa_encrypt_data_using_Camellia : CAPA T1027 E1027_m05 C0027_003  {
 		and 	$auw  
 	) 
 		or  (
-					$re_aux 
+			$re_aux 
 		and 	$str_auy 
-		and 			$re_auz 
-		and 			$re_ava 
-		and 			$re_avb 
-		and 			$re_avc  
+		and 	$re_auz 
+		and 	$re_ava 
+		and 	$re_avb 
+		and 	$re_avc  
 	)  
 	)  
 	) 
@@ -4956,12 +4395,8 @@ rule capa_encrypt_data_using_RC6 : CAPA T1027 E1027_m05 C0027_010  {
 	$num_ave = { B9 79 37 9E }
 	$num_avf = { 47 86 C8 61 }
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		$num_avd 
 		and  (
@@ -4996,12 +4431,8 @@ rule capa_encrypt_data_using_twofish : CAPA T1027 E1027_m05 C0027_005  {
 	$avm = { 01 02 04 08 10 20 40 80 4D 9A 79 F2 A9 1F 3E 7C F8 BD 37 6E DC F5 A7 03 06 0C 18 30 60 C0 CD D7 E3 8B 5B B6 21 42 84 45 8A 59 B2 29 52 A4 05 0A 14 28 50 A0 0D 1A 34 68 D0 ED 97 63 C6 C1 CF D3 EB 9B 7B F6 A1 0F 1E 3C 78 F0 AD 17 2E 5C B8 3D 7A F4 A5 07 0E 1C 38 70 E0 8D 57 AE 11 22 44 88 5D BA 39 72 E4 85 47 8E 51 A2 09 12 24 48 90 6D DA F9 BF 33 66 CC D5 E7 83 4B 96 61 C2 C9 DF F3 AB 1B 36 6C D8 FD B7 23 46 8C 55 AA 19 32 64 C8 DD F7 A3 0B 16 2C 58 B0 2D 5A B4 25 4A 94 65 CA D9 FF B3 2B 56 AC 15 2A 54 A8 1D } // EXP_TO_POLY
 	$avn = { A9 75 67 F3 B3 C6 E8 F4 04 DB FD 7B A3 FB 76 C8 9A 4A 92 D3 80 E6 78 6B E4 45 DD 7D D1 E8 38 4B 0D D6 C6 32 35 D8 98 FD 18 37 F7 71 EC F1 6C E1 43 30 75 0F 37 F8 26 1B FA 87 13 FA 94 06 48 3F F2 5E D0 BA 8B AE 30 5B 84 8A 54 00 DF BC 23 9D 19 6D 5B C1 3D B1 59 0E F3 80 AE 5D A2 D2 82 D5 63 A0 01 84 83 07 2E 14 D9 B5 51 90 9B 2C 7C A3 A6 B2 EB 73 A5 4C BE 54 16 92 0C 74 E3 36 61 51 C0 38 8C B0 3A BD F5 5A 73 FC 2C 60 25 62 0B 96 BB 6C 4E 42 89 F7 6B 10 53 7C 6A 28 B4 27 F1 8C E1 13 E6 95 BD 9C 45 C7 E2 24 F4 } // CALC_SB_TBL
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$avg 
 		or 	$avh 
@@ -5034,12 +4465,8 @@ rule capa_encrypt_data_using_AES_via__NET : CAPA T1027 E1027_m05 C0027_001  {
 	$str_awh = "CryptoStream" ascii wide
 	$str_awi = "System.Security.Cryptography" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_awg 
 		and 	$str_awh 
@@ -5065,12 +4492,8 @@ rule capa_encrypt_data_using_skipjack : CAPA T1027 E1027_m05 C0027_013  {
   strings: 
  	$awj = { A3 D7 09 83 F8 48 F6 F4 B3 21 15 78 99 B1 AF F9 E7 2D 4D 8A CE 4C CA 2E 52 95 D9 1E 4E 38 44 28 0A DF 02 A0 17 F1 60 68 12 B7 7A C3 E9 FA 3D 53 96 84 6B BA F2 63 9A 19 7C AE E5 F5 F7 16 6A A2 39 B6 7B 0F C1 93 81 1B EE B4 1A EA D0 91 2F B8 55 B9 DA 85 3F 41 BF E0 5A 58 80 5F 66 0B D8 90 35 D5 C0 A7 33 06 65 69 45 00 94 56 6D 98 9B 76 97 FC B2 C2 B0 FE DB 20 E1 EB D6 E4 DD 47 4A 1D 42 ED 9E 6E 49 3C CD 43 27 D2 07 D4 DE C7 67 18 89 CB 30 1F 8D C6 8F AA C8 74 DC C9 5D 5C 31 A4 70 88 61 2C 9F 0D 2B 87 50 82 54 64 26 7D 03 40 34 4B 1C 73 D1 C4 FD 3B CC FB 7F AB E6 3E 5B A5 AD 04 23 9C 14 51 22 F0 29 79 71 7E FF 8C 0E E2 0C EF BC 72 75 6F 37 A1 EC D3 8E 62 8B 86 10 E8 08 77 11 BE 92 4F 24 C5 32 36 9D CF F3 A6 BB AC 5E 6C A9 13 57 25 B5 E3 BD A8 3A 01 05 59 2A 46 } // FTable
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$awj  
 	) 
@@ -5092,12 +4515,8 @@ rule capa_reference_public_RSA_key : CAPA C0028  {
   strings: 
  	$awk = { 06 02 00 00 00 A4 00 00 52 53 41 31 }
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$awk  
 	) 
@@ -5124,12 +4543,8 @@ rule capa_encrypt_data_using_vest : CAPA T1027 E1027_m05 C0027  {
 	$awm = { 41 4B 1B DD 0D 65 72 EE 09 E7 A1 93 3F 0E 55 9C 63 89 3F B2 AB 5A 0E CB 2F 13 E3 9A C7 09 C5 8D C9 09 0D D7 59 1F A2 D6 CB B0 61 E5 39 44 F8 C5 8B C6 E5 B2 BD E3 82 D2 AB 04 DD D6 1F 94 CA EC 73 43 E7 94 5D 52 66 86 4F 4B 05 D4 AD 0F 66 A3 F9 15 9C C6 C9 3E 3A B8 9D 31 65 F8 C7 9A CE E0 6D BD 18 8D 63 F5 0A CD 11 B4 B5 EE 9B 28 9C A5 93 78 5B D1 D3 B1 2B 84 17 AB F4 85 EF 22 E1 D1 } // rns_f
 	$awn = { 4F 70 46 DA E1 8D F6 41 59 E8 5D 26 1E CC 2F 89 26 6D 52 BA BC 11 6B A9 C6 47 E4 9C 1E B6 65 A2 B6 CD 90 47 1C DF F8 10 4B D2 7C C4 72 25 C6 97 25 5D C6 1D 4B 36 BC 38 36 33 F8 89 B4 4C 65 A7 96 CA 1B 63 C3 4B 6A 63 DC 85 4C 57 EE 2A 05 C7 0C E7 39 35 8A C1 BF 13 D9 52 51 3D 2E 41 F5 72 85 23 FE A1 AA 53 61 3B 25 5F 62 B4 36 EE 2A 51 AF 18 8E 9A C6 CF C4 07 4A 9B 25 9B 76 62 0E 3E 96 3A A7 64 23 6B B6 19 BC 2D 40 D7 36 3E E2 85 9A D1 22 9F BC 30 15 9F C2 5D F1 23 E6 3A 73 C0 A6 AD 71 B0 94 1C 9D B6 56 B6 2B } // vest_f
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$awl 
 		or 	$awm 
@@ -5163,12 +4578,8 @@ rule capa_encrypt_data_using_blowfish : CAPA T1027 E1027_m05 C0027_002  {
 	$aww = { 68 5A 3D E9 F7 40 81 94 1C 26 4C F6 34 29 69 94 F7 20 15 41 F7 D4 02 76 2E 6B F4 BC 68 00 A2 D4 71 24 08 D4 6A F4 20 33 B7 D4 B7 43 AF 61 00 50 2E F6 39 1E 46 45 24 97 74 4F 21 14 40 88 8B BF 1D FC 95 4D AF 91 B5 96 D3 DD F4 70 45 2F A0 66 EC 09 BC BF 85 97 BD 03 D0 6D AC 7F 04 85 CB 31 B3 27 EB 96 41 39 FD 55 E6 47 25 DA 9A 0A CA AB 25 78 50 28 F4 29 04 53 DA 86 2C 0A FB 6D B6 E9 62 14 DC 68 00 69 48 D7 A4 C0 0E 68 EE 8D A1 27 A2 FE 3F 4F 8C AD 87 E8 06 E0 8C B5 B6 D6 F4 7A 7C 1E CE AA EC 5F 37 D3 99 A3 78 } // ks2 sbox3
 	$awx = { 37 CE 39 3A CF F5 FA D3 37 77 C2 AB 1B 2D C5 5A 9E 67 B0 5C 42 37 A3 4F 40 27 82 D3 BE 9B BC 99 9D 8E 11 D5 15 73 0F BF 7E 1C 2D D6 7B C4 00 C7 6B 1B 8C B7 45 90 A1 21 BE B1 6E B2 B4 6E 36 6A 2F AB 48 57 79 6E 94 BC D2 76 A3 C6 C8 C2 49 65 EE F8 0F 53 7D DE 8D 46 1D 0A 73 D5 C6 4D D0 4C DB BB 39 29 50 46 BA A9 E8 26 95 AC 04 E3 5E BE F0 D5 FA A1 9A 51 2D 6A E2 8C EF 63 22 EE 86 9A B8 C2 89 C0 F6 2E 24 43 AA 03 1E A5 A4 D0 F2 9C BA 61 C0 83 4D 6A E9 9B 50 15 E5 8F D6 5B 64 BA F9 A2 26 28 E1 3A 3A A7 86 95 A9 } // ks3 sbox4
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 		$num_awp 
@@ -5207,12 +4618,8 @@ rule capa_generate_random_numbers_via_WinAPI : CAPA C0021_003  {
  	$api_awy = /\bBCryptGenRandom(A|W)?\b/ ascii wide
 	$api_awz = /\bCryptGenRandom(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			$api_awy 
@@ -5243,12 +4650,8 @@ rule capa_generate_random_numbers_using_a_Mersenne_Twister : CAPA C0021_005  {
 	$num_axf = { E9 19 66 A9 5A 6F 02 B5 }
 	$num_axg = { 00 00 A6 ED FF 7F D6 71 }
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		$num_axa 
 		or $num_axb 
@@ -5286,12 +4689,8 @@ rule capa_compress_data_via_WinAPI : CAPA T1560_002 C0024  {
 	$api_axr = /\bRtlCompressBufferLZNT1(A|W)?\b/ ascii wide
 	$str_axs = "RtlCompressBufferLZNT1" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$api_axj 
 		or 	$str_axk 
@@ -5319,12 +4718,8 @@ rule capa_hash_data_via_WinCrypt : CAPA C0029  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/advapi32/i, /CryptHashData/)  
 	) 
@@ -5354,12 +4749,8 @@ rule capa_hash_data_using_SHA256 : CAPA C0029_003  {
 	$num_axz = { AB D9 83 1F }
 	$num_aya = { 19 CD E0 5B }
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		$num_axt 
 		and $num_axu 
@@ -5395,12 +4786,8 @@ rule capa_hash_data_using_SHA224 : CAPA C0029_004  {
 	$num_azf = { A7 8F F9 64 }
 	$num_azg = { A4 4F FA BE }
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		$num_ayz 
 		and $num_aza 
@@ -5427,25 +4814,21 @@ rule capa_schedule_task_via_command_line : CAPA T1053_005  {
 	license = "Apache-2.0 License"
 
   strings: 
- 			$re_azh = /schtasks/ nocase ascii wide 
-			$re_azi = /\/create / nocase ascii wide 
-		$re_azj = /Register-ScheduledTask / nocase ascii wide 
+ 	$re_azh = /schtasks/ nocase ascii wide 
+	$re_azi = /\/create / nocase ascii wide 
+	$re_azj = /Register-ScheduledTask / nocase ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			capa_create_process
 
 		and  (
 		 (
-					$re_azh 
-		and 			$re_azi  
+			$re_azh 
+		and 	$re_azi  
 	) 
-		or 		$re_azj  
+		or 	$re_azj  
 	)  
 	) 
 }
@@ -5469,12 +4852,8 @@ rule capa_persist_via_Active_Setup_registry_key : CAPA T1547_014  {
 	$re_azn = /Software\\Microsoft\\Active Setup\\Installed Components/ nocase ascii wide 
 	$str_azo = "StubPath" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			capa_set_registry_value
@@ -5504,12 +4883,8 @@ rule capa_persist_via_GinaDLL_registry_key : CAPA T1546  {
 	$re_azq = /SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon/ nocase ascii wide 
 	$re_azr = /GinaDLL/ nocase ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			capa_set_registry_value
@@ -5537,16 +4912,12 @@ rule capa_persist_via_AppInit_DLLs_registry_key : CAPA T1546_010  {
 
   strings: 
  	$num_azs = { 02 00 00 80 } // HKEY_LOCAL_MACHINE
-		$re_azt = /Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows/ nocase ascii wide 
-		$re_azu = /Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows/ nocase ascii wide 
+	$re_azt = /Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows/ nocase ascii wide 
+	$re_azu = /Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows/ nocase ascii wide 
 	$re_azv = /AppInit_DLLs/ nocase ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			capa_set_registry_value
@@ -5554,8 +4925,8 @@ rule capa_persist_via_AppInit_DLLs_registry_key : CAPA T1546_010  {
 		or $num_azs  
 	) 
 		and  (
-				$re_azt 
-		or 		$re_azu  
+			$re_azt 
+		or 	$re_azu  
 	) 
 		and 	$re_azv  
 	) 
@@ -5579,21 +4950,17 @@ rule capa_persist_via_Run_registry_key : CAPA T1547_001  {
   strings: 
  	$num_azx = { 01 00 00 80 } // HKEY_CURRENT_USER
 	$num_azy = { 02 00 00 80 } // HKEY_LOCAL_MACHINE
-			$re_azz = /Software\\Microsoft\\Windows\\CurrentVersion/ nocase ascii wide 
-				$re_baa = /Run/ nocase ascii wide 
-				$re_bab = /Explorer\\Shell Folders/ nocase ascii wide 
-				$re_bac = /User Shell Folders/ nocase ascii wide 
-				$re_bad = /RunServices/ nocase ascii wide 
-				$re_bae = /Policies\\Explorer\\Run/ nocase ascii wide 
-		$re_baf = /Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows\\load/ nocase ascii wide 
-		$re_bag = /System\\CurrentControlSet\\Control\\Session Manager\\BootExecute/ nocase ascii wide 
+	$re_azz = /Software\\Microsoft\\Windows\\CurrentVersion/ nocase ascii wide 
+	$re_baa = /Run/ nocase ascii wide 
+	$re_bab = /Explorer\\Shell Folders/ nocase ascii wide 
+	$re_bac = /User Shell Folders/ nocase ascii wide 
+	$re_bad = /RunServices/ nocase ascii wide 
+	$re_bae = /Policies\\Explorer\\Run/ nocase ascii wide 
+	$re_baf = /Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows\\load/ nocase ascii wide 
+	$re_bag = /System\\CurrentControlSet\\Control\\Session Manager\\BootExecute/ nocase ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			capa_set_registry_value
@@ -5603,17 +4970,17 @@ rule capa_persist_via_Run_registry_key : CAPA T1547_001  {
 	) 
 		and  (
 		 (
-					$re_azz 
+			$re_azz 
 		and  (
-						$re_baa 
-		or 				$re_bab 
-		or 				$re_bac 
-		or 				$re_bad 
-		or 				$re_bae  
+			$re_baa 
+		or 	$re_bab 
+		or 	$re_bac 
+		or 	$re_bad 
+		or 	$re_bae  
 	)  
 	) 
-		or 		$re_baf 
-		or 		$re_bag  
+		or 	$re_baf 
+		or 	$re_bag  
 	)  
 	) 
 }
@@ -5635,16 +5002,12 @@ rule capa_persist_via_Winlogon_Helper_DLL_registry_key : CAPA T1547_004  {
  	$num_bah = { 01 00 00 80 } // HKEY_CURRENT_USER
 	$num_bai = { 02 00 00 80 } // HKEY_LOCAL_MACHINE
 	$re_baj = /Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon/ nocase ascii wide 
-		$re_bak = /Notify/ nocase ascii wide 
-		$re_bal = /Userinit/ nocase ascii wide 
-		$re_bam = /Shell/ nocase ascii wide 
+	$re_bak = /Notify/ nocase ascii wide 
+	$re_bal = /Userinit/ nocase ascii wide 
+	$re_bam = /Shell/ nocase ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			capa_set_registry_value
@@ -5654,9 +5017,9 @@ rule capa_persist_via_Winlogon_Helper_DLL_registry_key : CAPA T1547_004  {
 	) 
 		and 	$re_baj 
 		and  (
-				$re_bak 
-		or 		$re_bal 
-		or 		$re_bam  
+			$re_bak 
+		or 	$re_bal 
+		or 	$re_bam  
 	)  
 	) 
 }
@@ -5673,12 +5036,8 @@ rule capa_compiled_to_the__NET_platform : CAPA  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/mscoree/i, /_CorExeMain/) 
 		or 	pe.imports(/mscoree/i, /_corexemain/) 
@@ -5703,12 +5062,8 @@ rule capa_get_COMSPEC_environment_variable : CAPA  {
  	$str_ban = "COMSPEC" ascii wide
 	$str_bao = "%COMSPEC%" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			capa_query_environment_variable
 
@@ -5734,12 +5089,8 @@ rule capa_packed_with_MaskPE : CAPA T1027_002 F0001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any bap in pe.sections : ( bap.name == ".MaskPE" )  
 	) 
@@ -5758,12 +5109,8 @@ rule capa_add_file_to_cabinet_file : CAPA  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/cabinet/i, /FCIAddFile/)  
 	) 
@@ -5786,12 +5133,8 @@ rule capa_reference_Quad9_DNS_server : CAPA  {
  	$str_baq = "9.9.9.9" ascii wide
 	$str_bar = "149.112.112.112" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_baq 
 		or 	$str_bar  
@@ -5812,21 +5155,17 @@ rule capa_run_PowerShell_expression : CAPA T1059_001  {
 	license = "Apache-2.0 License"
 
   strings: 
- 		$re_bas = / iex\(/ nocase ascii wide 
-		$re_bat = / iex / nocase ascii wide 
-		$re_bau = /Invoke-Expression/ nocase ascii wide 
+ 	$re_bas = / iex\(/ nocase ascii wide 
+	$re_bat = / iex / nocase ascii wide 
+	$re_bau = /Invoke-Expression/ nocase ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
-				$re_bas 
-		or 		$re_bat 
-		or 		$re_bau  
+			$re_bas 
+		or 	$re_bat 
+		or 	$re_bau  
 	)  
 	) 
 }
@@ -5844,12 +5183,8 @@ rule capa_get_file_size : CAPA T1083  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /GetFileSize/) 
 		or 	pe.imports(/kernel32/i, /GetFileSizeEx/)  
@@ -5869,12 +5204,8 @@ rule capa_open_cabinet_file : CAPA  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/cabinet/i, /FCICreate/)  
 	) 
@@ -5895,12 +5226,8 @@ rule capa_packed_with_Dragon_Armor : CAPA T1027_002 F0001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any bav in pe.sections : ( bav.name == "DAStub" )  
 	) 
@@ -5920,12 +5247,8 @@ rule capa_hooked_by_API_Override : CAPA  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any baw in pe.sections : ( baw.name == ".winapi" )  
 	) 
@@ -5943,12 +5266,8 @@ rule capa_get_service_handle : CAPA  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/advapi32/i, /CreateService/) 
 		or 	pe.imports(/advapi32/i, /OpenService/)  
@@ -5970,12 +5289,8 @@ rule capa_packed_with_Neolite : CAPA T1027_002 F0001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any bax in pe.sections : ( bax.name == ".neolite" ) 
 		or 	for any bay in pe.sections : ( bay.name == ".neolit" )  
@@ -6010,12 +5325,8 @@ rule capa_encrypt_data_using_Salsa20_or_ChaCha : CAPA T1027  {
 	$num_bbi = { 32 2D 62 79 }
 	$num_bbj = { 74 65 20 6B }
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_baz 
 		or 	$str_bba 
@@ -6047,12 +5358,8 @@ rule capa_listen_for_remote_procedure_calls : CAPA  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/rpcrt4/i, /RpcServerListen/)  
 	) 
@@ -6070,12 +5377,8 @@ rule capa_enumerate_internet_cache : CAPA  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/wininet/i, /FindFirstUrlCacheEntry/)  
 	) 
@@ -6098,12 +5401,8 @@ rule capa_reference_Verisign_DNS_server : CAPA  {
  	$str_bbm = "64.6.64.6" ascii wide
 	$str_bbn = "64.6.65.6" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bbm 
 		or 	$str_bbn  
@@ -6126,12 +5425,8 @@ rule capa_packaged_as_a_NSIS_installer : CAPA  {
   strings: 
  	$re_bbo = /http:\/\/nsis\.sf\.net/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_bbo  
 	) 
@@ -6156,12 +5451,8 @@ rule capa_reference_AliDNS_DNS_server : CAPA  {
 	$str_bbr = "2400:3200::1" ascii wide
 	$str_bbs = "2400:3200:baba::1" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bbp 
 		or 	$str_bbq 
@@ -6183,12 +5474,8 @@ rule capa_get_networking_parameters : CAPA T1016  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/iphlpapi/i, /GetNetworkParams/)  
 	) 
@@ -6209,12 +5496,8 @@ rule capa_packed_with_TSULoader : CAPA T1027_002 F0001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any bbx in pe.sections : ( bbx.name == ".tsuarch" ) 
 		or 	for any bby in pe.sections : ( bby.name == ".tsustub" )  
@@ -6234,12 +5517,8 @@ rule capa_packaged_as_a_WinZip_self_extracting_archive : CAPA  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any bbz in pe.sections : ( bbz.name == "_winzip_" )  
 	) 
@@ -6258,12 +5537,8 @@ rule capa_get_file_version_info : CAPA T1083  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			pe.imports(/version/i, /GetFileVersionInfo/) 
@@ -6287,12 +5562,8 @@ rule capa_packed_with_RPCrypt : CAPA T1027_002 F0001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any bcd in pe.sections : ( bcd.name == "RCryptor" ) 
 		or 	for any bce in pe.sections : ( bce.name == ".RCrypt" )  
@@ -6315,12 +5586,8 @@ rule capa_get_proxy : CAPA T1016  {
   strings: 
  	$str_bcf = "ProxyServer" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			capa_create_or_open_registry_key
 
@@ -6407,12 +5674,8 @@ rule capa_reference_DNS_over_HTTPS_endpoints : CAPA  {
 	$re_bep = /https:\/\/resolver-eu.lelux.fi\/dns-query.{,1000}/ nocase ascii wide 
 	$re_beq = /https:\/\/doh-jp.blahdns.com\/dns-query.{,1000}/ nocase ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_bcg 
 		or 	$re_bch 
@@ -6495,12 +5758,8 @@ rule capa_packed_with_Crunch : CAPA T1027_002 F0001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any ber in pe.sections : ( ber.name == "BitArts" )  
 	) 
@@ -6525,12 +5784,8 @@ rule capa_delete_registry_key_via_offline_registry_library : CAPA T1112 C0036_00
  	$api_bes = /\bORDeleteKey(A|W)?\b/ ascii wide
 	$api_bet = /\bORDeleteValue(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$api_bes 
 		or 	$api_bet  
@@ -6550,12 +5805,8 @@ rule capa_get_token_membership : CAPA T1033  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/advapi32/i, /CheckTokenMembership/)  
 	) 
@@ -6576,12 +5827,8 @@ rule capa_packed_with_PECompact : CAPA T1027_002 F0001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any beu in pe.sections : ( beu.name == "PEC2TO" ) 
 		or 	for any bev in pe.sections : ( bev.name == "PEC2" ) 
@@ -6610,12 +5857,8 @@ rule capa_packaged_as_a_CreateInstall_installer : CAPA  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any bff in pe.sections : ( bff.name == ".gentee" )  
 	) 
@@ -6636,12 +5879,8 @@ rule capa_packed_with_Pepack : CAPA T1027_002 F0001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any bfg in pe.sections : ( bfg.name == "PEPACK!!" )  
 	) 
@@ -6667,12 +5906,8 @@ rule capa_reference_Google_Public_DNS_server : CAPA  {
 	$str_bfn = "2001:4860:4860::8888" ascii wide
 	$str_bfo = "2001:4860:4860::8844" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bfl 
 		or 	$str_bfm 
@@ -6697,12 +5932,8 @@ rule capa_linked_against_C___regex_library : CAPA  {
  	$str_bfp = "regex_error(error_syntax)" ascii wide
 	$str_bfq = "regex_error(error_collate): The expression contained an invalid collating element name." ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bfp 
 		or 	$str_bfq  
@@ -6724,12 +5955,8 @@ rule capa_packed_with_MEW : CAPA T1027_002 F0001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any bfv in pe.sections : ( bfv.name == "MEW" )  
 	) 
@@ -6757,12 +5984,8 @@ rule capa_reference_114DNS_DNS_server : CAPA  {
 	$str_bga = "114.114.114.110" ascii wide
 	$str_bgb = "114.114.115.110" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bfw 
 		or 	$str_bfx 
@@ -6797,12 +6020,8 @@ rule capa_migrate_process_to_active_window_station : CAPA  {
 	$api_bgh = /\bOpenInputDesktop(A|W)?\b/ ascii wide
 	$api_bgi = /\bSetThreadDesktop(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$api_bgd 
 		and  (
@@ -6830,12 +6049,8 @@ rule capa_packed_with_Epack : CAPA T1027_002 F0001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any bgj in pe.sections : ( bgj.name == "!Epack" )  
 	) 
@@ -6856,12 +6071,8 @@ rule capa_packaged_as_a_Pintool : CAPA  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any bgk in pe.sections : ( bgk.name == ".charmve" ) 
 		or 	for any bgl in pe.sections : ( bgl.name == ".pinclie" )  
@@ -6880,12 +6091,8 @@ rule capa_get_thread_local_storage_value : CAPA  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /TlsGetValue/)  
 	) 
@@ -6904,12 +6111,8 @@ rule capa_rebuilt_by_ImpRec : CAPA  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any bgn in pe.sections : ( bgn.name == ".mackt" )  
 	) 
@@ -6927,12 +6130,8 @@ rule capa_enumerate_threads : CAPA  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /Thread32First/) 
 		and 	pe.imports(/kernel32/i, /Thread32Next/)  
@@ -6956,12 +6155,8 @@ rule capa_reference_Comodo_Secure_DNS_server : CAPA  {
  	$str_bgo = "8.26.56.26" ascii wide
 	$str_bgp = "8.20.247.20" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bgo 
 		or 	$str_bgp  
@@ -6982,12 +6177,8 @@ rule capa_decrypt_data_via_SSPI : CAPA T1140  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/secur32/i, /DecryptMessage/)  
 	) 
@@ -7014,12 +6205,8 @@ rule capa_reference_L3_DNS_server : CAPA  {
 	$str_bgv = "4.2.2.5" ascii wide
 	$str_bgw = "4.2.2.6" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bgr 
 		or 	$str_bgs 
@@ -7046,12 +6233,8 @@ rule capa_packaged_as_a_Wise_installer : CAPA  {
  	$str_bgx = "WiseMain" ascii wide
 	$re_bgy = /Wise Installation Wizard/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bgx 
 		or 	$re_bgy  
@@ -7074,12 +6257,8 @@ rule capa_acquire_debug_privileges : CAPA T1134  {
   strings: 
  	$str_bhc = "SeDebugPrivilege" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bhc  
 	) 
@@ -7100,12 +6279,8 @@ rule capa_empty_the_recycle_bin : CAPA  {
   strings: 
  	$api_bhd = /\bSHEmptyRecycleBin(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$api_bhd  
 	) 
@@ -7123,12 +6298,8 @@ rule capa_compare_security_identifiers : CAPA  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/advapi32/i, /EqualSid/)  
 	) 
@@ -7146,12 +6317,8 @@ rule capa_query_remote_server_for_available_data : CAPA  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/wininet/i, /InternetQueryDataAvailable/)  
 	) 
@@ -7172,12 +6339,8 @@ rule capa_packed_with_enigma : CAPA T1027_002 F0001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any bhe in pe.sections : ( bhe.name == ".enigma1" ) 
 		or 	for any bhf in pe.sections : ( bhf.name == ".enigma2" )  
@@ -7196,12 +6359,8 @@ rule capa_initialize_hashing_via_WinCrypt : CAPA  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/advapi32/i, /CryptCreateHash/)  
 	) 
@@ -7222,12 +6381,8 @@ rule capa_packed_with_StarForce : CAPA T1027_002 F0001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any bhg in pe.sections : ( bhg.name == ".sforce3" )  
 	) 
@@ -7247,12 +6402,8 @@ rule capa_encrypt_data_via_SSPI : CAPA T1027  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/secur32/i, /EncryptMessage/)  
 	) 
@@ -7273,12 +6424,8 @@ rule capa_packed_with_ProCrypt : CAPA T1027_002 F0001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any bhh in pe.sections : ( bhh.name == "ProCrypt" )  
 	) 
@@ -7299,12 +6446,8 @@ rule capa_packed_with_WWPACK : CAPA T1027_002 F0001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any bhi in pe.sections : ( bhi.name == ".WWPACK" ) 
 		or 	for any bhj in pe.sections : ( bhj.name == ".WWP32" )  
@@ -7328,12 +6471,8 @@ rule capa_reference_Cloudflare_DNS_server : CAPA  {
  	$str_bhk = "1.1.1.1" ascii wide
 	$str_bhl = "1.0.0.1" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bhk 
 		or 	$str_bhl  
@@ -7353,12 +6492,8 @@ rule capa_get_system_firmware_table : CAPA  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /GetSystemFirmwareTable/)  
 	) 
@@ -7377,12 +6512,8 @@ rule capa_get_socket_information : CAPA T1016  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/ws2_32/i, /getsockname/)  
 	) 
@@ -7406,12 +6537,8 @@ rule capa_check_license_value : CAPA T1497_001  {
  	$api_bhm = /\bNtQueryLicenseValue(A|W)?\b/ ascii wide
 	$str_bhn = "Kernel-VMDetection-Private" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$api_bhm 
 		and 	$str_bhn  
@@ -7437,12 +6564,8 @@ rule capa_bypass_UAC_via_ICMLuaUtil : CAPA T1548_002  {
 	$bhp = { F9 C7 5F 3E 51 9A 67 43 90 63 A1 20 24 4F BE C7 } // T_CLSID_CMSTPLUA
 	$str_bhq = "{3E5FC7F9-9A51-4367-9063-A120244FBEC7}" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			$str_bho 
@@ -7469,12 +6592,8 @@ rule capa_reference_screen_saver_executable : CAPA T1546_002  {
   strings: 
  	$str_bhr = "SCRNSAVE.EXE" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bhr  
 	) 
@@ -7494,12 +6613,8 @@ rule capa_create_Restart_Manager_session : CAPA  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/rstrtmgr/i, /RmStartSession/)  
 	) 
@@ -7521,12 +6636,8 @@ rule capa_reference_kornet_DNS_server : CAPA  {
   strings: 
  	$str_bhs = "168.126.63.1" ascii wide // kns.kornet.net
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bhs  
 	) 
@@ -7547,12 +6658,8 @@ rule capa_packed_with_Themida : CAPA T1027_002 F0001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any bht in pe.sections : ( bht.name == "Themida" ) 
 		or 	for any bhu in pe.sections : ( bhu.name == ".Themida" ) 
@@ -7573,12 +6680,8 @@ rule capa_impersonate_user : CAPA T1134_001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/advapi32/i, /LogonUser/) 
 		or  (
@@ -7600,12 +6703,8 @@ rule capa_get_user_security_identifier : CAPA T1087  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/advapi32/i, /LookupAccountName/) 
 		or 	pe.imports(/advapi32/i, /LsaLookupNames/) 
@@ -7629,12 +6728,8 @@ rule capa_read_raw_disk_data : CAPA  {
  	$str_bhw = "\\\\.\\PhysicalDrive0" ascii wide
 	$str_bhx = "\\\\.\\C:" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bhw 
 		or 	$str_bhx  
@@ -7660,12 +6755,8 @@ rule capa_bypass_UAC_via_scheduled_task_environment_variable : CAPA T1548_002  {
  	$str_bhy = "schtasks.exe" ascii wide
 	$re_bhz = /Microsoft\\Windows\\DiskCleanup\\SilentCleanup/ nocase ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bhy 
 		and 	$re_bhz 
@@ -7692,12 +6783,8 @@ rule capa_reference_AES_constants : CAPA T1027  {
 	$big = { 63 7C 77 7B F2 6B 6F C5 } // s-box
 	$bih = { 52 09 6A D5 30 36 A5 38 } // inv-s-box
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$bif 
 		or 	$big 
@@ -7727,12 +6814,8 @@ rule capa_compiled_with_Nim : CAPA  {
 	$re_bio = /alloc.nim$/ ascii wide 
 	$re_bip = /osalloc.nim$/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_bii 
 		or 	$re_bij 
@@ -7760,12 +6843,8 @@ rule capa_hook_routines_via_microsoft_detours : CAPA  {
   strings: 
  	$num_biq = { 64 74 72 52 } // DETOUR_REGION_SIGNATURE
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		$num_biq  
 	) 
@@ -7786,12 +6865,8 @@ rule capa_packed_with_SVKP : CAPA T1027_002 F0001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any bir in pe.sections : ( bir.name == ".svkp" )  
 	) 
@@ -7810,12 +6885,8 @@ rule capa_flush_cabinet_file : CAPA  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/cabinet/i, /FCIFlushFolder/) 
 		or 	pe.imports(/cabinet/i, /FCIFlushCabinet/)  
@@ -7835,12 +6906,8 @@ rule capa_enumerate_system_firmware_tables : CAPA  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /EnumSystemFirmwareTables/)  
 	) 
@@ -7862,12 +6929,8 @@ rule capa_reference_startup_folder : CAPA T1547_001  {
   strings: 
  	$re_bis = /Start Menu\\Programs\\Startup/ nocase ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_bis  
 	) 
@@ -7892,12 +6955,8 @@ rule capa_encrypt_or_decrypt_data_via_BCrypt : CAPA T1027 C0031 C0027  {
  	$api_bit = /\bBCryptDecrypt(A|W)?\b/ ascii wide
 	$api_biu = /\bBCryptEncrypt(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			$api_bit 
@@ -7919,12 +6978,8 @@ rule capa_connect_network_resource : CAPA  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			pe.imports(/mpr/i, /WNetAddConnection/) 
@@ -7949,12 +7004,8 @@ rule capa_packed_with_Shrinker : CAPA T1027_002 F0001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any biw in pe.sections : ( biw.name == ".shrink1" ) 
 		or 	for any bix in pe.sections : ( bix.name == ".shrink2" ) 
@@ -7977,12 +7028,8 @@ rule capa_packed_with_VProtect : CAPA T1027_002 F0001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any biz in pe.sections : ( biz.name == "VProtect" )  
 	) 
@@ -8003,12 +7050,8 @@ rule capa_packed_with_CCG : CAPA T1027_002 F0001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any bja in pe.sections : ( bja.name == ".ccg" )  
 	) 
@@ -8026,12 +7069,8 @@ rule capa_set_console_window_title : CAPA  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /SetConsoleTitle/)  
 	) 
@@ -8050,12 +7089,8 @@ rule capa_get_routing_table : CAPA T1016  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/iphlpapi/i, /GetIpForwardTable/) 
 		or 	pe.imports(/iphlpapi/i, /GetIpForwardTable2/)  
@@ -8083,12 +7118,8 @@ rule capa_reference_Hurricane_Electric_DNS_server : CAPA  {
 	$str_bje = "216.66.1.2" ascii wide // ns4.he.net
 	$str_bjf = "216.66.80.18" ascii wide // ns5.he.net
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bjb 
 		or 	$str_bjc 
@@ -8113,12 +7144,8 @@ rule capa_packed_with_Mpress : CAPA T1027_002 F0001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any bjg in pe.sections : ( bjg.name == ".MPRESS1" ) 
 		or 	for any bjh in pe.sections : ( bjh.name == ".MPRESS2" )  
@@ -8140,12 +7167,8 @@ rule capa_packaged_as_an_InstallShield_installer : CAPA  {
   strings: 
  	$str_bji = "InstallShield" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bji  
 	) 
@@ -8204,12 +7227,8 @@ rule capa_mine_cryptocurrency : CAPA T1496  {
 	$str_bks = "Steam" ascii wide
 	$str_bkt = "vk.cc" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bjj 
 		or 	$str_bjk 
@@ -8266,12 +7285,8 @@ rule capa_packed_with_SeauSFX : CAPA T1027_002 F0001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any bku in pe.sections : ( bku.name == ".seau" )  
 	) 
@@ -8293,12 +7308,8 @@ rule capa_debug_build : CAPA  {
  	$str_bkv = "Assertion failed!" ascii wide
 	$str_bkw = "Assertion failed:" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bkv 
 		or 	$str_bkw  
@@ -8320,12 +7331,8 @@ rule capa_packed_with_Simple_Pack : CAPA T1027_002 F0001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any bkx in pe.sections : ( bkx.name == ".spack" )  
 	) 
@@ -8356,12 +7363,8 @@ rule capa_resolve_function_by_hash : CAPA T1027_005  {
 	$num_ble = { 1A 06 7F FF } // ROR13(RtlExitUserThread)
 	$num_blf = { EF CE E0 60 } // ROR13(ExitThread)
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		$num_bky 
 		or $num_bkz 
@@ -8392,12 +7395,8 @@ rule capa_hash_data_via_BCrypt : CAPA T1027 C0029  {
  	$api_blg = /\bBCryptHash(A|W)?\b/ ascii wide
 	$api_blh = /\bBCryptHashData(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			$api_blg 
@@ -8420,12 +7419,8 @@ rule capa_delete_internet_cache : CAPA  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			capa_enumerate_internet_cache
 
@@ -8450,12 +7445,8 @@ rule capa_reference_OpenDNS_DNS_server : CAPA  {
  	$str_blj = "208.67.222.222" ascii wide
 	$str_blk = "208.67.220.220" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_blj 
 		or 	$str_blk  
@@ -8475,12 +7466,8 @@ rule capa_read_process_memory : CAPA  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /ReadProcessMemory/)  
 	) 
@@ -8520,12 +7507,8 @@ rule capa_linked_against_XZip : CAPA C0060  {
 	$str_bmb = "Zip-bug: internal initialisation not completed" ascii wide
 	$str_bmc = "Zip-bug: an internal error during flation" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bll 
 		or 	$str_blm 
@@ -8568,12 +7551,8 @@ rule capa_compiled_from_EPL : CAPA  {
 	$str_bmg = "Failed to allocate memory!" ascii wide
 	$str_bmh = "/ MADE BY E COMPILER – WUTAO" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bmd 
 		or 	$str_bme 
@@ -8602,12 +7581,8 @@ rule capa_get_session_information : CAPA T1033  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/wtsapi32/i, /WTSQuerySessionInformation/)  
 	) 
@@ -8628,12 +7603,8 @@ rule capa_packed_with_Perplex : CAPA T1027_002 F0001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any bmk in pe.sections : ( bmk.name == ".perplex" )  
 	) 
@@ -8656,12 +7627,8 @@ rule capa_compiled_with_Go : CAPA  {
 	$str_bmm = "go.buildid" ascii wide
 	$str_bmn = "Go buildinf:" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bml 
 		or 	$str_bmm 
@@ -8687,12 +7654,8 @@ rule capa_compiled_with_ps2exe : CAPA  {
 	$str_bmp = "PS2EXE" ascii wide
 	$str_bmq = "PS2EXE_Host" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			capa_compiled_to_the__NET_platform
 
@@ -8718,12 +7681,8 @@ rule capa_compiled_with_MinGW_for_Windows : CAPA  {
  	$str_bmr = "Mingw runtime failure:" ascii wide
 	$str_bms = "_Jv_RegisterClasses" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bmr 
 		and 	$str_bms  
@@ -8745,12 +7704,8 @@ rule capa_compiled_from_Visual_Basic : CAPA  {
   strings: 
  	$re_bmt = /VB5!.{,1000}/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_bmt 
 		and 	pe.imports(/msvbvm60/i, /ThunRTMain/)  
@@ -8778,12 +7733,8 @@ rule capa_compiled_with_pyarmor : CAPA T1059_006  {
 	$str_bmz = "__pyarmor__" ascii wide
 	$str_bna = "PYARMOR_SIGNATURE" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bmx 
 		or 	$str_bmy 
@@ -8818,12 +7769,8 @@ rule capa_compiled_with_exe4j : CAPA  {
 	$str_bnl = "INSTALL4J" ascii wide
 	$str_bnm = "EXE4J.ISINSTALL4J" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bnb 
 		or 	$str_bnc 
@@ -8861,12 +7808,8 @@ rule capa_compiled_with_AutoIt : CAPA T1059  {
 	$str_bnr = "#requireadmin" ascii wide
 	$str_bns = "#OnAutoItStartRegister" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bnn 
 		or 	$str_bno 
@@ -8895,12 +7838,8 @@ rule capa_compiled_with_Borland_Delphi : CAPA  {
 	$str_bnv = "Sysutils::Exception" ascii wide
 	$str_bnw = "TForm1" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bnt 
 		or 	$re_bnu 
@@ -8923,12 +7862,8 @@ rule capa_compiled_with_dmd : CAPA  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			for any bnx in pe.sections : ( bnx.name == "._deh" ) 
 		and 	for any bny in pe.sections : ( bny.name == ".tp" ) 
@@ -8953,12 +7888,8 @@ rule capa_compiled_with_py2exe : CAPA  {
  	$str_bob = "PY2EXE_VERBOSE" ascii wide
 	$api_boc = /\bgetenv(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bob 
 		and 	$api_boc  
@@ -8984,12 +7915,8 @@ rule capa_identify_ATM_dispenser_service_provider : CAPA  {
 	$str_boe = "CDM30" ascii wide
 	$str_bof = "DBD_AdvFuncDisp" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bod 
 		or 	$str_boe 
@@ -9019,12 +7946,8 @@ rule capa_load_NCR_ATM_library : CAPA  {
  	$str_bog = "MSXFS.dll" ascii wide
 	$str_boh = "msxfs.dll" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/msxfs/i, /dll/) 
 		or 	$str_bog 
@@ -9058,12 +7981,8 @@ rule capa_reference_NCR_ATM_library_routines : CAPA  {
 	$str_bor = "WFSStartUp" ascii wide
 	$str_bos = "WFSUnlock" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_boi 
 		or 	pe.imports(/msxfs/i, /WFSCleanUp/) 
@@ -9106,12 +8025,8 @@ rule capa_reference_Diebold_ATM_routines : CAPA  {
  	$str_bot = "DBD_AdvFuncDisp" ascii wide
 	$str_bou = "DBD_EPP4" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bot 
 		or 	$str_bou  
@@ -9163,12 +8078,8 @@ rule capa_load_Diebold_Nixdorf_ATM_library : CAPA  {
 	$str_bpv = "CscCngSelftest" ascii wide
 	$str_bpw = "CscCngEco" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/cscwcng/i, /dll/) 
 		or 	$str_bov 
@@ -9242,12 +8153,8 @@ rule capa_initialize_WinHTTP_library : CAPA C0002_008  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/winhttp/i, /WinHttpOpen/)  
 	) 
@@ -9266,12 +8173,8 @@ rule capa_set_HTTP_header : CAPA C0002_013  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/winhttp/i, /WinHttpAddRequestHeaders/)  
 	) 
@@ -9294,12 +8197,8 @@ rule capa_initialize_IWebBrowser2 : CAPA C0002_010  {
  	$bpx = { 01 DF 02 00 00 00 00 00 C0 00 00 00 00 00 00 46 } // CLSID_InternetExplorer
 	$bpy = { 61 16 0C D3 AF CD D0 11 8A 3E 00 C0 4F C9 E2 6E } // IID_IWebBrowser2
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/ole32/i, /CoCreateInstance/) 
 		and 	$bpx 
@@ -9320,12 +8219,8 @@ rule capa_read_HTTP_header : CAPA C0002_014  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/winhttp/i, /WinHttpQueryHeaders/)  
 	) 
@@ -9344,12 +8239,8 @@ rule capa_send_HTTP_response : CAPA C0002_016  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/httpapi/i, /HttpSendHttpResponse/)  
 	) 
@@ -9368,12 +8259,8 @@ rule capa_start_HTTP_server : CAPA C0002_018  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/httpapi/i, /HttpInitialize/)  
 	) 
@@ -9392,12 +8279,8 @@ rule capa_receive_HTTP_response : CAPA C0002_017  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/winhttp/i, /WinHttpReceiveResponse/) 
 		or  (
@@ -9419,12 +8302,8 @@ rule capa_create_HTTP_request : CAPA C0002_012  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/wininet/i, /InternetOpen/)  
 	) 
@@ -9443,12 +8322,8 @@ rule capa_connect_to_URL : CAPA C0002_004  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/wininet/i, /InternetOpenUrl/)  
 	) 
@@ -9467,12 +8342,8 @@ rule capa_send_file_via_HTTP : CAPA C0002_005  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/wininet/i, /InternetWriteFile/)  
 	) 
@@ -9492,12 +8363,8 @@ rule capa_download_URL_to_file : CAPA C0002_006  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/urlmon/i, /URLDownloadToFile/) 
 		or 	pe.imports(/urlmon/i, /URLDownloadToCacheFile/)  
@@ -9517,12 +8384,8 @@ rule capa_prepare_HTTP_request : CAPA C0002_012  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/winhttp/i, /WinHttpOpenRequest/)  
 	) 
@@ -9541,12 +8404,8 @@ rule capa_read_data_from_Internet : CAPA C0002_017  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			pe.imports(/wininet/i, /InternetReadFile/) 
@@ -9568,12 +8427,8 @@ rule capa_connect_to_HTTP_server : CAPA C0002_009  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/wininet/i, /InternetConnect/)  
 	) 
@@ -9593,12 +8448,8 @@ rule capa_send_file_using_FTP_via_wininet : CAPA C0004_001 C0004_002  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/wininet/i, /FtpPutFile/)  
 	) 
@@ -9624,12 +8475,8 @@ rule capa_send_ICMP_echo_request : CAPA C0014_002  {
 	$api_bqd = /\bIcmpSendEcho2Ex(A|W)?\b/ ascii wide
 	$api_bqe = /\bIcmp6SendEcho2(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			$api_bqb 
@@ -9653,12 +8500,8 @@ rule capa_initialize_Winsock_library : CAPA C0001_009  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/ws2_32/i, /WSAStartup/)  
 	) 
@@ -9678,12 +8521,8 @@ rule capa_get_socket_status : CAPA T1016 C0001_012  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/ws2_32/i, /select/)  
 	) 
@@ -9702,12 +8541,8 @@ rule capa_set_socket_configuration : CAPA C0001_001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/ws2_32/i, /setsockopt/) 
 		or 	pe.imports(/ws2_32/i, /ioctlsocket/)  
@@ -9727,12 +8562,8 @@ rule capa_receive_data_on_socket : CAPA C0001_006  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/ws2_32/i, /recv/) 
 		or 	pe.imports(/ws2_32/i, /recvfrom/) 
@@ -9757,12 +8588,8 @@ rule capa_send_data_on_socket : CAPA C0001_007  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/ws2_32/i, /send/) 
 		or 	pe.imports(/ws2_32/i, /sendto/) 
@@ -9785,12 +8612,8 @@ rule capa_create_pipe : CAPA C0003_001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /CreatePipe/) 
 		or 	pe.imports(/kernel32/i, /CreateNamedPipe/)  
@@ -9811,12 +8634,8 @@ rule capa_connect_pipe : CAPA C0003_002  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /ConnectNamedPipe/) 
 		or 	pe.imports(/kernel32/i, /CallNamedPipe/)  
@@ -9838,12 +8657,8 @@ rule capa_read_pipe : CAPA C0003_003  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			pe.imports(/kernel32/i, /PeekNamedPipe/) 
@@ -9870,12 +8685,8 @@ rule capa_access_PE_header : CAPA T1129  {
   strings: 
  	$api_bqf = /\bRtlImageNtHeader(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$api_bqf 
 		or 	pe.imports(/ntdll/i, /RtlImageNtHeaderEx/)  
@@ -9901,16 +8712,12 @@ rule capa_acquire_credentials_from_Windows_Credential_Manager : CAPA T1555_004  
 	$str_bqi = "Policy.vpol" ascii wide
 	$re_bqj = /AppData\\Local\\Microsoft\\(Vault|Credentials)/ ascii wide 
 	$api_bqk = /\bCredEnumerate(A|W)?\b/ ascii wide
-			$re_bql = /vaultcmd(\.exe)?/ ascii wide 
-			$re_bqm = /\/listcreds:/ ascii wide 
-			$re_bqn = /"Windows Credentials"/ ascii wide 
+	$re_bql = /vaultcmd(\.exe)?/ ascii wide 
+	$re_bqm = /\/listcreds:/ ascii wide 
+	$re_bqn = /"Windows Credentials"/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bqg 
 		or 	$str_bqh 
@@ -9919,9 +8726,9 @@ rule capa_acquire_credentials_from_Windows_Credential_Manager : CAPA T1555_004  
 		or 	$api_bqk 
 		or  (
 		 (
-					$re_bql 
-		or 			$re_bqm 
-		or 			$re_bqn  
+			$re_bql 
+		or 	$re_bqm 
+		or 	$re_bqn  
 	)  
 	)  
 	) 
@@ -9957,12 +8764,8 @@ rule capa_get_geographical_location : CAPA T1614  {
 	$re_brb = /\blatitude/ nocase ascii wide 
 	$re_brc = /\blongitude/ nocase ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$api_bqo 
 		or 	$api_bqp 
@@ -9996,12 +8799,8 @@ rule capa_log_keystrokes_via_polling : CAPA T1056_001 F0002_002  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/user32/i, /GetAsyncKeyState/) 
 		or 	pe.imports(/user32/i, /GetKeyState/) 
@@ -10032,12 +8831,8 @@ rule capa_log_keystrokes : CAPA T1056_001  {
 	$api_brh = /\bUnregisterHotKey(A|W)?\b/ ascii wide
 	$api_bri = /\bCallNextHookEx(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			$api_bre 
@@ -10078,12 +8873,8 @@ rule capa_capture_microphone_audio : CAPA T1123  {
 	$re_brl = /waveaudio/ nocase ascii wide 
 	$re_brm = /\brecord/ nocase ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$api_brj 
 		and 	$re_brk 
@@ -10107,25 +8898,21 @@ rule capa_get_domain_trust_relationships : CAPA T1482  {
 	license = "Apache-2.0 License"
 
   strings: 
- 		$re_brn = /nltest/ nocase ascii wide 
-			$re_bro = /\/domain_trusts/ nocase ascii wide 
-			$re_brp = /\/dclist/ nocase ascii wide 
-			$re_brq = /\/all_trusts/ nocase ascii wide 
+ 	$re_brn = /nltest/ nocase ascii wide 
+	$re_bro = /\/domain_trusts/ nocase ascii wide 
+	$re_brp = /\/dclist/ nocase ascii wide 
+	$re_brq = /\/all_trusts/ nocase ascii wide 
 	$api_brr = /\bDsEnumerateDomainTrusts(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
-				$re_brn 
+			$re_brn 
 		and  (
-					$re_bro 
-		or 			$re_brp 
-		or 			$re_brq  
+			$re_bro 
+		or 	$re_brp 
+		or 	$re_brq  
 	)  
 	) 
 		or 	$api_brr  
@@ -10148,12 +8935,8 @@ rule capa_capture_network_configuration_via_ipconfig : CAPA T1016  {
   strings: 
  	$re_brs = /ipconfig(\.exe)?/ nocase ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_brs 
 		and 	pe.imports(/msvcr100/i, /system/)  
@@ -10177,40 +8960,36 @@ rule capa_capture_public_ip : CAPA T1016  {
  	$api_brt = /\bInternetOpen(A|W)?\b/ ascii wide
 	$api_bru = /\bInternetOpenUrl(A|W)?\b/ ascii wide
 	$api_brv = /\bInternetReadFile(A|W)?\b/ ascii wide
-		$re_brw = /bot\.whatismyipaddress\.com/ ascii wide 
-		$re_brx = /ipinfo\.io\/ip/ ascii wide 
-		$re_bry = /checkip\.dyndns\.org/ ascii wide 
-		$re_brz = /ifconfig\.me/ ascii wide 
-		$re_bsa = /ipecho\.net\/plain/ ascii wide 
-		$re_bsb = /api\.ipify\.org/ ascii wide 
-		$re_bsc = /checkip\.amazonaws\.com/ ascii wide 
-		$re_bsd = /icanhazip\.com/ ascii wide 
-		$re_bse = /wtfismyip\.com\/text/ ascii wide 
-		$re_bsf = /api\.myip\.com/ ascii wide 
-		$re_bsg = /ip\-api\.com\/line/ ascii wide 
+	$re_brw = /bot\.whatismyipaddress\.com/ ascii wide 
+	$re_brx = /ipinfo\.io\/ip/ ascii wide 
+	$re_bry = /checkip\.dyndns\.org/ ascii wide 
+	$re_brz = /ifconfig\.me/ ascii wide 
+	$re_bsa = /ipecho\.net\/plain/ ascii wide 
+	$re_bsb = /api\.ipify\.org/ ascii wide 
+	$re_bsc = /checkip\.amazonaws\.com/ ascii wide 
+	$re_bsd = /icanhazip\.com/ ascii wide 
+	$re_bse = /wtfismyip\.com\/text/ ascii wide 
+	$re_bsf = /api\.myip\.com/ ascii wide 
+	$re_bsg = /ip\-api\.com\/line/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$api_brt 
 		and 	$api_bru 
 		and 	$api_brv 
 		and  (
-				$re_brw 
-		or 		$re_brx 
-		or 		$re_bry 
-		or 		$re_brz 
-		or 		$re_bsa 
-		or 		$re_bsb 
-		or 		$re_bsc 
-		or 		$re_bsd 
-		or 		$re_bse 
-		or 		$re_bsf 
-		or 		$re_bsg  
+			$re_brw 
+		or 	$re_brx 
+		or 	$re_bry 
+		or 	$re_brz 
+		or 	$re_bsa 
+		or 	$re_bsb 
+		or 	$re_bsc 
+		or 	$re_bsd 
+		or 	$re_bse 
+		or 	$re_bsf 
+		or 	$re_bsg  
 	)  
 	) 
 }
@@ -10232,22 +9011,18 @@ rule capa_gather_cuteftp_information : CAPA T1555  {
 
   strings: 
  	$re_bsh = /\\sm\.dat/ ascii wide 
-		$re_bsi = /\\GlobalSCAPE\\CuteFTP/ nocase ascii wide 
-		$re_bsj = /\\GlobalSCAPE\\CuteFTP Pro/ nocase ascii wide 
-		$re_bsk = /\\CuteFTP/ ascii wide 
+	$re_bsi = /\\GlobalSCAPE\\CuteFTP/ nocase ascii wide 
+	$re_bsj = /\\GlobalSCAPE\\CuteFTP Pro/ nocase ascii wide 
+	$re_bsk = /\\CuteFTP/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_bsh 
 		and  (
-				$re_bsi 
-		or 		$re_bsj 
-		or 		$re_bsk  
+			$re_bsi 
+		or 	$re_bsj 
+		or 	$re_bsk  
 	)  
 	) 
 }
@@ -10270,12 +9045,8 @@ rule capa_gather_ftprush_information : CAPA T1555  {
  	$re_bsl = /\\FTPRush/ ascii wide 
 	$re_bsm = /RushSite\.xml/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_bsl 
 		and 	$re_bsm  
@@ -10297,23 +9068,19 @@ rule capa_gather_smart_ftp_information : CAPA T1555  {
 	license = "Apache-2.0 License"
 
   strings: 
- 		$re_bsn = /\\SmartFTP/ ascii wide 
+ 	$re_bsn = /\\SmartFTP/ ascii wide 
 	$str_bso = ".xml" ascii wide
-		$re_bsp = /Favorites\.dat/ nocase ascii wide 
-		$re_bsq = /History\.dat/ nocase ascii wide 
+	$re_bsp = /Favorites\.dat/ nocase ascii wide 
+	$re_bsq = /History\.dat/ nocase ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
-				$re_bsn 
+			$re_bsn 
 		and 	$str_bso 
-		and 		$re_bsp 
-		and 		$re_bsq  
+		and 	$re_bsp 
+		and 	$re_bsq  
 	)  
 	) 
 }
@@ -10337,12 +9104,8 @@ rule capa_gather_cyberduck_information : CAPA T1555  {
 	$str_bss = "user.config" ascii wide
 	$str_bst = ".duck" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_bsr 
 		and  (
@@ -10371,12 +9134,8 @@ rule capa_gather_ws_ftp_information : CAPA T1555  {
 	$re_bsv = /\\win\.ini/ ascii wide 
 	$re_bsw = /WS_FTP/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_bsu 
 		and 	$re_bsv 
@@ -10406,12 +9165,8 @@ rule capa_gather_fling_ftp_information : CAPA T1555  {
 	$str_btb = "FtpUserName" ascii wide
 	$str_btc = "FtpDirectory" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_bsx 
 		or  (
@@ -10444,12 +9199,8 @@ rule capa_gather_directory_opus_information : CAPA T1555  {
 	$str_btf = ".oll" ascii wide
 	$str_btg = "ftplast.osd" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_btd 
 		and 	$str_bte 
@@ -10479,12 +9230,8 @@ rule capa_gather_coreftp_information : CAPA T1555  {
 	$str_btk = "Port" ascii wide
 	$str_btl = "PthR" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_bth 
 		or  (
@@ -10515,15 +9262,11 @@ rule capa_gather_wise_ftp_information : CAPA T1555  {
 	$str_btn = "wiseftp.ini" ascii wide
 	$str_bto = "wiseftpsrvs.bin" ascii wide
 	$str_btp = "wiseftpsrvs.bin" ascii wide
-			$re_btq = /\\AceBIT/ ascii wide 
-			$re_btr = /Software\\AceBIT/ ascii wide 
+	$re_btq = /\\AceBIT/ ascii wide 
+	$re_btr = /Software\\AceBIT/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			$str_btm 
@@ -10533,8 +9276,8 @@ rule capa_gather_wise_ftp_information : CAPA T1555  {
 		or  (
 			$str_btp 
 		and  (
-					$re_btq 
-		or 			$re_btr  
+			$re_btq 
+		or 	$re_btr  
 	)  
 	)  
 	) 
@@ -10555,24 +9298,20 @@ rule capa_gather_winzip_information : CAPA T1555  {
 	license = "Apache-2.0 License"
 
   strings: 
- 		$re_bts = /Software\\Nico Mak Computing\\WinZip\\FTP/ ascii wide 
-		$re_btt = /Software\\Nico Mak Computing\\WinZip\\mru\\jobs/ ascii wide 
+ 	$re_bts = /Software\\Nico Mak Computing\\WinZip\\FTP/ ascii wide 
+	$re_btt = /Software\\Nico Mak Computing\\WinZip\\mru\\jobs/ ascii wide 
 	$str_btu = "Site" ascii wide
 	$str_btv = "UserID" ascii wide
 	$str_btw = "xflags" ascii wide
 	$str_btx = "Port" ascii wide
 	$str_bty = "Folder" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
-				$re_bts 
-		and 		$re_btt  
+			$re_bts 
+		and 	$re_btt  
 	) 
 		or  (
 			$str_btu 
@@ -10606,12 +9345,8 @@ rule capa_gather_southriver_webdrive_information : CAPA T1555  {
 	$str_bud = "Port" ascii wide
 	$str_bue = "ServerType" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_btz 
 		or  (
@@ -10641,12 +9376,8 @@ rule capa_gather_freshftp_information : CAPA T1555  {
  	$str_buf = "FreshFTP" ascii wide
 	$str_bug = ".SMF" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_buf 
 		and 	$str_bug  
@@ -10671,12 +9402,8 @@ rule capa_gather_fasttrack_ftp_information : CAPA T1555  {
  	$str_buh = "FastTrack" ascii wide
 	$str_bui = "ftplist.txt" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			$str_buh 
@@ -10702,12 +9429,8 @@ rule capa_gather_classicftp_information : CAPA T1555  {
   strings: 
  	$re_buj = /Software\\NCH Software\\ClassicFTP\\FTPAccounts/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_buj  
 	) 
@@ -10731,12 +9454,8 @@ rule capa_gather_softx_ftp_information : CAPA T1555  {
  	$re_buk = /Software\\FTPClient\\Sites/ ascii wide 
 	$re_bul = /Software\\SoftX.org\\FTPClient\\Sites/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_buk 
 		or 	$re_bul  
@@ -10758,31 +9477,27 @@ rule capa_gather_ffftp_information : CAPA T1555  {
 	license = "Apache-2.0 License"
 
   strings: 
- 			$re_bum = /Software\\Sota\\FFFTP\\Options/ ascii wide 
-			$re_bun = /Software\\Sota\\FFFTP/ ascii wide 
-			$re_buo = /CredentialSalt/ ascii wide 
-			$re_bup = /CredentialCheck/ ascii wide 
+ 	$re_bum = /Software\\Sota\\FFFTP\\Options/ ascii wide 
+	$re_bun = /Software\\Sota\\FFFTP/ ascii wide 
+	$re_buo = /CredentialSalt/ ascii wide 
+	$re_bup = /CredentialCheck/ ascii wide 
 	$str_buq = "Password" ascii wide
 	$str_bur = "UserName" ascii wide
 	$str_bus = "HostAdrs" ascii wide
 	$str_but = "RemoteDir" ascii wide
 	$str_buu = "Port" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 		 (
-					$re_bum 
-		or 			$re_bun  
+			$re_bum 
+		or 	$re_bun  
 	) 
 		and  (
-					$re_buo 
-		or 			$re_bup  
+			$re_buo 
+		or 	$re_bup  
 	)  
 	) 
 		or  (
@@ -10813,12 +9528,8 @@ rule capa_gather_ftpshell_information : CAPA T1555  {
  	$str_buv = "FTPShell" ascii wide
 	$str_buw = "ftpshell.fsi" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_buv 
 		and 	$str_buw  
@@ -10847,12 +9558,8 @@ rule capa_gather_winscp_information : CAPA T1555  {
 	$str_bvb = "PortNumber" ascii wide
 	$str_bvc = "FSProtocol" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bux 
 		and 	$str_buy 
@@ -10881,12 +9588,8 @@ rule capa_gather_frigate3_information : CAPA T1555  {
  	$re_bvd = /FtpSite\.xml/ ascii wide 
 	$re_bve = /\\Frigate3/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_bvd 
 		and 	$re_bve  
@@ -10911,12 +9614,8 @@ rule capa_gather_staff_ftp_information : CAPA T1555  {
  	$str_bvf = "Staff-FTP" ascii wide
 	$str_bvg = "sites.ini" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bvf 
 		and 	$str_bvg  
@@ -10941,12 +9640,8 @@ rule capa_gather_xftp_information : CAPA T1555  {
  	$str_bvh = ".xfp" ascii wide
 	$re_bvi = /\\NetSarang/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bvh 
 		and 	$re_bvi  
@@ -10971,12 +9666,8 @@ rule capa_gather_ftpnow_information : CAPA T1555  {
 	$str_bvq = "FTP Now" ascii wide
 	$str_bvr = "sites.xml" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bvp 
 		and 	$str_bvq 
@@ -11002,12 +9693,8 @@ rule capa_gather_ftpgetter_information : CAPA T1555  {
  	$str_bvs = "servers.xml" ascii wide
 	$re_bvt = /\\FTPGetter/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bvs 
 		and 	$re_bvt  
@@ -11029,18 +9716,14 @@ rule capa_gather_nova_ftp_information : CAPA T1555  {
 
   strings: 
  	$str_bvu = "NovaFTP.db" ascii wide
-		$re_bvv = /\\INSoftware\\NovaFTP/ ascii wide 
+	$re_bvv = /\\INSoftware\\NovaFTP/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			$str_bvu 
-		and 		$re_bvv  
+		and 	$re_bvv  
 	)  
 	) 
 }
@@ -11060,10 +9743,10 @@ rule capa_gather_ftp_explorer_information : CAPA T1555  {
 	license = "Apache-2.0 License"
 
   strings: 
- 		$re_bvw = /profiles\.xml/ ascii wide 
-			$re_bvx = /Software\\FTP Explorer\\FTP Explorer\\Workspace\\MFCToolBar-224/ ascii wide 
-			$re_bvy = /Software\\FTP Explorer\\Profiles/ ascii wide 
-			$re_bvz = /\\FTP Explorer/ ascii wide 
+ 	$re_bvw = /profiles\.xml/ ascii wide 
+	$re_bvx = /Software\\FTP Explorer\\FTP Explorer\\Workspace\\MFCToolBar-224/ ascii wide 
+	$re_bvy = /Software\\FTP Explorer\\Profiles/ ascii wide 
+	$re_bvz = /\\FTP Explorer/ ascii wide 
 	$str_bwa = "Password" ascii wide
 	$str_bwb = "Host" ascii wide
 	$str_bwc = "Login" ascii wide
@@ -11071,19 +9754,15 @@ rule capa_gather_ftp_explorer_information : CAPA T1555  {
 	$str_bwe = "PasswordType" ascii wide
 	$str_bwf = "Port" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
-				$re_bvw 
+			$re_bvw 
 		and  (
-					$re_bvx 
-		or 			$re_bvy 
-		or 			$re_bvz  
+			$re_bvx 
+		or 	$re_bvy 
+		or 	$re_bvz  
 	)  
 	) 
 		or  (
@@ -11115,12 +9794,8 @@ rule capa_gather_bitkinex_information : CAPA T1555  {
  	$re_bwg = /bitkinex\.ds/ ascii wide 
 	$re_bwh = /\\BitKinex/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_bwg 
 		and 	$re_bwh  
@@ -11144,26 +9819,22 @@ rule capa_gather_turbo_ftp_information : CAPA T1555  {
   strings: 
  	$str_bwi = "addrbk.dat" ascii wide
 	$str_bwj = "quick.dat" ascii wide
-		$re_bwk = /installpath/ ascii wide 
-			$re_bwl = /Software\\TurboFTP/ ascii wide 
-			$re_bwm = /\\TurboFTP/ ascii wide 
+	$re_bwk = /installpath/ ascii wide 
+	$re_bwl = /Software\\TurboFTP/ ascii wide 
+	$re_bwm = /\\TurboFTP/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			$str_bwi 
 		and 	$str_bwj  
 	) 
 		or  (
-				$re_bwk 
+			$re_bwk 
 		and  (
-					$re_bwl 
-		or 			$re_bwm  
+			$re_bwl 
+		or 	$re_bwm  
 	)  
 	)  
 	) 
@@ -11187,12 +9858,8 @@ rule capa_gather_nexusfile_information : CAPA T1555  {
  	$str_bwn = "NexusFile" ascii wide
 	$str_bwo = "ftpsite.ini" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bwn 
 		and 	$str_bwo  
@@ -11218,12 +9885,8 @@ rule capa_gather_ftp_voyager_information : CAPA T1555  {
 	$str_bwq = "FTPVoyager.ftp" ascii wide
 	$str_bwr = "FTPVoyager.qc" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_bwp 
 		and 	$str_bwq 
@@ -11252,14 +9915,10 @@ rule capa_gather_blazeftp_information : CAPA T1555  {
 	$str_bwv = "LastAddress" ascii wide
 	$str_bww = "LastUser" ascii wide
 	$str_bwx = "LastPort" ascii wide
-		$re_bwy = /Software\\FlashPeak\\BlazeFtp\\Settings/ ascii wide 
+	$re_bwy = /Software\\FlashPeak\\BlazeFtp\\Settings/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bws 
 		and 	$str_bwt 
@@ -11268,7 +9927,7 @@ rule capa_gather_blazeftp_information : CAPA T1555  {
 		or 	$str_bwv 
 		or 	$str_bww 
 		or 	$str_bwx 
-		or 		$re_bwy  
+		or 	$re_bwy  
 	)  
 	) 
 }
@@ -11288,20 +9947,16 @@ rule capa_gather_ftp_commander_information : CAPA T1555  {
 	license = "Apache-2.0 License"
 
   strings: 
- 		$re_bwz = /FTP Navigator/ ascii wide 
-		$re_bxa = /FTP Commander/ ascii wide 
+ 	$re_bwz = /FTP Navigator/ ascii wide 
+	$re_bxa = /FTP Commander/ ascii wide 
 	$str_bxb = "ftplist.txt" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
-				$re_bwz 
-		or 		$re_bxa  
+			$re_bwz 
+		or 	$re_bxa  
 	) 
 		and  (
 			$str_bxb  
@@ -11324,29 +9979,25 @@ rule capa_gather_filezilla_information : CAPA T1555  {
 	license = "Apache-2.0 License"
 
   strings: 
- 		$re_bxc = /\\sitemanager\.xml/ ascii wide 
-		$re_bxd = /\\recentservers\.xml/ ascii wide 
-		$re_bxe = /\\filezilla.xml/ ascii wide 
-		$re_bxf = /Software\\FileZilla/ ascii wide 
+ 	$re_bxc = /\\sitemanager\.xml/ ascii wide 
+	$re_bxd = /\\recentservers\.xml/ ascii wide 
+	$re_bxe = /\\filezilla.xml/ ascii wide 
+	$re_bxf = /Software\\FileZilla/ ascii wide 
 	$str_bxg = "Install_Dir" ascii wide
-		$re_bxh = /Software\\FileZilla Client/ ascii wide 
+	$re_bxh = /Software\\FileZilla Client/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
-				$re_bxc 
-		and 		$re_bxd 
-		and 		$re_bxe  
+			$re_bxc 
+		and 	$re_bxd 
+		and 	$re_bxe  
 	) 
 		or  (
-				$re_bxf 
+			$re_bxf 
 		and 	$str_bxg 
-		and 		$re_bxh  
+		and 	$re_bxh  
 	)  
 	) 
 }
@@ -11369,12 +10020,8 @@ rule capa_gather_global_downloader_information : CAPA T1555  {
  	$re_bxi = /\\Global Downloader/ ascii wide 
 	$str_bxj = "SM.arch" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_bxi 
 		and 	$str_bxj  
@@ -11410,12 +10057,8 @@ rule capa_gather_direct_ftp_information : CAPA T1555  {
 	$str_bxv = "FTP destination catalog" ascii wide
 	$str_bxw = "FTP profiles" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_bxk 
 		or 	$re_bxl 
@@ -11455,12 +10098,8 @@ rule capa_gather_faststone_browser_information : CAPA T1555  {
  	$re_bxx = /FastStone Browser/ ascii wide 
 	$str_bxy = "FTPList.db" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_bxx 
 		and 	$str_bxy  
@@ -11484,12 +10123,8 @@ rule capa_gather_ultrafxp_information : CAPA T1555  {
  	$re_bxz = /UltraFXP/ ascii wide 
 	$re_bya = /\\sites\.xml/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_bxz 
 		and 	$re_bya  
@@ -11514,12 +10149,8 @@ rule capa_gather_netdrive_information : CAPA T1555  {
  	$str_byb = "NDSites.ini" ascii wide
 	$re_byc = /\\NetDrive/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_byb 
 		and 	$re_byc  
@@ -11541,28 +10172,24 @@ rule capa_gather_total_commander_information : CAPA T1555  {
 	license = "Apache-2.0 License"
 
   strings: 
- 		$re_byd = /Software\\Ghisler\\Total Commander/ ascii wide 
-		$re_bye = /Software\\Ghisler\\Windows Commander/ ascii wide 
+ 	$re_byd = /Software\\Ghisler\\Total Commander/ ascii wide 
+	$re_bye = /Software\\Ghisler\\Windows Commander/ ascii wide 
 	$str_byf = "FtpIniName" ascii wide
 	$str_byg = "wcx_ftp.ini" ascii wide
-		$re_byh = /\\GHISLER/ ascii wide 
+	$re_byh = /\\GHISLER/ ascii wide 
 	$str_byi = "InstallDir" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
-				$re_byd 
-		or 		$re_bye  
+			$re_byd 
+		or 	$re_bye  
 	) 
 		and  (
 			$str_byf 
 		or 	$str_byg 
-		or 		$re_byh 
+		or 	$re_byh 
 		or 	$str_byi  
 	)  
 	) 
@@ -11585,21 +10212,17 @@ rule capa_gather_ftpinfo_information : CAPA T1555  {
   strings: 
  	$str_byj = "ServerList.xml" ascii wide
 	$str_byk = "DataDir" ascii wide
-		$re_byl = /Software\\MAS-Soft\\FTPInfo\\Setup/ ascii wide 
-		$re_bym = /FTPInfo/ ascii wide 
+	$re_byl = /Software\\MAS-Soft\\FTPInfo\\Setup/ ascii wide 
+	$re_bym = /FTPInfo/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_byj 
 		and 	$str_byk 
 		and  (
-				$re_byl 
-		or 		$re_bym  
+			$re_byl 
+		or 	$re_bym  
 	)  
 	) 
 }
@@ -11619,29 +10242,25 @@ rule capa_gather_flashfxp_information : CAPA T1555  {
 	license = "Apache-2.0 License"
 
   strings: 
- 		$re_byn = /Software\\FlashFXP/ ascii wide 
-		$re_byo = /DataFolder/ ascii wide 
-		$re_byp = /Install Path/ ascii wide 
-		$re_byq = /\\Sites.dat/ ascii wide 
-		$re_byr = /\\Quick.dat/ ascii wide 
-		$re_bys = /\\History.dat/ ascii wide 
+ 	$re_byn = /Software\\FlashFXP/ ascii wide 
+	$re_byo = /DataFolder/ ascii wide 
+	$re_byp = /Install Path/ ascii wide 
+	$re_byq = /\\Sites.dat/ ascii wide 
+	$re_byr = /\\Quick.dat/ ascii wide 
+	$re_bys = /\\History.dat/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
-				$re_byn 
-		and 		$re_byo 
-		and 		$re_byp  
+			$re_byn 
+		and 	$re_byo 
+		and 	$re_byp  
 	) 
 		or  (
-				$re_byq 
-		and 		$re_byr 
-		and 		$re_bys  
+			$re_byq 
+		and 	$re_byr 
+		and 	$re_bys  
 	)  
 	) 
 }
@@ -11664,22 +10283,18 @@ rule capa_gather_securefx_information : CAPA T1555  {
  	$re_byt = /\\Sessions/ ascii wide 
 	$str_byu = ".ini" ascii wide
 	$re_byv = /Config Path/ ascii wide 
-		$re_byw = /_VanDyke\\Config\\Sessions/ ascii wide 
-		$re_byx = /Software\\VanDyke\\SecureFX/ ascii wide 
+	$re_byw = /_VanDyke\\Config\\Sessions/ ascii wide 
+	$re_byx = /Software\\VanDyke\\SecureFX/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_byt 
 		and 	$str_byu 
 		and 	$re_byv 
 		and  (
-				$re_byw 
-		or 		$re_byx  
+			$re_byw 
+		or 	$re_byx  
 	)  
 	) 
 }
@@ -11699,9 +10314,9 @@ rule capa_gather_robo_ftp_information : CAPA T1555  {
 	license = "Apache-2.0 License"
 
   strings: 
- 		$re_byy = /SOFTWARE\\Robo-FTP/ ascii wide 
-			$re_byz = /\\FTPServers/ ascii wide 
-			$re_bza = /FTP File/ ascii wide 
+ 	$re_byy = /SOFTWARE\\Robo-FTP/ ascii wide 
+	$re_byz = /\\FTPServers/ ascii wide 
+	$re_bza = /FTP File/ ascii wide 
 	$str_bzb = "FTP Count" ascii wide
 	$str_bzc = "Password" ascii wide
 	$str_bzd = "ServerName" ascii wide
@@ -11710,18 +10325,14 @@ rule capa_gather_robo_ftp_information : CAPA T1555  {
 	$str_bzg = "InitialDirectory" ascii wide
 	$str_bzh = "ServerType" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
-				$re_byy 
+			$re_byy 
 		and  (
-					$re_byz 
-		or 			$re_bza 
+			$re_byz 
+		or 	$re_bza 
 		or 	$str_bzb  
 	)  
 	) 
@@ -11753,20 +10364,16 @@ rule capa_gather_bulletproof_ftp_information : CAPA T1555  {
   strings: 
  	$str_bzi = ".dat" ascii wide
 	$str_bzj = ".bps" ascii wide
-			$re_bzk = /Software\\BPFTP\\Bullet Proof FTP\\Main/ ascii wide 
-			$re_bzl = /Software\\BulletProof Software\\BulletProof FTP Client\\Main/ ascii wide 
-			$re_bzm = /Software\\BulletProof Software\\BulletProof FTP Client\\Options/ ascii wide 
-			$re_bzn = /Software\\BPFTP\\Bullet Proof FTP\\Options/ ascii wide 
-			$re_bzo = /Software\\BPFTP/ ascii wide 
+	$re_bzk = /Software\\BPFTP\\Bullet Proof FTP\\Main/ ascii wide 
+	$re_bzl = /Software\\BulletProof Software\\BulletProof FTP Client\\Main/ ascii wide 
+	$re_bzm = /Software\\BulletProof Software\\BulletProof FTP Client\\Options/ ascii wide 
+	$re_bzn = /Software\\BPFTP\\Bullet Proof FTP\\Options/ ascii wide 
+	$re_bzo = /Software\\BPFTP/ ascii wide 
 	$str_bzp = "LastSessionFile" ascii wide
 	$str_bzq = "SitesDir" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			$str_bzi 
@@ -11774,11 +10381,11 @@ rule capa_gather_bulletproof_ftp_information : CAPA T1555  {
 	) 
 		or  (
 		 (
-					$re_bzk 
-		or 			$re_bzl 
-		or 			$re_bzm 
-		or 			$re_bzn 
-		or 			$re_bzo  
+			$re_bzk 
+		or 	$re_bzl 
+		or 	$re_bzm 
+		or 	$re_bzn 
+		or 	$re_bzo  
 	) 
 		and  (
 			$str_bzp 
@@ -11808,12 +10415,8 @@ rule capa_gather_alftp_information : CAPA T1555  {
 	$str_bzs = "QData.dat" ascii wide
 	$re_bzt = /\\Estsoft\\ALFTP/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bzr 
 		and 	$str_bzs 
@@ -11836,25 +10439,21 @@ rule capa_gather_expandrive_information : CAPA T1555  {
 	license = "Apache-2.0 License"
 
   strings: 
- 		$re_bzu = /Software\\ExpanDrive\\Sessions/ ascii wide 
-		$re_bzv = /Software\\ExpanDrive/ ascii wide 
-		$re_bzw = /ExpanDrive_Home/ ascii wide 
-		$re_bzx = /\\drives\.js/ ascii wide 
+ 	$re_bzu = /Software\\ExpanDrive\\Sessions/ ascii wide 
+	$re_bzv = /Software\\ExpanDrive/ ascii wide 
+	$re_bzw = /ExpanDrive_Home/ ascii wide 
+	$re_bzx = /\\drives\.js/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
-				$re_bzu 
-		or 		$re_bzv  
+			$re_bzu 
+		or 	$re_bzv  
 	) 
 		and  (
-				$re_bzw 
-		or 		$re_bzx  
+			$re_bzw 
+		or 	$re_bzx  
 	)  
 	) 
 }
@@ -11877,12 +10476,8 @@ rule capa_gather_goftp_information : CAPA T1555  {
  	$str_bzy = "GoFTP" ascii wide
 	$str_bzz = "Connections.txt" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_bzy 
 		and 	$str_bzz  
@@ -11907,12 +10502,8 @@ rule capa_gather_3d_ftp_information : CAPA T1555  {
  	$str_caa = "3D-FTP" ascii wide
 	$str_cab = "sites.ini" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_caa 
 		and 	$str_cab  
@@ -11935,12 +10526,8 @@ rule capa_reference_SQL_statements : CAPA T1213  {
   strings: 
  	$re_cah = /SELECT.{,1000}FROM.{,1000}WHERE/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_cah  
 	) 
@@ -11964,12 +10551,8 @@ rule capa_reference_WMI_statements : CAPA T1213  {
 	$re_caj = /SELECT\s+\*\s+FROM\s+Win32_./ ascii wide 
 	$re_cak = /SELECT\s+\*\s+FROM\s+MSAcpi_./ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_cai 
 		or 	$re_caj 
@@ -11992,12 +10575,8 @@ rule capa_write_and_execute_a_file : CAPA B0023  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			capa_write_file
 
@@ -12023,12 +10602,8 @@ rule capa_self_delete_via_COMSPEC_environment_variable : CAPA T1070_004 F0007_00
   strings: 
  	$re_cam = /\/c\s*del\s*/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			capa_get_COMSPEC_environment_variable
 
@@ -12056,12 +10631,8 @@ rule capa_check_for_windows_sandbox_via_process_name : CAPA T1497_001 B0009  {
   strings: 
  	$str_cap = "CExecSvc.exe" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			capa_enumerate_processes
 
@@ -12085,12 +10656,8 @@ rule capa_get_CPU_information : CAPA T1082  {
   strings: 
  	$re_cbe = /Hardware\\Description\\System\\CentralProcessor/ nocase ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			capa_query_or_enumerate_registry_value
 
@@ -12114,12 +10681,8 @@ rule capa_disable_code_signing : CAPA T1553_006  {
   strings: 
  	$re_cbi = /\bbcdedit(\.exe)? -set TESTSIGNING ON/ nocase ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			capa_create_process
 
@@ -12143,12 +10706,8 @@ rule capa_find_taskbar : CAPA B0043  {
   strings: 
  	$str_cbj = "Shell_TrayWnd" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$str_cbj 
 		and 	capa_find_graphical_window
@@ -12169,12 +10728,8 @@ rule capa_check_mutex : CAPA C0043  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			pe.imports(/kernel32/i, /OpenMutex/) 
@@ -12204,12 +10759,8 @@ rule capa_linked_against_Go_process_enumeration_library : CAPA T1057 T1518  {
  	$str_cdu = "github.com/mitchellh/go-ps.FindProcess" ascii wide
 	$str_cdv = "github.com/mitchellh/go-ps.Processes" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			capa_compiled_with_Go
 
@@ -12241,12 +10792,8 @@ rule capa_linked_against_Go_WMI_library : CAPA T1213  {
  	$str_ceh = "github.com/StackExchange/wmi.CreateQuery" ascii wide
 	$str_cei = "github.com/StackExchange/wmi.Query" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			capa_compiled_with_Go
 
@@ -12277,12 +10824,8 @@ rule capa_check_for_windows_sandbox_via_mutex : CAPA T1497_001 B0009  {
   strings: 
  	$str_cen = "WindowsSandboxMutex" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			capa_check_mutex
 
@@ -12308,12 +10851,8 @@ rule capa_linked_against_Go_registry_library : CAPA  {
  	$str_ceo = "golang.org/x/sys/windows/registry.Key.Close" ascii wide
 	$str_cep = "github.com/golang/sys/windows/registry.Key.Close" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			capa_compiled_with_Go
 
@@ -12341,20 +10880,16 @@ rule capa_capture_screenshot_in_Go : CAPA T1113 E1113_m01  {
 
   strings: 
  	$str_cev = "syscall.NewLazyDLL" ascii wide // Dynamic loading of DLLs
-					$re_cew = /user32.dll/ ascii wide 
-						$re_cex = /GetWindowDC/ ascii wide 
-						$re_cey = /GetDC/ ascii wide 
-					$re_cez = /gdi32.dll/ ascii wide 
-						$re_cfa = /BitBlt/ ascii wide 
-						$re_cfb = /GetDIBits/ ascii wide 
-			$re_cfc = /CreateCompatibleDC/ ascii wide 
+	$re_cew = /user32.dll/ ascii wide 
+	$re_cex = /GetWindowDC/ ascii wide 
+	$re_cey = /GetDC/ ascii wide 
+	$re_cez = /gdi32.dll/ ascii wide 
+	$re_cfa = /BitBlt/ ascii wide 
+	$re_cfb = /GetDIBits/ ascii wide 
+	$re_cfc = /CreateCompatibleDC/ ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			capa_compiled_with_Go
 
@@ -12363,21 +10898,21 @@ rule capa_capture_screenshot_in_Go : CAPA T1113 E1113_m01  {
 			$str_cev 
 		and  (
 		 (
-							$re_cew 
+			$re_cew 
 		and  (
-								$re_cex 
-		or 						$re_cey  
+			$re_cex 
+		or 	$re_cey  
 	)  
 	) 
 		or  (
-							$re_cez 
+			$re_cez 
 		and  (
-								$re_cfa 
-		or 						$re_cfb  
+			$re_cfa 
+		or 	$re_cfb  
 	)  
 	)  
 	) 
-		and 			$re_cfc  
+		and 	$re_cfc  
 	)  
 	)  
 	) 
@@ -12414,18 +10949,14 @@ rule capa_linked_against_Go_static_asset_library : CAPA  {
 	$str_cfl = "github.com/markbates/pkger.Parse" ascii wide
 	$str_cfm = "github.com/GeertJohan/go.rice.FindBox" ascii wide
 	$str_cfn = "github.com/GeertJohan/go.rice.MustFindBox" ascii wide
-			$re_cfo = /\/bindata\.go/ ascii wide  // go-bindata
-			$re_cfp = /\.Asset/ ascii wide 
+	$re_cfo = /\/bindata\.go/ ascii wide  // go-bindata
+	$re_cfp = /\.Asset/ ascii wide 
 	$str_cfq = "github.com/lu4p/binclude.Include" ascii wide
 	$str_cfr = "github.com/omeid/go-resources" ascii wide
 	$str_cfs = "github.com/pyros2097/go-embed" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			capa_compiled_with_Go
 
@@ -12449,8 +10980,8 @@ rule capa_linked_against_Go_static_asset_library : CAPA  {
 		or 	$str_cfn  
 	) 
 		or  (
-					$re_cfo 
-		and 			$re_cfp  
+			$re_cfo 
+		and 	$re_cfp  
 	) 
 		or  (
 			$str_cfq  
@@ -12479,12 +11010,8 @@ rule capa_receive_data : CAPA B0030_002  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			capa_receive_data_on_socket
 
@@ -12510,14 +11037,10 @@ rule capa_send_HTTP_request : CAPA C0002_003  {
 	license = "Apache-2.0 License"
 
   strings: 
- 		$re_cfy = /HTTP/ nocase ascii wide 
+ 	$re_cfy = /HTTP/ nocase ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 		 (
@@ -12536,7 +11059,7 @@ rule capa_send_HTTP_request : CAPA C0002_003  {
 		or  (
 			capa_send_data_on_socket
 
-		and 		$re_cfy  
+		and 	$re_cfy  
 	)  
 	) 
 }
@@ -12555,12 +11078,8 @@ rule capa_write_pipe : CAPA C0003_004  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 		 (
@@ -12591,12 +11110,8 @@ rule capa_download_and_write_a_file : CAPA T1105 B0030_003  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			capa_receive_data
 
@@ -12622,27 +11137,23 @@ rule capa_create_container : CAPA T1610  {
   strings: 
  	$re_cjh = /\bdocker(\.exe)? create/ ascii wide 
 	$re_cji = /\bdocker(\.exe)? start/ ascii wide 
-		$re_cjj = /\/v1\.[0-9]{1,2}\/containers\/create/ ascii wide  // docker API endpoint, e.g., /v1.24/containers/create
-		$re_cjk = /\/v1\.[0-9]{1,2}\/containers\/[0-9a-fA-F]+\/start/ ascii wide  // docker API endpoint, e.g., /v1.24/containers/e90e34656806/start
+	$re_cjj = /\/v1\.[0-9]{1,2}\/containers\/create/ ascii wide  // docker API endpoint, e.g., /v1.24/containers/create
+	$re_cjk = /\/v1\.[0-9]{1,2}\/containers\/[0-9a-fA-F]+\/start/ ascii wide  // docker API endpoint, e.g., /v1.24/containers/e90e34656806/start
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_cjh 
 		or 	$re_cji 
 		or  (
 			capa_send_HTTP_request
 
-		and 		$re_cjj  
+		and 	$re_cjj  
 	) 
 		or  (
 			capa_send_HTTP_request
 
-		and 		$re_cjk  
+		and 	$re_cjk  
 	)  
 	) 
 }
@@ -12663,20 +11174,16 @@ rule capa_list_containers : CAPA T1609  {
 
   strings: 
  	$re_cjp = /\bdocker(\.exe)? ps/ ascii wide 
-		$re_cjq = /\/v1\.[0-9]{1,2}\/containers\/json/ ascii wide  // docker API endpoint, e.g., /v1.24/containers/json?all=1&before=8dfafdbc3a40&size=1
+	$re_cjq = /\/v1\.[0-9]{1,2}\/containers\/json/ ascii wide  // docker API endpoint, e.g., /v1.24/containers/json?all=1&before=8dfafdbc3a40&size=1
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_cjp 
 		or  (
 			capa_send_HTTP_request
 
-		and 		$re_cjq  
+		and 	$re_cjq  
 	)  
 	) 
 }
@@ -12693,12 +11200,8 @@ rule capa_receive_and_write_data_from_server_to_client : CAPA  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			capa_receive_data
 
@@ -12723,20 +11226,16 @@ rule capa_build_Docker_image : CAPA T1612  {
 
   strings: 
  	$re_cke = /\bdocker(\.exe)? build/ ascii wide 
-		$re_ckf = /\/v1\.[0-9]{1,2}\/build/ ascii wide  // docker API endpoint, e.g., /v1.24/build
+	$re_ckf = /\/v1\.[0-9]{1,2}\/build/ ascii wide  // docker API endpoint, e.g., /v1.24/build
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_cke 
 		or  (
 			capa_send_HTTP_request
 
-		and 		$re_ckf  
+		and 	$re_ckf  
 	)  
 	) 
 }
@@ -12759,15 +11258,11 @@ rule capa_run_in_container : CAPA T1609  {
  	$re_ckg = /\bdocker(\.exe)? exec/ ascii wide 
 	$re_ckh = /\bkubectl(\.exe)? exec/ ascii wide 
 	$re_cki = /\bkubectl(\.exe)? run/ ascii wide 
-		$re_ckj = /\/v1\.[0-9]{1,2}\/containers\/[0-9a-fA-F]+\/exec/ ascii wide  // docker API endpoint, e.g., /v1.24/containers/e90e34656806/exec
-		$re_ckk = /\/v1\.[0-9]{1,2}\/exec\/[0-9a-fA-F]+\/start/ ascii wide  // docker API endpoint, e.g., /v1.24/exec/e90e34656806/start
+	$re_ckj = /\/v1\.[0-9]{1,2}\/containers\/[0-9a-fA-F]+\/exec/ ascii wide  // docker API endpoint, e.g., /v1.24/containers/e90e34656806/exec
+	$re_ckk = /\/v1\.[0-9]{1,2}\/exec\/[0-9a-fA-F]+\/start/ ascii wide  // docker API endpoint, e.g., /v1.24/exec/e90e34656806/start
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$re_ckg 
 		or 	$re_ckh 
@@ -12775,12 +11270,12 @@ rule capa_run_in_container : CAPA T1609  {
 		or  (
 			capa_send_HTTP_request
 
-		and 		$re_ckj  
+		and 	$re_ckj  
 	) 
 		or  (
 			capa_send_HTTP_request
 
-		and 		$re_ckk  
+		and 	$re_ckk  
 	)  
 	) 
 }
@@ -12800,12 +11295,8 @@ rule capa_send_HTTP_request_with_Host_header : CAPA  {
   strings: 
  	$re_ckl = /Host:/ nocase ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			capa_send_HTTP_request
 
@@ -12828,12 +11319,8 @@ rule capa_make_an_HTTP_request_with_a_Cookie : CAPA  {
   strings: 
  	$re_cks = /Cookie:/ nocase ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			capa_send_HTTP_request
 
@@ -12855,12 +11342,8 @@ rule capa_send_data : CAPA B0030_001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			capa_send_HTTP_request
 
@@ -12883,12 +11366,8 @@ rule capa_read_and_send_data_from_client_to_server : CAPA  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			capa_read_file
 
@@ -12912,12 +11391,8 @@ rule capa_create_reverse_shell : CAPA T1059_003 B0022_001  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			capa_create_pipe
@@ -12961,12 +11436,8 @@ rule capa_delete_file : CAPA C0047  {
 	$api_cqc = /\bremove(A|W)?\b/ ascii wide
 	$api_cqd = /\b_wremove(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /DeleteFile/) 
 		or 	$api_cpz 
@@ -12991,12 +11462,8 @@ rule capa_check_if_file_exists : CAPA T1083  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/shlwapi/i, /PathFileExists/)  
 	) 
@@ -13020,12 +11487,8 @@ rule capa_copy_file : CAPA C0045  {
  	$api_cqf = /\bCopyFile2(A|W)?\b/ ascii wide
 	$api_cqg = /\bCopyFileTransacted(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /CopyFile/) 
 		or 	pe.imports(/kernel32/i, /CopyFileEx/) 
@@ -13049,12 +11512,8 @@ rule capa_run_as_service : CAPA E1480_m07  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.exports("ServiceMain")  
 	) 
@@ -13077,23 +11536,19 @@ rule capa_get_disk_size : CAPA T1082  {
 	license = "Apache-2.0 License"
 
   strings: 
- 			$re_cqm = /SELECT\s+\*\s+FROM\s+Win32_LogicalDisk/ nocase ascii wide 
-			$re_cqn = /SELECT\s+\*\s+FROM\s+Win32_DiskDrive\s+WHERE\s+\(SerialNumber\s+IS\s+NOT\s+NULL\)\s+AND\s+\(MediaType\s+LIKE\s+\'Fixed\s+hard\s+disk\%\'\)/ nocase ascii wide 
+ 	$re_cqm = /SELECT\s+\*\s+FROM\s+Win32_LogicalDisk/ nocase ascii wide 
+	$re_cqn = /SELECT\s+\*\s+FROM\s+Win32_DiskDrive\s+WHERE\s+\(SerialNumber\s+IS\s+NOT\s+NULL\)\s+AND\s+\(MediaType\s+LIKE\s+\'Fixed\s+hard\s+disk\%\'\)/ nocase ascii wide 
 	$str_cqo = "Size" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /GetDiskFreeSpace/) 
 		or 	pe.imports(/kernel32/i, /GetDiskFreeSpaceEx/) 
 		or  (
 		 (
-					$re_cqm 
-		or 			$re_cqn  
+			$re_cqm 
+		or 	$re_cqn  
 	) 
 		and 	$str_cqo  
 	)  
@@ -13120,12 +11575,8 @@ rule capa_interact_with_driver_via_control_codes : CAPA T1569_002  {
 	$api_cqq = /\bNtUnloadDriver(A|W)?\b/ ascii wide
 	$api_cqr = /\bZwUnloadDriver(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$api_cqp 
 		or 	$api_cqq 
@@ -13151,12 +11602,8 @@ rule capa_get_local_IPv4_addresses : CAPA T1016  {
   strings: 
  	$api_cqu = /\bGetAdaptersAddresses(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			$api_cqu  
@@ -13179,12 +11626,8 @@ rule capa_get_session_user_name : CAPA T1033 T1087  {
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/advapi32/i, /GetUserName/) 
 		or 	pe.imports(/secur32/i, /GetUserNameEx/)  
@@ -13215,12 +11658,8 @@ rule capa_encrypt_data_using_Sosemanuk : CAPA T1027 E1027_m05 C0027_008  {
 	$cra = { 00 00 00 00 18 0F 40 CD 30 1E 80 33 28 11 C0 FE 60 3C A9 66 78 33 E9 AB 50 22 29 55 48 2D 69 98 C0 78 FB CC D8 77 BB 01 F0 66 7B FF E8 69 3B 32 A0 44 52 AA B8 4B 12 67 90 5A D2 99 88 55 92 54 29 F0 5F 31 31 FF 1F FC 19 EE DF 02 01 E1 9F CF 49 CC F6 57 51 C3 B6 9A 79 D2 76 64 61 DD 36 A9 E9 88 A4 FD F1 87 E4 30 D9 96 24 CE C1 99 64 03 89 B4 0D 9B 91 BB 4D 56 B9 AA 8D A8 A1 A5 CD 65 } // mul_ia
 	$crb = { 00 00 00 00 CD 40 0F 18 33 80 1E 30 FE C0 11 28 66 A9 3C 60 AB E9 33 78 55 29 22 50 98 69 2D 48 CC FB 78 C0 01 BB 77 D8 FF 7B 66 F0 32 3B 69 E8 AA 52 44 A0 67 12 4B B8 99 D2 5A 90 54 92 55 88 31 5F F0 29 FC 1F FF 31 02 DF EE 19 CF 9F E1 01 57 F6 CC 49 9A B6 C3 51 64 76 D2 79 A9 36 DD 61 FD A4 88 E9 30 E4 87 F1 CE 24 96 D9 03 64 99 C1 9B 0D B4 89 56 4D BB 91 A8 8D AA B9 65 CD A5 A1 } // mul_ia_4byte_array_le
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$cqy 
 		or 	$cqz 
@@ -13261,12 +11700,8 @@ rule capa_encrypt_data_using_DES : CAPA T1027 E1027_m05 C0027_004  {
 	$cro = { 20 01 02 03 04 05 04 05 06 07 08 09 08 09 0A 0B 0C 0D 0C 0D 0E 0F 10 11 10 11 12 13 14 15 14 15 16 17 18 19 18 19 1A 1B 1C 1D 1C 1D 1E 1F 20 01 } // DES Expansion
 	$crp = { 10 07 14 15 1D 0C 1C 11 01 0F 17 1A 05 12 1F 0A 02 08 18 0E 20 1B 03 09 13 0D 1E 06 16 0B 04 19 } // PBOX
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$crc 
 		or 	$crd 
@@ -13304,12 +11739,8 @@ rule capa_hash_data_with_CRC32 : CAPA C0032_001  {
   strings: 
  	$api_cru = /\bRtlComputeCrc32(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$api_cru  
 	) 
@@ -13336,12 +11767,8 @@ rule capa_hash_data_using_SHA1 : CAPA C0029_002  {
 	$num_cry = { 76 54 32 10 }
 	$num_crz = { F0 E1 D2 C3 }
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 		$num_crv 
@@ -13373,12 +11800,8 @@ rule capa_hash_data_using_tiger : CAPA C0029_005  {
 	$csd = { 9B F3 DA F1 2F CC 9F F4 81 92 F2 6F C6 D5 7F 48 3F A8 DC FC 67 06 A3 E8 63 CE FC D2 E3 4B 9B 2C C2 BB FB 93 4B F7 3F DA 66 BA 70 FE D2 65 A1 2F D4 93 0E 97 79 E2 03 A1 71 5E E4 B0 77 EC CD BE 97 E4 85 39 72 1E B4 CF 17 50 F7 5E 02 AA 0A B7 E0 B8 40 38 F0 09 23 D4 79 85 89 35 D0 1A FC 8E C5 AB B2 E2 0B 92 C6 96 72 91 5A 37 63 41 AF 66 FB 27 71 CA DC AB 74 21 41 FF 72 4A A6 CE 3C B3 A5 66 30 08 33 49 4A F0 F5 9A 28 D7 CD 0A 97 8D 5E C2 C8 31 E0 E8 96 8F 47 5D 87 76 22 C0 FE F3 DD 90 61 05 10 F3 7B EC 91 14 0F } // sbox3
 	$cse = { 55 3C 32 26 85 60 0E 5B F5 59 1B FA A9 C1 46 1A FA 8F 4C 7C A1 45 E2 A9 D7 55 29 DB 59 51 CA 65 C2 AF 35 CE 76 0A DB 05 45 3D 11 A9 7E C7 EA 81 0D 0A AC B6 8A F8 8E 52 FF E3 7B 59 53 A2 9E A0 56 CD 48 AC B3 DF 0D 43 6F E4 5C F4 7A A6 B3 C4 5E D0 E2 FB D8 CF CE 4E F0 35 99 B3 10 6F F5 3E C6 19 D6 9C 82 D6 22 0B 69 20 DF 74 0A 46 FD 17 40 ED 10 85 8E CC F8 6C A7 CA 6E 3A BF 24 C8 D6 49 70 81 1A 58 3D 24 61 A2 63 C1 BB B6 AC 8B 04 32 CC 44 7D C2 8A A3 D9 AB 10 F4 AA 5B FF DD 7F 4B 82 04 A8 5A 49 6D AD 94 9F 8C } // sbox4
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			$csb 
 		or 	$csc 
@@ -13416,12 +11839,8 @@ rule capa_hash_data_using_murmur3 : CAPA C0030_001  {
 	$num_csr = { D5 53 42 11 91 7B C3 87 } // 64-bit c1 for 128-bit hash
 	$num_css = { 7F 93 45 27 43 AD F5 4C } // 64-bit c2 for 128-bit hash
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 		$num_csh 
@@ -13464,28 +11883,24 @@ rule capa_persist_via_Windows_service : CAPA T1543_003 T1569_002  {
 	license = "Apache-2.0 License"
 
   strings: 
- 				$re_csv = /\bsc(\.exe)?$/ nocase ascii wide 
-				$re_csw = /create / nocase ascii wide 
-			$re_csx = /\bsc(\.exe)? create/ nocase ascii wide 
-			$re_csy = /New-Service / nocase ascii wide 
+ 	$re_csv = /\bsc(\.exe)?$/ nocase ascii wide 
+	$re_csw = /create / nocase ascii wide 
+	$re_csx = /\bsc(\.exe)? create/ nocase ascii wide 
+	$re_csy = /New-Service / nocase ascii wide 
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			capa_create_process
 
 		and  (
 		 (
-						$re_csv 
-		and 				$re_csw  
+			$re_csv 
+		and 	$re_csw  
 	) 
-		or 			$re_csx 
-		or 			$re_csy  
+		or 	$re_csx 
+		or 	$re_csy  
 	)  
 	)  
 	) 
@@ -13510,12 +11925,8 @@ rule capa_move_file : CAPA  {
 	$api_ctj = /\brename(A|W)?\b/ ascii wide
 	$api_ctk = /\b_wrename(A|W)?\b/ ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 			pe.imports(/kernel32/i, /MoveFile/) 
 		or 	pe.imports(/kernel32/i, /MoveFileEx/) 
@@ -13546,12 +11957,8 @@ rule capa_hash_data_with_MD5 : CAPA  {
 	$num_ctu = { 76 54 32 10 }
 	$num_ctv = { F0 E1 D2 C3 }
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 		$num_ctr 
@@ -13585,12 +11992,8 @@ rule capa_capture_screenshot : CAPA T1113 E1113_m01  {
   strings: 
  	$str_cud = "DISPLAY" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 		 (
@@ -13631,12 +12034,8 @@ rule capa_gather_leapftp_information : CAPA T1555  {
 	$str_cug = "sites.dat" ascii wide
 	$str_cuh = "sites.ini" ascii wide
  
-  condition: 
-	(
-		uint16be(0) == 0x4d5a or
-		uint16be(0) == 0x558b or
-		uint16be(0) == 0x5649
-	) and
+  condition:
+    capa_pe_file and
  (
 		 (
 			$str_cue 
@@ -13650,6 +12049,6 @@ rule capa_gather_leapftp_information : CAPA T1555  {
 
 // converted rules              : 403
 //   among those are incomplete : 20
-// unconverted rules            : 130
+// unconverted rules            : 149
 
 

@@ -1,0 +1,3949 @@
+rule:
+  meta:
+    name: contain pusha popa sequence
+    author: moritz.raabe@fireeye.com
+    lib: true
+    scope: function
+    examples:
+      - a5c70086b3bc4fe64f4e7a0aa452e620:0x35007200
+  features:
+    - and:
+      - or:
+        - count(mnemonic(pusha)): 2 or more
+        # vivisect
+        - count(mnemonic(pushad)): 2 or more
+      - or:
+        - count(mnemonic(popa)): 2 or more
+        # vivisect
+        - count(mnemonic(popad)): 2 or more
+
+Reason: Range (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/lib/contain-pusha-popa-sequence.yml
+----------------------------------------------
+rule:
+  meta:
+    name: validate payment card number using luhn algorithm with no lookup table
+    author: "@_re_fox"
+    lib: true
+    scope: function
+    mbc:
+      - Data::Checksum::Luhn [C0032.002]
+    examples:
+      - 6fcc13563aad936c7d0f3165351cb453:0x4026C0
+  features:
+    - and:
+      - characteristic: loop
+        description: Iterate over CC digits
+      - or:
+        - basic block:
+          - and:
+            - or:
+              - mnemonic: add
+              - and:
+                - mnemonic: shl
+                - number: 0x1
+              - and:
+                - mnemonic: imul
+                - number: 0x2
+            - mnemonic: cmp
+            - number: 0x9
+            - description: Digital Root check number*2 < 0x9
+        - and:
+          - basic block:
+            - and:
+              - mnemonic: cmp
+              - number: 0x9
+              - description: Compare number to 0x9 for Digital Root
+          - basic block:
+            - or:
+              - mnemonic: add
+              - and:
+                - mnemonic: imul
+                - number: 0x2
+              - and:
+                - mnemonic: shl
+                - number: 0x1
+              - description: 2*Number for Digital Root
+      - basic block:
+        - or:
+          - and:
+            - number: 0x30
+            - mnemonic: sub
+            - description: Conversion of chr to int (SUB 0x30)
+          - and:
+            - mnemonic: lea
+            - offset: -0x30
+            - description: Conversion of chr to int (LEA REG,[REG+ -0x30])
+      - basic block:
+        - or:
+          - and:
+            - or:
+              - mnemonic: div
+              - and:
+                - mnemonic: idiv
+                - mnemonic: cdq
+            - number: 0xa
+            - optional:
+              - mnemonic: neg
+            - description: Final section returning checkum % 10
+          - and:
+            - mnemonic: shr
+            - mnemonic: imul
+            - number: 0x66666667
+            - number: 0x1f
+            - number: 0x2
+            - optional:
+              - mnemonic: neg
+            - description: Compiler optimized returning checkum % 10
+
+Reason: characteristic (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/lib/validate-payment-card-number-using-luhn-algorithm-with-no-lookup-table.yml
+----------------------------------------------
+rule:
+  meta:
+    name: contain loop
+    author: moritz.raabe@fireeye.com
+    lib: true
+    scope: function
+    examples:
+      - 08AC667C65D36D6542917655571E61C8:0x406EAA
+  features:
+    - or:
+      - characteristic: loop
+      - characteristic: tight loop
+      - characteristic: recursive call
+
+Reason: Multiple statements inside "- or:" where all unsupported, the last one was "characteristic" (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/lib/contain-loop.yml
+----------------------------------------------
+rule:
+  meta:
+    name: calculate modulo 256 via x86 assembly
+    author: moritz.raabe@fireeye.com
+    lib: true
+    scope: basic block
+    mbc:
+      - Data::Modulo [C0058]
+    examples:
+      - 9324D1A8AE37A36AE560C37448C9705A:0x4049A9
+  features:
+    #  and ecx, 800000FFh
+    #  and ecx, 0FFh
+    - and:
+      - mnemonic: and
+      - or:
+        - number: 0x800000FF
+        - number: 0xFF
+
+Reason: mnemonic (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/lib/calculate-modulo-256-via-x86-assembly.yml
+----------------------------------------------
+rule:
+  meta:
+    name: validate payment card number using luhn algorithm with lookup table
+    author: "@_re_fox"
+    lib: true
+    scope: function
+    mbc:
+      - Data::Checksum::Luhn [C0032.002]
+    examples:
+      - 1d8fd13c890060464019c0f07b928b1a:0x401920
+      - 60abaef3fda131ffa20df480cb3f8029:0x4048e0
+  features:
+    - and:
+      - not:
+        - characteristic: nzxor
+      - characteristic: loop
+        description: Iterate over CC digits
+      - basic block:
+        - or:
+          - 8 or more:
+            - description: Digital root lookup table
+            - number: 0x0
+            - number: 0x2
+            - number: 0x4
+            - number: 0x6
+            - number: 0x8
+            - number: 0x1
+            - number: 0x3
+            - number: 0x5
+            - number: 0x7
+            - number: 0x9
+          - 8 or more:
+            - description: Digital root lookup table via neg numbers
+            - number: 0x0
+            - number: 0x1
+            - number: 0x2
+            - number: 0x3
+            - number: 0x4
+            - number: 0xfffffffc
+            - number: 0xfffffffd
+            - number: 0xfffffffe
+            - number: 0xffffffff
+      - basic block:
+        - or:
+          - and:
+            - description: Conversion of chr to int (SUB 0x30)
+            - number: 0x30
+            - mnemonic: sub
+          - and:
+            - description: Conversion of chr to int (LEA REG,[REG+ -0x30])
+            - mnemonic: lea
+            - offset: -0x30
+      - basic block:
+        - or:
+          - and:
+            - description: Final section returning checkum % 10
+            - mnemonic: idiv
+            - mnemonic: cdq
+            - number: 0xa
+            - optional:
+              - mnemonic: neg
+          - and:
+            - description: Compiler optimized returning checkum % 10
+            - mnemonic: shr
+            - mnemonic: imul
+            - number: 0x66666667
+            - number: 0x1f
+            - number: 0x2
+            - optional:
+              - mnemonic: neg
+
+Reason: characteristic (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/lib/validate-payment-card-number-using-luhn-algorithm-with-lookup-table.yml
+----------------------------------------------
+rule:
+  meta:
+    name: allocate RW memory
+    author: 0x534a@mailbox.org
+    lib: true
+    scope: basic block
+    mbc:
+      - Memory::Allocate Memory [C0007]
+    examples:
+      - Practical Malware Analysis Lab 17-02.dll_:0x1000D10D
+  features:
+    - and:
+      - match: allocate memory
+      - number: 0x4 = PAGE_READWRITE
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/lib/allocate-rw-memory.yml
+----------------------------------------------
+rule:
+  meta:
+    name: PEB access
+    author: michael.hunhoff@fireeye.com
+    lib: true
+    scope: basic block
+    mbc:
+      - Anti-Behavioral Analysis::Debugger Detection::Process Environment Block [B0001.019]
+    references:
+      - https://github.com/LordNoteworthy/al-khaser/blob/master/al-khaser/AntiDebug/NtGlobalFlag.cpp
+    examples:
+      - al-khaser_x86.exe_:0x420D20
+  features:
+    - or:
+      - characteristic: peb access
+      - and:
+        # https://github.com/LordNoteworthy/al-khaser/blob/master/al-khaser/AntiDebug/NtGlobalFlag.cpp#L41
+        - characteristic: fs access
+        - or:
+          - offset/x32: 0x30
+          - and:
+            - number/x32: 0x30
+            - mnemonic: add
+      - and:
+        - characteristic: gs access
+        - or:
+          - offset/x64: 0x60
+          - and:
+            - number/x64: 0x60
+            - mnemonic: add
+      - and:
+        # WoW64 PEB address is fetched via the WoW64 Thread Environment Block (TEB) at FS:[0x18]-0x2000
+        # https://github.com/LordNoteworthy/al-khaser/blob/master/al-khaser/AntiDebug/NtGlobalFlag.cpp#L45
+        - characteristic: fs access
+        - mnemonic: sub
+        - number: 0x2000
+
+Reason: Multiple statements inside "- or:" where all unsupported, the last one was "And" (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/lib/peb-access.yml
+----------------------------------------------
+rule:
+  meta:
+    name: overwrite Master Boot Record (MBR)
+    namespace: impact/wipe-disk/wipe-mbr
+    author: michael.hunhoff@fireeye.com
+    scope: function
+    att&ck:
+      - Impact::Disk Wipe::Disk Structure Wipe [T1561.002]
+    examples:
+      - 39C05B15E9834AC93F206BC114D0A00C357C888DB567BA8F5345DA0529CBED41:0x100070A0
+  features:
+    - and:
+      - string: "\\\\.\\PHYSICALDRIVE0"
+      - api: kernel32.WriteFile
+      # MBR/sector size in bytes
+      - number: 0x200
+      - or:
+        # MBR signature constant
+        - number: 0x55
+        # MBR signature constant
+        - number: 0xAA
+      - optional:
+        - api: kernel32.CreateFile
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/impact/wipe-disk/wipe-mbr/overwrite-master-boot-record-mbr.yml
+----------------------------------------------
+rule:
+  meta:
+    name: execute shell command and capture output
+    namespace: c2/shell
+    author: matthew.williams@fireeye.com
+    scope: function
+    att&ck:
+      - Execution::Command and Scripting Interpreter::Windows Command Shell [T1059.003]
+    references:
+      - https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/ns-processthreadsapi-startupinfoa
+    examples:
+      - Practical Malware Analysis Lab 14-02.exe_:0x4011C0
+  features:
+    - and:
+      - match: create a process with modified I/O handles and window
+      - match: create pipe
+      - or:
+        - match: get COMSPEC environment variable
+        - string: "\\cmd.exe"
+        - string: "cmd.exe"
+        - string: "cmd.exe /c "
+        - string: "C:\\Windows\\system32\\cmd.exe"
+      - optional:
+        - api: kernel32.GetSystemDirectory
+        - api: kernel32.SetCurrentDirectory
+        - match: create thread
+        - match: read pipe
+
+Reason: needed sub-rule not converted (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/c2/shell/execute-shell-command-and-capture-output.yml
+----------------------------------------------
+rule:
+  meta:
+    name: patch process command line
+    namespace: anti-analysis/anti-forensic
+    author:
+      - william.ballenthin@fireeye.com
+      - '@_re_fox'
+    scope: function
+    references:
+      - https://stackoverflow.com/q/24754844/87207
+      - https://blog.xpnsec.com/how-to-argue-like-cobalt-strike/
+    examples:
+      - e353d3fbfb5c3738a77a622adff9a416:0x401626
+  features:
+    - or:
+      - and:
+        - basic block:
+          # example:
+          #   mov     rbx, gs:60h
+          #   lea     r9, [rsp+4A0h+flOldProtect] ; lpflOldProtect
+          #   mov     edx, 8          ; dwSize
+          #   mov     rcx, [rbx+20h]
+          #   add     rcx, 70h ; 'p'  ; lpAddress
+          #   lea     r8d, [rdx-4]    ; flNewProtect
+          #   call    cs:VirtualProtect
+          #   test    eax, eax
+          - and:
+            - characteristic: gs access
+            - offset/x64: 0x60 = PEB
+            - offset/x64: 0x20 = PEB->ProcessParameters
+            - offset/x64: 0x70 = PEB->ProcessParameters->CommandLine
+            - api: VirtualProtect
+        - count(api(VirtualProtect)): 2 or more
+      - and:
+        - characteristic: indirect call
+        - api: GetProcAddress
+        - string: "NtQueryInformationProcess"
+        - api: ReadProcessMemory
+        - or:
+          - and:
+            - offset/x32: 0x10 = PEB->ProcessParameters
+            - offset/x32: 0x40 = PEB->ProcessParameters->CommandLine
+          - and:
+            - offset/x64: 0x20 = PEB->ProcessParameters
+            - offset/x64: 0x70 = PEB->ProcessParameters->CommandLine
+
+Reason: Multiple statements inside "- or:" where all unsupported, the last one was "And" (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-forensic/patch-process-command-line.yml
+----------------------------------------------
+rule:
+  meta:
+    name: crash the Windows event logging service
+    namespace: anti-analysis/anti-forensic
+    author: michael.hunhoff@fireeye.com
+    scope: basic block
+    att&ck:
+      - Defense Evasion::Impair Defenses::Disable Windows Event Logging [T1562.002]
+    references:
+      - https://github.com/limbenjamin/LogServiceCrash
+    examples:
+      - 82BF6347ACF15E5D883715DC289D8A2B:0x14005E0C0
+  features:
+    - and:
+      - count(api(advapi32.ElfClearEventLogFileW)): 3 or more
+      - count(api(advapi32.OpenEventLogA)): 1 or more
+
+Reason: Range (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-forensic/crash-the-windows-event-logging-service.yml
+----------------------------------------------
+rule:
+  meta:
+    name: contain obfuscated stackstrings
+    namespace: anti-analysis/obfuscation/string/stackstring
+    author: moritz.raabe@fireeye.com
+    scope: basic block
+    att&ck:
+      - Defense Evasion::Obfuscated Files or Information::Indicator Removal from Tools [T1027.005]
+    mbc:
+      - Anti-Static Analysis::Disassembler Evasion::Argument Obfuscation [B0012.001]
+    examples:
+      - Practical Malware Analysis Lab 16-03.exe_:0x4013D0
+  features:
+    - characteristic: stack string
+
+Reason: characteristic (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/anti-analysis/obfuscation/string/stackstring/contain-obfuscated-stackstrings.yml
+----------------------------------------------
+rule:
+  meta:
+    name: contain anti-disasm techniques
+    namespace: anti-analysis/anti-disasm
+    author: moritz.raabe@fireeye.com
+    scope: file
+    mbc:
+      - Anti-Static Analysis::Disassembler Evasion [B0012]
+    examples:
+      - a5c70086b3bc4fe64f4e7a0aa452e620
+  features:
+    - or:
+      - count(match(contain pusha popa sequence)): 10 or more
+
+Reason: Multiple statements inside "- or:" where all unsupported, the last one was "Range" (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-disasm/contain-anti-disasm-techniques.yml
+----------------------------------------------
+rule:
+  meta:
+    name: 64-bit execution via heavens gate
+    namespace: anti-analysis/anti-disasm
+    author: '@recvfrom'
+    description: Looks for instructions related to executing 64-bit code from a 32-bit process (Heaven's Gate)
+    scope: function
+    mbc:
+      - Defense Evasion::Disable or Evade Security Tools::Heavens Gate [F0004.008]
+    references:
+      - https://download.bitdefender.com/resources/files/News/CaseStudies/study/318/Bitdefender-TRR-Whitepaper-Maze-creat4351-en-EN-GenericUse.pdf
+      - https://www.malwaretech.com/2014/02/the-0x33-segment-selector-heavens-gate.html
+    examples:
+      - 79abd17391adc6251ecdc58d13d76baf:0x10002385
+  features:
+    - and:
+      - and:
+        - or:
+          - mnemonic: push = 'push 33h'
+          - mnemonic: mov = cover any mov ESP / EBP equivalents
+        - number: 0x33 = set up retf to push 0x33 to CS indicating 64-bit mode
+      - mnemonic: call = 'call $+5' pushes the current EIP onto the stack, +5 to jump past call insn bytes
+      - and:
+        - mnemonic: add = 'add dword ptr[esp], 5' updates the return address to point after retf
+        - number: 0x5 = length of add + retf insn bytes
+      - mnemonic: retf = set EIP = [ESP] and CS = [ESP+4]
+
+Reason: mnemonic (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-disasm/64-bit-execution-via-heavens-gate.yml
+----------------------------------------------
+rule:
+  meta:
+    name: packed with generic packer
+    namespace: anti-analysis/packer/generic
+    author: william.ballenthin@fireeye.com
+    scope: function
+    att&ck:
+      - Defense Evasion::Obfuscated Files or Information::Software Packing [T1027.002]
+    mbc:
+      - Anti-Static Analysis::Software Packing::Standard Compression [F0001.002]
+    examples:
+      - Practical Malware Analysis Lab 18-01.exe_:0x409dc0
+  features:
+    - and:
+      - or:
+        - mnemonic: pusha
+        - mnemonic: pushad  # vivisect
+      - or:
+        - mnemonic: popa
+        - mnemonic: popad  # vivisect
+      - characteristic: cross section flow
+      - not:
+        - match: contain pusha popa sequence
+
+Reason: mnemonic (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/anti-analysis/packer/generic/packed-with-generic-packer.yml
+----------------------------------------------
+rule:
+  meta:
+    name: check for windows sandbox via dns suffix
+    namespace: anti-analysis/anti-vm/vm-detection
+    author: "@_re_fox"
+    scope: function
+    att&ck:
+      - Defense Evasion::Virtualization/Sandbox Evasion::System Checks [T1497.001]
+    mbc:
+      - Anti-Behavioral Analysis::Virtual Machine Detection [B0009]
+    references:
+      - https://github.com/LloydLabs/wsb-detect
+    examples:
+      - 773290480d5445f11d3dc1b800728966:0x140001140
+  features:
+    - and:
+      - api: GetAdaptersAddresses
+      - string: "mshome.net"
+      - offset: 0x38 = DnsSuffix
+      - match: contain loop
+
+Reason: offset (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-vm/vm-detection/check-for-windows-sandbox-via-dns-suffix.yml
+----------------------------------------------
+rule:
+  meta:
+    name: execute anti-VM instructions
+    namespace: anti-analysis/anti-vm/vm-detection
+    author: moritz.raabe@fireeye.com
+    scope: basic block
+    att&ck:
+      - Defense Evasion::Virtualization/Sandbox Evasion::System Checks [T1497.001]
+    mbc:
+      - Anti-Behavioral Analysis::Virtual Machine Detection::Instruction Testing [B0009.029]
+    examples:
+      - Practical Malware Analysis Lab 17-03.exe_:0x401A80
+  features:
+    - or:
+      - mnemonic: sidt
+      - mnemonic: sgdt
+      - mnemonic: sldt
+      - mnemonic: smsw
+      - mnemonic: str
+      - mnemonic: in
+      # many misleading hits in runtime code, see #194
+      # - mnemonic: cpuid
+      - mnemonic: vpcext
+
+Reason: Multiple statements inside "- or:" where all unsupported, the last one was "mnemonic" (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-vm/vm-detection/execute-anti-vm-instructions.yml
+----------------------------------------------
+rule:
+  meta:
+    name: check for unmoving mouse cursor
+    namespace: anti-analysis/anti-vm/vm-detection
+    author: BitsOfBinary
+    scope: function
+    att&ck:
+      - Defense Evasion::Virtualization/Sandbox Evasion::User Activity Based Checks [T1497.002]
+    mbc:
+      - Anti-Behavioral Analysis::Virtual Machine Detection::Human User Check [B0009.012]
+    references:
+      - https://www.joesecurity.org/blog/5852460122427342172
+    examples:
+      - d7ff81ff775d4ab50d31ac1e962c8c4dea7ff9f280aa2b42ddd06760a5665002:0x401118
+  features:
+    - and:
+      - count(api(user32.GetCursorPos)): 2 or more
+
+Reason: Range (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-vm/vm-detection/check-for-unmoving-mouse-cursor.yml
+----------------------------------------------
+rule:
+  meta:
+    name: check for windows sandbox via genuine state
+    namespace: anti-analysis/anti-vm/vm-detection
+    author: "@_re_fox"
+    scope: function
+    att&ck:
+      - Defense Evasion::Virtualization/Sandbox Evasion::System Checks [T1497.001]
+    mbc:
+      - Anti-Behavioral Analysis::Virtual Machine Detection [B0009]
+    references:
+      - https://github.com/LloydLabs/wsb-detect
+    examples:
+      - 773290480d5445f11d3dc1b800728966:0x140001140
+  features:
+    - and:
+      - basic block:
+        - and:
+          - api: SLIsGenuineLocal
+      - basic block:
+        - and:
+          - api: UuidFromString
+          - string: "55c92734-d682-4d71-983e-d6ec3f16059f"
+
+Reason: Depending on myself = basic block (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-vm/vm-detection/check-for-windows-sandbox-via-genuine-state.yml
+----------------------------------------------
+rule:
+  meta:
+    name: check for unexpected memory writes
+    namespace: anti-analysis/anti-debugging/debugger-detection
+    author: michael.hunhoff@fireeye.com
+    scope: basic block
+    mbc:
+      - Anti-Behavioral Analysis::Debugger Detection::Memory Write Watching [B0001.010]
+    references:
+      - https://github.com/LordNoteworthy/al-khaser/blob/master/al-khaser/AntiDebug/WriteWatch.cpp
+    examples:
+      - al-khaser_x86.exe_:0x431EBC
+  features:
+    - and:
+      - api: kernel32.GetWriteWatch
+      - number: 0x0
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-debugging/debugger-detection/check-for-unexpected-memory-writes.yml
+----------------------------------------------
+rule:
+  meta:
+    name: check for software breakpoints
+    namespace: anti-analysis/anti-debugging/debugger-detection
+    author: michael.hunhoff@fireeye.com
+    scope: function
+    mbc:
+      - Anti-Behavioral Analysis::Debugger Detection::Software Breakpoints [B0001.025]
+    references:
+      - https://github.com/LordNoteworthy/al-khaser/blob/master/al-khaser/AntiDebug/SoftwareBreakpoints.cpp
+    examples:
+      - al-khaser_x86.exe_:0x431020
+  features:
+    - and:
+      - basic block:
+        - and:
+          - mnemonic: cmp
+          - or:
+            - number: 0xCC
+            - and:
+              - number: 0xCD
+              - number: 0x3
+      - match: contain loop
+
+Reason: Depending on myself = basic block (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-debugging/debugger-detection/check-for-software-breakpoints.yml
+----------------------------------------------
+rule:
+  meta:
+    name: execute anti-debugging instructions
+    namespace: anti-analysis/anti-debugging/debugger-detection
+    author: moritz.raabe@fireeye.com
+    scope: function
+    mbc:
+      - Anti-Behavioral Analysis::Debugger Detection::Anti-debugging Instructions [B0001.034]
+    examples:
+      - Practical Malware Analysis Lab 16-03.exe_:0x401300
+  features:
+    - or:
+      - count(mnemonic(rdtsc)): 2 or more
+      - mnemonic: icebp
+
+Reason: Multiple statements inside "- or:" where all unsupported, the last one was "mnemonic" (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-debugging/debugger-detection/execute-anti-debugging-instructions.yml
+----------------------------------------------
+rule:
+  meta:
+    name: check for PEB BeingDebugged flag
+    namespace: anti-analysis/anti-debugging/debugger-detection
+    author: moritz.raabe@fireeye.com
+    scope: basic block
+    mbc:
+      - Anti-Behavioral Analysis::Debugger Detection::Process Environment Block BeingDebugged [B0001.035]
+    references:
+      - Practical Malware Analysis, Chapter 16, p. 353
+    examples:
+      - Practical Malware Analysis Lab 16-01.exe_:0x403530
+  features:
+    - and:
+      - match: PEB access
+      - offset: 2 = PEB.BeingDebugged
+
+Reason: needed sub-rule not converted (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-debugging/debugger-detection/check-for-peb-beingdebugged-flag.yml
+----------------------------------------------
+rule:
+  meta:
+    name: check for protected handle exception
+    namespace: anti-analysis/anti-debugging/debugger-detection
+    author: michael.hunhoff@fireeye.com
+    scope: function
+    mbc:
+      - Anti-Behavioral Analysis::Debugger Detection::SetHandleInformation [B0001.024]
+    references:
+      - https://github.com/LordNoteworthy/al-khaser/blob/master/al-khaser/AntiDebug/SetHandleInformation_API.cpp
+    examples:
+      - al-khaser_x86.exe_:0x430D20
+  features:
+    - and:
+      - basic block:
+        - and:
+          - count(number(2)): 2 or more
+          - api: SetHandleInformation
+      - api: CloseHandle
+
+Reason: Depending on myself = basic block (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-debugging/debugger-detection/check-for-protected-handle-exception.yml
+----------------------------------------------
+rule:
+  meta:
+    name: check for hardware breakpoints
+    namespace: anti-analysis/anti-debugging/debugger-detection
+    author: michael.hunhoff@fireeye.com
+    scope: function
+    mbc:
+      - Anti-Behavioral Analysis::Debugger Detection::Hardware Breakpoints [B0001.005]
+    references:
+      - https://github.com/LordNoteworthy/al-khaser/blob/master/al-khaser/AntiDebug/HardwareBreakpoints.cpp
+    examples:
+      - al-khaser_x86.exe_:0x42035D
+  features:
+    - and:
+      - api: kernel32.GetThreadContext
+      - number: 0x10010 = CONTEXT_DEBUG_REGISTERS
+      - offset: 0x4 = DR0
+      - offset: 0x8 = DR1
+      - offset: 0xC = DR2
+      - offset: 0x10 = DR3
+      - count(mnemonic(cmp)): 4 or more
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-debugging/debugger-detection/check-for-hardware-breakpoints.yml
+----------------------------------------------
+rule:
+  meta:
+    name: check for PEB NtGlobalFlag flag
+    namespace: anti-analysis/anti-debugging/debugger-detection
+    author: moritz.raabe@fireeye.com
+    scope: function
+    mbc:
+      - Anti-Behavioral Analysis::Debugger Detection::Process Environment Block NtGlobalFlag [B0001.036]
+    references:
+      - Practical Malware Analysis, Chapter 16, p. 355
+      - https://www.geoffchappell.com/studies/windows/win32/ntdll/structs/peb/index.htm
+    examples:
+      - Practical Malware Analysis Lab 16-01.exe_:0x403530
+  features:
+    - and:
+      - basic block:
+        - and:
+          - match: PEB access
+          - or:
+            - or:
+              - offset/x32: 0x68 = PEB.NtGlobalFlag
+              - offset/x64: 0xBC = PEB.NtGlobalFlag
+            - and:
+              - mnemonic: add
+              - or:
+                - number/x32: 0x68 = PEB.NtGlobalFlag
+                - number/x64: 0xBC = PEB.NtGlobalFlag
+      - number: 0x70 = (FLG_HEAP_ENABLE_TAIL_CHECK | FLG_HEAP_ENABLE_FREE_CHECK | FLG_HEAP_VALIDATE_PARAMETERS)
+
+Reason: Depending on myself = basic block (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-debugging/debugger-detection/check-for-peb-ntglobalflag-flag.yml
+----------------------------------------------
+rule:
+  meta:
+    name: check for trap flag exception
+    namespace: anti-analysis/anti-debugging/debugger-detection
+    author: michael.hunhoff@fireeye.com
+    scope: basic block
+    mbc:
+      - Anti-Behavioral Analysis::Debugger Detection [B0001]
+    references:
+      - https://github.com/LordNoteworthy/al-khaser/blob/master/al-khaser/AntiDebug/TrapFlag.cpp
+    examples:
+      - al-khaser_x86.exe_:0x431680
+      - al-khaser_x64.exe_:0x140030CB0
+  features:
+    - and:
+      - or:
+        - description: read/write EFLAGS register
+        - and:
+          - mnemonic: pushf
+          - mnemonic: popf
+        - and:
+          - mnemonic: pushfd
+          - mnemonic: popfd
+        - and:
+          - mnemonic: pushfq
+          - mnemonic: popfq
+      - or:
+        - description: set trap flag
+        - and:
+          - mnemonic: or
+          - number: 0x100
+        - and:
+          - mnemonic: bts
+          - number: 0x8
+
+Reason: mnemonic (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-debugging/debugger-detection/check-for-trap-flag-exception.yml
+----------------------------------------------
+rule:
+  meta:
+    name: check for time delay via GetTickCount
+    namespace: anti-analysis/anti-debugging/debugger-detection
+    author: michael.hunhoff@fireeye.com
+    scope: function
+    mbc:
+      - Anti-Behavioral Analysis::Debugger Detection::Timing/Delay Check GetTickCount [B0001.032]
+    examples:
+      - Practical Malware Analysis Lab 16-03.exe_:0x4013d0
+  features:
+    - and:
+      - count(api(kernel32.GetTickCount)): 2 or more
+
+Reason: Range (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-debugging/debugger-detection/check-for-time-delay-via-gettickcount.yml
+----------------------------------------------
+rule:
+  meta:
+    name: check process job object
+    namespace: anti-analysis/anti-debugging/debugger-detection
+    author: michael.hunhoff@fireeye.com
+    scope: function
+    mbc:
+      - Anti-Behavioral Analysis::Debugger Detection [B0001]
+    references:
+      - https://github.com/LordNoteworthy/al-khaser/blob/master/al-khaser/AntiDebug/ProcessJob.cpp
+    examples:
+      - al-khaser_x86.exe_:0x426730
+  features:
+    - and:
+      - match: contain loop
+      - basic block:
+        - and:
+          - api: kernel32.QueryInformationJobObject
+          - number: 0x3 = JobObjectBasicProcessIdList
+      - basic block:
+        - and:
+          - api: kernel32.OpenProcess
+          - number: 0x400 = PROCESS_QUERY_INFORMATION
+
+Reason: needed sub-rule not converted (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-debugging/debugger-detection/check-process-job-object.yml
+----------------------------------------------
+rule:
+  meta:
+    name: check for kernel debugger via shared user data structure
+    namespace: anti-analysis/anti-debugging/debugger-detection
+    author: michael.hunhoff@fireeye.com
+    scope: function
+    mbc:
+      - Anti-Behavioral Analysis::Debugger Detection [B0001]
+    references:
+      - https://github.com/LordNoteworthy/al-khaser/blob/master/al-khaser/AntiDebug/SharedUserData_KernelDebugger.cpp
+      - http://www.geoffchappell.com/studies/windows/km/ntoskrnl/structs/kuser_shared_data.htm
+    examples:
+      - al-khaser_x86.exe_:0x430E60
+  features:
+    - and:
+      - number: 0x7FFE02D4 = UserSharedData->KdDebuggerEnabled
+      - basic block:
+        - and:
+          - mnemonic: and
+          - number: 0x2 = KdDebuggerNotPresent
+      - basic block:
+        - and:
+          - mnemonic: and
+          - number: 0x1 = KdDebuggerEnabled
+
+Reason: Depending on myself = basic block (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-debugging/debugger-detection/check-for-kernel-debugger-via-shared-user-data-structure.yml
+----------------------------------------------
+rule:
+  meta:
+    name: check for time delay via QueryPerformanceCounter
+    namespace: anti-analysis/anti-debugging/debugger-detection
+    author: michael.hunhoff@fireeye.com
+    scope: function
+    mbc:
+      - Anti-Behavioral Analysis::Debugger Detection::Timing/Delay Check QueryPerformanceCounter [B0001.033]
+    examples:
+      - Practical Malware Analysis Lab 16-03.exe_:0x4011e0
+  features:
+    - and:
+      - count(api(kernel32.QueryPerformanceCounter)): 2 or more
+
+Reason: Range (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-debugging/debugger-detection/check-for-time-delay-via-queryperformancecounter.yml
+----------------------------------------------
+rule:
+  meta:
+    name: contain an embedded PE file
+    namespace: executable/subfile/pe
+    author: moritz.raabe@fireeye.com
+    scope: file
+    mbc:
+      - Execution::Install Additional Program [B0023]
+    examples:
+      - Practical Malware Analysis Lab 01-04.exe_:0x4060
+  features:
+    - or:
+      - count(characteristic(embedded pe)): 1 or more
+      - count(string(This program cannot be run in DOS mode.)): 2 or more
+
+Reason: Multiple statements inside "- or:" where all unsupported, the last one was "Range" (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/executable/subfile/pe/contain-an-embedded-pe-file.yml
+----------------------------------------------
+rule:
+  meta:
+    name: read file via mapping
+    namespace: host-interaction/file-system/read
+    author: michael.hunhoff@fireeye.com
+    scope: function
+    examples:
+      - Practical Malware Analysis Lab 01-01.exe_:0x401440
+  features:
+    - and:
+      - basic block:
+        - and:
+          - api: kernel32.MapViewOfFile
+          - number: 4 = FILE_MAP_READ
+      - optional:
+        - api: kernel32.UnmapViewOfFile
+        - and:
+          - match: get file size
+          - basic block:
+            - and:
+              - api: kernel32.CreateFileMapping
+              - number: 2 = PAGE_READONLY
+
+Reason: Depending on myself = basic block (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/read-file-via-mapping.yml
+----------------------------------------------
+rule:
+  meta:
+    name: get Program Files directory
+    namespace: host-interaction/file-system
+    author: moritz.raabe@fireeye.com
+    scope: basic block
+    att&ck:
+      - Discovery::File and Directory Discovery [T1083]
+    examples:
+      - BC452CC1128CCF7FA9F76D83CDA79132740414973600FED14509749FE946816E:0x407880
+  features:
+    - and:
+      - or:
+        - number: 0x26 = CSIDL_PROGRAM_FILES
+        - number: 0x2A = CSIDL_PROGRAM_FILESX86
+      - or:
+        - api: shell32.SHGetFolderPath
+        - api: shell32.SHGetFolderLocation
+        - api: shell32.SHGetSpecialFolderPath
+        - api: shell32.SHGetSpecialFolderLocation
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/get-program-files-directory.yml
+----------------------------------------------
+rule:
+  meta:
+    name: bypass Windows File Protection
+    namespace: host-interaction/file-system/windows-file-protection
+    author: michael.hunhoff@fireeye.com
+    scope: function
+    mbc:
+      - Defense Evasion::Disable or Evade Security Tools::Bypass Windows File Protection [F0004.007]
+    examples:
+      - Practical Malware Analysis Lab 01-04.exe_:0x401174
+  features:
+    - and:
+      - string: "sfc_os.dll"              #   System File Checker
+      - number: 0x2                     #   SfcTerminateWatcherThread
+      - match: link function at runtime
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/windows-file-protection/bypass-windows-file-protection.yml
+----------------------------------------------
+rule:
+  meta:
+    name: enumerate files via ntdll functions
+    namespace: host-interaction/file-system/files/list
+    author: moritz.raabe@fireeye.com
+    scope: function
+    att&ck:
+      - Discovery::File and Directory Discovery [T1083]
+    references:
+      - https://github.com/hfiref0x/TDL/blob/cc4b46ae1c939b14a22a734a727b163f873a41b5/Source/Furutaka/sup.c#L315
+    examples:
+      - 563653399B82CD443F120ECEFF836EA3678D4CF11D9B351BB737573C2D856299:0x14000203C
+  features:
+    - and:
+      - basic block:
+        - and:
+          - number: 1 = DIRECTORY_QUERY
+          - api: ntdll.NtOpenDirectoryObject
+      - api: ntdll.NtQueryDirectoryObject
+      - optional:
+        - api: RtlAllocateHeap
+        - match: contain loop
+        - characteristic: indirect call
+
+Reason: Depending on myself = basic block (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/files/list/enumerate-files-via-ntdll-functions.yml
+----------------------------------------------
+rule:
+  meta:
+    name: enumerate files recursively
+    namespace: host-interaction/file-system/files/list
+    author: "@_re_fox"
+    scope: function
+    att&ck:
+      - Discovery::File and Directory Discovery [T1083]
+    examples:
+      - 5f66b82558ca92e54e77f216ef4c066c:0x40640E
+  features:
+    - and:
+      - or:
+        - match: enumerate files via kernel32 functions
+        - match: enumerate files via ntdll functions
+      - characteristic: recursive call
+
+Reason: needed sub-rule not converted (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/files/list/enumerate-files-recursively.yml
+----------------------------------------------
+rule:
+  meta:
+    name: check OS version
+    namespace: host-interaction/os/version
+    author:
+      - michael.hunhoff@fireeye.com
+      - johnk3r
+    scope: function
+    att&ck:
+      - Discovery::System Information Discovery [T1082]
+    examples:
+      - 493167E85E45363D09495D0841C30648:0x401000
+      - 477743976643213d96b66ed5041a3b12:0x43CFF6
+  features:
+    - and:
+      - or:
+        - api: RtlGetVersion
+        - api: ntoskrnl.PsGetVersion
+        - api: GetVersion
+        - api: GetVersionEx
+        - api: VerifyVersionInfo
+        - api: VerSetConditionMask
+      - mnemonic: cmp
+      - or:
+        - and:
+          - number: 5 # Windows 2000
+          - optional:
+            - or:
+              - number: 0
+              - number: 1 # Windows XP
+              - number: 2 # Windows XP 64-bit / Windows Server 2003 / Windows Server 2003 R2
+        - and:
+          - number: 6 # Windows Vista / Windows Server 2008
+          - optional:
+            - or:
+              - number: 0
+              - number: 1 # Windows Server 2008 R2 / Windows 7
+              - number: 2 # Windows Server 2012 / Windows 8
+              - number: 3 # Windows Server 2012 R2 / Windows 8.1
+        - and:
+          - number: 10 # Windows Server 2016 / Windows Server 2019 / Windows 10
+          - optional:
+            - number: 0
+
+Reason: mnemonic (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/host-interaction/os/version/check-os-version.yml
+----------------------------------------------
+rule:
+  meta:
+    name: stop service
+    namespace: host-interaction/service/stop
+    author: moritz.raabe@fireeye.com
+    scope: function
+    att&ck:
+      - Persistence::Create or Modify System Process::Windows Service [T1543.003]
+      - Impact::Service Stop [T1489]
+    examples:
+      - E544A4D616B60147D9774B48C2B65EF2:0x402140
+  features:
+    - and:
+      - optional:
+        - match: get service handle
+      - number: 0x1 = SERVICE_CONTROL_STOP
+      - or:
+        - api: advapi32.ControlService
+        - api: advapi32.ControlServiceEx
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/host-interaction/service/stop/stop-service.yml
+----------------------------------------------
+rule:
+  meta:
+    name: get number of processors
+    namespace: host-interaction/hardware/cpu
+    author: michael.hunhoff@fireeye.com
+    scope: function
+    att&ck:
+      - Discovery::System Information Discovery [T1082]
+    references:
+      - https://github.com/LordNoteworthy/al-khaser/blob/master/al-khaser/AntiVM/Generic.cpp#L113
+    examples:
+      - al-khaser_x86.exe_:0x432CB0
+  features:
+    - and:
+      - match: PEB access
+      - or:
+        - number/x32: 0x64
+        - number/x64: 0xB8
+
+Reason: needed sub-rule not converted (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/host-interaction/hardware/cpu/get-number-of-processors.yml
+----------------------------------------------
+rule:
+  meta:
+    name: enumerate disk properties
+    namespace: host-interaction/hardware/storage
+    author: michael.hunhoff@fireeye.com
+    scope: function
+    att&ck:
+      - Discovery::System Information Discovery [T1082]
+    references:
+      - https://github.com/LordNoteworthy/al-khaser/blob/master/al-khaser/AntiVM/Generic.cpp#L518
+    examples:
+      - al-khaser_x86.exe_:0x4369B0
+  features:
+    - and:
+      - basic block:
+        - and:
+          - api: SetupAPI.SetupDiGetClassDevs
+          - bytes: 67 E9 36 4D 25 E3 CE 11 BF C1 08 00 2B E1 03 18 = GUID_DEVCLASS_DISKDRIVE
+      - api: SetupAPI.SetupDiEnumDeviceInfo
+      - api: SetupAPI.SetupDiGetDeviceRegistryProperty
+      - optional:
+        - api: SetupAPI.SetupDiDestroyDeviceInfoList
+
+Reason: Depending on myself = basic block (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/host-interaction/hardware/storage/enumerate-disk-properties.yml
+----------------------------------------------
+rule:
+  meta:
+    name: simulate CTRL ALT DEL
+    namespace: host-interaction/hardware/keyboard
+    author:
+      - michael.hunhoff@fireeye.com
+      - johnk3r
+    scope: function
+    mbc:
+      - Hardware::Simulate Hardware::Ctrl-Alt-Del [C0057.001]
+    examples:
+      - b766cc43d649d30e9f27aff8f7ee7de0:0x406153
+  features:
+    - and:
+      - optional:
+        - basic block:
+          - and:
+            - or:
+              - api: OpenDesktop
+              - api: OpenInputDesktop
+            - string: "Winlogon"
+      - basic block:
+        - and:
+          - api: PostMessage
+          - number: 0x2E0003 = (MOD_ALT | MOD_CONTROL | VK_DELETE)
+          - number: 0x312 = WM_HOTKEY
+          - number: 0xFFFF = HWND_BROADCAST
+
+Reason: Depending on myself = basic block (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/host-interaction/hardware/keyboard/simulate-ctrl-alt-del.yml
+----------------------------------------------
+rule:
+  meta:
+    name: hide the Windows taskbar
+    namespace: host-interaction/gui/taskbar/hide
+    author: michael.hunhoff@fireeye.com
+    scope: function
+    att&ck:
+      - Defense Evasion::Hide Artifacts [T1564]
+    examples:
+      - 39C05B15E9834AC93F206BC114D0A00C357C888DB567BA8F5345DA0529CBED41:0x10007250
+  features:
+    - and:
+      - match: find taskbar
+      - match: hide graphical window
+
+Reason: needed sub-rule not converted (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/host-interaction/gui/taskbar/hide/hide-the-windows-taskbar.yml
+----------------------------------------------
+rule:
+  meta:
+    name: hide graphical window
+    namespace: host-interaction/gui/window/hide
+    author: michael.hunhoff@fireeye.com
+    scope: basic block
+    att&ck:
+      - Defense Evasion::Hide Artifacts::Hidden Window [T1564.003]
+    examples:
+      - 39C05B15E9834AC93F206BC114D0A00C357C888DB567BA8F5345DA0529CBED41:0x10007250
+  features:
+    - and:
+      - number: 0x0 = SW_HIDE
+      - api: user32.ShowWindow
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/host-interaction/gui/window/hide/hide-graphical-window.yml
+----------------------------------------------
+rule:
+  meta:
+    name: get graphical window text
+    namespace: host-interaction/gui/window/get-text
+    author: moritz.raabe@fireeye.com
+    scope: function
+    mbc:
+      - Discovery::Application Window Discovery::Window Text [E1010.m01]
+    examples:
+      - B7841B9D5DC1F511A93CC7576672EC0C:0x10007A50
+  features:
+    - and:
+      - optional:
+        - api: user32.IsWindowVisible
+      - basic block:
+        - and:
+          - number: 0xD = WM_GETTEXT
+          - api: user32.SendMessage
+
+Reason: Depending on myself = basic block (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/host-interaction/gui/window/get-text/get-graphical-window-text.yml
+----------------------------------------------
+rule:
+  meta:
+    name: change the wallpaper
+    namespace: host-interaction/gui/session
+    author: "@_re_fox"
+    scope: basic block
+    mbc:
+      - Operating System::Wallpaper [C0035]
+    examples:
+      - 5dd0b130d5c3d40c69e3972f39fd7d62:0x45AC6F
+  features:
+    - and:
+      - api: SystemParametersInfo
+      - number: 0x14 = SPI_SETDESKWALLPAPER
+      - number: 0x3 = SPIF_SENDWININICHANGE | SPIF_UPDATEINIFILE
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/host-interaction/gui/session/wallpaper/change-the-wallpaper.yml
+----------------------------------------------
+rule:
+  meta:
+    name: get process heap flags
+    namespace: host-interaction/process
+    author: michael.hunhoff@fireeye.com
+    scope: basic block
+    att&ck:
+      - Discovery::Process Discovery [T1057]
+    references:
+      - https://github.com/LordNoteworthy/al-khaser/blob/master/al-khaser/AntiDebug/ProcessHeap_Flags.cpp
+    examples:
+      - al-khaser_x86.exe_:0x425470
+  features:
+    - and:
+      - match: PEB access
+      - or:
+        - and:
+          - number/x32: 0x18 = offset process heap
+          - or:
+            - number/x32: 0x40 = offset heap flags >= Vista
+            - number/x32: 0xC = offset heap flags < Vista
+        - and:
+          - number/x64: 0x30 = offset process heap
+          - or:
+            - number/x64: 0x70 = offset heap flags >= Vista
+            - number/x64: 0x14 = offset heap flags < Vista
+
+Reason: needed sub-rule not converted (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/get-process-heap-flags.yml
+----------------------------------------------
+rule:
+  meta:
+    name: get process heap force flags
+    namespace: host-interaction/process
+    author: michael.hunhoff@fireeye.com
+    scope: basic block
+    att&ck:
+      - Discovery::Process Discovery [T1057]
+    references:
+      - https://github.com/LordNoteworthy/al-khaser/blob/master/al-khaser/AntiDebug/ProcessHeap_ForceFlags.cpp
+    examples:
+      - al-khaser_x86.exe_:0x425470
+  features:
+    - and:
+      - match: PEB access
+      - or:
+        - and:
+          - number/x32: 0x18 = offset process heap
+          - or:
+            - number/x32: 0x44 = offset force flags >= Vista
+            - number/x32: 0x10 = offset force flags < Vista
+        - and:
+          - number/x64: 0x30 = offset process heap
+          - or:
+            - number/x64: 0x74 = offset force flags >= Vista
+            - number/x64: 0x18 = offset force flags < Vista
+
+Reason: needed sub-rule not converted (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/get-process-heap-force-flags.yml
+----------------------------------------------
+rule:
+  meta:
+    name: hijack thread execution
+    namespace: host-interaction/process/inject
+    author: 0x534a@mailbox.org
+    scope: function
+    att&ck:
+      - Defense Evasion::Process Injection::Thread Execution Hijacking [T1055.003]
+    examples:
+      - 77d87e9937546aebc1595039d730352b15fab32c72a76913f04262c6802d098f:0x401000
+  features:
+    - and:
+      - optional:
+        - or:
+          - match: open thread
+          - match: create thread
+      - match: suspend thread
+      - api: kernel32.GetThreadContext
+      - match: allocate RWX memory
+      - optional:
+        - match: write process memory
+      - api: kernel32.SetThreadContext
+      - match: resume thread
+
+Reason: needed sub-rule not converted (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/inject/hijack-thread-execution.yml
+----------------------------------------------
+rule:
+  meta:
+    name: inject thread
+    namespace: host-interaction/process/inject
+    author:
+      - anamaria.martinezgom@fireeye.com
+      - 0x534a@mailbox.org
+    scope: function
+    att&ck:
+      - Defense Evasion::Process Injection::Thread Execution Hijacking [T1055.003]
+    examples:
+      - Practical Malware Analysis Lab 12-01.exe_:0x4010D0
+      - 2D3EDC218A90F03089CC01715A9F047F:0x4027CF
+  features:
+    - and:
+      - or:
+        - match: allocate RWX memory
+        - match: allocate RW memory
+      - match: write process memory
+      - match: create thread
+      - optional:
+        - or:
+          - match: open process
+          - match: create process
+          - number: 0x3000 = MEM_COMMIT or MEM_RESERVE
+
+Reason: needed sub-rule not converted (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/inject/inject-thread.yml
+----------------------------------------------
+rule:
+  meta:
+    name: allocate RWX memory
+    namespace: host-interaction/process/inject
+    author: moritz.raabe@fireeye.com
+    scope: basic block
+    mbc:
+      - Memory::Allocate Memory [C0007]
+    examples:
+      - Practical Malware Analysis Lab 03-03.exe_:0x4010EA
+      - 563653399B82CD443F120ECEFF836EA3678D4CF11D9B351BB737573C2D856299:0x140001ABA
+  features:
+    - and:
+      - match: allocate memory
+      - number: 0x40 = PAGE_EXECUTE_READWRITE
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/inject/allocate-rwx-memory.yml
+----------------------------------------------
+rule:
+  meta:
+    name: allocate user process RWX memory
+    namespace: host-interaction/process/inject
+    author: michael.hunhoff@fireeye.com
+    scope: function
+    att&ck:
+      - Defense Evasion::Process Injection [T1055]
+    examples:
+      - 493167E85E45363D09495D0841C30648:0x404B00
+  features:
+    - and:
+      - match: attach user process memory
+      - match: allocate RWX memory
+      - number: 0xFFFFFFFF = NtCurrentProcess()
+      - optional:
+        - match: find process by PID
+
+Reason: needed sub-rule not converted (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/inject/allocate-user-process-rwx-memory.yml
+----------------------------------------------
+rule:
+  meta:
+    name: inject pe
+    namespace: host-interaction/process/inject
+    author: 0x534a@mailbox.org
+    scope: function
+    att&ck:
+      - Defense Evasion::Process Injection::Portable Executable Injection [T1055.002]
+    references:
+      - https://www.elastic.co/de/blog/ten-process-injection-techniques-technical-survey-common-and-trending-process
+    examples:
+      - ce8d7590182db2e51372a4a04d6a0927a65b2640739f9ec01cfd6c143b1110da:0x4014E0
+  features:
+    - and:
+      - characteristic: loop
+      - optional:
+        - or:
+          - match: open process
+          - match: create process
+      - match: allocate RWX memory
+      - basic block:
+        - description: virtual address offset calculation
+        - and:
+          - mnemonic: and
+          - number: 0x0FFF
+      - match: write process memory
+      - match: create thread
+
+Reason: characteristic (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/inject/inject-pe.yml
+----------------------------------------------
+rule:
+  meta:
+    name: free user process memory
+    namespace: host-interaction/process/inject
+    author: michael.hunhoff@fireeye.com
+    scope: function
+    att&ck:
+      - Defense Evasion::Process Injection [T1055]
+    mbc:
+      - Memory::Free Memory [C0044]
+    examples:
+      - 493167E85E45363D09495D0841C30648:0x404B00
+  features:
+    - and:
+      - match: attach user process memory
+      - number: 0xFFFFFFFF = NtCurrentProcess()
+      - api: ZwFreeVirtualMemory
+      - optional:
+        - match: find process by PID
+
+Reason: slow byte pattern for YARA search (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/inject/free-user-process-memory.yml
+----------------------------------------------
+rule:
+  meta:
+    name: use process replacement
+    namespace: host-interaction/process/inject
+    author: william.ballenthin@fireeye.com
+    scope: function
+    att&ck:
+      - Defense Evasion::Process Injection::Process Hollowing [T1055.012]
+    references:
+      - http://www.autosectools.com/process-hollowing.pdf
+      - https://www.andreafortuna.org/2017/10/09/understanding-process-hollowing/
+    examples:
+      - Practical Malware Analysis Lab 12-02.exe_:0x4010EA
+  features:
+    - and:
+      - match: create process suspended
+      - match: write process memory
+      - match: resume thread
+
+Reason: needed sub-rule not converted (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/inject/use-process-replacement.yml
+----------------------------------------------
+rule:
+  meta:
+    name: inject dll
+    namespace: host-interaction/process/inject
+    author: 0x534a@mailbox.org
+    scope: function
+    att&ck:
+      - Defense Evasion::Process Injection::Dynamic-link Library Injection [T1055.001]
+    references:
+      - Practical Malware Analysis, p. 676
+      - https://www.researchgate.net/publication/279155742_A_Novel_Approach_to_Detect_Malware_Based_on_API_Call_Sequence_Analysis
+      - https://www.welivesecurity.com/wp-content/uploads/2016/10/eset-sednit-part3.pdf
+      - https://www.accenture.com/t20180127T003755Z_w_/us-en/_acnmedia/PDF-46/Accenture-Security-Dragonfish-Threat-Analysis.pdf
+      - https://unit42.paloaltonetworks.com/unit42-kazuar-multiplatform-espionage-backdoor-api-access/
+      - https://www.welivesecurity.com/wp-content/uploads/2018/10/ESET_GreyEnergy.pdf
+      - https://www.welivesecurity.com/2019/05/29/turla-powershell-usage/
+    examples:
+      - Practical Malware Analysis Lab 17-02.dll_:0x1000D10D
+  features:
+    - and:
+      - optional:
+        - or:
+          - match: open process
+          - match: create process
+      - match: allocate RW memory
+      - match: write process memory
+      - and:
+        - or:
+          - api: kernel32.GetModuleHandle
+          - api: kernel32.GetModuleHandleEx
+        - string: "/LoadLibrary[AW]/"
+      - match: create thread
+
+Reason: needed sub-rule not converted (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/inject/inject-dll.yml
+----------------------------------------------
+rule:
+  meta:
+    name: enumerate processes via NtQuerySystemInformation
+    namespace: host-interaction/process/list
+    author: "@_re_fox"
+    scope: basic block
+    att&ck:
+      - Discovery::Process Discovery [T1057]
+      - Discovery::Software Discovery [T1518]
+    examples:
+      - 31bd8dd48ac0de3d4da340bf29f4d280:0x00401be3
+  features:
+    - and:
+      - number: 0x5 = SYSTEM_PROCESS_INFORMATION
+      - api: NtQuerySystemInformation
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/list/enumerate-processes-via-ntquerysysteminformation.yml
+----------------------------------------------
+rule:
+  meta:
+    name: create a process with modified I/O handles and window
+    namespace: host-interaction/process/create
+    author: matthew.williams@fireeye.com
+    scope: function
+    mbc:
+      - Process::Create Process [C0017]
+    references:
+      - https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/ns-processthreadsapi-startupinfoa
+    examples:
+      - Practical Malware Analysis Lab 14-02.exe_:0x4011C0
+  features:
+    - and:
+      - or:
+        # API functions below accept a pointer to a STARTUPINFO structure (see StartupInfo.cb feature below)
+        - api: kernel32.CreateProcess
+        - api: kernel32.CreateProcessInternal
+        - api: advapi32.CreateProcessAsUser
+        - api: advapi32.CreateProcessWithLogon
+        - api: advapi32.CreateProcessWithToken
+      - number: 0x101 = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW
+        # STARTF_USESTDHANDLES indicates the hStdInput, hStdOutput, and hStdError members contain additional information
+        # STARTF_USESHOWWINDOW indicates the wShowWindow member contains additional information
+      - or:
+        - number/x32: 0x44 = StartupInfo.cb (size)
+        - number/x64: 0x68 = StartupInfo.cb (size)
+        # STARTUPINFOEX size values not currently supported
+      - optional:
+        - api: kernel32.GetStartupInfo
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/create/create-a-process-with-modified-io-handles-and-window.yml
+----------------------------------------------
+rule:
+  meta:
+    name: create process suspended
+    namespace: host-interaction/process/create
+    author: william.ballenthin@fireeye.com
+    scope: basic block
+    mbc:
+      - Process::Create Process::Create Suspended Process [C0017.003]
+    examples:
+      - Practical Malware Analysis Lab 03-03.exe_:0x4010EA
+  features:
+    - and:
+      - or:
+        - number: 0x08000004 = CREATE_NO_WINDOW | CREATE_SUSPENDED
+        - number: 4 = CREATE_SUSPENDED
+      - or:
+        - api: kernel32.CreateProcess
+        - api: advapi32.CreateProcessAsUser
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/create/create-process-suspended.yml
+----------------------------------------------
+rule:
+  meta:
+    name: terminate process via fastfail
+    namespace: host-interaction/process/terminate
+    author: "@_re_fox"
+    scope: basic block
+    mbc:
+      - Process::Terminate Process [C0018]
+    references:
+      - https://docs.microsoft.com/en-us/cpp/intrinsics/fastfail?view=vs-2019
+    examples:
+      - b87e9dd18a5533a09d3e48a7a1efbcf6:0x14000747F
+  features:
+    - and:
+      - mnemonic: int
+      - number: 0x29
+
+Reason: mnemonic (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/terminate/terminate-process-via-fastfail.yml
+----------------------------------------------
+rule:
+  meta:
+    name: check mutex and exit
+    namespace: host-interaction/mutex
+    author:
+      - '@_re_fox'
+      - moritz.raabe@fireeye.com
+    scope: function
+    mbc:
+      - Process::Check Mutex [C0043]
+      - Process::Terminate Process [C0018]
+    examples:
+      - 1d8fd13c890060464019c0f07b928b1a:0x402eb0
+  features:
+    - and:
+      - match: create mutex
+      - api: ExitProcess
+      - or:
+        - api: WaitForSingleObject
+        - and:
+          - api: GetLastError
+          - or:
+            - number: 2 = ERROR_FILE_NOT_FOUND
+            - number: 0xB7 = ERROR_ALREADY_EXISTS
+            - number: 5 = ERROR_ACCESS_DENIED
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/host-interaction/mutex/check-mutex-and-exit.yml
+----------------------------------------------
+rule:
+  meta:
+    name: resolve function by FIN8 fasthash
+    namespace: linking/runtime-linking
+    author: "@r3c0nst (Frank Boldewin)"
+    description: APIHashing algorithm derived from a fasthash implementation in OpenCPN using seeds
+    scope: function
+    references:
+      - https://www.bitdefender.com/files/News/CaseStudies/study/394/Bitdefender-PR-Whitepaper-BADHATCH-creat5237-en-EN.pdf
+      - https://raw.githubusercontent.com/fboldewin/YARA-rules/master/Shellcode.APIHashing.FIN8.yar
+    examples:
+      - B43FCA5283BFC7022553EFF663683834:0x12F
+      - 4BF70EA92979DD88C9761EE848370050:0x28b
+  features:
+    - or:
+      - basic block:
+        - and:
+            # 64-bit constants
+          - mnemonic: mov
+          - number: 0x880355F21E6D1965
+          - number: 0x2127599BF4325C37
+          - mnemonic: add
+        # 32-bit constants
+      - basic block:
+        - and:
+          - mnemonic: push
+          - number: 0x880355F2
+          - number: 0x1E6D1965
+          - mnemonic: shr
+          - mnemonic: xor
+      - basic block:
+        - and:
+          - mnemonic: push
+          - number: 0x2127599B
+          - mnemonic: shr
+          - mnemonic: xor
+          - number: 0xF4325C37
+
+Reason: Multiple statements inside "- or:" where all unsupported, the last one was "match" (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/linking/runtime-linking/resolve-function-by-fin8-fasthash.yml
+----------------------------------------------
+rule:
+  meta:
+    name: get kernel32 base address
+    namespace: linking/runtime-linking
+    author: moritz.raabe@fireeye.com
+    scope: basic block
+    att&ck:
+      - Execution::Shared Modules [T1129]
+    references:
+      - https://idafchev.github.io/exploit/2017/09/26/writing_windows_shellcode.html
+      - https://www.geoffchappell.com/studies/windows/win32/ntdll/structs/ldr_data_table_entry.htm
+    examples:
+      - 67f8302a2fd28d15f62d6d20d748bfe350334e5353cbdef112bd1f8231b5599d:0x406936
+  features:
+    - and:
+      # PEB -> PEB.Ldr -> PEB_LDR_DATA.InLoadOrderModuleList.Flink
+      - match: access PEB ldr_data
+      # -> current module -> ntdll
+      - count(offset(0)): 2
+      # -> kernel32 -> LDR_DATA_TABLE_ENTRY.DllBase
+      - or:
+        - offset/x32: 0x18 = LDR_DATA_TABLE_ENTRY.DllBase
+        - offset/x64: 0x30 = LDR_DATA_TABLE_ENTRY.DllBase
+
+Reason: needed sub-rule not converted (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/linking/runtime-linking/get-kernel32-base-address.yml
+----------------------------------------------
+rule:
+  meta:
+    name: get ntdll base address
+    namespace: linking/runtime-linking
+    author: moritz.raabe@fireeye.com
+    scope: basic block
+    att&ck:
+      - Execution::Shared Modules [T1129]
+    references:
+      - https://idafchev.github.io/exploit/2017/09/26/writing_windows_shellcode.html
+      - https://www.geoffchappell.com/studies/windows/win32/ntdll/structs/ldr_data_table_entry.htm
+    examples:
+      - 67f8302a2fd28d15f62d6d20d748bfe350334e5353cbdef112bd1f8231b5599d:0x40694A
+  features:
+    - and:
+      # PEB -> PEB.Ldr -> PEB_LDR_DATA.InLoadOrderModuleList.Flink
+      - match: access PEB ldr_data
+      # -> current module
+      - count(offset(0)): 1
+      # -> ntdll -> LDR_DATA_TABLE_ENTRY.DllBase
+      - or:
+        - offset/x32: 0x18 = LDR_DATA_TABLE_ENTRY.DllBase
+        - offset/x64: 0x30 = LDR_DATA_TABLE_ENTRY.DllBase
+
+Reason: needed sub-rule not converted (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/linking/runtime-linking/get-ntdll-base-address.yml
+----------------------------------------------
+rule:
+  meta:
+    name: link many functions at runtime
+    namespace: linking/runtime-linking
+    author: moritz.raabe@fireeye.com
+    scope: function
+    att&ck:
+      - Execution::Shared Modules [T1129]
+    examples:
+      - b7b5e1253710d8927cbe07d52d2d2e10:0x401000
+  features:
+    - and:
+      - or:
+        - api: kernel32.LoadLibrary
+        - api: kernel32.GetModuleHandle
+        - api: kernel32.GetModuleHandleEx
+        - api: ntdll.LdrLoadDll
+      - or:
+        - count(api(kernel32.GetProcAddress)): 5 or more
+        - count(api(ntdll.LdrGetProcedureAddress)): 5 or more
+
+Reason: Range (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/linking/runtime-linking/link-many-functions-at-runtime.yml
+----------------------------------------------
+rule:
+  meta:
+    name: access PEB ldr_data
+    namespace: linking/runtime-linking
+    author: moritz.raabe@fireeye.com
+    scope: basic block
+    att&ck:
+      - Execution::Shared Modules [T1129]
+    examples:
+      - 3FDFB2D522E7DEECAAAF2F87420F7E75:0x4117B7
+  features:
+    - or:
+      # x32
+      - and:
+        # resolve the PEB
+        - or:
+          - match: PEB access
+
+        # x86 Windows uses fs:0 to access the TIB which contains SEH information at offset 0
+        # checking for fs:0 and a (possibly unrelated) number or offset often results in false positives
+
+        # LDR_DATA* Ldr;
+        # good PEB layout reference here:
+        # https://www.geoffchappell.com/studies/windows/win32/ntdll/structs/peb_ldr_data.htm
+        - offset/x32: 0x0C = PEB.LDR_DATA
+
+        # resolve a module list
+        - or:
+          - offset/x32: 0x0C = PEB.LDR_DATA.InLoadOrderModuleList
+          - offset/x32: 0x14 = PEB.LDR_DATA.InMemoryOrderModuleList
+          - offset/x32: 0x1C = PEB.LDR_DATA.InInitializationOrderModuleList
+
+      # x64
+      - and:
+        # resolve the PEB
+        - or:
+          - match: PEB access
+          # in the case of CallObfuscator, gs:[rax]
+          # ref: https://github.com/d35ha/CallObfuscator/blob/5834aff9ff4511f1408ae4ce80b79737af4ae77b/ShellCode/shell_x64.asm#L8
+          - and:
+            - number/x64: 0x60
+            - characteristic: gs access
+          # in 0f5d5d07c6533bc6d991836ce79daaa1
+          # then we have:
+          #
+          #     xor edx, edx
+          #     mov edx, fs:[edx+30h]
+          - and:
+            - offset/x64: 0x60 = PEB
+            - characteristic: gs access
+
+        # good PEB layout reference here:
+        # https://www.geoffchappell.com/studies/windows/win32/ntdll/structs/peb_ldr_data.htm
+        - offset/x64: 0x18 = PEB.LDR_DATA
+
+        # resolve a module list
+        - or:
+          - offset/x64: 0x10 = PEB.LDR_DATA.InLoadOrderModuleList
+          - offset/x64: 0x20 = PEB.LDR_DATA.InMemoryOrderModuleList
+          - offset/x64: 0x30 = PEB.LDR_DATA.InInitializationOrderModuleList
+
+Reason: Multiple statements inside "- or:" where all unsupported, the last one was "And" (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/linking/runtime-linking/access-peb-ldr_data.yml
+----------------------------------------------
+rule:
+  meta:
+    name: encode data using XOR
+    namespace: data-manipulation/encoding/xor
+    author: moritz.raabe@fireeye.com
+    scope: basic block
+    att&ck:
+      - Defense Evasion::Obfuscated Files or Information [T1027]
+    mbc:
+      - Defense Evasion::Obfuscated Files or Information::Encoding-Standard Algorithm [E1027.m02]
+      - Data::Encode Data::XOR [C0026.002]
+    examples:
+      - 2D3EDC218A90F03089CC01715A9F047F:0x403D7E
+  features:
+    - and:
+      - characteristic: tight loop
+      - characteristic: nzxor
+      # Reduce false positives
+      - not:
+        - or:
+          # ~i: Bitwise negation operation for unsigned numbers
+          - number: 0xFFFFFFFF # 32 bits
+          - number: 0xFFFFFFFFFFFFFFFF # 64 bits
+          # ~i: Bitwise negation operation for numbers in 2 complement representation
+          - number: 0x0FFFFFFF # 32 bits
+          - number: 0x0FFFFFFFFFFFFFFF # 64 bits
+          # Magic constants used in the implementation of strings functions
+          # such as `strlen` and `strcat` in the Windows standard library:
+          # (((i - 0x81010101) ^ ~i) & 0x81010100)
+          ## 32 bits
+          - number: 0x7EFEFEFF
+          - number: 0x81010101 # -0x81010101 = 0x7EFEFEFF
+          - number: 0x81010100 # 0x81010100 = ~0x7EFEFEFF
+          ## 64 bits
+          - number: 0x7EFEFEFEFEFEFEFF
+          - number: 0x8101010101010101
+          - number: 0x8101010101010100
+
+Reason: characteristic (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encoding/xor/encode-data-using-xor.yml
+----------------------------------------------
+rule:
+  meta:
+    name: encode data using Base64
+    namespace: data-manipulation/encoding/base64
+    author: moritz.raabe@fireeye.com
+    scope: function
+    att&ck:
+      - Defense Evasion::Obfuscated Files or Information [T1027]
+    mbc:
+      - Defense Evasion::Obfuscated Files or Information::Encoding-Standard Algorithm [E1027.m02]
+      - Data::Encode Data::Base64 [C0026.001]
+    examples:
+      - BFB9B5391A13D0AFD787E87AB90F14F5:0x1314889C
+      - 074072B261FC27B65C72671F13510C05:0x100049B2
+      - 5DB2D2BE20D59AA0BE6709A6850F1775:0x18001CC30
+      - 08AC667C65D36D6542917655571E61C8:0x406EAA
+  features:
+    - and:
+      - mnemonic: shl
+      - mnemonic: shr
+      - number: 0x3F  # modulo 64
+      - or:
+        - number: 0x3D = '='
+        - number: 0x3D3D = '=='
+      - match: contain loop
+      - optional:
+        - number: 2
+        - number: 3
+        - number: 4
+        - number: 6
+        - number: 0xF
+        - string: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+
+Reason: mnemonic (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encoding/base64/encode-data-using-base64.yml
+----------------------------------------------
+rule:
+  meta:
+    name: encrypt data using HC-128
+    namespace: data-manipulation/encryption/hc-128
+    author: '@recvfrom'
+    description: Looks for instruction mnemonics associated with initialization of the HC-128 stream cipher
+    scope: basic block
+    att&ck:
+      - Defense Evasion::Obfuscated Files or Information [T1027]
+    mbc:
+      - Defense Evasion::Obfuscated Files or Information::Encryption-Standard Algorithm [E1027.m05]
+      - Cryptography::Encrypt Data::HC-128 [C0027.006]
+    references:
+      - https://download.bitdefender.com/resources/files/News/CaseStudies/study/318/Bitdefender-TRR-Whitepaper-Maze-creat4351-en-EN-GenericUse.pdf
+      - https://github.com/rost1993/hc128/blob/master/hc128.c
+    examples:
+      - e69a8eb94f65480980deaf1ff5a431a6:0x405D0D
+  features:
+    - and:
+      - and:
+        - number: 0x0F = (v << (32 - 17)) from ROTR32(x, 17) in F2(x)
+        - mnemonic: shl
+      - and:
+        - number: 0x11 = (v >> 17) from ROTR32(x, 17) in F2(x)
+        - mnemonic: shr
+      - and:
+        - number: 0xD = (v << (32 - 19)) from ROTR32(x, 19) in F2(x)
+        - mnemonic: shl
+      - and:
+        - number: 0x13 = (v >> 19) from ROTR32(x, 19) in F2(x)
+        - mnemonic: shr
+      - and:
+        - number: 0xA = (v >> 10) in F2(x)
+        - mnemonic: shr
+      - and:
+        - number: 0x19 = (v << (32 - 7)) from ROTR32(x, 7) in F1(x)
+        - mnemonic: shl
+      - and:
+        - number: 0x7 = (v >> 7) from ROTR32(x, 7) in F1(x)
+        - mnemonic: shr
+      - and:
+        - number: 0xE = (v << (32 - 18)) from ROTR32(x, 18) in F1(x)
+        - mnemonic: shl
+      - and:
+        - number: 0x12 = (v >> 18) from ROTR32(x, 18) in F1(X)
+        - mnemonic: shr
+      - and:
+        - number: 0x3 = (x >> 3) in F1(x)
+        - mnemonic: shr
+      - count(mnemonic(shl)): 4
+      - count(mnemonic(shr)): 6
+      - count(mnemonic(or)): 4
+      - count(characteristic(nzxor)): 4
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/hc-128/encrypt-data-using-hc-128.yml
+----------------------------------------------
+rule:
+  meta:
+    name: encrypt data using DES via WinAPI
+    namespace: data-manipulation/encryption/des
+    author: "@_re_fox"
+    scope: function
+    att&ck:
+      - Defense Evasion::Obfuscated Files or Information [T1027]
+    mbc:
+      - Defense Evasion::Obfuscated Files or Information::Encryption-Standard Algorithm [E1027.m05]
+      - Cryptography::Encrypt Data::3DES [C0027.004]
+    examples:
+      - 5f66b82558ca92e54e77f216ef4c066c:0x403377
+  features:
+    - and:
+      - or:
+        - number: 0x6601 = CALG_DES
+        - number: 0x6603 = CALG_3DES
+        - number: 0x6609 = CALG_3DES_112
+      - or:
+        - api: CryptGenKey
+        - api: CryptDeriveKey
+        - api: CryptImportKey
+      - optional:
+        - or:
+          - api: CryptAcquireContext
+          - api: CryptEncrypt
+          - api: CryptDecrypt
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/des/encrypt-data-using-des-via-winapi.yml
+----------------------------------------------
+rule:
+  meta:
+    name: encrypt data using AES via x86 extensions
+    namespace: data-manipulation/encryption/aes
+    author: moritz.raabe@fireeye.com
+    scope: function
+    att&ck:
+      - Defense Evasion::Obfuscated Files or Information [T1027]
+    mbc:
+      - Defense Evasion::Obfuscated Files or Information::Encryption-Standard Algorithm [E1027.m05]
+      - Cryptography::Encrypt Data::AES [C0027.001]
+    examples:
+      - 8BA66E4B618FFDC8255F1DF01F875DDE6FD0561305D9F8307BE7BB11D02AE363:0x436E20
+  features:
+    - or:
+      - mnemonic: aesenc  # Perform One Round of an AES Encryption Flow
+      - mnemonic: vaesenc
+      - mnemonic: aesenclast  # Perform Last Round of an AES Encryption Flow
+      - mnemonic: vaesenclast
+      - mnemonic: aesimc  # Perform the AES InvMixColumn Transformation
+      - mnemonic: vaesimc
+      - mnemonic: aeskeygenassist  # AES Round Key Generation Assist
+      - mnemonic: vaeskeygenassist
+
+Reason: Multiple statements inside "- or:" where all unsupported, the last one was "mnemonic" (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/aes/encrypt-data-using-aes-via-x86-extensions.yml
+----------------------------------------------
+rule:
+  meta:
+    name: encrypt data using AES via WinAPI
+    namespace: data-manipulation/encryption/aes
+    author: moritz.raabe@fireeye.com
+    scope: function
+    att&ck:
+      - Defense Evasion::Obfuscated Files or Information [T1027]
+    mbc:
+      - Defense Evasion::Obfuscated Files or Information::Encryption-Standard Algorithm [E1027.m05]
+      - Cryptography::Encrypt Data::AES [C0027.001]
+    examples:
+      - BC577119D1A5B7DA489E7B5817D3CC38:0x10002FAC
+  features:
+    - and:
+      - or:
+        - number: 0x6611 = CALG_AES
+        - number: 0x660E = CALG_AES_128
+        - number: 0x660F = CALG_AES_192
+        - number: 0x6610 = CALG_AES_256
+      - or:
+        - api: CryptGenKey
+        - api: CryptDeriveKey
+        - api: CryptImportKey
+      - optional:
+        - or:
+          - number: 1 = PROV_RSA_FULL
+          - api: CryptAcquireContext
+          - api: CryptEncrypt
+          - api: CryptDecrypt
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/aes/encrypt-data-using-aes-via-winapi.yml
+----------------------------------------------
+rule:
+  meta:
+    name: decrypt data using AES via x86 extensions
+    namespace: data-manipulation/encryption/aes
+    author: moritz.raabe@fireeye.com
+    scope: function
+    att&ck:
+      - Defense Evasion::Deobfuscate/Decode Files or Information [T1140]
+    mbc:
+      - Cryptography::Decrypt Data::AES [C0031.001]
+    examples:
+      - 66602B5FAB602CB4E6F754748D249542:0x4097D0
+  features:
+    - or:
+      - mnemonic: aesdec  # Perform One Round of an AES Decryption Flow
+      - mnemonic: vaesdec
+      - mnemonic: aesdeclast  # Perform Last Round of an AES Decryption Flow
+      - mnemonic: vaesdeclast
+
+Reason: Multiple statements inside "- or:" where all unsupported, the last one was "mnemonic" (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/aes/decrypt-data-using-aes-via-x86-extensions.yml
+----------------------------------------------
+rule:
+  meta:
+    name: encrypt data using RC4 with custom key via WinAPI
+    namespace: data-manipulation/encryption/rc4
+    author: blaine.stancill@mandiant.com
+    scope: function
+    att&ck:
+      - Defense Evasion::Obfuscated Files or Information [T1027]
+    mbc:
+      - Defense Evasion::Obfuscated Files or Information::Encryption-Standard Algorithm [E1027.m05]
+      - Cryptography::Encrypt Data::RC4 [C0027.009]
+    references:
+      - https://www.phdcc.com/cryptorc4.htm
+    examples:
+      - 4E9C546A54E40D0DA89BB4616DD7F8C4:0x140007B70
+      - A563C50C5FA0FD541248ACAF72CC4E7D:0x401AF0
+  features:
+    - and:
+      - api: CryptImportKey
+      - number: 0x4C = SimpleBlobRC4KeyTemplate size
+      - bytes: 01 02 00 00 01 68 00 00 00 A4 00 00 = SimpleBlobRC4KeyTemplate header
+      - number: 0x134 = PrivateKeyWithExponentOfOne size
+      - bytes: 07 02 00 00 00 A4 00 00 52 53 41 32 00 02 00 00 01 00 00 00 AB EF FA C6 7D E8 DE FB 68 38 09 92 D9 42 7E 6B 89 9E 21 D7 52 1C 99 3C 17 48 4E 3A 44 02 F2 FA 74 57 DA E4 D3 C0 35 67 FA 6E DF 78 4C 75 35 1C A0 74 49 E3 20 13 71 35 65 DF 12 20 F5 F5 F5 C1 ED 5C 91 36 75 B0 A9 9C 04 DB 0C 8C BF 99 75 13 7E 87 80 4B 71 94 B8 00 A0 7D B7 53 DD 20 63 EE F7 83 41 FE 16 A7 6E DF 21 7D 76 C0 85 D5 65 7F 00 23 57 45 52 02 9D EA 69 AC 1F FD 3F 8C 4A D0 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 64 D5 AA B1 A6 03 18 92 03 AA 31 2E 48 4B 65 20 99 CD C6 0C 15 0C BF 3E FF 78 95 67 B1 74 5B 60 01 00 00 00 00 00 00 00 00 00 00 00 = PrivateKeyWithExponentOfOne
+      - match: contain loop # Copies RC4 key in reverse order
+      - optional:
+        - or:
+          - number: 1 = PROV_RSA_FULL
+          - api: CryptAcquireContext
+          - api: CryptEncrypt
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/rc4/encrypt-data-using-rc4-with-custom-key-via-winapi.yml
+----------------------------------------------
+rule:
+  meta:
+    name: encrypt data using RC4 PRGA
+    namespace: data-manipulation/encryption/rc4
+    author: moritz.raabe@fireeye.com
+    scope: function
+    att&ck:
+      - Defense Evasion::Obfuscated Files or Information [T1027]
+    mbc:
+      - Cryptography::Encrypt Data::RC4 [C0027.009]
+      - Cryptography::Generate Pseudo-random Sequence::RC4 PRGA [C0021.004]
+    examples:
+      - 34404A3FB9804977C6AB86CB991FB130:0x403DB0
+      - 34404A3FB9804977C6AB86CB991FB130:0x403E50
+      - 9324D1A8AE37A36AE560C37448C9705A:0x4049F0
+      - 73CE04892E5F39EC82B00C02FC04C70F:0x4064C6
+  features:
+    - and:
+      # TODO: maybe add characteristic for nzxor reg size
+      - count(characteristic(nzxor)): 1
+      - or:
+        - match: calculate modulo 256 via x86 assembly
+        # compiler may do this via zero-extended mov from 8-bit register
+        - count(mnemonic(movzx)): 4 or more
+      # should not call (many) functions
+      - count(characteristic(calls from)): (0, 4)
+      # should not be too simple
+      - count(basic blocks): 4 or more
+      - match: contain loop
+      - optional:
+        - or:
+          - number: 0xFF
+          - number: 0x100
+
+Reason: Range (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/rc4/encrypt-data-using-rc4-prga.yml
+----------------------------------------------
+rule:
+  meta:
+    name: encrypt data using RC4 via WinAPI
+    namespace: data-manipulation/encryption/rc4
+    author: moritz.raabe@fireeye.com
+    scope: function
+    att&ck:
+      - Defense Evasion::Obfuscated Files or Information [T1027]
+    mbc:
+      - Defense Evasion::Obfuscated Files or Information::Encryption-Standard Algorithm [E1027.m05]
+      - Cryptography::Encrypt Data::RC4 [C0027.009]
+    examples:
+      - 2A584DFC657348D164274A12BFF9BBD8:0x404D42
+      - 32BB43F8847ECF158C1E96891ED9A28C:0x10003A88
+  features:
+    - and:
+      - or:
+        - number: 0x6801 = CALG_RC4
+      - or:
+        - api: CryptGenKey
+        - api: CryptDeriveKey
+        - api: CryptImportKey
+      - optional:
+        - or:
+          - number: 1 = PROV_RSA_FULL
+          - api: CryptAcquireContext
+          - api: CryptEncrypt
+          - api: CryptDecrypt
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/rc4/encrypt-data-using-rc4-via-winapi.yml
+----------------------------------------------
+rule:
+  meta:
+    name: encrypt data using RC4 KSA
+    namespace: data-manipulation/encryption/rc4
+    author: moritz.raabe@fireeye.com
+    scope: function
+    att&ck:
+      - Defense Evasion::Obfuscated Files or Information [T1027]
+    mbc:
+      - Cryptography::Encrypt Data::RC4 [C0027.009]
+      - Cryptography::Encryption Key::RC4 KSA [C0028.002]
+    examples:
+      - 34404A3FB9804977C6AB86CB991FB130:0x403D40
+      - C805528F6844D7CAF5793C025B56F67D:0x4067AE
+      - 9324D1A8AE37A36AE560C37448C9705A:0x404950
+      - 782A48821D88060ADF0F7EF3E8759FEE3DDAD49E942DAAD18C5AF8AE0E9EB51E:0x405C42
+      - 73CE04892E5F39EC82B00C02FC04C70F:0x40646E
+  features:
+    - or:
+      - and:
+        - basic block:
+          - and:
+            - description: initialize S
+            # misses if regular loop is used,
+            # however we cannot model that a loop contains a certain number
+            - characteristic: tight loop
+            - or:
+              - number: 0xFF
+              - number: 0x100
+        - or:
+          - match: calculate modulo 256 via x86 assembly
+          # compiler may do this via zero-extended mov from 8-bit register
+          - count(mnemonic(movzx)): 2 or more
+        - or:
+          - description: modulo key length
+          - mnemonic: div
+          - mnemonic: idiv
+      - and:
+        - description: optimized, writes DWORDs instead of bytes
+        - or:
+          - number: 0xFFFEFDFC
+          - mnemonic: sub
+        - or:
+          - number: 0x03020100
+          - mnemonic: add
+        - number: 0x4040404
+
+Reason: Multiple statements inside "- or:" where all unsupported, the last one was "And" (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/rc4/encrypt-data-using-rc4-ksa.yml
+----------------------------------------------
+rule:
+  meta:
+    name: encrypt data using Curve25519
+    namespace: data-manipulation/encryption/elliptic-curve
+    author: dimiter.andonov@fireeye.com
+    scope: basic block
+    att&ck:
+      - Defense Evasion::Obfuscated Files or Information [T1027]
+    examples:
+      - 0a0882b8da225406cc838991b5f67d11:0x4135f6
+      - 0a0882b8da225406cc838991b5f67d11:0x416f51
+      - 80372de850597bd9e7e021a94f13f0a1:0x406480
+      - 80372de850597bd9e7e021a94f13f0a1:0x4086f4
+  features:
+    # initializes a 32-byte array with 
+    #   array[0] = 0xf8, 
+    #   array[31] = array[31] & 0x3f | 0x40
+    - and:
+      - and:
+        - number: 0xf8
+        - mnemonic: and
+      - and:
+        - number: 0x3f
+        - mnemonic: and
+      - and:
+        - number: 0x40
+        - mnemonic: or
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/elliptic-curve/encrypt-data-using-curve25519.yml
+----------------------------------------------
+rule:
+  meta:
+    name: decompress data using QuickLZ
+    namespace: data-manipulation/compression
+    author: david@edeca.net
+    description: detects the inner decompression loop from QuickLZ
+    scope: function
+    mbc:
+      - Data::Decompress Data::QuickLZ [C0025.001]
+    references:
+      - http://www.quicklz.com/
+    examples:
+      - 64d9f7d96b99467f36e22fada623c3bb:0x10001510
+      - 234c8034e88b2d097d2da51a85253825:0x100015B0
+      - f54a09e966bb929e68f5c01fa3087a3a:0x10001590
+      - d115f4b2ec8579be33fe883219c00ae2:0x1800015E0
+      - 831083e1614090dbb5815dba36faa2f3:0x1800016E0
+      - 7e0b974f004e4e0523fe4d9b9d89e5ad:0x1800016B0
+      - 6a352c3e55e8ae5ed39dc1be7fb964b1:0x10010DE0
+  features:
+    - or:
+      - basic block:
+        - and:
+          - description: Mode 1 decompression
+          - mnemonic: xor
+          - mnemonic: shr
+          - mnemonic: and
+          - number: 0xC
+          - number: 0xFFF
+          - or:
+            - offset: 0x4000
+            - offset: 0x8000
+      - basic block:
+        - and:
+          - description: Mode 2 decompression
+          - mnemonic: shr
+          - mnemonic: and
+          - mnemonic: mov
+          - number: 0x5
+          - number: 0x1
+          - number: 0x7FF
+      - and:
+        - description: Mode 3 decompression
+        - basic block:
+          - and:
+            - mnemonic: shr
+            - mnemonic: and
+            - mnemonic: mov
+            - number: 0x2
+            - number: 0x3
+            - number: 0x3FFF
+        - basic block:
+          - and:
+            - mnemonic: shr
+            - mnemonic: and
+            - number: 0x3FF
+
+Reason: Multiple statements inside "- or:" where all unsupported, the last one was "And" (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/data-manipulation/compression/decompress-data-using-quicklz.yml
+----------------------------------------------
+rule:
+  meta:
+    name: decompress data via IEncodingFilterFactory
+    namespace: data-manipulation/compression
+    author: matthew.williams@fireeye.com
+    scope: function
+    mbc:
+      - Data::Decompress Data::IEncodingFilterFactory [C0025.002]
+    references:
+      - https://www.virusbulletin.com/virusbulletin/2012/09/urlzone-reloaded-new-evolution/
+    examples:
+      - FBBAAF569B63F6398503E4F1979CABEF:0x40691F
+  features:
+    - and:
+      - api: ole32.CoCreateInstance
+      - bytes: D0 7C C3 54 44 D9 D0 11 A9 F4 00 60 97 94 23 11 = StdEncodingFilterFac
+      - bytes: 00 DE BD 70 8E C1 D0 11 A9 CE 00 60 97 94 23 11 = IEncodingFilterFactory
+      - count(offset(0x10 = IEncodingFilterFactory.GetDefaultFilter and <filter>.DoDecode)): 2 or more
+
+Reason: Range (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/data-manipulation/compression/decompress-data-via-iencodingfilterfactory.yml
+----------------------------------------------
+rule:
+  meta:
+    name: decompress data using aPLib
+    namespace: data-manipulation/compression
+    author:
+      - '@r3c0nst (Frank Boldewin)'
+      - moritz.raabe@fireeye.com
+    description: detects decompression function of library aPLib
+    scope: function
+    references:
+      - https://ibsensoftware.com/files/aPLib-1.1.1.zip
+    examples:
+      - DAA13AE302FE8B618DDBF590537443EF:0x419F50
+      - B43FCA5283BFC7022553EFF663683834:0x424
+      - 6CE584F4F2157C63D5DD239A12A3DCEC:0x40AC20
+  features:
+    - and:
+      - description: aP_depack
+      - basic block:
+        - and:
+          - mnemonic: cmp
+          - number: 32000
+      - basic block:
+        - and:
+          - mnemonic: cmp
+          - or:
+            - number: 127
+            - number: 128
+      - count(characteristic(calls from)): 2 or more  # calls aP_getbit and aP_getgamma
+      - match: contain loop
+
+Reason: Depending on myself = basic block (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/data-manipulation/compression/decompress-data-using-aplib.yml
+----------------------------------------------
+rule:
+  meta:
+    name: validate payment card number using luhn algorithm
+    namespace: data-manipulation/checksum/luhn
+    author: "@_re_fox"
+    scope: function
+    mbc:
+      - Data::Checksum::Luhn [C0032.002]
+    examples:
+      - 1d8fd13c890060464019c0f07b928b1a:0x401920
+      - 6fcc13563aad936c7d0f3165351cb453:0x4026C0
+  features:
+    - or:
+      - match: validate payment card number using luhn algorithm with no lookup table
+      - match: validate payment card number using luhn algorithm with lookup table
+
+Reason: Multiple statements inside "- or:" where all unsupported, the last one was "match" (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/data-manipulation/checksum/luhn/validate-payment-card-number-using-luhn-algorithm.yml
+----------------------------------------------
+rule:
+  meta:
+    name: compute adler32 checksum
+    namespace: data-manipulation/checksum/adler32
+    author: matthew.williams@fireeye.com
+    scope: function
+    mbc:
+      - Data::Checksum::Adler [C0032.005]
+    references:
+      - https://en.wikipedia.org/wiki/Adler-32
+    examples:
+      - 42E81CC1145BA3C1936A6CF9B8DA0CCD:0x10001000
+  features:
+    - and:
+      - basic block:
+        - and:
+          - number: 0x80078071
+          - number: 0xF
+          - mnemonic: shr
+          - mnemonic: mul
+          - mnemonic: imul
+          - or:
+            - and:
+              - number: 0xFFFF000F  # -65521
+              - mnemonic: add
+            - and:
+              - number: 0xFFF1      # 65521
+              - mnemonic: sub
+        # Examples:
+        # The sequence below performs mod 65521 using the example 262089 % 65521 = 5:
+        # mov     eax, 80078071h  ; ecx = 262089 (0x3FFC9)
+        # mul     ecx             ; 0x3FFC9 * 0x80078071 = 0x20002802767B9
+        #                         ; edx = 0x20002
+        # shr     edx, 0Fh        ; edx = 0x2002 >> 0xF = 4
+        # imul    edx, 0FFFF000Fh ; edx = 4 * -65521 (0xFFFF000F) = -262084 = 0xFFFC003C (-0x3FFC4)
+        # add     ecx, edx        ; ecx = 0x3FFC9 + -0x3FFC4 = 5
+
+        # A variation of the above was observed in a deobfuscated MAZE sample (hash not available):           
+        # mov     eax, ebx          ; eax = ebx = 262089 (0x3FFC9)
+        # mov     esi, 80078071h
+        # mul     esi               ; 0x3FFC9 * 0x80078071 = 0x20002802767B9
+        #                           ; edx = 0x20002
+        # shr     edx, 0Fh          ; edx = 0x2002 >> 0xF = 4
+        # imul    eax, edx, 0FFF1h  ; eax = 4 * 65521 (0xFFF1) = 262084 (3FFC4)
+        # sub     ebx, eax          ; ebx = 0x3FFC9 - 0x3FFC4 = 5
+      - basic block:
+        - and:
+          - mnemonic: shl
+          - number: 0x10
+      - count(characteristic(tight loop)): 2 or more
+
+Reason: Depending on myself = basic block (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/data-manipulation/checksum/adler32/compute-adler32-checksum.yml
+----------------------------------------------
+rule:
+  meta:
+    name: hash data using fnv
+    namespace: data-manipulation/hashing/fnv
+    author:
+      - moritz.raabe@fireeye.com
+      - '@_re_fox'
+      - michael.hunhoff@fireeye.com
+    description: can be any Fowler-Noll-Vo (FNV) hash variant, including FNV-1, FNV-1a, FNV-0
+    scope: function
+    mbc:
+      - Data::Non-Cryptographic Hash::FNV [C0030.005]
+    references:
+      - https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
+      - http://isthe.com/chongo/tech/comp/fnv/
+      - https://create.stephan-brumme.com/fnv-hash/
+    examples:
+      - ad4229879180e267f431ac6666b6a0a2:0x14007B4D4
+  features:
+    - and:
+      - optional:
+        - characteristic: loop
+        # FNV-0 hash does not use these initialization values
+        - number: 0xcbf29ce484222325 = FNV_offset_basis
+        - number: 0x811c9dc5 = FNV_offset_basis
+      - or:
+        - number: 0x100000001b3 = FNV prime
+        - number: 0x01000193 = FNV prime
+      - basic block:
+        # FNV-1 hash does multiply then XOR
+        # FNV-1a hash does XOR then multiply
+        - and:
+          - characteristic: nzxor
+          - or:
+            - mnemonic: imul
+            - mnemonic: mul
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/data-manipulation/hashing/fnv/hash-data-using-fnv.yml
+----------------------------------------------
+rule:
+  meta:
+    name: schedule task via ITaskScheduler
+    namespace: persistence/scheduled-tasks
+    author: moritz.raabe@fireeye.com
+    scope: function
+    att&ck:
+      - Persistence::Scheduled Task/Job::Scheduled Task [T1053.005]
+    examples:
+      - 2B8BEC5BCB1777EAA155D832F7AFC797:0x405887
+  features:
+    - and:
+      - api: ole32.CoCreateInstance
+      - bytes: 2A D5 8B 14 AB A2 CE 11 B1 1F 00 AA 00 53 05 03 = CLSID_CTaskScheduler
+      - bytes: 27 D5 8B 14 AB A2 CE 11 B1 1F 00 AA 00 53 05 03 = IID_ITaskScheduler
+      - or:
+        - offset: 0x20 = pts->NewWorkItem
+        - offset: 0x24 = pts->AddWorkItem
+
+Reason: offset (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/persistence/scheduled-tasks/schedule-task-via-itaskscheduler.yml
+----------------------------------------------
+rule:
+  meta:
+    name: write file to startup folder
+    namespace: persistence/startup-folder
+    author: matthew.williams@fireeye.com
+    scope: function
+    att&ck:
+      - Persistence::Boot or Logon Autostart Execution::Registry Run Keys / Startup Folder [T1547.001]
+    examples:
+      - 07F7846BBCDA782E5639292AD93907EB:0x401040
+  features:
+    - and:
+      - match: get startup folder
+      - or:
+        - match: copy file
+        - match: move file
+        - match: write file
+
+Reason: needed sub-rule not converted (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/persistence/startup-folder/write-file-to-startup-folder.yml
+----------------------------------------------
+rule:
+  meta:
+    name: get startup folder
+    namespace: persistence/startup-folder
+    author: matthew.williams@fireeye.com
+    scope: basic block
+    att&ck:
+      - Persistence::Boot or Logon Autostart Execution::Registry Run Keys / Startup Folder [T1547.001]
+    examples:
+      - 07F7846BBCDA782E5639292AD93907EB:0x40121A
+  features:
+    - and:
+      - or:
+        - number: 0x07 = CSIDL_STARTUP
+        - number: 0x18 = CSIDL_COMMON_STARTUP
+      - or:
+        - api: shell32.SHGetFolderPath
+        - api: shell32.SHGetFolderLocation
+        - api: shell32.SHGetSpecialFolderPath
+        - api: shell32.SHGetSpecialFolderLocation
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/persistence/startup-folder/get-startup-folder.yml
+----------------------------------------------
+rule:
+  meta:
+    name: disable AppInit_DLLs code signature enforcement
+    namespace: persistence/registry/appinitdlls
+    author: william.ballenthin@fireye.com
+    scope: function
+    att&ck:
+      - Persistence::Event Triggered Execution::AppInit DLLs [T1546.010]
+      - Defense Evasion::Subvert Trust Controls::Code Signing Policy Modification [T1553.006]
+    references:
+      - https://docs.microsoft.com/en-us/windows/win32/win7appqual/appinit-dlls-in-windows-7-and-windows-server-2008-r2
+    examples:
+      - 58ADC2E97FBEE01B71073CCD7FF1B9A4:0x401350
+  features:
+    - and:
+      - string: /RequireSignedAppInit_DLLs/i
+        description: disable DLL code signature enforcement
+      - number: 0 = state disabled
+      - or:
+        - match: set registry value
+        - number: 0x80000002 = HKEY_LOCAL_MACHINE
+      - or:
+        - string: /Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows/i
+        - string: /Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows/i
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/persistence/registry/appinitdlls/disable-appinit_dlls-code-signature-enforcement.yml
+----------------------------------------------
+rule:
+  meta:
+    name: set global application hook
+    namespace: host-interaction/gui
+    author: michael.hunhoff@fireeye.com
+    scope: basic block
+  features:
+    - and:
+      - api: user32.SetWindowsHookEx
+      - number: 0x3 = WM_GETMESSAGE
+      - number: 0x0 = dwThreadId
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/set-global-application-hook.yml
+----------------------------------------------
+# generated using capa explorer for IDA Pro
+rule:
+  meta:
+    name: inspect load icon resource
+    namespace: anti-analysis
+    author: michael.hunhoff@fireeye.com
+    scope: basic block
+  features:
+    # check if call to LoadIcon fails when first argument is NULL
+    # and second argument is not a valid predefined icon - LoadIcon
+    # should return NULL here, but some sandboxes/emulation may instead
+    # return a valid handle
+    - and:
+      - api: user32.LoadIcon
+      - number: 0x0
+      - mnemonic: test
+      - not:
+        - or:
+          - description: predefined icon identifiers
+          - number: 0x7F05 = IDI_WINLOGO
+          - number: 0x7F06 = IDI_SHIELD
+          - number: 0x7F02 = IDI_QUESTION
+          - number: 0x7F00 = IDI_APPLICATION
+          - number: 0x7F04 = (IDI_ASTERISK | IDI_INFORMATION)
+          - number: 0x7F01 = (IDI_ERROR | IDI_HAND)
+          - number: 0x7F03 = (IDI_EXCLAMATION | IDI_WARNING)
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/inspect-load-icon-resource.yml
+----------------------------------------------
+rule:
+  meta:
+    name: hash data using MD4
+    namespace: data-manipulation/hashing/md4
+    author: anamaria.martinezgom@fireeye.com
+    scope: basic block
+  features:
+    - and:
+      - number: 0x8002 = CALG_MD4
+      - api: advapi32.CryptCreateHash
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/hash-data-using-md4.yml
+----------------------------------------------
+rule:
+  meta:
+    name: spawn thread to RWX shellcode
+    namespace: load-code/shellcode
+    author: moritz.raabe@fireeye.com
+    scope: function
+  features:
+    - and:
+      - match: allocate RWX memory
+      - match: create thread
+
+Reason: needed sub-rule not converted (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/spawn-thread-to-rwx-shellcode.yml
+----------------------------------------------
+rule:
+  meta:
+    name: create shortcut via IShellLink
+    namespace: host-interaction/file-system/write
+    author: matthew.williams@fireeye.com
+    scope: function
+    references:
+      - https://docs.microsoft.com/en-us/windows/win32/shell/links#creating-a-shortcut-and-a-folder-shortcut-to-a-file
+  features:
+    - and:
+      - bytes: 01 14 02 00 00 00 00 00 C0 00 00 00 00 00 00 46 = CLSID_ShellLink
+      - or:
+        - bytes: EE 14 02 00 00 00 00 00 C0 00 00 00 00 00 00 46 = IID_IShellLinkA
+        - bytes: F9 14 02 00 00 00 00 00 C0 00 00 00 00 00 00 46 = IID_IShellLinkW
+      - bytes: 0B 01 00 00 00 00 00 00 C0 00 00 00 00 00 00 46 = IID_IPersistFile
+      - offset: 0x50 = psl->SetPath
+      - offset: 0x18 = ppf->Save
+      - api: ole32.CoCreateInstance
+
+Reason: offset (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/create-shortcut-via-ishelllink.yml
+----------------------------------------------
+rule:
+  meta:
+    name: check ProcessDebugPort
+    namespace: anti-analysis/anti-debugging/debugger-detection
+    author: michael.hunhoff@fireeye.com
+    scope: basic block
+    mbc:
+      - Anti-Behavioral Analysis::Debugger Detection
+    references:
+      - https://github.com/LordNoteworthy/al-khaser/blob/master/al-khaser/AntiDebug/NtQueryInformationProcess_ProcessDebugPort.cpp
+  features:
+    - and:
+      - api: NtQueryInformationProcess
+      - number: 0x7 = ProcessDebugPort
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/check-processdebugport.yml
+----------------------------------------------
+rule:
+  meta:
+    name: check ProcessDebugFlags
+    namespace: anti-analysis/anti-debugging/debugger-detection
+    author: michael.hunhoff@fireeye.com
+    scope: basic block
+    mbc:
+      - Anti-Behavioral Analysis::Debugger Detection
+    references:
+      - https://github.com/LordNoteworthy/al-khaser/blob/master/al-khaser/AntiDebug/NtQueryInformationProcess_ProcessDebugFlags.cpp
+  features:
+    - and:
+      - api: NtQueryInformationProcess
+      - number: 0x1F = ProcessDebugFlags
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/check-processdebugflags.yml
+----------------------------------------------
+rule:
+  meta:
+    name: encode data using Base64 via WinAPI
+    namespace: data-manipulation/encoding/base64
+    author: moritz.raabe@fireeye.com
+    scope: basic block
+    att&ck:
+      - Defense Evasion::Obfuscated Files or Information [T1027]
+  features:
+    - and:
+      - number: 1 = CRYPT_STRING_BASE64
+      - api: CryptBinaryToString
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/encode-data-using-base64-via-winapi.yml
+----------------------------------------------
+rule:
+  meta:
+    name: empty recycle bin quietly
+    namespace: host-interaction/recycle-bin
+    author: matthew.williams@fireeye.com
+    scope: basic block
+    references:
+      - https://docs.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shemptyrecyclebina
+    examples:
+      - 276F691A3DF25481F59D79781799E35F:0x1400254E0
+  features:
+    - and:
+      - api: SHEmptyRecycleBin
+      - or:
+        - and:
+          - mnemonic: lea
+          - offset: 7 = SHERB_NOSOUND|SHERB_NOPROGRESSUI|SHERB_NOCONFIRMATION
+          - description: accounts for argument loaded via LEA (lea r8d, [rdx+7])
+        - number: 7 = SHERB_NOSOUND|SHERB_NOPROGRESSUI|SHERB_NOCONFIRMATION
+
+Reason: mnemonic (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/empty-recycle-bin-quietly.yml
+----------------------------------------------
+rule:
+  meta:
+    name: terminate process by name
+    namespace: host-interaction/process/terminate
+    author: william.ballenthin@fireeye.com
+    scope: function
+    examples:
+      # - unpacked Cl0p ransomware
+  features:
+    - and:
+      - match: terminate process
+      - match: enumerate processes
+      - or:
+        - offset: 0x24 = pe.szExeFile (x32)
+
+Reason: offset (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/terminate-process-by-name.yml
+----------------------------------------------
+rule:
+  meta:
+    name: hash data using sha256 via x86 extensions
+    namespace: data-manipulation/hashing/sha256
+    author: "@_re_fox"
+    scope: basic block
+  features:
+    - or:
+      - mnemonic: sha256rnds2   #Perform Two Rounds of SHA256 Operation
+      - mnemonic: sha256msg1    #Perform an Intermediate Calculation for the Next Four SHA256 Message Dwords
+      - mnemonic: sha256msg2    #Perform a Final Calculation for the Next Four SHA256 Message Dwords
+
+Reason: Multiple statements inside "- or:" where all unsupported, the last one was "mnemonic" (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/hash-data-using-sha256-via-x86-extensions.yml
+----------------------------------------------
+rule:
+  meta:
+    name: enumerate browser history
+    namespace: host-interaction/browser/history/list
+    author: michael.hunhoff@fireeye.com
+    scope: function
+  features:
+    - and:
+      - api: ole32.CoCreateInstance
+      - bytes: 11 DC A0 AF 13 C3 D0 11 83 1A 00 C0 4F D5 AE 38 = IUrlHistoryStg2
+      - bytes: 40 4A 37 3C E4 BA CF 11 BF 7D 00 AA 00 69 46 EE = CUrlHistory
+      - offset: 28 = IUrlHistoryStg2.EnumUrls # enumerate IE URLs
+      - optional:
+        - offset: 20 = IEnumSTATURL.Reset # reset iterator to start of IE URLs
+        - offset: 12 = IEnumSTATURL.Next
+
+Reason: offset (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/enumerate-browser-history.yml
+----------------------------------------------
+rule:
+  meta:
+    name: hash data using murmur2
+    namespace: data-manipulation/hashing/murmur
+    author: william.ballenthin@fireeye.com
+    scope: function
+    references:
+      - https://github.com/abrandoned/murmur2/blob/master/MurmurHash2.c
+    examples:
+  features:
+    - and:
+      - or:
+        - number: 0xc6a4a7935bd1e995 = 64-bit mixing constant m
+        - number: 0x5bd1e995 = 32-bit mixing constant m
+      - mnemonic: imul
+
+Reason: mnemonic (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/hash-data-using-murmur2.yml
+----------------------------------------------
+rule:
+  meta:
+    name: hide thread from debugger
+    namespace: anti-analysis/anti-debugging
+    author: michael.hunhoff@fireeye.com
+    scope: basic block
+    references:
+      - https://github.com/LordNoteworthy/al-khaser/blob/master/al-khaser/AntiDebug/NtSetInformationThread_ThreadHideFromDebugger.cpp
+  features:
+    - and:
+      - api: NtSetInformationThread
+      - number: 0x11 = ThreadHideFromDebugger
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/hide-thread-from-debugger.yml
+----------------------------------------------
+rule:
+  meta:
+    name: search for credit card data
+    namespace: collection/credit-card
+    author: matthew.williams@fireeye.com
+    scope: function
+  features:
+    - and:
+      - basic block:
+        - and:
+          - mnemonic: cmp
+          - number: 0x5E = '^' (Track 1 separator)
+      - basic block:
+        - and:
+          - mnemonic: cmp
+          - number: 0x3D = '=' (Track 2 separator)
+      - basic block:
+        - and:
+          - mnemonic: cmp
+          # seen in 518185ED134F93DF708590E74473DA8E and 05B2D1AF23CF96E295BBBFC6CDC76E1F
+          - number: 0x44 = 'D' (Unknown separator)
+      - match: read process memory
+
+Reason: Depending on myself = basic block (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/search-for-credit-card-data.yml
+----------------------------------------------
+rule:
+  meta:
+    name: get installed programs
+    namespace: host-interaction/software
+    author: moritz.raabe@fireeye.com
+    scope: function
+    att&ck:
+      - Discovery::Software Discovery [T1518]
+  features:
+    - and:
+      - match: create or open registry key
+      - string: /SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall/i
+      - characteristic: loop
+
+Reason: characteristic (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/get-installed-programs.yml
+----------------------------------------------
+rule:
+  meta:
+    name: hash data using SHA1 via WinCrypt
+    namespace: data-manipulation/hashing/sha1
+    author: michael.hunhoff@fireeye.com
+    scope: function
+  features:
+    - or:
+      - and:
+        - match: initialize hashing via WinCrypt
+        - number: 0x8004 = CALG_SHA1
+        - api: advapi32.CryptHashData
+
+Reason: Multiple statements inside "- or:" where all unsupported, the last one was "And" (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/hash-data-using-sha1-via-wincrypt.yml
+----------------------------------------------
+rule:
+  meta:
+    name: hash data using sha1 via x86 extensions
+    namespace: data-manipulation/hashing/sha1
+    author: "@_re_fox"
+    scope: basic block
+  features:
+    - or:
+      - mnemonic: sha1rnds4  #Perform Four Rounds of SHA1 Operation
+      - mnemonic: sha1nexte  #Calculate SHA1 State Variable E after Four Rounds
+      - mnemonic: sha1msg1  #Perform an Intermediate Calculation for the Next Four SHA1 Message Dwords
+      - mnemonic: sha1msg2 #Perform a Final Calculation for the Next Four SHA1 Message Dwords
+
+Reason: Multiple statements inside "- or:" where all unsupported, the last one was "mnemonic" (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/hash-data-using-sha1-via-x86-extensions.yml
+----------------------------------------------
+rule:
+  meta:
+    name: reference the VMWare IO port
+    namespace: anti-analysis/anti-vm/vm-detection
+    author: matthew.williams@fireeye.com
+    scope: function
+    att&ck:
+      - Defense Evasion::Virtualization/Sandbox Evasion::System Checks [T1497.001]
+    mbc:
+      - Anti-Behavioral Analysis::Virtual Machine Detection::Unique Hardware/Firmware Check - I/O Communication Port [B0009.025]
+  features:
+    - and:
+      - mnemonic: in
+      - number: 0x564D5868 = VMXh
+      - number: 0x5658 = VX
+
+Reason: mnemonic (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/reference-the-vmware-io-port.yml
+----------------------------------------------
+rule:
+  meta:
+    name: check for process debug object
+    namespace: anti-analysis/anti-debugging/debugger-detection
+    author: michael.hunhoff@fireeye.com
+    scope: function
+    mbc:
+      - Anti-Behavioral Analysis::Debugger Detection
+    references:
+      - https://github.com/LordNoteworthy/al-khaser/blob/master/al-khaser/AntiDebug/NtQueryInformationProcess_ProcessDebugObject.cpp
+  features:
+    - and:
+      - api: kernel32.GetCurrentProcess
+      - basic block:
+        - and:
+          - api: NtQueryInformationProcess
+          - number: 0x1E = ProcessDebugObjectHandle
+
+Reason: Depending on myself = basic block (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/check-for-process-debug-object.yml
+----------------------------------------------
+rule:
+  meta:
+    name: get inbound credentials handle via CredSSP
+    namespace: data-manipulation/encryption
+    author: matthew.williams@fireeye.com
+    scope: basic block
+    att&ck:
+      - Defense Evasion::Obfuscated Files or Information [T1027]
+    references:
+      - https://docs.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-acquirecredentialshandlea
+      - https://docs.microsoft.com/en-us/windows/win32/secauthn/getting-schannel-credentials
+  features:
+    - and:
+      - api: secur32.AcquireCredentialsHandle
+      - number: 1 = SECPKG_CRED_INBOUND
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/get-inbound-credentials-handle-via-credssp.yml
+----------------------------------------------
+rule:
+  meta:
+    name: enumerate network shares
+    namespace: host-interaction/network
+    author: michael.hunhoff@fireeye.com
+    scope: function
+    att&ck:
+      - Discovery::Network Share Discovery [T1135]
+  features:
+    - and:
+      - or:
+        - api: netapi32.NetShareEnum
+        - api: mpr.WNetEnumResource
+      - match: contain loop
+
+Reason: needed sub-rule not converted (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/enumerate-network-shares.yml
+----------------------------------------------
+# generated using capa explorer for IDA Pro
+rule:
+  meta:
+    name: encrypt data using FAKEM cipher
+    namespace: data-manipulation/encryption
+    author: michael.hunhoff@fireeye.com
+    description: Detect custom encryption cipher used by FAKEM malware family
+    scope: basic block
+    att&ck:
+      - Defense Evasion::Obfuscated Files or Information [T1027]
+    mbc:
+      - Cryptography::Decrypt Data [C0031]
+      - Cryptography::Encrypt Data [C0027]
+    references: https://attack.mitre.org/software/S0076/
+  features:
+    - and:
+      - characteristic: tight loop
+      - count(mnemonic(ror)): 5
+      - count(mnemonic(xor)): 5
+      - number: 0x59 = Y
+      - number: 0x48 = H
+      - number: 0x43 = C
+      - number: 0x52 = R
+      - number: 0x41 = A
+
+Reason: characteristic (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/encrypt-data-using-fakem-cipher.yml
+----------------------------------------------
+rule:
+  meta:
+    name: authenticate HMAC
+    namespace: data-manipulation/hmac
+    author: moritz.raabe@fireeye.com
+    scope: function
+    references:
+      - https://tools.ietf.org/html/rfc2104
+      - https://tools.ietf.org/html/rfc4634
+      - https://github.com/ogay/hmac
+  features:
+    - and:
+      # block-sized inner padding, consisting of repeated bytes valued 0x36
+      - number: 0x36 = inner padding byte value
+      # block-sized outer padding, consisting of repeated bytes valued 0x5c
+      - number: 0x5C = outer padding byte value
+      - match: contain loop
+      - count(characteristic(nzxor)): 2 or more
+      - optional:
+        - description: block size
+        - number: 64 = MD5, SHA-1, SHA-224, or SHA-256
+        - number: 128 = SHA-384 or SHA-512
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/authenticate-hmac.yml
+----------------------------------------------
+rule:
+  meta:
+    name: get outbound credentials handle via CredSSP
+    namespace: data-manipulation/encryption
+    author: matthew.williams@fireeye.com
+    scope: basic block
+    att&ck:
+      - Defense Evasion::Obfuscated Files or Information [T1027]
+    references:
+      - https://docs.microsoft.com/en-us/windows/win32/api/sspi/nf-sspi-acquirecredentialshandlea
+      - https://docs.microsoft.com/en-us/windows/win32/secauthn/getting-schannel-credentials
+  features:
+    - and:
+      - api: secur32.AcquireCredentialsHandle
+      - number: 2 = SECPKG_CRED_OUTBOUND
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/get-outbound-credentials-handle-via-credssp.yml
+----------------------------------------------
+rule:
+  meta:
+    name: get client handle via SChannel
+    namespace: data-manipulation/encryption
+    author: matthew.williams@fireeye.com
+    scope: function
+    att&ck:
+      - Defense Evasion::Obfuscated Files or Information [T1027]
+    references:
+      - https://docs.microsoft.com/en-us/windows/win32/secauthn/getting-schannel-credentials
+      - https://docs.microsoft.com/en-us/windows/win32/api/credssp/ns-credssp-credssp_cred
+      - https://docs.microsoft.com/en-us/windows/win32/api/credssp/ne-credssp-credspp_submit_type
+  features:
+    - and:
+      - match: get outbound credentials handle via CredSSP
+      - number: 4 = CredsspSchannelCreds
+      - optional:
+        - string: "Microsoft Unified Security Protocol Provider"
+
+Reason: needed sub-rule not converted (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/get-client-handle-via-schannel.yml
+----------------------------------------------
+rule:
+  meta:
+    name: check SystemKernelDebuggerInformation
+    namespace: anti-analysis/anti-debugging/debugger-detection
+    author: michael.hunhoff@fireeye.com
+    scope: basic block
+    mbc:
+      - Anti-Behavioral Analysis::Debugger Detection
+    references:
+      - https://github.com/LordNoteworthy/al-khaser/blob/master/al-khaser/AntiDebug/NtQuerySystemInformation_SystemKernelDebuggerInformation.cpp
+  features:
+    - and:
+      - api: NtQueryInformationProcess
+      - number: 0x23 = SystemKernelDebuggerInformation
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/check-systemkerneldebuggerinformation.yml
+----------------------------------------------
+rule:
+  meta:
+    name: reference processor manufacturer constants
+    namespace: anti-analysis/anti-vm/vm-detection
+    author: matthew.williams@fireeye.com
+    scope: basic block
+    att&ck:
+      - Defense Evasion::Virtualization/Sandbox Evasion::System Checks [T1497.001]
+    mbc:
+      - Anti-Behavioral Analysis::Virtual Machine Detection::Instruction Testing - CPUID [B0009.034]
+    references:
+      - https://en.wikipedia.org/wiki/CPUID
+  features:
+    - and:
+      - mnemonic: cmp
+      - or:
+        - number: 0x61774D56    # 'awMV' (VMware)
+        - number: 0x566E6558    # 'VneX' (Xen HVM)
+        - number: 0x7263694D    # 'rciM' (Microsoft Hyper-V)
+        - number: 0x4B4D564B    # 'KMVK' (KVM)
+        - number: 0x70726C20    # 'prl ' (Parallels)
+        - number: 0x786F4256    # 'xoBV' (VirtualBox)
+      - optional:
+        - mnemonic: cpuid
+
+Reason: mnemonic (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/reference-processor-manufacturer-constants.yml
+----------------------------------------------
+rule:
+  meta:
+    name: decode data using Base64 via WinAPI
+    namespace: data-manipulation/encoding/base64
+    author: michael.hunhoff@fireeye.com
+    scope: basic block
+    att&ck:
+      - Defense Evasion::Deobfuscate/Decode Files or Information [T1140]
+  features:
+    - and:
+      - or:
+        - number: 0x1 = CRYPT_STRING_BASE64
+        - number: 0x6 = CRYPT_STRING_BASE64_ANY
+        - number: 0x7 = CRYPT_STRING_ANY
+      - api: CryptStringToBinary
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/decode-data-using-base64-via-winapi.yml
+----------------------------------------------
+rule:
+  meta:
+    name: get remote cert context via SChannel
+    namespace: data-manipulation/encryption
+    author: matthew.williams@fireeye.com
+    scope: basic block
+    att&ck:
+      - Defense Evasion::Obfuscated Files or Information [T1027]
+    references:
+      - https://docs.microsoft.com/en-us/windows/win32/secauthn/querycontextattributes--schannel
+  features:
+    - and:
+      - api: secur32.QueryContextAttributes
+      - number: 0x53 = SECPKG_ATTR_REMOTE_CERT_CONTEXT
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/get-remote-cert-context-via-schannel.yml
+----------------------------------------------
+rule:
+  meta:
+    name: schedule task via ITaskService
+    namespace: persistence/scheduled-tasks
+    author: michael.hunhoff@fireeye.com
+    scope: function
+    att&ck:
+      - Persistence/Scheduled Task/Job/Scheduled Task [T1053.005]
+  features:
+    - and:
+      - basic block:
+        - and:
+          - api: ole32.CoCreateInstance
+          - bytes: 9F 36 87 0F E5 A4 FC 4C BD 3E 73 E6 15 45 72 DD = CLSID_TaskScheduler
+          - bytes: C7 A4 AB 2F A9 4D 13 40 96 97 20 CC 3F D4 0F 85 = IID_ITaskService
+      - offset: 0x24 = ppv->NewTask
+
+Reason: Depending on myself = basic block (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/schedule-task-via-itaskservice.yml
+----------------------------------------------
+rule:
+  meta:
+    name: enumerate disk volumes
+    namespace: host-interaction/hardware/storage
+    author: michael.hunhoff@fireeye.com
+    scope: function
+    att&ck:
+      - Discovery::System Information Discovery [T1082]
+  features:
+    - and:
+      - match: contain loop
+      - or:
+        - and:
+          - api: kernel32.FindFirstVolume
+          - api: kernel32.FindNextVolume
+          - optional:
+            - api: kernel32.FindVolumeClose
+        - and:
+          - api: kernel32.FindFirstVolumeMountPoint
+          - api: kernel32.FindNextVolumeMountPoint
+          - optional:
+            - api: kernel32.FindVolumeMountPointClose
+
+Reason: needed sub-rule not converted (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/enumerate-disk-volumes.yml
+----------------------------------------------
+rule:
+  meta:
+    name: check thread yield allowed
+    namespace: anti-analysis/anti-debugging/debugger-detection
+    author: michael.hunhoff@fireeye.com
+    scope: function
+    mbc:
+      - Anti-Behavioral Analysis::Debugger Detection
+    references:
+      - https://github.com/LordNoteworthy/al-khaser/blob/master/al-khaser/AntiDebug/NtYieldExecution.cpp
+  features:
+    - and:
+      - api: NtYieldExecution
+      - match: contain loop
+      - basic block:
+        - and:
+          - mnemonic: cmp
+          - number: 0x40000024 = STATUS_NO_YIELD_PERFORMED
+
+Reason: needed sub-rule not converted (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/check-thread-yield-allowed.yml
+----------------------------------------------
+rule:
+  meta:
+    name: hash data using CRC32b
+    namespace: data-manipulation/checksum/crc32
+    author: moritz.raabe@fireeye.com
+    scope: function
+  features:
+    - and:
+      - number: 0x4C11DB7
+      - characteristic: nzxor
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/hash-data-using-crc32b.yml
+----------------------------------------------
+rule:
+  meta:
+    name: generate random numbers using the Delphi LCG
+    namespace: data-manipulation/prng/lcg
+    author: william.ballenthin@fireeye.com
+    scope: basic block
+    mbc:
+      - Cryptography::Generate Pseudo-random Sequence [C0021]
+    references:
+      - https://en.wikipedia.org/wiki/Linear_congruential_generator
+      - https://community.osr.com/discussion/130410/generating-random-numbers
+  features:
+    - and:
+      - mnemonic: imul
+      - number: 0x8088405 = multiplier a
+      - mnemonic: inc = increment c
+
+Reason: mnemonic (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/nursery/generate-random-numbers-using-the-delphi-lcg.yml
+----------------------------------------------
+rule:
+  meta:
+    name: compiled with perl2exe
+    namespace: compiler/perl2exe
+    author: "@_re_fox"
+    scope: function
+    examples:
+      - 873275ce8bf88ef66e9fa0c74b5c2a1e:0x4011C9
+  features:
+    - and:
+      - api: LoadLibrary
+      - api: FreeLibrary
+      - string: /^p2x[a-z0-9]{1,10}\.dll/i
+      - basic block:
+        - and:
+          - api: GetProcAddress
+          - string: "RunPerl"
+
+Reason: Depending on myself = basic block (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/compiler/perl2exe/compiled-with-perl2exe.yml
+----------------------------------------------
+rule:
+  meta:
+    name: compiled with rust
+    namespace: compiler/rust
+    author: "@_re_fox"
+    scope: function
+    examples:
+      - c3341b7dfbb9d43bca8c812e07b4299f:0x45F490
+  features:
+    - and:
+      - basic block:
+        - string: /run with \`RUST_BACKTRACE=1\` environment variable/
+      - basic block:
+        - string: /thread '' panicked at '',/
+
+Reason: Depending on myself = basic block (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/compiler/rust/compiled-with-rust.yml
+----------------------------------------------
+rule:
+  meta:
+    name: receive HTTP request
+    namespace: communication/http/server
+    author: michael.hunhoff@fireeye.com
+    scope: function
+    mbc:
+      - Communication::HTTP Communication::Receive Request [C0002.015]
+    examples:
+      - 6A352C3E55E8AE5ED39DC1BE7FB964B1:0x10001D30
+      - 6A352C3E55E8AE5ED39DC1BE7FB964B1:0x100027D0
+  features:
+    - or:
+      - and:
+        - api: httpapi.HttpReceiveHttpRequest
+        - or:
+          - number: 0
+          - number: 1 = HTTP_RECEIVE_REQUEST_FLAG_COPY_BODY
+          - number: 2 = HTTP_RECEIVE_REQUEST_FLAG_FLUSH_BODY
+      - and:
+        - api: httpapi.HttpReceiveRequestEntityBody
+        - or:
+          - number: 0 # Windows Server 2003 with SP1 and Windows XP with SP2:  This parameter is reserved and must be zero
+          - number: 1 = HTTP_RECEIVE_REQUEST_ENTITY_BODY_FLAG_FILL_BUFFER
+
+Reason: Multiple statements inside "- or:" where all unsupported, the last one was "And" (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/communication/http/server/receive-http-request.yml
+----------------------------------------------
+rule:
+  meta:
+    name: check HTTP status code
+    namespace: communication/http/client
+    author: moritz.raabe@fireeye.com
+    scope: function
+    mbc:
+      - Communication::HTTP Communication::Read Header [C0002.014]
+    examples:
+      - 54ac78733552a62d1d05ea4ba3fc604bb49fe000d7fc948da45335b726e64d75:0x10001a20
+  features:
+    - and:
+      - or:
+        - number: 0x20000013 = HTTP_QUERY_FLAG_NUMBER | HTTP_QUERY_STATUS_CODE
+        - number: 0x13 = HTTP_QUERY_STATUS_CODE
+      - optional:
+        - api: atoi
+        - api: wininet.HttpQueryInfo
+      - basic block:
+        - and:
+          - or:
+            - mnemonic: cmp
+            - mnemonic: test
+          - or:
+            - number: 200 = OK
+            - number: 400 = Bad Request
+            - number: 401 = Unauthorized
+            - number: 403 = Forbidden
+            - number: 404 = Not Found
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/communication/http/client/check-http-status-code.yml
+----------------------------------------------
+rule:
+  meta:
+    name: decompress HTTP response via IEncodingFilterFactory
+    namespace: communication/http/client
+    author: matthew.williams@fireeye.com
+    scope: function
+    mbc:
+      - Communication::HTTP Communication::Get Response [C0002.017]
+    examples:
+      - FBBAAF569B63F6398503E4F1979CABEF:0x4067F0
+  features:
+    - and:
+      - match: get HTTP response content encoding
+      - match: decompress data via IEncodingFilterFactory
+
+Reason: needed sub-rule not converted (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/communication/http/client/decompress-http-response-via-iencodingfilterfactory.yml
+----------------------------------------------
+rule:
+  meta:
+    name: get HTTP response content encoding
+    namespace: communication/http/client
+    author: matthew.williams@fireeye.com
+    scope: basic block
+    mbc:
+      - Communication::HTTP Communication::Get Response [C0002.017]
+    examples:
+      - FBBAAF569B63F6398503E4F1979CABEF:0x4068D9
+  features:
+    - and:
+      - api: wininet.HttpQueryInfo
+      - number: 0x1D = HTTP_QUERY_CONTENT_ENCODING
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/communication/http/client/get-http-response-content-encoding.yml
+----------------------------------------------
+rule:
+  meta:
+    name: extract HTTP body
+    namespace: communication/http/client
+    author: matthew.williams@fireeye.com
+    scope: function
+    mbc:
+      - Communication::HTTP Communication::Extract Body [C0002.011]
+    references:
+      - https://docs.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/platform-apis/aa752574(v=vs.85)
+    examples:
+      - 395EB0DDD99D2C9E37B6D0B73485EE9C:0x4020A9
+  features:
+    - and:
+      - bytes: 25 44 2C 33 CB 26 D0 11 B4 83 00 C0 4F D9 01 19 = CLSID_IHTMLDocument2
+      - offset: 0x24 = IHTMLDocument2Vtbl.get_body
+      - offset: 0xF0 = IHTMLElementVtbl.get_innerText
+
+Reason: offset (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/communication/http/client/extract-http-body.yml
+----------------------------------------------
+rule:
+  meta:
+    name: get HTTP document via IWebBrowser2
+    namespace: communication/http/client
+    author: matthew.williams@fireeye.com
+    scope: function
+    mbc:
+      - Communication::HTTP Communication::Get Response [C0002.017]
+      - Communication::HTTP Communication::IWebBrowser [C0002.010]
+    examples:
+      - 395EB0DDD99D2C9E37B6D0B73485EE9C:0x402000
+  features:
+    - and:
+      - api: oleaut32.SysAllocString
+      - api: oleaut32.VariantInit
+      - offset: 0x2C = pBrowser2->Navigate
+      - offset: 0x48 = pBrowser2->get_Document
+      - offset: 0x80 = pBrowser2->Quit
+      - count(characteristic(indirect call)): 3 or more
+
+Reason: offset (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/communication/http/client/get-http-document-via-iwebbrowser2.yml
+----------------------------------------------
+rule:
+  meta:
+    name: connect TCP socket
+    namespace: communication/socket/tcp
+    author: moritz.raabe@fireeye.com
+    scope: function
+    mbc:
+      - Communication::Socket Communication::Connect Socket [C0001.004]
+    examples:
+      - Practical Malware Analysis Lab 01-01.dll_:0x10001010
+  features:
+    - and:
+      - match: create TCP socket
+      - or:
+        - api: ws2_32.connect
+        - api: ws2_32.WSAConnect
+        - api: ConnectEx
+        - and:
+          - basic block:
+            # candidate for GUID: WSAID_CONNECTEX/25a207b9-ddf3-4660-8ee9-76e58c74063e
+            - and:
+              - number: 0x25A207B9
+              - number: 0x4660DDF3
+              - number: 0xE576E98E
+              - number: 0x3E06748C
+          - basic block:
+            - and:
+              - api: WSAIoctl
+              - number: 0xC8000006 = SIO_GET_EXTENSION_FUNCTION_POINTER
+          - basic block:
+            - and:
+              - api: setsockopt
+              - number: 0xFFFF = SOL_SOCKET
+              - number: 0x7010 = SO_UPDATE_CONNECT_CONTEXT
+          # socket must be bound to ConnectEx
+          # https://gist.github.com/joeyadams/4158972
+          - api: bind
+
+Reason: needed sub-rule not converted (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/communication/socket/tcp/connect-tcp-socket.yml
+----------------------------------------------
+rule:
+  meta:
+    name: create TCP socket
+    namespace: communication/socket/tcp
+    author: william.ballenthin@fireeye.com
+    scope: basic block
+    mbc:
+      - Communication::Socket Communication::Create TCP Socket [C0001.011]
+    examples:
+      - Practical Malware Analysis Lab 01-01.dll_:0x10001010
+  features:
+    - and:
+      - number: 6 = IPPROTO_TCP
+      - number: 1 = SOCK_STREAM
+      - number: 2 = AF_INET
+      - or:
+        - api: ws2_32.socket
+        - api: ws2_32.WSASocket
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/communication/socket/tcp/create-tcp-socket.yml
+----------------------------------------------
+rule:
+  meta:
+    name: send TCP data via WFP API
+    namespace: communication/socket/tcp/send
+    author: michael.hunhoff@fireeye.com
+    scope: function
+    mbc:
+      - Communication::Socket Communication::Send TCP Data [C0001.014]
+    examples:
+      - 493167E85E45363D09495D0841C30648:0x404560
+  features:
+    - and:
+      - api: fwpkclnt.FwpsStreamInjectAsync0
+      - number: 0x10000 = FWPS_STREAM_FLAG_SEND
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/communication/socket/tcp/send/send-tcp-data-via-wfp-api.yml
+----------------------------------------------
+rule:
+  meta:
+    name: create UDP socket
+    namespace: communication/socket/udp/send
+    author: moritz.raabe@fireeye.com
+    scope: basic block
+    mbc:
+      - Communication::Socket Communication::Create UDP Socket [C0001.010]
+    examples:
+      - 203BD48BCC18434314AD60F4C8BC21E3D3422EB0624B22B827410F9BC63B4082:0x401240
+  features:
+    - and:
+      - count(number(2 = AF_INET/SOCK_DGRAM)): 2 or more
+      - or:
+        - api: ws2_32.socket
+        - api: ws2_32.WSASocket
+
+Reason: Range (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/communication/socket/udp/send/create-udp-socket.yml
+----------------------------------------------
+rule:
+  meta:
+    name: start TCP server
+    namespace: communication/tcp/serve
+    author: william.ballenthin@fireeye.com
+    scope: function
+    mbc:
+      - Communication::Socket Communication::Start TCP Server [C0001.005]
+    examples:
+      - AF2F4142463F42548B8650A3ADF5CEB2:0x10010880
+  features:
+    - and:
+      - match: create TCP socket
+      - api: listen
+      - or:
+        - api: accept
+        - api: WSAAccept
+
+Reason: needed sub-rule not converted (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/communication/tcp/serve/start-tcp-server.yml
+----------------------------------------------
+rule:
+  meta:
+    name: act as TCP client
+    namespace: communication/tcp/client
+    author: william.ballenthin@fireeye.com
+    scope: function
+    mbc:
+      - Communication::Socket Communication::TCP Client [C0001.008]
+    examples:
+      - Practical Malware Analysis Lab 01-01.dll_:0x10001010
+  features:
+    - and:
+      - match: connect TCP socket
+
+Reason: needed sub-rule not converted (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/communication/tcp/client/act-as-tcp-client.yml
+----------------------------------------------
+rule:
+  meta:
+    name: create two anonymous pipes
+    namespace: communication/named-pipe/create
+    author: matthew.williams@fireeye.com
+    scope: function
+    mbc:
+      - Communication::Interprocess Communication::Create Pipe [C0003.001]
+    examples:
+      - Practical Malware Analysis Lab 14-02.exe_:0x4011C0
+  features:
+    - and:
+      - count(api(CreatePipe)): 2
+
+Reason: Range (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/communication/named-pipe/create/create-two-anonymous-pipes.yml
+----------------------------------------------
+rule:
+  meta:
+    name: enumerate PE sections
+    namespace: load-code/pe
+    author: "@Ana06"
+    scope: function
+    references:
+      - https://0x00sec.org/t/reflective-dll-injection/3080
+      - https://www.ired.team/offensive-security/code-injection-process-injection/reflective-dll-injection
+    examples:
+      - E4C33AC3638EEF68311F8AC0D72483C7:0x401510
+  features:
+    - and:
+      - offset: 0x6 = IMAGE_NT_HEADERS.FileHeader.NumberOfSections
+      - basic block:
+        - or:
+          - and:
+            - description: IMAGE_FIRST_SECTION(nt_header)
+            - offset: 0x14 = IMAGE_NT_HEADERS.FileHeader.SizeOfOptionalHeader
+            - offset: 0x18 = FileHeader.SizeOfOptionalHeader
+          - and:
+            - description: (DWORD)dll_raw + dos_header->e_lfanew + sizeof(IMAGE_NT_HEADERS) + sizeof(IMAGE_SECTION_HEADER) * i
+            - number: 0x28 = sizeof(IMAGE_SECTION_HEADER)
+            - or:
+              - offset/x32: 0xF8 = sizeof(IMAGE_NT_HEADERS32)
+              - offset/x64: 0x108 = sizeof(IMAGE_NT_HEADERS64)
+      - basic block:
+        - and:
+          - offset: 0xC = IMAGE_SECTION_HEADER.VirtualAddress
+          - offset: 0x14 = IMAGE_SECTION_HEADER.PointerToRawData
+          - offset: 0x10 = IMAGE_SECTION_HEADER.SizeOfRawData
+
+Reason: offset (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/load-code/pe/enumerate-pe-sections.yml
+----------------------------------------------
+rule:
+  meta:
+    name: parse PE exports
+    namespace: load-code/pe
+    author: "@Ana06"
+    scope: function
+    references:
+      - Practical Malware Analysis, Chapter 19
+    examples:
+      - E4C33AC3638EEF68311F8AC0D72483C7:0x401390
+  features:
+    - and:
+      - offset: 0x3C = IMAGE_DOS_HEADER.e_lfanew
+      - or:
+        - offset/x32: 0x78 = IMAGE_NT_HEADERS32.OptionalHeader.DataDirectory.VirtualAddress
+        - offset/x64: 0x88 = IMAGE_NT_HEADERS64.OptionalHeader.DataDirectory.VirtualAddress
+      - offset: 0x18 = IMAGE_EXPORT_DIRECTORY.NumberOfNames
+      - offset: 0x20 = IMAGE_EXPORT_DIRECTORY.AddressOfNames
+      - offset: 0x24 = IMAGE_EXPORT_DIRECTORY.AddressOfNameOrdinals
+      - offset: 0x1C = IMAGE_EXPORT_DIRECTORY.AddressOfFunctions
+
+Reason: offset (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/load-code/pe/parse-pe-exports.yml
+----------------------------------------------
+rule:
+  meta:
+    name: rebuild import table
+    namespace: load-code/pe
+    author: "@Ana06"
+    scope: function
+    references:
+      - https://0x00sec.org/t/reflective-dll-injection/3080
+      - https://www.ired.team/offensive-security/code-injection-process-injection/reflective-dll-injection
+    examples:
+      - E4C33AC3638EEF68311F8AC0D72483C7:0x401510
+  features:
+    - and:
+      - offset: 0x7C = IMAGE_NT_HEADERS.OptionalHeader.DataDirectory.Size
+      - offset: 0x78 = IMAGE_NT_HEADERS.OptionalHeader.DataDirectory.VirtualAddress
+      - basic block:
+        - and:
+          - offset: 0xC = IMAGE_IMPORT_DESCRIPTOR.Name
+          - api: LoadLibraryA
+      - offset: 0x10 = IMAGE_IMPORT_DESCRIPTOR.FirstThunk
+      - api: GetProcAddress
+      - optional: # Optional as may only support import by ordinal or import by name
+        - or:
+          - number/x32: 0x80000000 = IMAGE_SNAP_BY_ORDINAL32
+          - number/x64: 0x8000000000000000 = IMAGE_SNAP_BY_ORDINAL64
+          - number: 0xFFFF = IMAGE_ORDINAL
+          - number: 0x2 = thunk->u1.AddressOfData
+
+Reason: offset (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/load-code/pe/rebuild-import-table.yml
+----------------------------------------------
+rule:
+  meta:
+    name: inject DLL reflectively
+    namespace: load-code/pe
+    author: "@Ana06"
+    scope: function
+    att&ck:
+      - Defense Evasion::Process Injection::Dynamic-link Library Injection [T1055.001]
+    references:
+      - https://0x00sec.org/t/reflective-dll-injection/3080
+      - https://www.ired.team/offensive-security/code-injection-process-injection/reflective-dll-injection
+    examples:
+      - E4C33AC3638EEF68311F8AC0D72483C7:0x401510
+  features:
+    - and:
+      - match: enumerate PE sections
+      - match: rebuild import table
+      - basic block:
+        - and:
+          - offset: 0x28 = IMAGE_NT_HEADERS.OptionalHeader.AddressOfEntryPoint
+          - number: 0x1 = DLL_PROCESS_ATTACH
+          - characteristic: indirect call = call entry point
+      - optional:
+        - match: inspect section memory permissions
+
+Reason: needed sub-rule not converted (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/load-code/pe/inject-dll-reflectively.yml
+----------------------------------------------
+rule:
+  meta:
+    name: parse PE header
+    namespace: load-code/pe
+    author: moritz.raabe@fireeye.com
+    scope: function
+    att&ck:
+      - Execution::Shared Modules [T1129]
+    examples:
+      - 9324D1A8AE37A36AE560C37448C9705A:0x403DD0
+  features:
+    # TODO filter out false positives
+    - or:
+      - and:
+        - mnemonic: cmp
+        - or:
+          - number: 0x4550 = IMAGE_NT_SIGNATURE (PE)
+          - and:
+            - number: 0x50
+            - number: 0x45
+        - or:
+          - number: 0x5A4D = IMAGE_DOS_SIGNATURE (MZ)
+          - and:
+            - number: 0x4D
+            - number: 0x5A
+      - and:
+        - offset: 0x3C = IMAGE_DOS_HEADER.e_lfanew
+        - or:
+          - and:
+            - offset/x32: 0x50 = IMAGE_NT_HEADERS.OptionalHeader.SizeOfImage
+            - offset/x32: 0x34 = IMAGE_NT_HEADERS.OptionalHeader.ImageBase
+          - and:
+            - offset/x64: 0x50 = IMAGE_NT_HEADERS64.OptionalHeader.SizeOfImage
+            - offset/x64: 0x30 = IMAGE_NT_HEADERS64.OptionalHeader.ImageBase
+
+Reason: Multiple statements inside "- or:" where all unsupported, the last one was "And" (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/load-code/pe/parse-pe-header.yml
+----------------------------------------------
+rule:
+  meta:
+    name: inspect section memory permissions
+    namespace: load-code/pe
+    author: "@Ana06"
+    description: "translate section memory permissions (specified in the 'Characteristics' field of the image section header) into page protection constants"
+    scope: function
+    examples:
+      - E4C33AC3638EEF68311F8AC0D72483C7:0x401480
+  features:
+    - and:
+      - 3 or more:
+        - and:
+          - number: 0x40000000 = IMAGE_SCN_MEM_READ
+          - number: 0x2 = PAGE_READONLY
+        - and:
+          - number: 0x20000000 = IMAGE_SCN_MEM_EXECUTE
+          - number: 0x10 = PAGE_EXECUTE
+        - and:
+          - or:
+            - number: 0x60000000 = IMAGE_SCN_MEM_READ | IMAGE_SCN_MEM_EXECUTE
+            - and:
+              - number: 0x40000000 = IMAGE_SCN_MEM_READ
+              - number: 0x20000000 = IMAGE_SCN_MEM_EXECUTE
+          - number: 0x20 = PAGE_EXECUTE_READ
+        - and:
+          - or:
+            - number: 0xC0000000 = IMAGE_SCN_MEM_READ | IMAGE_SCN_MEM_WRITE
+            - and:
+              - number: 0x40000000 = IMAGE_SCN_MEM_READ
+              - number: 0x80000000 = IMAGE_SCN_MEM_WRITE
+          - number: 0x4 = PAGE_READWRITE
+        - and:
+          - or:
+            - number: 0xE0000000 = IMAGE_SCN_MEM_READ | IMAGE_SCN_MEM_WRITE | IMAGE_SCN_MEM_EXECUTE
+            - and:
+              - number: 0x40000000 = IMAGE_SCN_MEM_READ
+              - number: 0x80000000 = IMAGE_SCN_MEM_WRITE
+              - number: 0x20000000 = IMAGE_SCN_MEM_EXECUTE
+          - number: 0x40 = PAGE_EXECUTE_READWRITE
+      - optional:
+        - number: 0x1 = PAGE_NOACCESS
+
+Reason: Some aka x or more (TODO) (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/load-code/pe/inspect-section-memory-permissions.yml
+----------------------------------------------
+rule:
+  meta:
+    name: steal KeePass passwords using KeeFarce
+    namespace: collection/password-manager
+    author: "@Ana06"
+    scope: file
+    att&ck:
+      - Credential Access::Credentials from Password Stores::Password Managers [T1555.005]
+    references:
+      - https://github.com/denandz/KeeFarce
+      - https://keepass.info/help/kb/sec_issues.html
+    examples:
+      - 1e609dffd12a59ea5d5c9b3055939b1f
+  features:
+    - and:
+      - match: inject dll
+      - string: /KeePass/i
+      - optional:
+        - string: /Bootstrap/
+        - string: /KeeFarce/
+
+Reason: needed sub-rule not converted (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/collection/password-manager/steal-keepass-passwords-using-keefarce.yml
+----------------------------------------------
+rule:
+  meta:
+    name: log keystrokes via application hook
+    namespace: collection/keylog
+    author: michael.hunhoff@fireeye.com
+    scope: function
+    att&ck:
+      - Collection::Input Capture::Keylogging [T1056.001]
+    mbc:
+      - Collection::Keylogging::Application Hook [F0002.001]
+    examples:
+      - Practical Malware Analysis Lab 12-03.exe_:0x401000
+  features:
+    - and:
+      - match: set application hook
+      - or:
+        - number: 13 = WH_KEYBOARD_LL
+        - number: 2  = WH_KEYBOARD
+
+Reason: Number too short (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/collection/keylog/log-keystrokes-via-application-hook.yml
+----------------------------------------------
+rule:
+  meta:
+    name: parse credit card information
+    namespace: collection/credit-card
+    author: "@_re_fox"
+    scope: function
+    mbc:
+      - Data::Check String [C0019]
+    examples:
+      - 1d8fd13c890060464019c0f07b928b1a:0x402860
+  features:
+    - 4 or more:
+      - basic block:
+        - and:
+          - mnemonic: cmp
+          - number: 0x5E = '^' (Track 1 separator)
+      - basic block:
+        - and:
+          - mnemonic: cmp
+          - number: 0x3D = '=' (Track 2 separator)
+      - basic block:
+        - and:
+          - mnemonic: cmp
+          - number: 0x25 = '%' (Track 1 start sentinel)
+      - basic block:
+        - and:
+          - mnemonic: cmp
+          - number: 0x42 = 'B' (Format code)
+      - basic block:
+        - and:
+          - mnemonic: cmp
+          - number: 0x44 = 'D' (Format code)
+      - basic block:
+        - and:
+          - mnemonic: cmp
+          - number: 0x3F = '?' (Track 1 & 2 end sentinel)
+      - basic block:
+        - and:
+          - mnemonic: cmp
+          - number: 0x3B = ';' (Track 2 start sentinel)
+
+Reason: Depending on myself = basic block (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/collection/credit-card/parse-credit-card-information.yml
+----------------------------------------------
+rule:
+  meta:
+    name: get MAC address
+    namespace: collection/network
+    author: moritz.raabe@fireeye.com
+    scope: function
+    att&ck:
+      - Discovery::System Information Discovery [T1082]
+    examples:
+      - al-khaser_x64.exe_:0x14001A1BC
+  features:
+    - and:
+      - api: iphlpapi.GetAdaptersInfo
+      - or:
+        - offset: 0x194 = IP_ADAPTER_INFO.Address
+        - offset: 0x195 = IP_ADAPTER_INFO.Address+1
+        - offset: 0x196 = IP_ADAPTER_INFO.Address+2
+        - offset: 0x197 = IP_ADAPTER_INFO.Address+3
+        - offset: 0x198 = IP_ADAPTER_INFO.Address+4
+        - offset: 0x199 = IP_ADAPTER_INFO.Address+5
+      - optional:
+        - string: "%02X-%02X-%02X-%02X-%02X-%02X"
+
+Reason: offset (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/collection/network/get-mac-address.yml
+----------------------------------------------
+rule:
+  meta:
+    name: gather firefox profile information
+    namespace: collection/browser
+    author: "@_re_fox"
+    scope: function
+    att&ck:
+      - Credential Access::Credentials from Password Stores::Credentials from Web Browsers [T1555.003]
+    examples:
+      - 7204e3efc2434012e13ca939db0d0b02:0x4073c0
+  features:
+    - 2 or more:
+      - string: /\\Mozilla\\Firefox\\profiles(\.ini)?/i
+      - string: /\\signons\.sqlite/i
+      - string: /SELECT\s+[a-z,\s]{5,}FROM moz_(logins|cookies)/i
+      - string: /FROM moz_(logins|cookies)/i
+      - string: /WHERE moz_cookies.host LIKE/
+      - optional:
+        - or:
+          - string: "encryptedUsername"
+          - string: "encryptedPassword"
+          - string: "usernameField"
+          - string: "formSubmitURL"
+          - string: "httpRealm"
+          - string: "passwordField"
+          - string: "timeCreated"
+          - string: "timeLastUsed"
+          - string: "timePasswordChanged"
+          - string: "timesUsed"
+
+Reason: Some aka x or more (TODO) (there might be multiple unsupported things in this rule, this is the 1st one encountered)
+https://github.com/fireeye/capa-rules/blob/master/collection/browser/gather-firefox-profile-information.yml
+----------------------------------------------
