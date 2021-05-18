@@ -1,6 +1,6 @@
 # capa2yara
 
-Rules from Fireeyes https://github.com/fireeye/capa-rules converted to YARA using capa2yara.py (not published yet).
+Rules from Fireeyes https://github.com/fireeye/capa-rules converted to YARA using capa2yara.py (will probaly end up on https://github.com/fireeye/capa/blob/master/scripts/capa2yara.py).
 
 ## Advantages:
 * YARA is lots faster than CAPA so it's possible to search with these rules on millions of files
