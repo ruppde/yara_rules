@@ -89,7 +89,7 @@ TODO: move "not php_false_positive" down once https://github.com/plyara/plyara/p
 
 import "math"
 
-private rule webshell_encoded_stats {
+private rule webshell_encoded_stats : WEBSHELL PROD {
 	meta:
 		description = "Webshell having statistical signs of encoded code which gets dynamically executed"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -98,29 +98,233 @@ private rule webshell_encoded_stats {
 	condition:
 		// file shouldn't be too small to have big enough data for math.entropy
 		filesize > 2KB and 
-		// ignore first and last 500bytes because they usually contain code for decoding and executing
-		math.entropy(500, filesize-500) >= 5.7 and
-		// encoded text has a higher mean than text or code because it's missing the spaces and special chars with the low numbers
-		math.mean(500, filesize-500) > 80 and
-		// deviation of base64 is ~20 according to CyberChef_v9.21.0.html#recipe=Generate_Lorem_Ipsum(3,'Paragraphs')To_Base64('A-Za-z0-9%2B/%3D')To_Charcode('Space',10)Standard_Deviation('Space')
-		// lets take a bit more because it might not be pure base64 also include some xor, shift, replacement, ...
-		// 89 is the mean of the base64 chars
-		math.deviation(500, filesize-500, 89.0) < 23
+        (
+            // base64:
+            // ignore first and last 500bytes because they usually contain code for decoding and executing
+            math.entropy(500, filesize-500) >= 5.7 and
+            // encoded text has a higher mean than text or code because it's missing the spaces and special chars with the low numbers
+            math.mean(500, filesize-500) > 80 and
+            // deviation of base64 is ~20 according to CyberChef_v9.21.0.html#recipe=Generate_Lorem_Ipsum(3,'Paragraphs')To_Base64('A-Za-z0-9%2B/%3D')To_Charcode('Space',10)Standard_Deviation('Space')
+            // lets take a bit more because it might not be pure base64 also include some xor, shift, replacement, ...
+            // 89 is the mean of the base64 chars
+            math.deviation(500, filesize-500, 89.0) < 23
+        ) or (
+            // gzinflated binary sometimes used in php webshells
+            // ignore first and last 500bytes because they usually contain code for decoding and executing
+            math.entropy(500, filesize-500) >= 7.7 and
+            // encoded text has a higher mean than text or code because it's missing the spaces and special chars with the low numbers
+            math.mean(500, filesize-500) > 120 and
+            math.mean(500, filesize-500) < 136 and
+            // deviation of base64 is ~20 according to CyberChef_v9.21.0.html#recipe=Generate_Lorem_Ipsum(3,'Paragraphs')To_Base64('A-Za-z0-9%2B/%3D')To_Charcode('Space',10)Standard_Deviation('Space')
+            // lets take a bit more because it might not be pure base64 also include some xor, shift, replacement, ...
+            // 89 is the mean of the base64 chars
+            math.deviation(500, filesize-500, 89.0) > 65
+        )
 }
 
-private rule capa_bin_files {
+private rule capa_bin_files : WEBSHELL PROD {
 	meta:
 		description = "Detects MZ, dex and zip/jar for exclusion"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		date = "2021/03/03"
     strings:
-        $dex   = { 64 65 78 0a 30 }
+        $dex   = { 64 65 ( 78 | 79 ) 0a 30 }
+        $pack  = { 50 41 43 4b 00 00 00 02 00 }
+        $rar   = { 52 61 72 21 1A 07 00 }
 	condition:
         uint16(0) == 0x5a4d or 
+        //gzip
+        uint16(0) == 0x8b1f or 
         $dex at 0 or 
+        $pack at 0 or 
+        $rar at 0 or 
         // fp on jar with zero compression
         uint16(0) == 0x4b50
+}
+
+private rule capa_gen_sus : WEBSHELL PROD {
+	meta:
+		description = "suspicious strings from webshells"
+		license = "https://creativecommons.org/licenses/by-nc/4.0/"
+		author = "Arnim Rupp"
+		date = "2021/04/16"
+	strings:
+
+        // these strings are just a bit suspicious, so several of them are needed, depending on filesize
+        $gen_bit_sus1  = /:\s{0,20}eval}/ nocase wide ascii
+        $gen_bit_sus2  = /\.replace\(\/\w\/g/ nocase wide ascii
+        $gen_bit_sus6  = "self.delete"
+        $gen_bit_sus9  = "\"cmd /c" nocase
+        $gen_bit_sus10 = "\"cmd\"" nocase
+        $gen_bit_sus11 = "\"cmd.exe" nocase
+        $gen_bit_sus12 = "%comspec%" wide ascii
+        $gen_bit_sus13 = "%COMSPEC%" wide ascii
+        //TODO:$gen_bit_sus12 = ".UserName" nocase
+        $gen_bit_sus18 = "Hklm.GetValueNames();" nocase
+        // bonus string for proxylogon exploiting webshells
+        $gen_bit_sus19 = "http://schemas.microsoft.com/exchange/" wide ascii
+        $gen_bit_sus21 = "\"upload\"" wide ascii
+        $gen_bit_sus22 = "\"Upload\"" wide ascii
+        $gen_bit_sus23 = "UPLOAD" fullword wide ascii
+        $gen_bit_sus24 = "fileupload" wide ascii
+        $gen_bit_sus25 = "file_upload" wide ascii
+        // own base64 func
+        $gen_bit_sus29 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789" fullword wide ascii
+        $gen_bit_sus30 = "serv-u" wide ascii
+        $gen_bit_sus31 = "Serv-u" wide ascii
+        $gen_bit_sus32 = "Army" fullword wide ascii
+        // single letter paramweter
+        $gen_bit_sus33 = /\$_(GET|POST|REQUEST)\["\w"\]/ fullword wide ascii
+        $gen_bit_sus34 = "Content-Transfer-Encoding: Binary" wide ascii
+        $gen_bit_sus35 = "crack" fullword wide ascii
+
+        $gen_bit_sus44 = "<pre>" wide ascii
+        $gen_bit_sus45 = "<PRE>" wide ascii
+        $gen_bit_sus46 = "shell_" wide ascii
+        $gen_bit_sus47 = "Shell" fullword wide ascii
+        $gen_bit_sus50 = "bypass" wide ascii
+        $gen_bit_sus51 = "suhosin" wide ascii
+        $gen_bit_sus52 = " ^ $" wide ascii
+        $gen_bit_sus53 = ".ssh/authorized_keys" wide ascii
+        $gen_bit_sus55 = /\w'\.'\w/ wide ascii
+        $gen_bit_sus56 = /\w\"\.\"\w/ wide ascii
+        $gen_bit_sus57 = "dumper" wide ascii
+        $gen_bit_sus59 = "'cmd'" wide ascii
+        $gen_bit_sus60 = "\"execute\"" wide ascii
+        $gen_bit_sus61 = "/bin/sh" wide ascii
+        $gen_bit_sus62 = "Cyber" wide ascii
+        $gen_bit_sus63 = "portscan" fullword wide ascii
+        //$gen_bit_sus64 = "\"command\"" fullword wide ascii
+        //$gen_bit_sus65 = "'command'" fullword wide ascii
+        $gen_bit_sus66 = "whoami" fullword wide ascii
+        $gen_bit_sus67 = "$password='" fullword wide ascii
+        $gen_bit_sus68 = "$password=\"" fullword wide ascii
+        $gen_bit_sus69 = "$cmd" fullword wide ascii
+        $gen_bit_sus70 = "\"?>\"." fullword wide ascii
+        $gen_bit_sus71 = "Hacking" fullword wide ascii
+        $gen_bit_sus72 = "hacking" fullword wide ascii
+        $gen_bit_sus73 = ".htpasswd" wide ascii
+        $gen_bit_sus74 = /\btouch\(\$[^,]{1,30},/ wide ascii
+        $gen_bit_sus75 = "\n                                                                                                                                                                                                                                                       " wide ascii
+        $gen_bit_sus77 = "r00t" fullword wide ascii
+        // 1 char param
+        $gen_bit_sus78 = /request.getParameter\("\w"\)/ wide ascii
+
+        // very suspicious strings, one is enough
+        $gen_much_sus7  = "Web Shell" nocase
+        $gen_much_sus8  = "WebShell" nocase
+        $gen_much_sus3  = "hidded shell" 
+        $gen_much_sus4  = "WScript.Shell.1" nocase
+        $gen_much_sus5  = "AspExec" 
+        $gen_much_sus14 = "\\pcAnywhere\\" nocase
+        $gen_much_sus15 = "antivirus" nocase
+        $gen_much_sus16 = "McAfee" nocase
+        $gen_much_sus17 = "nishang" 
+        $gen_much_sus18 = "\"unsafe" fullword wide ascii
+        $gen_much_sus19 = "'unsafe" fullword wide ascii
+        $gen_much_sus24 = "exploit" fullword wide ascii
+        $gen_much_sus25 = "Exploit" fullword wide ascii
+        $gen_much_sus26 = "TVqQAAMAAA" wide ascii
+        $gen_much_sus30 = "Hacker" wide ascii
+        $gen_much_sus31 = "HACKED" fullword wide ascii
+        $gen_much_sus32 = "hacked" fullword wide ascii
+        $gen_much_sus33 = "hacker" wide ascii
+        $gen_much_sus34 = "grayhat" nocase wide ascii
+        $gen_much_sus35 = "Microsoft FrontPage" wide ascii
+        $gen_much_sus36 = "Rootkit" wide ascii
+        $gen_much_sus37 = "rootkit" wide ascii
+        $gen_much_sus38 = "/*-/*-*/" wide ascii
+        $gen_much_sus39 = "u\"+\"n\"+\"s" wide ascii
+        $gen_much_sus40 = "\"e\"+\"v" wide ascii
+        $gen_much_sus41 = "a\"+\"l\"" wide ascii
+        $gen_much_sus42 = "\"+\"(\"+\"" wide ascii
+        $gen_much_sus43 = "q\"+\"u\"" wide ascii
+        $gen_much_sus44 = "\"u\"+\"e" wide ascii
+        $gen_much_sus45 = "/*//*/" wide ascii
+        $gen_much_sus46 = "(\"/*/\"" wide ascii
+        $gen_much_sus47 = "eval(eval(" wide ascii
+        // self remove
+        $gen_much_sus48 = "unlink(__FILE__)" wide ascii
+        $gen_much_sus49 = "Shell.Users" wide ascii
+        $gen_much_sus50 = "PasswordType=Regular" wide ascii
+        $gen_much_sus51 = "-Expire=0" wide ascii
+        $gen_much_sus60 = "_=$$_" wide ascii
+        $gen_much_sus61 = "_=$$_" wide ascii
+        $gen_much_sus62 = "++;$" wide ascii
+        $gen_much_sus63 = "++; $" wide ascii
+        $gen_much_sus64 = "_.=$_" wide ascii
+        $gen_much_sus70 = "-perm -04000" wide ascii
+        $gen_much_sus71 = "-perm -02000" wide ascii
+        $gen_much_sus72 = "grep -li password" wide ascii
+        $gen_much_sus73 = "-name config.inc.php" wide ascii
+        // touch without parameters sets the time to now, not malicious and gives fp
+        $gen_much_sus75 = "password crack" wide ascii
+        $gen_much_sus76 = "mysqlDll.dll" wide ascii
+        $gen_much_sus77 = "net user" wide ascii
+        $gen_much_sus78 = "suhosin.executor.disable_" wide ascii
+        $gen_much_sus79 = "disabled_suhosin" wide ascii
+        $gen_much_sus80 = "fopen(\".htaccess\",\"w" wide ascii
+        $gen_much_sus81 = /strrev\(['"]/ wide ascii
+        $gen_much_sus82 = "PHPShell" fullword wide ascii
+        $gen_much_sus821= "PHP Shell" fullword wide ascii
+        $gen_much_sus83 = "phpshell" fullword wide ascii
+        $gen_much_sus84 = "PHPshell" fullword wide ascii
+        $gen_much_sus87 = "deface" wide ascii
+        $gen_much_sus88 = "Deface" wide ascii
+        $gen_much_sus89 = "backdoor" wide ascii
+        $gen_much_sus91 = "xp_cmdshell" fullword wide ascii
+        $gen_much_sus92 = ",3306,3389," wide ascii
+        $gen_much_sus93 = "#l@$ak#.lk;0@P" wide ascii
+        $gen_much_sus94 = "YmFzZTY0X2RlY29kZQ==" fullword wide ascii
+
+        $gif = { 47 49 46 38 }
+
+	condition:
+        $gif at 0 or
+        (
+            filesize < 500 and 
+            (
+                1 of ( $gen_much_sus* ) or
+                1 of ( $gen_bit_sus* )
+            )
+        ) or (
+            filesize < 4KB and 
+            (
+                1 of ( $gen_much_sus* ) or
+                2 of ( $gen_bit_sus* )
+            )
+        ) or (
+            filesize < 20KB and 
+            (
+                2 of ( $gen_much_sus* ) or
+                3 of ( $gen_bit_sus* )
+            )
+        ) or (
+            filesize < 50KB and 
+            (
+                2 of ( $gen_much_sus* ) or
+                4 of ( $gen_bit_sus* )
+            )
+        ) or (
+            filesize < 100KB and 
+            (
+                2 of ( $gen_much_sus* ) or
+                6 of ( $gen_bit_sus* )
+            )
+        ) or (
+            filesize < 150KB and 
+            (
+                3 of ( $gen_much_sus* ) or
+                7 of ( $gen_bit_sus* )
+            )
+        ) or (
+            filesize < 500KB and 
+            (
+                4 of ( $gen_much_sus* ) or
+                8 of ( $gen_bit_sus* )
+            )
+        )
 }
 
 //           _
@@ -129,9 +333,8 @@ private rule capa_bin_files {
 //    | |_) | | | | |_) |
 //    | .__/|_| |_| .__/
 //    |_|         |_|
-//    ... is crazy in what it allows to define own functions
 
-private rule php_false_positive {
+private rule php_false_positive : WEBSHELL PROD {
 	meta:
 		description = "PHP false positives"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -151,11 +354,12 @@ private rule php_false_positive {
 		$gfp9  = "?p4yl04d=UNION%20SELECT%20'<?%20system($_GET['command']);%20?>',2,3%20INTO%20OUTFILE%20'/var/www/w3bsh3ll.php"
 		$gfp10 = "[][}{;|]\\|\\\\[+=]\\|<?=>?"
 		$gfp11 = "(eval (getenv \"EPROLOG\")))"
+		$gfp12 = "ZmlsZV9nZXRfY29udGVudHMoJ2h0dHA6Ly9saWNlbnNlLm9wZW5jYXJ0LWFwaS5jb20vbGljZW5zZS5waHA/b3JkZXJ"
 	condition:
 		any of ( $gfp* )
 }
 
-private rule php_false_positive_tiny {
+private rule php_false_positive_tiny : WEBSHELL PROD {
 	meta:
 		description = "PHP false positives"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -163,18 +367,21 @@ private rule php_false_positive_tiny {
 		date = "2021/02/25"
 	strings:
 		// try to use only strings which would be flagged by themselves as suspicous by other rules, e.g. eval 
-		$gfp_tiny1 = "addslashes" fullword
-		$gfp_tiny2 = "escapeshellarg" fullword
+		//$gfp_tiny1 = "addslashes" fullword
+		//$gfp_tiny2 = "escapeshellarg" fullword
 		$gfp_tiny3 = "include \"./common.php\";" // xcache
 		$gfp_tiny4 = "assert('FALSE');"
 		$gfp_tiny5 = "assert(false);"
 		$gfp_tiny6 = "assert(FALSE);"
 		$gfp_tiny7 = "assert('array_key_exists("
 		$gfp_tiny8 = "echo shell_exec($aspellcommand . ' 2>&1');"
+		$gfp_tiny9 = "throw new Exception('Could not find authentication source with id ' . $sourceId);"
+		$gfp_tiny10= "return isset( $_POST[ $key ] ) ? $_POST[ $key ] : ( isset( $_REQUEST[ $key ] ) ? $_REQUEST[ $key ] : $default );"
 	condition:
 		any of ( $gfp_tiny* )
 }
 
+/*
 private rule capa_php {
 	meta:
 		description = "PHP short tag or <script language=\"php\". Ok if rule limits the filesize to less than 10kb. Use only if needed to reduce false positives because it won't find includer shells anymore. (e.g. <? include 'webshell.txt'?> and the payload in webshell.txt without <? )"
@@ -188,8 +395,9 @@ private rule capa_php {
 	condition:
 		any of ( $php_tag* )
 }
+*/
 
-private rule capa_php_old_safe {
+private rule capa_php_old_safe : WEBSHELL PROD {
 	meta:
 		description = "PHP short tag <? in the first 100 bytes or the long ones anywhere"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -206,7 +414,7 @@ private rule capa_php_old_safe {
 
 		// of course the new tags should also match
         // already matched by "<?"
-		$php_new1 = "<?=" wide ascii
+		$php_new1 = /<\?=[^?]/ wide ascii
 		$php_new2 = "<?php" nocase wide ascii
 		$php_new3 = "<script language=\"php" nocase wide ascii
 	condition:
@@ -220,21 +428,54 @@ private rule capa_php_old_safe {
 		or any of ( $php_new* )
 }
 
-private rule capa_php_new {
+private rule capa_php_new : WEBSHELL PROD {
 	meta:
 		description = "PHP tags, only <?= and <?php. Use only if needed to reduce false positives because it won't find includer shells anymore. (e.g. <? include 'webshell.txt'?> and the payload in webshell.txt without <? )"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		date = "2021/01/14"
 	strings:
-		$new_php1 = "<?=" wide ascii
+		$new_php1 = /<\?=[\w\s@$]/ wide ascii
 		$new_php2 = "<?php" nocase wide ascii
 		$new_php3 = "<script language=\"php" nocase wide ascii
+        $php_short = "<?"
 	condition:
-		any of ( $new_php* )
+		any of ( $new_php* ) or
+        $php_short at 0
 }
 
-private rule capa_php_input {
+private rule capa_php_new_long : WEBSHELL PROD {
+	meta:
+		description = "PHP tags, only <script language=\"php and <?php, no <?=. useful to avoid false positives in huge binary files and the old tag is dieing out anyway."
+		license = "https://creativecommons.org/licenses/by-nc/4.0/"
+		author = "Arnim Rupp"
+		date = "2021/01/14"
+	strings:
+		// no <?=
+		$new_php2 = "<?php" nocase wide ascii
+		$new_php3 = "<script language=\"php" nocase wide ascii
+        $php_short = "<?"
+	condition:
+		any of ( $new_php* ) or
+        $php_short at 0
+}
+
+private rule capa_php_write_file : WEBSHELL PROD {
+	meta:
+		description = "PHP file write"
+		license = "https://creativecommons.org/licenses/by-nc/4.0/"
+		author = "Arnim Rupp"
+		date = "2021/04/16"
+	strings:
+		$php_multi_write1 = "fopen(" wide ascii
+		$php_multi_write2 = "fwrite(" wide ascii
+		$php_write1 = "move_uploaded_file" fullword wide ascii
+	condition:
+        any of ( $php_write* ) or
+        all of ( $php_multi_write* )
+}
+
+private rule capa_php_input : WEBSHELL PROD {
 	meta:
 		description = "PHP user input methods, in plain text"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -242,44 +483,91 @@ private rule capa_php_input {
 		date = "2021/01/14"
 	strings:
 		$inp1 = "php://input" wide ascii
-		$inp2 = "_GET[" wide ascii
-		$inp3 = "_POST[" wide ascii
-		$inp4 = "_REQUEST[" wide ascii
+		$inp2 = /_GET\s?\[/ wide ascii
+        // for passing $_GET to a function 
+		$inp3 = /\(\s?\$_GET\s?\)/ wide ascii
+		$inp4 = /_POST\s?\[/ wide ascii
+		$inp5 = /\(\s?\$_POST\s?\)/ wide ascii
+		$inp6 = /_REQUEST\s?\[/ wide ascii
+		$inp7 = /\(\s?\$_REQUEST\s?\)/ wide ascii
 		// PHP automatically adds all the request headers into the $_SERVER global array, prefixing each header name by the "HTTP_" string, so e.g. @eval($_SERVER['HTTP_CMD']) will run any code in the HTTP header CMD
-		$inp5 = "_SERVER['HTTP_" wide ascii
-		$inp6 = "_SERVER[\"HTTP_" wide ascii
-		$inp7 = /getenv[\t ]{0,20}\([\t ]{0,20}['"]HTTP_/ wide ascii
+		$inp15 = "_SERVER['HTTP_" wide ascii
+		$inp16 = "_SERVER[\"HTTP_" wide ascii
+		$inp17 = /getenv[\t ]{0,20}\([\t ]{0,20}['"]HTTP_/ wide ascii
+		$inp18 = "array_values($_SERVER)" wide ascii
+		$inp19 = /file_get_contents\("https?:\/\// wide ascii
 	condition:
 		any of ( $inp* )
 }
 
-private rule capa_php_payload {
+private rule capa_php_payload_evals : WEBSHELL PROD {
 	meta:
-		description = "PHP methods for executing OS commands or eval, in plain text"
+		description = "PHP methods for any kind of eval"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		date = "2021/01/14"
 	strings:
 		// \([^)] to avoid matching on e.g. eval() in comments
 		$cpayload1 = /\beval[\t ]*\([^)]/ nocase wide ascii
-		$cpayload2 = /\bexec[\t ]*\([^)]/ nocase wide ascii
-		$cpayload3 = /\bshell_exec[\t ]*\([^)]/ nocase wide ascii
-		$cpayload4 = /\bpassthru[\t ]*\([^)]/ nocase wide ascii
-		$cpayload5 = /\bsystem[\t ]*\([^)]/ nocase wide ascii
-		$cpayload6 = /\bpopen[\t ]*\([^)]/ nocase wide ascii
-		$cpayload7 = /\bproc_open[\t ]*\([^)]/ nocase wide ascii
-		$cpayload8 = /\bpcntl_exec[\t ]*\([^)]/ nocase wide ascii
-		$cpayload9 = /\bassert[\t ]*\([^)]/ nocase wide ascii
-		$cpayload10 = /\bpreg_replace[\t ]*\([^\)]1,1000}\/e/ nocase wide ascii
-		$cpayload11 = /\bcreate_function[\t ]*\([^)]/ nocase wide ascii
-		$cpayload12 = /\bReflectionFunction[\t ]*\([^)]/ nocase wide ascii
-		// TODO: $_GET['func_name']($_GET['argument']);
+		$cpayload9 = /\bassert[\t ]*\([^)0]/ nocase wide ascii
+		$cpayload10 = /\bpreg_replace[\t ]*\(.{1,100}\/[ismxADSUXju]{0,11}(e|\\x65)/ nocase wide ascii
+		$cpayload12 = /\bmb_ereg_replace[\t ]*\([^\)]{1,100}'e'/ nocase wide ascii
+		$cpayload13 = /\bmb_eregi_replace[\t ]*\([^\)]{1,100}'e'/ nocase wide ascii
+		$cpayload20 = /\bcreate_function[\t ]*\([^)]/ nocase wide ascii
+		$cpayload21 = /\bReflectionFunction[\t ]*\([^)]/ nocase wide ascii
+
+		$m_cpayload_preg_filter1 = /\bpreg_filter[\t ]*\([^\)]/ nocase wide ascii
+		$m_cpayload_preg_filter2 = "'|.*|e'" nocase wide ascii
 		// TODO backticks
 	condition:
-		any of ( $cpayload* )
+		any of ( $cpayload* ) or
+        all of ( $m_cpayload_preg_filter* )
 }
 
-private rule capa_php_callback {
+private rule capa_php_payload_execs : WEBSHELL PROD {
+	meta:
+		description = "PHP methods for executing OS commands"
+		license = "https://creativecommons.org/licenses/by-nc/4.0/"
+		author = "Arnim Rupp"
+		date = "2021/01/14"
+	strings:
+		$xpayload2 = /\bexec[\t ]*\([^)]/ nocase wide ascii
+		$xpayload3 = /\bshell_exec[\t ]*\([^)]/ nocase wide ascii
+		$xpayload4 = /\bpassthru[\t ]*\([^)]/ nocase wide ascii
+		$xpayload5 = /\bsystem[\t ]*\([^)]/ nocase wide ascii
+		$xpayload6 = /\bpopen[\t ]*\([^)]/ nocase wide ascii
+		$xpayload7 = /\bproc_open[\t ]*\([^)]/ nocase wide ascii
+		$xpayload8 = /\bpcntl_exec[\t ]*\([^)]/ nocase wide ascii
+	condition:
+		any of ( $xpayload* ) 
+}
+private rule capa_php_payload_multiple : WEBSHELL PROD {
+	meta:
+		description = "containing multiple PHP methods for executing OS commands or eval, in plain text"
+		license = "https://creativecommons.org/licenses/by-nc/4.0/"
+		author = "Arnim Rupp"
+		date = "2021/04/17"
+	strings:
+		// \([^)] to avoid matching on e.g. eval() in comments
+		$cmpayload1 = /\beval[\t ]*\([^)]/ nocase wide ascii
+		$cmpayload2 = /\bexec[\t ]*\([^)]/ nocase wide ascii
+		$cmpayload3 = /\bshell_exec[\t ]*\([^)]/ nocase wide ascii
+		$cmpayload4 = /\bpassthru[\t ]*\([^)]/ nocase wide ascii
+		$cmpayload5 = /\bsystem[\t ]*\([^)]/ nocase wide ascii
+		$cmpayload6 = /\bpopen[\t ]*\([^)]/ nocase wide ascii
+		$cmpayload7 = /\bproc_open[\t ]*\([^)]/ nocase wide ascii
+		$cmpayload8 = /\bpcntl_exec[\t ]*\([^)]/ nocase wide ascii
+		$cmpayload9 = /\bassert[\t ]*\([^)0]/ nocase wide ascii
+		$cmpayload10 = /\bpreg_replace[\t ]*\([^\)]{1,100}\/e/ nocase wide ascii
+		$cmpayload11 = /\bpreg_filter[\t ]*\([^\)]{1,100}\/e/ nocase wide ascii
+		$cmpayload12 = /\bmb_ereg_replace[\t ]*\([^\)]{1,100}'e'/ nocase wide ascii
+		$cmpayload20 = /\bcreate_function[\t ]*\([^)]/ nocase wide ascii
+		$cmpayload21 = /\bReflectionFunction[\t ]*\([^)]/ nocase wide ascii
+	condition:
+		4 of ( $cmpayload* )
+}
+
+private rule capa_php_callback : WEBSHELL PROD {
 	meta:
 		description = "PHP functions which accept callback functions to execute, in plain text"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -318,60 +606,89 @@ private rule capa_php_callback {
 		$callback30 = /\bsession_set_save_handler[\t ]*\([^)]/ nocase wide ascii
 		$callback31 = /\bsqlite_create_aggregate[\t ]*\([^)]/ nocase wide ascii
 		$callback32 = /\bsqlite_create_function[\t ]*\([^)]/ nocase wide ascii
+		$callback33 = /\bmb_ereg_replace_callback[\t ]*\([^)]/ nocase wide ascii
+
+		$m_callback1 = /\bfilter_var[\t ]*\([^)]/ nocase wide ascii
+		$m_callback2 = "FILTER_CALLBACK" fullword wide ascii
 
 		$cfp1 = /ob_start\(['\"]ob_gzhandler/ nocase wide ascii
+        $cfp2 = "IWPML_Backend_Action_Loader" ascii wide
+		$cfp3 = "<?phpclass WPML" ascii
 	condition:
-		any of ( $callback* ) and
-		not any of ( $cfp* )
+		not any of ( $cfp* ) and
+        (
+            any of ( $callback* )  or
+            all of ( $m_callback* )
+        )
 }
 
-private rule capa_php_include {
+private rule capa_php_include : WEBSHELL PROD {
 	meta:
 		description = "PHP methods for including code from other files, in plain text"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		date = "2021/01/14"
 	strings:
-		$cinclude1 = /\binclude[_once]?[\t ]*[('"]/ nocase wide ascii
-		$cinclude2 = /\brequire[_once]?[\t ]*[('"]/ nocase wide ascii
+		$cinclude1 = /\binclude(_once)?[\t ]*[('"]/ nocase wide ascii
+		$cinclude2 = /\brequire(_once)?[\t ]*[('"]/ nocase wide ascii
 	condition:
-		capa_php and any of ( $cinclude* )
+        any of ( $cinclude* )
 }
 
-private rule capa_php_dynamic {
+private rule capa_php_dynamic : WEBSHELL PROD {
 	meta:
 		description = "PHP webshell using function name from variable, e.g. $a='ev'.'al'; $a($code)"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		date = "2021/02/11"
 	strings:
-		$dynamic1 = /\$[a-zA-Z0-9_]{1,10}\(\$/ wide ascii
-		$dynamic2 = /\$[a-zA-Z0-9_]{1,10}\("/ wide ascii
-		$dynamic3 = /\$[a-zA-Z0-9_]{1,10}\('/ wide ascii
-		$dynamic4 = /\$[a-zA-Z0-9_]{1,10}\(str/ wide ascii
-		$dynamic5 = /\$[a-zA-Z0-9_]{1,10}\(\)/ wide ascii
-		$dynamic6 = /\$[a-zA-Z0-9_]{1,10}\(@/ wide ascii
+        // php variable regex from https://www.php.net/manual/en/language.variables.basics.php
+		$dynamic1 = /\$[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff\[\]'"]{0,20}\(\$/ wide ascii
+		$dynamic2 = /\$[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff\[\]'"]{0,20}\("/ wide ascii
+		$dynamic3 = /\$[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff\[\]'"]{0,20}\('/ wide ascii
+		$dynamic4 = /\$[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff\[\]'"]{0,20}\(str/ wide ascii
+		$dynamic5 = /\$[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff\[\]'"]{0,20}\(\)/ wide ascii
+		$dynamic6 = /\$[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff\[\]'"]{0,20}\(@/ wide ascii
+		$dynamic7 = /\$[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff\[\]'"]{0,20}\(base64_decode/ wide ascii
 	condition:
 		any of ( $dynamic* )
 }
 
 
-rule webshell_php_generic_tiny {
+rule webshell_php_generic : WEBSHELL PROD {
 	meta:
-		description = "php webshell having some kind of input and some kind of payload. restricted to small files or would give lots of false positives"
+		description = "php webshell having some kind of input and some kind of payload. restricted to small files or big ones inclusing suspicious strings"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		date = "2021/01/14"
 		hash = "bee1b76b1455105d4bfe2f45191071cf05e83a309ae9defcf759248ca9bceddd"
+    strings:
+		$wfp_tiny1 = "escapeshellarg" fullword
+		$wfp_tiny2 = "addslashes" fullword
 	condition:
-		filesize < 1000 
-		and not php_false_positive_tiny
-		and capa_php_old_safe
-		and capa_php_input
-		and capa_php_payload
+		not php_false_positive_tiny and
+		capa_php_old_safe  and
+		capa_php_input and
+		( capa_php_payload_evals or capa_php_payload_execs ) and
+        (
+            (
+                filesize < 1000 and
+                not any of ( $wfp_tiny* )
+            ) or (
+                capa_gen_sus and
+                ( 
+                    filesize > 5KB or
+                    not any of ( $wfp_tiny* )
+                )
+            )or (
+                filesize < 500KB and
+                capa_php_payload_multiple
+            )
+        )
 }
 
-rule webshell_php_generic_callback_tiny {
+
+rule webshell_php_generic_callback : WEBSHELL PROD {
 	meta:
 		description = "php webshell having some kind of input and using a callback to execute the payload. restricted to small files or would give lots of false positives"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -379,34 +696,18 @@ rule webshell_php_generic_callback_tiny {
 		date = "2021/01/14"
 		hash = "e98889690101b59260e871c49263314526f2093f"
 	condition:
-		filesize < 1000 and 
         not php_false_positive and 
         not php_false_positive_tiny and 
         capa_php_input and 
-        capa_php_callback
-}
-
-rule webshell_php_generic_nano_input {
-	meta:
-		description = "php webshell having some kind of input and whatever mechanism to execute it. restricted to small files or would give lots of false positives"
-		license = "https://creativecommons.org/licenses/by-nc/4.0/"
-		author = "Arnim Rupp"
-		hash = "b492336ac5907684c1b922e1c25c113ffc303ffbef645b4e95d36bc50e932033"
-		date = "2021/01/13"
-	strings:
-		$fp1 = "echo $_POST['" 
-		$fp2 = "echo $_POST[\""
-		$fp3 = "$http_raw_post_data = file_get_contents('php://input');"
-		$fp4 = "highlight_file(basename(urldecode($_GET['target'])));"
-	condition:
-		filesize < 90 and 
-		capa_php and
-		capa_php_input and
-		not any of ( $fp* )
+        capa_php_callback and
+        (
+            filesize < 1000 or
+            capa_gen_sus
+        )
 }
 
 
-rule webshell_php_base64_encoded_payloads {
+rule webshell_php_base64_encoded_payloads : WEBSHELL PROD {
 	meta:
 		description = "php webshell containing base64 encoded payload"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -497,10 +798,15 @@ rule webshell_php_base64_encoded_payloads {
 		$opening2 = "9wZW5pbm"
 		$opening3 = "b3BlbmluZ"
 
+        // false positives
+        $fp1 = { D0 CF 11 E0 A1 B1 1A E1 }
+        // api.telegram
+        $fp2 = "YXBpLnRlbGVncmFtLm9" 
 
 	condition:
 		filesize < 300KB and 
 		capa_php_old_safe and 
+        not any of ( $fp* ) and
 		any of ( $decode* ) and 
         (
 			( any of ( $one* ) and 
@@ -518,7 +824,7 @@ rule webshell_php_base64_encoded_payloads {
 		) 
 }
 
-rule webshell_php_unknown_1 {
+rule webshell_php_unknown_1 : WEBSHELL PROD {
 	meta:
 		description = "obfuscated php webshell"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -536,7 +842,7 @@ rule webshell_php_unknown_1 {
 		all of ( $sp* )
 }
 
-rule webshell_php_generic_eval {
+rule webshell_php_generic_eval : WEBSHELL PROD {
 	meta:
 		description = "Generic PHP webshell which uses any eval/exec function in the same line with user input"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -545,14 +851,15 @@ rule webshell_php_generic_eval {
 		hash = "90c5cc724ec9cf838e4229e5e08955eec4d7bf95"
 		date = "2021/01/07"
 	strings:
-		$geval = /(exec|shell_exec|passthru|system|popen|proc_open|pcntl_exec|eval|assert)[\t ]*(stripslashes\()?[\t ]*(trim\()?[\t ]*\(\$(_POST|_GET|_REQUEST|_SERVER\[['"]HTTP_)/ wide ascii
+        // new: eval($GLOBALS['_POST'
+		$geval = /\b(exec|shell_exec|passthru|system|popen|proc_open|pcntl_exec|eval|assert)[\t ]*(\(base64_decode)?(\(stripslashes)?[\t ]*(\(trim)?[\t ]*\(\$(_POST|_GET|_REQUEST|_SERVER\s?\[['"]HTTP_|GLOBALS\[['"]_(POST|GET|REQUEST))/ wide ascii
 	condition:
 		filesize < 300KB and 
         not php_false_positive and
 		$geval
 }
 
-rule webshell_php_double_eval_tiny {
+rule webshell_php_double_eval_tiny : WEBSHELL PROD {
 	meta:
 		description = "PHP webshell which probably hides the input inside an eval()ed obfuscated string"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -566,12 +873,12 @@ rule webshell_php_double_eval_tiny {
 	condition:
 		filesize > 70 and 
 		filesize < 300 and 
-		capa_php and 
+		capa_php_old_safe and 
 		#payload >= 2 and 
 		not any of ( $fp* )
 }
 
-private rule capa_php_obfuscation_multi {
+private rule capa_php_obfuscation_multi : WEBSHELL PROD {
 	meta:
 		description = "PHP obfuscation functions which have to be used multiple times, e.g. for each character"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -615,7 +922,7 @@ private rule capa_php_obfuscation_multi {
 
 }
 
-private rule capa_php_obfuscation_single {
+private rule capa_php_obfuscation_single : WEBSHELL PROD {
 	meta:
 		description = "PHP obfuscation functions which can be used on multiple strings"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -627,11 +934,12 @@ private rule capa_php_obfuscation_single {
 		$cobfs3 = "gzdecode" fullword nocase wide ascii
 		$cobfs4 = "base64_decode" fullword nocase wide ascii
 		$cobfs5 = "pack" fullword nocase wide ascii
+		$cobfs6 = "undecode" fullword nocase wide ascii
 	condition:
 		any of ( $cobfs* )
 }
 
-rule webshell_php_obfuscated {
+rule webshell_php_obfuscated : WEBSHELL PROD {
 	meta:
 		description = "PHP webshell obfuscated"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -640,13 +948,71 @@ rule webshell_php_obfuscated {
 		hash = "eec9ac58a1e763f5ea0f7fa249f1fe752047fa60"
 	condition:
 		// filesize checked in capa_php_obfuscation_multi
+        not php_false_positive and
 		capa_php_old_safe and 
 		capa_php_obfuscation_multi and 
-        not php_false_positive and
-		capa_php_payload
+		capa_php_payload_evals
 }
 
-rule webshell_php_obfuscated_str_replace {
+rule webshell_php_obfuscated_encoding : WEBSHELL PROD {
+	meta:
+		description = "PHP webshell obfuscated by encoding"
+		license = "https://creativecommons.org/licenses/by-nc/4.0/"
+		author = "Arnim Rupp"
+		date = "2021/04/18"
+	strings:
+        // one without plain e, one without plain v, to avoid hitting on plain "eval("
+		$enc_eval1 = /(e|\\x65|\\101)(\\x76|\\118)(a|\\x61|\\97)(l|\\x6c|\\108)(\(|\\x28|\\40)/ wide ascii nocase
+		$enc_eval2 = /(\\x65|\\101)(v|\\x76|\\118)(a|\\x61|\\97)(l|\\x6c|\\108)(\(|\\x28|\\40)/ wide ascii nocase
+        // one without plain a, one without plain s, to avoid hitting on plain "assert("
+		$enc_assert1 = /(a|\\97|\\x61)(\\115|\\x73)(s|\\115|\\x73)(e|\\101|\\x65)(r|\\114|\\x72)(t|\\116|\\x74)(\(|\\x28|\\40)/ wide ascii nocase
+		$enc_assert2 = /(\\97|\\x61)(s|\\115|\\x73)(s|\\115|\\x73)(e|\\101|\\x65)(r|\\114|\\x72)(t|\\116|\\x74)(\(|\\x28|\\40)/ wide ascii nocase
+	condition:
+        filesize < 700KB and
+		capa_php_old_safe and 
+        any of ( $enc* )
+}
+
+rule webshell_php_obfuscated_encoding_mixed_dec_and_hex : WEBSHELL PROD {
+	meta:
+		description = "PHP webshell obfuscated by encoding of mixed hex and dec"
+		license = "https://creativecommons.org/licenses/by-nc/4.0/"
+		author = "Arnim Rupp"
+		date = "2021/04/18"
+	strings:
+        // "e\x4a\x48\x5a\x70\x63\62\154\x30\131\171\101\x39\111\x43\x52\x66\x51\
+		//$mix = /['"]\\x?[0-9a-f]{2,3}[\\\w]{2,20}\\\d{1,3}[\\\w]{2,20}\\x[0-9a-f]{2}\\/ wide ascii nocase
+		$mix = /['"](\w|\\x?[0-9a-f]{2,3})[\\x0-9a-f]{2,20}\\\d{1,3}[\\x0-9a-f]{2,20}\\x[0-9a-f]{2}\\/ wide ascii nocase
+
+	condition:
+        filesize < 900KB and
+		capa_php_old_safe and 
+        any of ( $mix* )
+}
+
+rule webshell_php_obfuscated_tiny : WEBSHELL PROD {
+	meta:
+		description = "PHP webshell obfuscated"
+		license = "https://creativecommons.org/licenses/by-nc/4.0/"
+		author = "Arnim Rupp"
+		date = "2021/01/12"
+	strings:
+        // 'ev'.'al'
+        $obf1 = /\w'\.'\w/ wide ascii
+        $obf2 = /\w\"\.\"\w/ wide ascii
+        $obf3 = "].$" wide ascii
+	condition:
+		filesize < 500 and
+        not php_false_positive and
+		capa_php_old_safe and 
+		capa_php_payload_evals and
+        (
+            ( #obf1 + #obf2 ) > 2 or
+            #obf3 > 10
+        )
+}
+
+rule webshell_php_obfuscated_str_replace : WEBSHELL PROD {
 	meta:
 		description = "PHP webshell which eval()s obfuscated string"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -674,7 +1040,7 @@ rule webshell_php_obfuscated_str_replace {
 		( #chr1 > 10 or #chr2 > 10 or #chr3 > 10 )
 }
 
-rule webshell_php_obfuscated_fopo {
+rule webshell_php_obfuscated_fopo : WEBSHELL PROD {
 	meta:
 		description = "PHP webshell which eval()s obfuscated string"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -707,7 +1073,7 @@ rule webshell_php_obfuscated_fopo {
 		)
 }
 
-private rule capa_os_strings {
+private rule capa_os_strings : WEBSHELL PROD {
 	meta:
 		description = "typical webshell OS commands"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -732,7 +1098,8 @@ private rule capa_os_strings {
         )
 }
 
-rule webshell_php_gzinflated {
+            
+rule webshell_php_gzinflated : WEBSHELL PROD {
 	meta:
 		description = "PHP webshell which directly eval()s obfuscated string"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -740,48 +1107,56 @@ rule webshell_php_gzinflated {
 		date = "2021/01/12"
 		hash = "49e5bc75a1ec36beeff4fbaeb16b322b08cf192d"
 	strings:
-		$php = "<?" wide ascii
-		$payload1 = "eval(gzinflate(base64_decode(" wide ascii
-		$payload2 = "eval(\"?>\".gzinflate(base64_decode(" wide ascii
-		$payload3 = "eval(gzuncompress(base64_decode(" wide ascii
-		$payload4 = "eval(\"?>\".gzuncompress(base64_decode(" wide ascii
-		$payload5 = "eval(gzdecode(base64_decode(" wide ascii
-		$payload6 = "eval(\"?>\".gzdecode(base64_decode(" wide ascii
-		$payload7 = "eval(base64_decode(" wide ascii
-		$payload8 = "eval(pack(" wide ascii
+		$payload2 = /eval\s?\(\s?("\?>".)?gzinflate\s?\(\s?base64_decode\s?\(/ wide ascii nocase
+		$payload4 = /eval\s?\(\s?("\?>".)?gzuncompress\s?\(\s?(base64_decode|gzuncompress)/ wide ascii nocase
+		$payload6 = /eval\s?\(\s?("\?>".)?gzdecode\s?\(\s?base64_decode\s?\(/ wide ascii nocase
+		$payload7 = /eval\s?\(\s?base64_decode\s?\(/ wide ascii nocase
+		$payload8 = /eval\s?\(\s?pack\s?\(/ wide ascii nocase
+
+        // api.telegram
+        $fp1 = "YXBpLnRlbGVncmFtLm9" 
 	condition:
 		filesize < 700KB and 
         not php_false_positive and
-		$php and 
-        1 of ( $payload* )
+		capa_php_old_safe and
+        1 of ( $payload* ) and
+        not any of ( $fp* )
 }
 
-rule webshell_php_obfuscated_2 {
+rule webshell_php_obfuscated_3 : WEBSHELL PROD {
 	meta:
 		description = "PHP webshell which eval()s obfuscated string"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
-		hash = "1d4b374d284c12db881ba42ee63ebce2759e0b14"
-		date = "2021/01/13"
-	strings:
-		// <?php function vUMmFr($MkUOmK) { $MkUOmK=gzinflate(base64_decode($MkUOmK)); for($i=0;$i<strlen($MkUOmK);$i++) { $MkUOmK[$i] = chr(ord($MkUOmK[$i])-1); } return $MkUOmK; }eval
-		$obf1 = "function" fullword wide ascii
-		$obf2 = "base64_decode" fullword wide ascii
-		$obf3 = "chr" fullword wide ascii
-		$obf4 = "ord" fullword wide ascii
-		$payload1 = "eval" fullword wide ascii
-		$payload2 = "assert" fullword wide ascii
+		date = "2021/04/17"
+    strings:
+        $obf1 = "chr(" wide ascii
 	condition:
-		filesize < 300KB and 
 		capa_php_old_safe and 
-		1 of ( $payload* ) and 
+        (
+            capa_php_callback or
+            capa_php_payload_evals
+        ) and
+        capa_php_obfuscation_single and
+        (
+            filesize < 1KB or
+            (
+                filesize < 3KB and
+                (
+                    capa_gen_sus or
+                    #obf1 > 10
+                )
+            )
+        )
+        /*
 		$obf1 in (0..500) and
 		$obf2 in (0..500) and
 		$obf3 in (0..500) and
 		$obf4 in (0..500) 
+        */
 }
 
-rule webshell_php_includer {
+rule webshell_php_includer_eval : WEBSHELL PROD {
 	meta:
 		description = "PHP webshell which eval()s another included file"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -795,13 +1170,26 @@ rule webshell_php_includer {
 		$include2 = "include" wide ascii
 	condition:
 		filesize < 200 and 
-		capa_php and 
+		capa_php_old_safe and 
 		1 of ( $payload* ) and 
 		1 of ( $include* )
 }
 
+rule webshell_php_includer_tiny : WEBSHELL PROD {
+	meta:
+		description = "Suspicious: Might be PHP webshell includer, check the included file"
+		license = "https://creativecommons.org/licenses/by-nc/4.0/"
+		author = "Arnim Rupp"
+		date = "2021/04/17"
+	strings:
+		$php_include1 = /include\(\$_(GET|POST|REQUEST)\[/ nocase wide ascii
+	condition:
+		filesize < 100 and 
+        capa_php_old_safe and
+        any of ( $php_include* )
+}
 
-rule webshell_php_dynamic {
+rule webshell_php_dynamic : WEBSHELL PROD {
 	meta:
 		description = "PHP webshell using function name from variable, e.g. $a='ev'.'al'; $a($code)"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -815,13 +1203,13 @@ rule webshell_php_dynamic {
 		$pd_fp1 = "whoops_add_stack_frame" wide ascii
 		$pd_fp2 = "new $ec($code, $mode, $options, $userinfo);" wide ascii
 	condition:
-		filesize < 200 and 
-		capa_php and 
+		filesize > 20 and filesize < 200 and 
+		capa_php_old_safe and 
 		capa_php_dynamic and
 		not any of ( $pd_fp* )
 }
 
-rule webshell_php_dynamic_big {
+rule webshell_php_dynamic_big : WEBSHELL PROD {
 	meta:
 		description = "PHP webshell using $a($code) for kind of eval with encoded blob to decode, e.g. b374k"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -829,28 +1217,33 @@ rule webshell_php_dynamic_big {
 		date = "2021/02/07"
 		score = 50
 	condition:
-		filesize < 3000KB and 
-		capa_php_new and 
+		filesize < 500KB and 
+        not capa_bin_files and
+		capa_php_new_long and
 		capa_php_dynamic and
-		webshell_encoded_stats
+        (
+            webshell_encoded_stats or
+            capa_gen_sus
+        )
 }
 
-rule webshell_php_encoded_big {
+rule webshell_php_encoded_big : WEBSHELL PROD {
 	meta:
 		description = "PHP webshell using some kind of eval with encoded blob to decode"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		date = "2021/02/07"
 		score = 50
+		hash = "1d4b374d284c12db881ba42ee63ebce2759e0b14"
 	condition:
-		filesize < 3000KB and 
+		filesize < 1000KB and 
 		capa_php_new and 
-		capa_php_payload and 
+		capa_php_payload_evals and
 		webshell_encoded_stats
 }
 
 
-rule webshell_php_generic_backticks {
+rule webshell_php_generic_backticks : WEBSHELL PROD {
 	meta:
 		description = "Generic PHP webshell which uses backticks directly on user input"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -861,12 +1254,13 @@ rule webshell_php_generic_backticks {
 		$backtick = /`[\t ]*\$(_POST\[|_GET\[|_REQUEST\[|_SERVER\['HTTP_)/ wide ascii
 	condition:
 		// arg, can't search everywhere because lots of people write comments like "the value of `$_POST['action']`. Default false." :(
-		filesize < 200 and 
-		capa_php and
-		$backtick
+		capa_php_old_safe and
+		$backtick and
+        filesize < 200
+                
 }
 
-rule webshell_php_generic_backticks_obfuscated {
+rule webshell_php_generic_backticks_obfuscated : WEBSHELL PROD {
 	meta:
 		description = "Generic PHP webshell which uses backticks directly on user input"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -881,7 +1275,7 @@ rule webshell_php_generic_backticks_obfuscated {
 		$s1
 }
 
-rule webshell_php_by_string_known_webshell {
+rule webshell_php_by_string_known_webshell : WEBSHELL PROD {
 	meta:
 		description = "Known PHP Webshells which contain unique strings, lousy rule for low hanging fruits. Most are catched by other rules in here but maybe these catch different versions."
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -894,7 +1288,7 @@ rule webshell_php_by_string_known_webshell {
 		$pbs1 = "b374k shell" wide ascii
 		$pbs2 = "b374k/b374k" wide ascii
 		$pbs3 = "\"b374k" wide ascii
-		$pbs4 = "$b374k" wide ascii
+		$pbs4 = "$b374k(\"" wide ascii
 		$pbs5 = "b374k " wide ascii
 		$pbs6 = "0de664ecd2be02cdd54234a0d1229b43" wide ascii
 		$pbs7 = "pwnshell" wide ascii
@@ -907,27 +1301,36 @@ rule webshell_php_by_string_known_webshell {
 		// crawler avoid string
 		$pbs30 = "bot|spider|crawler|slurp|teoma|archive|track|snoopy|java|lwp|wget|curl|client|python|libwww" wide ascii
 		// <?=($pbs_=@$_GET[2]).@$_($_GET[1])?>
-		$pbs35 = /@\$_GET\[\d\]\)\.@\$_\(\$_GET\[\d\]\)/ wide ascii
-		$pbs36 = /@\$_GET\[\d\]\)\.@\$_\(\$_POST\[\d\]\)/ wide ascii
-		$pbs37 = /@\$_POST\[\d\]\)\.@\$_\(\$_GET\[\d\]\)/ wide ascii
+		$pbs35 = /@\$_GET\s?\[\d\]\)\.@\$_\(\$_GET\s?\[\d\]\)/ wide ascii
+		$pbs36 = /@\$_GET\s?\[\d\]\)\.@\$_\(\$_POST\s?\[\d\]\)/ wide ascii
+		$pbs37 = /@\$_POST\s?\[\d\]\)\.@\$_\(\$_GET\s?\[\d\]\)/ wide ascii
 		$pbs38 = /@\$_POST\[\d\]\)\.@\$_\(\$_POST\[\d\]\)/ wide ascii
 		$pbs39 = /@\$_REQUEST\[\d\]\)\.@\$_\(\$_REQUEST\[\d\]\)/ wide ascii
 		$pbs42 = "array(\"find config.inc.php files\", \"find / -type f -name config.inc.php\")" wide ascii
 		$pbs43 = "$_SERVER[\"\\x48\\x54\\x54\\x50" wide ascii
 		$pbs52 = "preg_replace(\"/[checksql]/e\""
+		$pbs53 = "='http://www.zjjv.com'"
+		$pbs54 = "=\"http://www.zjjv.com\""
+
+        $pbs60 = /setting\["AccountType"\]\s?=\s?3/
+        $pbs61 = "~+d()\"^\"!{+{}"
+        $pbs62 = "use function \\eval as "
+        $pbs63 = "use function \\assert as "
+
 		$front1 = "<?php eval(" nocase wide ascii
 	condition:
 		filesize < 500KB and 
 		capa_php_old_safe and 
+        not capa_bin_files and
         (
             any of ( $pbs* ) or
             $front1 in (0..60)
         )
 }
 
-rule webshell_php_by_string_obfuscation {
+rule webshell_php_by_string_obfuscation : WEBSHELL PROD {
 	meta:
-		description = "PHP Webshells which contain unique obfuscation strings, lousy rule for low hanging fruits. Most are catched by other rules in here but maybe these catch different versions. (Might also be used to insert malicious Javascript for credit card skimming)"
+		description = "PHP file containing obfuscation strings. Might be legitimate code obfuscated for whatever reasons, a webshell or can be used to insert malicious Javascript for credit card skimming"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		date = "2021/01/09"
@@ -967,6 +1370,24 @@ rule webshell_php_by_string_obfuscation {
 		$opbs50 = "'ro'.'t13'" nocase
 		$opbs51 = "c'.'od'.'e" nocase
 		$opbs53 = "e'. 128/2 .'_' .'d"
+        // move malicious code out of sight if line wrapping not enabled
+		$opbs54 = "<?php                                                                                                                                                                                " //here I end
+		$opbs55 = "=chr(99).chr(104).chr(114);$_"
+		$opbs56 = "\\x47LOBAL"
+		$opbs57 = "pay\".\"load"
+		$opbs58 = "bas'.'e64"
+		$opbs59 = "dec'.'ode"
+		$opbs60 = "fla'.'te"
+        // rot13 of eval($_POST
+		$opbs70 = "riny($_CBFG["
+		$opbs71 = "riny($_TRG["
+		$opbs72 = "riny($_ERDHRFG["
+		$opbs73 = "eval(str_rot13("
+		$opbs74 = "\"p\".\"r\".\"e\".\"g\""
+		$opbs75 = "$_'.'GET"
+		$opbs76 = "'ev'.'al("
+        // eval( in hex
+		$opbs77 = "\\x65\\x76\\x61\\x6c\\x28" wide ascii nocase
 	condition:
 		filesize < 500KB and 
 		capa_php_old_safe and 
@@ -974,7 +1395,7 @@ rule webshell_php_by_string_obfuscation {
 }
 
 
-rule webshell_php_strings_susp {
+rule webshell_php_strings_susp : WEBSHELL PROD {
 	meta:
 		description = "typical webshell strings, suspicious"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -992,7 +1413,7 @@ rule webshell_php_strings_susp {
 }
 
 
-rule webshell_php_in_htaccess {
+rule webshell_php_in_htaccess : WEBSHELL PROD {
 	meta:
 		description = "Use Apache .htaccess to execute php code inside .htaccess"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -1006,36 +1427,81 @@ rule webshell_php_in_htaccess {
 		$hta
 }
 
-rule webshell_php_func_in_get {
+rule webshell_php_function_via_get : WEBSHELL PROD {
 	meta:
 		description = "Webshell which sends eval/assert via GET"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		hash = "ce739d65c31b3c7ea94357a38f7bd0dc264da052d4fd93a1eabb257f6e3a97a6"
 		hash = "d870e971511ea3e082662f8e6ec22e8a8443ca79"
+		hash = "73fa97372b3bb829835270a5e20259163ecc3fdbf73ef2a99cb80709ea4572be"
 		date = "2021/01/09"
 	strings:
-		$sr0 = /\$_GET\[.{1,30}\]\(\$_GET\[/ wide ascii
-		$sr1 = /\$_POST\[.{1,30}\]\(\$_GET\[/ wide ascii
-		$sr2 = /\$_POST\[.{1,30}\]\(\$_POST\[/ wide ascii
-		$sr3 = /\$_GET\[.{1,30}\]\(\$_POST\[/ wide ascii
-		$sr4 = /\$_REQUEST\[.{1,30}\]\(\$_REQUEST\[/ wide ascii
-		$sr5 = /\$_SERVER\[HTTP_.{1,30}\]\(\$_SERVER\[HTTP_/ wide ascii
+		$sr0 = /\$_GET\s?\[.{1,30}\]\(\$_GET\s?\[/ wide ascii
+		$sr1 = /\$_POST\s?\[.{1,30}\]\(\$_GET\s?\[/ wide ascii
+		$sr2 = /\$_POST\s?\[.{1,30}\]\(\$_POST\s?\[/ wide ascii
+		$sr3 = /\$_GET\s?\[.{1,30}\]\(\$_POST\s?\[/ wide ascii
+		$sr4 = /\$_REQUEST\s?\[.{1,30}\]\(\$_REQUEST\s?\[/ wide ascii
+		$sr5 = /\$_SERVER\s?\[HTTP_.{1,30}\]\(\$_SERVER\s?\[HTTP_/ wide ascii
 	condition:
 		filesize < 500KB and 
         not php_false_positive and
 		any of ( $sr* )
 }
 
+rule webshell_php_writer : WEBSHELL PROD {
+	meta:
+		description = "PHP webshell which only writes an uploaded file to disk"
+		license = "https://creativecommons.org/licenses/by-nc/4.0/"
+		author = "Arnim Rupp"
+		date = "2021/04/17"
+        score = 50
+	strings:
+        $sus4 = "\"upload\"" wide ascii
+        $sus5 = "\"Upload\"" wide ascii
+        $sus6 = "gif89" wide ascii
+        //$sus13= "<textarea " wide ascii
+        $sus16= "Army" fullword wide ascii
+        $sus17= "fileperms($_" wide ascii
+        $sus18= "chmod($_" wide ascii
+	condition:
+        capa_php_old_safe and
+        capa_php_input and
+        capa_php_write_file and
+        (
+            filesize < 400 or
+            (
+                filesize < 4000 and
+                1 of ( $sus* )
+            )
+        ) or
+            (
+                filesize < 10000 and
+                3 of ( $sus* )
+            )
+
+}
+
+/*
+rule webshell_php_TESTING_RULE_NEVERUSE {
+    meta:
+        description ="just for tesintg, never use!!!!!"
+	condition:
+        capa_php_old_safe
+        //and capa_gen_sus
+        and ( ( capa_php_payload_evals or capa_php_payload_execs ) )
+        //and capa_php_input
+
+}
+*/
 
 ////        _    ____  ____           __     ______ ____   ____ ____  ___ ____ _____ 
 ////       / \  / ___||  _ \     _    \ \   / / __ ) ___| / ___|  _ \|_ _|  _ \_   _|
 ////      / _ \ \___ \| |_) |  _| |_   \ \ / /|  _ \___ \| |   | |_) || || |_) || |  
 ////     / ___ \ ___) |  __/  |_   _|   \ V / | |_) |__) | |___|  _ < | ||  __/ | |  
 ////    /_/   \_\____/|_|       |_|      \_/  |____/____/ \____|_| \_\___|_|    |_|  
-                                                                             
 
-private rule capa_asp_classid {
+private rule capa_asp_classid : WEBSHELL PROD {
 	meta:
 		description = "ASP classids which can execute code"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -1051,14 +1517,14 @@ private rule capa_asp_classid {
         any of ( $tagasp_capa_classid* )
 }
 
-private rule capa_asp {
+private rule capa_asp : WEBSHELL PROD {
 	meta:
 		description = "ASP short tag in first or last 1000 bytes or long ones anywhere"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		date = "2021/01/26"
 	strings:
-		$tagasp_short1 = "<%" wide ascii
+		$tagasp_short1 = /<%[^"]/ wide ascii
         // also looking for %> to reduce fp (yeah, short atom but seldom since special chars)
 		$tagasp_short2 = "%>" wide ascii
 
@@ -1087,38 +1553,56 @@ private rule capa_asp {
         // <%@ Page Language = Jscript %>
         // <%@ Page Language="C#" %>
         // <%@ Page Language="VB" ContentType="text/html" validaterequest="false" AspCompat="true" Debug="true" %>
-		$tagasp_long20 = /<%\s{0,9}@\s{0,9}.{0,100}language\s{0,9}=\s{0,9}"?(vb|jscript|c#)/ nocase wide ascii
-
         // <script runat="server" language="JScript">
         // <SCRIPT RUNAT=SERVER LANGUAGE=JSCRIPT>
         // <SCRIPT  RUNAT=SERVER  LANGUAGE=JSCRIPT>
         // <msxsl:script language="JScript" ...
-		$tagasp_long30 = /[<:]script.{1,30}language=/ wide ascii
-		$tagasp_long31 = /[<:]SCRIPT.{1,30}LANGUAGE=/ wide ascii
+		$tagasp_long20 = /<(%|script|msxsl:script).{0,60}language="?(vb|jscript|c#)/ nocase wide ascii
+
 		$tagasp_long32 = /<script\s{1,30}runat=/ wide ascii
 		$tagasp_long33 = /<SCRIPT\s{1,30}RUNAT=/ wide ascii
 
-        // avoid hitting legitimate php
+        // avoid hitting php
         $php1 = "<?php"
         $php2 = "<?="
+
+        // avoid hitting jsp
+        $jsp1 = "=\"java." wide ascii
+        $jsp2 = "=\"javax." wide ascii
+        $jsp3 = "java.lang." wide ascii
+        $jsp4 = "public" fullword wide ascii
+        $jsp5 = "throws" fullword wide ascii
+        $jsp6 = "getValue" fullword wide ascii
+        $jsp7 = "getBytes" fullword wide ascii
+
+        $perl1 = "PerlScript" fullword
+        
 	condition:
         (
             any of ( $tagasp_long* ) or
             // TODO: yara_push_private_rules.py doesn't do private rules in private rules yet
             any of ( $tagasp_classid* ) or
             (
+                $tagasp_short1 and
+                $tagasp_short2 in ( filesize-100..filesize ) 
+            ) or (
                 $tagasp_short2 and (
                     $tagasp_short1 in ( 0..1000 ) or
                     $tagasp_short1 in ( filesize-1000..filesize ) 
                 )
             ) 
         ) and not ( 
-            $php1 at 0 or
-            $php2 at 0 
+            (
+                any of ( $perl* ) or
+                $php1 at 0 or
+                $php2 at 0 
+            ) or (
+                ( #jsp1 + #jsp2 + #jsp3 ) > 0 and ( #jsp4 + #jsp5 + #jsp6 + #jsp7 ) > 0
+                )
         )
 }
 
-private rule capa_asp_obfuscation_multi {
+private rule capa_asp_obfuscation_multi : WEBSHELL PROD {
 	meta:
 		description = "ASP obfuscation functions which have to be used multiple times, e.g. for each character"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -1128,73 +1612,80 @@ private rule capa_asp_obfuscation_multi {
 	strings:
         // many Chr or few and a loop????
         //$loop1 = "For "
-		$o1 = "chr(" nocase wide ascii
-		$o2 = "chr (" nocase wide ascii
+		//$o1 = "chr(" nocase wide ascii
+		//$o2 = "chr (" nocase wide ascii
 		// not excactly a string function but also often used in obfuscation
-		$o4 = "\\x1" wide ascii
-		$o5 = "\\x2" wide ascii
+		$o4 = "\\x8" wide ascii
+		$o5 = "\\x9" wide ascii
 		// just picking some random numbers because they should appear often enough in a long obfuscated blob and it's faster than a regex
 		$o6 = "\\61" wide ascii
 		$o7 = "\\44" wide ascii
 		$o8 = "\\112" wide ascii
 		$o9 = "\\120" wide ascii
-		$o10 = " & \"" wide ascii
-		$o11 = " += \"" wide ascii
+		//$o10 = " & \"" wide ascii
+		//$o11 = " += \"" wide ascii
         // used for e.g. "scr"&"ipt"
 
         $m_multi_one1 = "Replace(" wide ascii
         $m_multi_one2 = "Len(" wide ascii
         $m_multi_one3 = "Mid(" wide ascii
         $m_multi_one4 = "mid(" wide ascii
+        $m_multi_one5 = ".ToString(" wide ascii
+
+        /*
         $m_multi_one5 = "InStr(" wide ascii
         $m_multi_one6 = "Function" wide ascii
+
         $m_multi_two1 = "for each" wide ascii
         $m_multi_two2 = "split(" wide ascii
         $m_multi_two3 = " & chr(" wide ascii
         $m_multi_two4 = " & Chr(" wide ascii
         $m_multi_two5 = " & Chr (" wide ascii
+
         $m_multi_three1 = "foreach" fullword wide ascii
         $m_multi_three2 = "(char" wide ascii
+
         $m_multi_four1 = "FromBase64String(" wide ascii
         $m_multi_four2 = ".Replace(" wide ascii
         $m_multi_five1 = "String.Join(\"\"," wide ascii
         $m_multi_five2 = ".Trim(" wide ascii
         $m_any1 = " & \"2" wide ascii
         $m_any2 = " += \"2" wide ascii
+        */
+
+        $m_fp1 = "Author: Andre Teixeira - andret@microsoft.com" /* FPs with 0227f4c366c07c45628b02bae6b4ad01 */
+
 	condition:
         (
             filesize < 100KB and 
+            not any of ( $m_fp* ) and
             (
-                ( #o1+#o2 ) > 50 or
-                ( #o4+#o5+#o6+#o7+#o8+#o9 ) > 20 or
-                (
-                    ( #o10+#o11 ) > 50 and
-                    2 of ( $m_multi* ) and
-                    any of ( $m_any* )
-                )
+                //( #o1+#o2 ) > 50 or
+                ( #o4+#o5+#o6+#o7+#o8+#o9 ) > 20 
             ) 
         ) or (
             filesize < 5KB and 
             (
-                ( #o1+#o2 ) > 10 or
+                //( #o1+#o2 ) > 10 or
                 ( #o4+#o5+#o6+#o7+#o8+#o9 ) > 5 or
                 (
-                    ( #o1+#o2 ) > 1 and
-                    ( #m_multi_one1 + #m_multi_one2 + #m_multi_one3 + #m_multi_one4  ) > 3 
+                    //( #o1+#o2 ) > 1 and
+                    ( #m_multi_one1 + #m_multi_one2 + #m_multi_one3 + #m_multi_one4 + #m_multi_one5 ) > 3 
                 )
 
             ) 
         ) or (
             filesize < 700 and 
             (
-                ( #o1+#o2 ) > 1 or
-                ( #o4+#o5+#o6+#o7+#o8+#o9 ) > 3 
+                //( #o1+#o2 ) > 1 or
+                ( #o4+#o5+#o6+#o7+#o8+#o9 ) > 3 or
+                ( #m_multi_one1 + #m_multi_one2 + #m_multi_one3 + #m_multi_one4 + #m_multi_one5 ) > 2 
             ) 
         ) 
 }
 
 
-private rule capa_asp_obfuscation_obviously {
+private rule capa_asp_obfuscation_obviously : WEBSHELL PROD {
 	meta:
 		description = "ASP obfuscation functions which are very obvious because they don't have a legitimate use (I can imageing ;)"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -1203,11 +1694,13 @@ private rule capa_asp_obfuscation_obviously {
 		score = 60
 	strings:
 		$oo1 = /\w\"&\"\w/ wide ascii
+		$oo2 = "*/\").Replace(\"/*" wide ascii
 	condition:
         (
             filesize < 100KB and 
             (
-                ( #oo1 ) > 2 
+                ( #oo1 ) > 2 or
+                $oo2
             ) 
         ) or (
             filesize < 25KB and 
@@ -1221,7 +1714,7 @@ private rule capa_asp_obfuscation_obviously {
             ) 
         ) 
 }
-private rule capa_asp_payload {
+private rule capa_asp_payload : WEBSHELL PROD {
 	meta:
 		description = "ASP eval versions to dynamically execute code"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -1234,9 +1727,9 @@ private rule capa_asp_payload {
 		$asp_payload3  = /\beval\"\"/ nocase wide ascii
         // var Fla = {'E':eval};  Fla.E(code)
 		$asp_payload4  = /:\s{0,10}eval\b/ nocase wide ascii
-		$asp_payload10 = "execute" fullword nocase wide ascii
+		$asp_payload8  = /\bexecute\s?\(/ nocase wide ascii
+		$asp_payload9  = /\bexecute\s[\w"]/ nocase wide ascii
 		$asp_payload11 = "WSCRIPT.SHELL" fullword nocase wide ascii
-		$asp_payload12 = "Scripting.FileSystemObject" fullword nocase wide ascii
 		$asp_payload13 = "ExecuteGlobal" fullword nocase wide ascii
 		$asp_payload14 = "ExecuteStatement" fullword nocase wide ascii
 		$asp_payload15 = "ExecuteStatement" fullword nocase wide ascii
@@ -1253,15 +1746,50 @@ private rule capa_asp_payload {
 		$asp_multi_payload_four1 = "CreateObject" fullword nocase wide ascii
 		$asp_multi_payload_four2 = "TransformNode" fullword nocase wide ascii
 		$asp_multi_payload_four3 = "loadxml" fullword nocase wide ascii
+
+        // execute cmd.exe /c with arguments using ProcessStartInfo
+		$asp_multi_payload_five1 = "ProcessStartInfo" fullword nocase wide ascii
+		$asp_multi_payload_five2 = ".Start" nocase wide ascii
+		$asp_multi_payload_five3 = ".Filename" nocase wide ascii
+		$asp_multi_payload_five4 = ".Arguments" nocase wide ascii
+
 	condition:
 		any of ( $asp_payload* ) or
         all of ( $asp_multi_payload_one* ) or
         all of ( $asp_multi_payload_two* ) or
         all of ( $asp_multi_payload_three* ) or
-        all of ( $asp_multi_payload_four* )
+        all of ( $asp_multi_payload_four* ) or
+        all of ( $asp_multi_payload_five* )
 }
 
-private rule capa_asp_input {
+private rule capa_asp_write_file : WEBSHELL PROD {
+	meta:
+		description = "ASP file write"
+		license = "https://creativecommons.org/licenses/by-nc/4.0/"
+		author = "Arnim Rupp"
+		date = "2021/04/08"
+	strings:
+		// $asp_write1 = "ADODB.Stream" wide ascii # just a string, can be easily obfuscated
+		$asp_always_write1 = /\.write/ nocase wide ascii
+		$asp_always_write2 = /\.swrite/ nocase wide ascii
+		//$asp_write_way_one1 = /\.open\b/ nocase wide ascii
+		$asp_write_way_one2 = "SaveToFile" fullword nocase wide ascii
+		$asp_write_way_one3 = "CREAtEtExtFiLE" fullword nocase wide ascii
+		$asp_cr_write1 = "CreateObject(" fullword nocase wide ascii
+		$asp_cr_write2 = "CreateObject (" fullword nocase wide ascii
+		$asp_streamwriter1 = "streamwriter" fullword nocase wide ascii
+		$asp_streamwriter2 = "filestream" fullword nocase wide ascii
+	condition:
+        any of ( $asp_always_write* ) and
+        (
+            any of ( $asp_write_way_one* ) and
+            any of ( $asp_cr_write* )
+        ) or (
+            any of ( $asp_streamwriter* )
+        )
+}
+
+private rule capa_asp_input : WEBSHELL PROD {
 	meta:
 		description = "ASP input"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -1271,6 +1799,9 @@ private rule capa_asp_input {
         // Request.BinaryRead
         // Request.Form
 		$asp_input1 = "request" fullword nocase wide ascii
+		$asp_input2 = "Page_Load" fullword nocase wide ascii
+        // base64 of Request.Form(
+		$asp_input3 = "UmVxdWVzdC5Gb3JtK" fullword wide ascii
 		$asp_xml_http = "Microsoft.XMLHTTP" fullword nocase wide ascii
 		$asp_xml_method1 = "GET" fullword wide ascii
 		$asp_xml_method2 = "POST" fullword wide ascii
@@ -1296,43 +1827,33 @@ private rule capa_asp_input {
 }
 
 /*
-rule webshell_TESTING_RULE_NEVERUSE {
+rule webshell_asp_TESTING_RULE_NEVERUSE {
     meta:
         description ="just for tesintg, never use!!!!!"
 	//strings:
 		// $asp_write1 = "ADODB.Stream" wide ascii # just a string, can be easily obfuscated
 		//$asp_cr_write2 = "CreateObject (" fullword nocase wide ascii
 	condition:
-        capa_asp 
-        and capa_asp_payload 
-        and capa_asp_input
+        capa_asp
+        //and ( capa_asp_payload or capa_asp_write_file )
+        //and capa_asp_input
 
 }
 */
 
-rule webshell_asp_writer {
+rule webshell_asp_writer : WEBSHELL PROD {
 	meta:
 		description = "ASP webshell which only writes an uploaded file to disk"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		date = "2021/03/07"
+        score = 60
 	strings:
-		// $asp_write1 = "ADODB.Stream" wide ascii # just a string, can be easily obfuscated
-		$asp_always_write1 = /\.write/ nocase wide ascii
-		$asp_always_write2 = /\.swrite/ nocase wide ascii
-		//$asp_write_way_one1 = /\.open\b/ nocase wide ascii
-		$asp_write_way_one2 = "SaveToFile" fullword nocase wide ascii
-		$asp_write_way_one3 = "CREAtEtExtFiLE" fullword nocase wide ascii
-		$asp_cr_write1 = "CreateObject(" fullword nocase wide ascii
-		$asp_cr_write2 = "CreateObject (" fullword nocase wide ascii
-		$asp_streamwriter1 = "streamwriter" fullword nocase wide ascii
-		$asp_streamwriter2 = "filestream" fullword nocase wide ascii
-
         $sus1 = "password" fullword wide ascii
         $sus2 = "pwd" fullword wide ascii
         $sus3 = "<asp:TextBox" fullword nocase wide ascii
-        $sus4 = "upload" wide ascii
-        $sus5 = "Upload" wide ascii
+        $sus4 = "\"upload\"" wide ascii
+        $sus5 = "\"Upload\"" wide ascii
         $sus6 = "gif89" wide ascii
         $sus7 = "\"&\"" wide ascii
         $sus8 = "authkey" fullword wide ascii
@@ -1341,19 +1862,14 @@ rule webshell_asp_writer {
         $sus11= "cmd.asp" fullword wide ascii
         $sus12= ".Write(Request." wide ascii
         $sus13= "<textarea " wide ascii
+        $sus14= "\"unsafe" fullword wide ascii
+        $sus15= "'unsafe" fullword wide ascii
+        $sus16= "Army" fullword wide ascii
 	condition:
         capa_asp and
         capa_asp_input and
-        any of ( $asp_always_write* ) and
+        capa_asp_write_file and
         (
-            (
-                any of ( $asp_write_way_one* ) and
-                any of ( $asp_cr_write* )
-            ) or (
-                any of ( $asp_streamwriter* )
-            )
-        )
-        and (
             filesize < 400 or
             (
                 filesize < 6000 and
@@ -1364,29 +1880,40 @@ rule webshell_asp_writer {
 }
 
 
-
-rule webshell_asp_obfuscated {
+rule webshell_asp_obfuscated : WEBSHELL PROD {
 	meta:
 		description = "ASP webshell obfuscated"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		date = "2021/01/12"
-		hash = "7466d1434870eb151dbb415191fef2884dfade52"
-		hash = "a6ab3695e46cd65610edb3c7780495d03a72c43d"
+		//TODO hash = "7466d1434870eb151dbb415191fef2884dfade52"
+		//TODO hash = "a6ab3695e46cd65610edb3c7780495d03a72c43d"
+	strings:
+        $asp_obf1 = "/*-/*-*/" wide ascii
+        $asp_obf2 = "u\"+\"n\"+\"s" wide ascii
+        $asp_obf3 = "\"e\"+\"v" wide ascii
+        $asp_obf4 = "a\"+\"l\"" wide ascii
+        $asp_obf5 = "\"+\"(\"+\"" wide ascii
+        $asp_obf6 = "q\"+\"u\"" wide ascii
+        $asp_obf7 = "\"u\"+\"e" wide ascii
+        $asp_obf8 = "/*//*/" wide ascii
 	condition:
 		filesize < 100KB and 
         capa_asp and 
         (
             (
-                capa_asp_obfuscation_multi and 
-                capa_asp_payload
+                capa_asp_payload or
+                capa_asp_write_file
+            ) and (
+                capa_asp_obfuscation_multi or
+                any of ( $asp_obf* ) 
             ) or
             capa_asp_obfuscation_obviously 
         )
 }
 
 
-rule webshell_asp_generic_eval_on_input {
+rule webshell_asp_generic_eval_on_input : WEBSHELL PROD {
 	meta:
 		description = "Generic ASP webshell which uses any eval/exec function directly on user input"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -1403,18 +1930,17 @@ rule webshell_asp_generic_eval_on_input {
 		$payload_and_input4 = /\bExecuteGlobal\s{1,20}request\(/ nocase wide ascii
 	condition:
         (
-            filesize < 100KB and 
+            filesize < 1100KB and 
             capa_asp and
             any of ( $payload_and_input* )
-        ) or 
-        (
+        ) or (
             // might be "included", not checking capa_asp for this tiny size
             filesize < 100 and 
             any of ( $payload_and_input* )
         )
 }
 
-rule webshell_asp_nano {
+rule webshell_asp_nano : WEBSHELL PROD {
 	meta:
 		description = "Generic ASP webshell which uses any eval/exec function"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -1435,12 +1961,18 @@ rule webshell_asp_nano {
         // Request and request in b64:
 		$susasp8  = "UmVxdWVzdC"
 		$susasp9  = "cmVxdWVzdA"
+        $susasp10 = "/*//*/"
+        $susasp11 = "(\"/*/\""
+        $susasp12 = "eval(eval("
         $fp1      = "eval a"
         $fp2      = "'Eval'"
         $fp3      = "Eval(\""
 	condition:
 		capa_asp and 
-		capa_asp_payload and 
+        (
+            capa_asp_payload or
+            capa_asp_write_file
+        ) and
         not any of ( $fp* ) and
         (
             filesize < 200 or
@@ -1453,7 +1985,7 @@ rule webshell_asp_nano {
 
 
 
-rule webshell_asp_encoded {
+rule webshell_asp_encoded : WEBSHELL PROD {
 	meta:
 		description = "Webshell in VBscript or JScript encoded using *.Encode plus a suspicious string"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -1484,7 +2016,7 @@ rule webshell_asp_encoded {
         )
 }
 
-rule webshell_asp_encoded_aspcoding {
+rule webshell_asp_encoded_aspcoding : WEBSHELL PROD {
 	meta:
 		description = "ASP Webshell encoded using ASPEncodeDLL.AspCoding"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -1509,7 +2041,7 @@ rule webshell_asp_encoded_aspcoding {
 }
 
 
-rule webshell_asp_by_string {
+rule webshell_asp_by_string : WEBSHELL PROD {
 	meta:
 		description = "Known ASP Webshells which contain unique strings, lousy rule for low hanging fruits. Most are catched by other rules in here but maybe these catch different versions."
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -1566,14 +2098,22 @@ rule webshell_asp_by_string {
 		$asp_string39 = "cript\"&\"ing" wide ascii
 		$asp_string40 = "tcejbOmetsySeliF.gnitpircS" wide ascii
 		$asp_string41 = "tcejbOetaerC.revreS" wide ascii
+		$asp_string42 = "This file is part of A Black Path Toward The Sun (\"ABPTTS\")" wide ascii
+		$asp_string43 = "if ((Request.Headers[headerNameKey] != null) && (Request.Headers[headerNameKey].Trim() == headerValueKey.Trim()))" wide ascii
+		$asp_string44 = "if (request.getHeader(headerNameKey).toString().trim().equals(headerValueKey.trim()))" wide ascii
+		$asp_string45 = "Response.Write(Server.HtmlEncode(ExcutemeuCmd(txtArg.Text)));" wide ascii
+		$asp_string46 = "\"c\" + \"m\" + \"d\"" wide ascii
+		$asp_string47 = "\".\"+\"e\"+\"x\"+\"e\"" wide ascii
+		$asp_string48 = "<title>ASPXSpy" wide ascii
+		$asp_string49 = ".CreateInstance(\"SharPy\");" wide ascii
 
 	condition:
 		filesize < 200KB and 
-		// not checking capa_asp
+        capa_asp and
 		any of ( $asp_string* )
 }
 
-rule webshell_asp_sniffer {
+rule webshell_asp_sniffer : WEBSHELL PROD {
 	meta:
 		description = "ASP webshell which can sniff local traffic"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -1592,7 +2132,7 @@ rule webshell_asp_sniffer {
         all of ( $sniff* )
 }
 
-rule webshell_asp_generic_tiny {
+rule webshell_asp_generic_tiny : WEBSHELL PROD {
 	meta:
 		description = "Generic tiny ASP webshell which uses any eval/exec function indirectly on user input or writes a file"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -1601,65 +2141,153 @@ rule webshell_asp_generic_tiny {
 		hash = "990e3f129b8ba409a819705276f8fa845b95dad0"
 		hash = "52ce724580e533da983856c4ebe634336f5fd13a"
 	strings:
-		$write1 = "Scripting.FileSystemObject" fullword nocase wide ascii
-		$write2 = ".Create" nocase wide ascii
+        $fp1 = "net.rim.application.ipproxyservice.AdminCommand.execute"
 	condition:
 		capa_asp and 
-        capa_asp_input and
+        capa_asp_input and 
+        not 1 of ($fp*) and
         not capa_bin_files and
         (
+            filesize < 700 and 
             (
-                filesize < 700 and 
-                capa_asp_payload
-            ) or (
-                filesize < 300 and 
-                all of ( $write* )
+                capa_asp_payload or
+                capa_asp_write_file
             )
 		)
 }
 
-rule webshell_asp_generic {
+rule webshell_asp_generic : WEBSHELL PROD {
 	meta:
 		description = "Generic ASP webshell which uses any eval/exec function indirectly on user input or writes a file"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		date = "2021/03/07"
+        score = 60
+        hash = "a8c63c418609c1c291b3e731ca85ded4b3e0fba83f3489c21a3199173b176a75"
 	strings:
+        $asp_much_sus7  = "Web Shell" nocase
+        $asp_much_sus8  = "WebShell" nocase
+        $asp_much_sus3  = "hidded shell" 
+        $asp_much_sus4  = "WScript.Shell.1" nocase
+        $asp_much_sus5  = "AspExec" 
+        $asp_much_sus14 = "\\pcAnywhere\\" nocase
+        $asp_much_sus15 = "antivirus" nocase
+        $asp_much_sus16 = "McAfee" nocase
+        $asp_much_sus17 = "nishang" 
+        $asp_much_sus18 = "\"unsafe" fullword wide ascii
+        $asp_much_sus19 = "'unsafe" fullword wide ascii
+        $asp_much_sus28 = "exploit" fullword wide ascii
+        $asp_much_sus30 = "TVqQAAMAAA" wide ascii
+        $asp_much_sus31 = "HACKED" fullword wide ascii
+        $asp_much_sus32 = "hacked" fullword wide ascii
+        $asp_much_sus33 = "hacker" wide ascii
+        $asp_much_sus34 = "grayhat" nocase wide ascii
+        $asp_much_sus35 = "Microsoft FrontPage" wide ascii
+        $asp_much_sus36 = "Rootkit" wide ascii
+        $asp_much_sus37 = "rootkit" wide ascii
+        $asp_much_sus38 = "/*-/*-*/" wide ascii
+        $asp_much_sus39 = "u\"+\"n\"+\"s" wide ascii
+        $asp_much_sus40 = "\"e\"+\"v" wide ascii
+        $asp_much_sus41 = "a\"+\"l\"" wide ascii
+        $asp_much_sus42 = "\"+\"(\"+\"" wide ascii
+        $asp_much_sus43 = "q\"+\"u\"" wide ascii
+        $asp_much_sus44 = "\"u\"+\"e" wide ascii
+        $asp_much_sus45 = "/*//*/" wide ascii
+        $asp_much_sus46 = "(\"/*/\"" wide ascii
+        $asp_much_sus47 = "eval(eval(" wide ascii
+        $asp_much_sus48 = "Shell.Users" wide ascii
+        $asp_much_sus49 = "PasswordType=Regular" wide ascii
+        $asp_much_sus50 = "-Expire=0" wide ascii
+        $asp_much_sus51 = "sh\"&\"el" wide ascii
+        $asp_much_sus52 = "<![CDATA[function " wide ascii
+
         $asp_gen_sus1  = /:\s{0,20}eval}/ nocase wide ascii
         $asp_gen_sus2  = /\.replace\(\/\w\/g/ nocase wide ascii
-        $asp_gen_sus3  = "hidded shell" 
-        $asp_gen_sus4  = "WScript.Shell.1" nocase
-        $asp_gen_sus5  = "AspExec" 
         $asp_gen_sus6  = "self.delete"
-        $asp_gen_sus7  = "Web Shell" nocase
-        $asp_gen_sus8  = "WebShell" nocase
         $asp_gen_sus9  = "\"cmd /c" nocase
         $asp_gen_sus10 = "\"cmd\"" nocase
         $asp_gen_sus11 = "\"cmd.exe" nocase
+        $asp_gen_sus12 = "%comspec%" wide ascii
+        $asp_gen_sus13 = "%COMSPEC%" wide ascii
         //TODO:$asp_gen_sus12 = ".UserName" nocase
-        $asp_gen_sus13 = "Hklm.GetValueNames();" nocase
-        $asp_gen_sus14 = "\\pcAnywhere\\" nocase
-        $asp_gen_sus15 = "antivirus" nocase
-        $asp_gen_sus16 = "McAfee" nocase
-        $asp_gen_sus17 = "nishang" 
+        $asp_gen_sus18 = "Hklm.GetValueNames();" nocase
+        // bonus string for proxylogon exploiting webshells
+        $asp_gen_sus19 = "http://schemas.microsoft.com/exchange/" wide ascii
+        $asp_gen_sus21 = "\"upload\"" wide ascii
+        $asp_gen_sus22 = "\"Upload\"" wide ascii
+        $asp_gen_sus25 = "shell_" wide ascii
+        //$asp_gen_sus26 = "password" fullword wide ascii
+        //$asp_gen_sus27 = "passw" fullword wide ascii
+        // own base64 func
+        $asp_gen_sus29 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789" fullword wide ascii
+        $asp_gen_sus30 = "serv-u" wide ascii
+        $asp_gen_sus31 = "Serv-u" wide ascii
+        $asp_gen_sus32 = "Army" fullword wide ascii
+
+        $asp_slightly_sus1 = "<pre>" wide ascii
+        $asp_slightly_sus2 = "<PRE>" wide ascii
+
+
+        // "e"+"x"+"e"
+        $asp_gen_obf1 = "\"+\"" wide ascii 
+
+        $fp1 = "DataBinder.Eval" 
 	condition:
-        filesize < 20KB and 
 		capa_asp and 
         not capa_bin_files and
         capa_asp_input and
         capa_asp_payload and
+        not any of ( $fp* ) and
         (
-            any of ( $asp_gen_sus* ) or
-            capa_asp_classid
+            (
+                filesize < 3KB and 
+                (
+                    1 of ( $asp_slightly_sus* )
+                )
+            ) or (
+                filesize < 25KB and 
+                (
+                    1 of ( $asp_much_sus* ) or
+                    1 of ( $asp_gen_sus* ) or
+                    ( #asp_gen_obf1 > 2 )
+                )
+            ) or (
+                filesize < 50KB and 
+                (
+                    1 of ( $asp_much_sus* ) or
+                    3 of ( $asp_gen_sus* ) or
+                    ( #asp_gen_obf1 > 6 )
+                )
+            ) or (
+                filesize < 150KB and 
+                (
+                    1 of ( $asp_much_sus* ) or
+                    4 of ( $asp_gen_sus* ) or
+                    ( #asp_gen_obf1 > 6 ) or
+                    (
+                        // find those big all-in-one-file-upload-and-eval-webshells:
+                        capa_asp_write_file and
+                        (
+                            1 of ( $asp_much_sus* ) or
+                            2 of ( $asp_gen_sus* ) or
+                            ( #asp_gen_obf1 > 3 ) 
+                        )
+                    )
+                )
+            ) or (
+                filesize < 100KB and 
+                capa_asp_classid
+            )
         )
 }
 
-rule webshell_asp_generic_registry_reader {
+rule webshell_asp_generic_registry_reader : WEBSHELL PROD {
 	meta:
 		description = "Generic ASP webshell which reads the registry (might look for passwords, license keys, database settings, general recon, ..."
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		date = "2021/03/14"
+        score = 50
 	strings:
         $asp_reg1  = "Registry" fullword wide ascii
         $asp_reg2  = "LocalMachine" fullword wide ascii
@@ -1669,9 +2297,19 @@ rule webshell_asp_generic_registry_reader {
         $asp_reg6  = "CurrentConfig" fullword wide ascii
         $asp_reg7  = "Microsoft.Win32" fullword wide ascii
         $asp_reg8  = "OpenSubKey" fullword wide ascii
+
+        $sus1 = "shell" fullword nocase wide ascii
+        $sus2 = "cmd.exe" fullword wide ascii
+        $sus3 = "<form " wide ascii
+        $sus4 = "<table " wide ascii
+        $sus5 = "System.Security.SecurityException" wide ascii
+
+        $fp1 = "Avira Operations GmbH" wide
 	condition:
 		capa_asp and 
         all of ( $asp_reg* ) and 
+        any of ( $sus* ) and 
+        not any of ( $fp* ) and
         (
             filesize < 10KB or 
             (
@@ -1681,7 +2319,7 @@ rule webshell_asp_generic_registry_reader {
         )
 }
 
-rule webshell_aspx_regeorg_csharp {
+rule webshell_aspx_regeorg_csharp : WEBSHELL PROD {
 	meta:
 		description = "Webshell regeorg aspx c# version"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -1710,7 +2348,7 @@ rule webshell_aspx_regeorg_csharp {
         )
 }
 
-rule webshell_csharp_generic {
+rule webshell_csharp_generic : WEBSHELL PROD {
 	meta:
 		description = "Webshell in c#"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -1735,7 +2373,7 @@ rule webshell_csharp_generic {
 		any of ($exec_shell*)
 }
 
-rule webshell_asp_runtime_compile {
+rule webshell_asp_runtime_compile : WEBSHELL PROD {
 	meta:
 		description = "ASP webshell compiling payload in memory at runtime, e.g. sharpyshell"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -1745,27 +2383,44 @@ rule webshell_asp_runtime_compile {
 		hash = "e826c4139282818d38dcccd35c7ae6857b1d1d01"
 		hash = "e20e078d9fcbb209e3733a06ad21847c5c5f0e52"
 		hash = "57f758137aa3a125e4af809789f3681d1b08ee5b"
+        type = "file"
 	strings:
 		$payload_reflection1 = "System.Reflection" nocase wide ascii
 		$payload_reflection2 = "Assembly" fullword nocase wide ascii
-		$payload_reflection3 = "Load" fullword nocase wide ascii
+		$payload_load_reflection1 = /[."']Load\b/ nocase wide ascii
+        // only match on "load" or variable which might contain "load"
+		$payload_load_reflection2 = /\bGetMethod\(("load|\w)/ nocase wide ascii
 		$payload_compile1 = "GenerateInMemory" nocase wide ascii
 		$payload_compile2 = "CompileAssemblyFromSource" nocase wide ascii
-		$payload_invoke1 = "Invoke" nocase wide ascii
-		$payload_invoke2 = "CreateInstance" nocase wide ascii
+		$payload_invoke1 = "Invoke" fullword nocase wide ascii
+		$payload_invoke2 = "CreateInstance" fullword nocase wide ascii
         $rc_fp1 = "Request.MapPath"
+        $rc_fp2 = "<body><mono:MonoSamplesHeader runat=\"server\"/>" wide ascii
+
+        $rc_sus1= "[i] ^= (byte)" wide ascii
+        $rc_sus2= "SharPy" fullword wide ascii
+        $rc_sus3= "i++) int_arr[i] = (int_arr[i] * " wide ascii
 	condition:
-		filesize < 10KB and
         capa_asp_input and
         not any of ( $rc_fp* ) and
 		( 
-			all of ( $payload_reflection* ) or 
+			(
+                all of ( $payload_reflection* ) and 
+                any of ( $payload_load_reflection* )
+            ) or 
 			all of ( $payload_compile* ) 
 		) and 
-		any of ( $payload_invoke* )
+		any of ( $payload_invoke* ) and
+        (
+            filesize < 10KB or
+            (
+                filesize < 50KB and
+                any of ( $rc_sus* )
+            )
+        )
 }
 
-rule webshell_asp_sql {
+rule webshell_asp_sql : WEBSHELL PROD {
 	meta:
 		description = "ASP webshell giving SQL access. Might also be a dual use tool."
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -1781,6 +2436,21 @@ rule webshell_asp_sql {
         $sql7 = "Open" fullword wide ascii
         $sql8 = "SqlCommand" fullword wide ascii
         $sql9 = "SQLCommand" fullword wide ascii
+
+        $o_sql1 = "SQLOLEDB" fullword wide ascii
+        $o_sql2 = "CreateObject" fullword wide ascii
+        $o_sql3 = "open" fullword wide ascii
+
+        $a_sql1 = "ADODB.Connection" fullword wide ascii
+        $a_sql2 = "adodb.connection" fullword wide ascii
+        $a_sql3 = "CreateObject" fullword wide ascii
+        $a_sql4 = "createobject" fullword wide ascii
+        $a_sql5 = "open" fullword wide ascii
+
+        $c_sql1 = "System.Data.SqlClient" fullword wide ascii
+        $c_sql2 = "sqlConnection" fullword wide ascii
+        $c_sql3 = "open" fullword wide ascii
+
         $sus1 = "shell" fullword nocase wide ascii
         $sus2 = "xp_cmdshell" fullword nocase wide ascii
         $sus3 = "aspxspy" fullword nocase wide ascii
@@ -1788,17 +2458,44 @@ rule webshell_asp_sql {
         $sus5 = "cmd.exe" fullword wide ascii
         $sus6 = "cmd /c" fullword wide ascii
         $sus7 = "net user" fullword wide ascii
+        $sus8 = "\\x2D\\x3E\\x7C" wide ascii
+        $sus9 = "Hacker" fullword wide ascii
+        $sus10 = "hacker" fullword wide ascii
+        $sus11 = "HACKER" fullword wide ascii
+        $sus12 = "webshell" wide ascii
+        $sus13 = "equest[\"sql\"]" wide ascii
+        $sus14 = "equest(\"sql\")" wide ascii
+        $sus15 = { e5 bc 80 e5 a7 8b e5 af bc e5 }
+        $sus16 = "\"sqlCommand\"" wide ascii
+        $sus17 = "\"sqlcommand\"" wide ascii
+
+        //$slightly_sus1 = "select * from " wide ascii
+        //$slightly_sus2 = "SELECT * FROM " wide ascii
+        $slightly_sus3 = "SHOW COLUMNS FROM " wide ascii
+        $slightly_sus4 = "show columns from " wide ascii
         
 	condition:
-        // keep filesize bigger than in webshell_hunting_asp_sql TODO: automate
-		filesize < 150KB and
         capa_asp and
         capa_asp_input and
-        6 of ( $sql* ) and
-        any of ( $sus* )
+        (
+            6 of ( $sql* ) or
+            all of ( $o_sql* ) or
+            3 of ( $a_sql* ) or
+            all of ( $c_sql* )
+        ) and 
+        (
+            (
+                // keep filesize smaller than in webshell_hunting_asp_sql TODO: automate
+                filesize < 150KB and
+                any of ( $sus* )
+            ) or (
+                filesize < 5KB and
+                any of ( $slightly_sus* )
+            )
+        )
 }
 
-rule webshell_asp_scan_writable {
+rule webshell_asp_scan_writable : WEBSHELL PROD {
 	meta:
 		description = "ASP webshell searching for writable directories (to hide more webshells ...)"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -1837,7 +2534,7 @@ rule webshell_asp_scan_writable {
 
 
 
-private rule capa_jsp {
+private rule capa_jsp : WEBSHELL PROD {
 	meta:
 		description = "capa JSP tag"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -1853,7 +2550,52 @@ private rule capa_jsp {
 		any of ( $cjsp* )
 } 
 
-private rule capa_jsp_input {
+
+private rule capa_jsp_safe : WEBSHELL PROD {
+	meta:
+		description = "capa JSP tag"
+		license = "https://creativecommons.org/licenses/by-nc/4.0/"
+		author = "Arnim Rupp"
+		date = "2021/01/24"
+	strings:
+		$cjsp_short1 = "<%" ascii wide
+		$cjsp_short2 = "%>" wide ascii
+		$cjsp_long1 = "<jsp:" ascii wide
+		$cjsp_long2 = /language=[\"']java[\"\']/ ascii wide
+		// JSF
+		$cjsp_long3 = "/jstl/core" ascii wide
+		$cjsp_long4 = "<%@p" nocase ascii wide
+		$cjsp_long5 = "<%@ " nocase ascii wide
+		$cjsp_long6 = "<% " ascii wide
+		$cjsp_long7 = "< %" ascii wide
+	condition:
+        $cjsp_short1 at 0 or
+		any of ( $cjsp_long* ) or
+		$cjsp_short2 in ( filesize-100..filesize ) or
+        (
+            $cjsp_short2 and (
+                $cjsp_short1 in ( 0..1000 ) or
+                $cjsp_short1 in ( filesize-1000..filesize ) 
+            )
+        )
+} 
+
+/*
+rule webshell_jsp_TESTING_RULE_NEVERUSE {
+    meta:
+        description ="just for tesintg, never use!!!!!"
+	//strings:
+		// $asp_write1 = "ADODB.Stream" wide ascii # just a string, can be easily obfuscated
+		//$asp_cr_write2 = "CreateObject (" fullword nocase wide ascii
+	condition:
+        capa_jsp_safe
+        //and capa_jsp_payload 
+        //and capa_jsp_input
+
+}
+*/
+
+private rule capa_jsp_input : WEBSHELL PROD {
 	meta:
 		description = "capa JSP input"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -1874,7 +2616,7 @@ private rule capa_jsp_input {
 		any of ( $req* )
 } 
 
-private rule capa_jsp_payload {
+private rule capa_jsp_payload : WEBSHELL PROD {
 	meta:
 		description = "capa JSP payload"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -1892,7 +2634,7 @@ private rule capa_jsp_payload {
         all of ( $rt_payload* )
 }
 
-rule webshell_jsp_regeorg {
+rule webshell_jsp_regeorg : WEBSHELL PROD {
 	meta:
 		description = "Webshell regeorg JSP version"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -1909,11 +2651,11 @@ rule webshell_jsp_regeorg {
 		$jgeorg6 = "FORWARD" fullword wide ascii
 	condition:
 		filesize < 300KB and 
-		capa_jsp and 
+		capa_jsp_safe and 
 		all of ( $jgeorg* )
 }
 
-rule webshell_jsp_http_proxy {
+rule webshell_jsp_http_proxy : WEBSHELL PROD {
 	meta:
 		description = "Webshell JSP HTTP proxy"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -1929,11 +2671,11 @@ rule webshell_jsp_http_proxy {
 		$jh6 = "getParameter" fullword wide ascii
 	condition:
 		filesize < 10KB and 
-		capa_jsp and 
+		capa_jsp_safe and 
 		all of ( $jh* )
 }
 
-rule webshell_jsp_writer_nano {
+rule webshell_jsp_writer_nano : WEBSHELL PROD {
 	meta:
 		description = "JSP file writer"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -1945,20 +2687,26 @@ rule webshell_jsp_writer_nano {
 		$payload1 = ".write" wide ascii
 		$payload2 = "getBytes" fullword wide ascii
 	condition:
-		filesize < 200 and 
 		capa_jsp_input and 
-		capa_jsp and 
-		2 of ( $payload* )
+		capa_jsp_safe and 
+		2 of ( $payload* ) and
+        (
+            filesize < 210 or
+            (
+                filesize < 1000 and
+                capa_gen_sus
+            )
+        )
+
 }
 
-rule webshell_jsp_generic_tiny {
+rule webshell_jsp_generic_tiny : WEBSHELL PROD {
 	meta:
 		description = "Generic JSP webshell tiny"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		date = "2021/01/07"
 		hash = "8fd343db0442136e693e745d7af1018a99b042af"
-		hash = "ee9408eb923f2d16f606a5aaac7e16b009797a07"
 	strings:
 		$payload1 = "ProcessBuilder" fullword wide ascii
 		$payload2 = "URLClassLoader" fullword wide ascii
@@ -1967,8 +2715,8 @@ rule webshell_jsp_generic_tiny {
 		$payload_rt2 = "getRuntime" fullword wide ascii
 		$payload_rt3 = "exec" fullword wide ascii
 	condition:
-		filesize < 8000 and 
-		capa_jsp and
+		filesize < 250 and 
+		capa_jsp_safe and
 		capa_jsp_input and
 		( 
 			1 of ( $payload* ) or
@@ -1976,7 +2724,7 @@ rule webshell_jsp_generic_tiny {
 		)
 }
 
-rule webshell_jsp_generic {
+rule webshell_jsp_generic : WEBSHELL PROD {
 	meta:
 		description = "Generic JSP webshell"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -1984,6 +2732,7 @@ rule webshell_jsp_generic {
 		date = "2021/01/07"
 		hash = "4762f36ca01fb9cda2ab559623d2206f401fc0b1"
 		hash = "bdaf9279b3d9e07e955d0ce706d9c42e4bdf9aa1"
+		hash = "ee9408eb923f2d16f606a5aaac7e16b009797a07"
 	strings:
 		$susp0 = "cmd" fullword nocase ascii wide
 		$susp1 = "command" fullword nocase ascii wide
@@ -1991,16 +2740,21 @@ rule webshell_jsp_generic {
 		$susp3 = "download" fullword nocase ascii wide
 		$susp4 = "upload" fullword nocase ascii wide
 		$susp5 = "Execute" fullword nocase ascii wide
+		$susp6 = "\"pwd\"" ascii wide
+		$susp7 = "\"</pre>" ascii wide
+
+        $fp1 = "command = \"cmd.exe /c set\";"
 	condition:
 		filesize < 300KB and 
         not capa_bin_files and
-		capa_jsp and  
+		capa_jsp_safe and  
 		capa_jsp_input and  
 		capa_jsp_payload and  
+        not any of ( $fp* ) and
 		any of ( $susp* )
 }
 
-rule webshell_jsp_generic_base64 {
+rule webshell_jsp_generic_base64 : WEBSHELL PROD {
 	meta:
 		description = "Generic JSP webshell with base64 encoded payload"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -2032,7 +2786,7 @@ rule webshell_jsp_generic_base64 {
 		$three6 = "UwBjAHIAaQBwAHQARQBuAGcAaQBuAGUARgBhAGMAdABvAHIAeQ" wide ascii
 
 	condition:
-		capa_jsp and
+		capa_jsp_safe and
         not capa_bin_files and
 		filesize < 300KB and (
 			any of ( $one* ) and any of ( $two* ) 
@@ -2041,7 +2795,7 @@ rule webshell_jsp_generic_base64 {
 
 }
 
-rule webshell_jsp_generic_processbuilder {
+rule webshell_jsp_generic_processbuilder : WEBSHELL PROD {
 	meta:
 		description = "Generic JSP webshell which uses processbuilder to execute user input"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -2059,7 +2813,7 @@ rule webshell_jsp_generic_processbuilder {
 		$start
 }
 
-rule webshell_jsp_generic_reflection {
+rule webshell_jsp_generic_reflection : WEBSHELL PROD {
 	meta:
 		description = "Generic JSP webshell which uses reflection to execute user input"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -2073,12 +2827,12 @@ rule webshell_jsp_generic_reflection {
 	condition:
 		filesize < 10KB and 
 		all of ( $ws_* ) and
-		capa_jsp and
+		capa_jsp_safe and
 		capa_jsp_input and
 		not $fp
 }
 
-rule webshell_jsp_generic_classloader {
+rule webshell_jsp_generic_classloader : WEBSHELL PROD {
 	meta:
 		description = "Generic JSP webshell which uses classloader to execute user input"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -2090,13 +2844,13 @@ rule webshell_jsp_generic_classloader {
 		$class = "defineClass" fullword wide ascii
 	condition:
 		filesize < 10KB and 
-		capa_jsp and
+		capa_jsp_safe and
 		capa_jsp_input and
 		$exec and
 		$class
 }
 
-rule webshell_jsp_generic_encoded_shell {
+rule webshell_jsp_generic_encoded_shell : WEBSHELL PROD {
 	meta:
 		description = "Generic JSP webshell which contains cmd or /bin/bash encoded in ascii ord"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -2116,7 +2870,7 @@ rule webshell_jsp_generic_encoded_shell {
 		any of ( $sj* )
 }
 
-rule webshell_jsp_netspy {
+rule webshell_jsp_netspy : WEBSHELL PROD {
 	meta:
 		description = "JSP netspy webshell"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -2137,14 +2891,14 @@ rule webshell_jsp_netspy {
 		$http = "java.net.HttpURLConnection" fullword wide ascii
 	condition:
 		filesize < 30KB and 
-		capa_jsp and
+		capa_jsp_safe and
 		capa_jsp_input and
 		4 of ( $scan* ) and 
 		1 of ( $write* ) and 
 		$http
 }
 
-rule webshell_jsp_by_string {
+rule webshell_jsp_by_string : WEBSHELL PROD {
 	meta:
 		description = "JSP Webshells which contain unique strings, lousy rule for low hanging fruits. Most are catched by other rules in here but maybe these catch different versions."
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -2168,14 +2922,17 @@ rule webshell_jsp_by_string {
 		$jstring12 = "MiniWebCmdShell" fullword wide ascii
 		$jstring13 = "pwnshell.jsp" fullword wide ascii
 		$jstring14 = "session set &lt;key&gt; &lt;value&gt; [class]<br>"  wide ascii
+		$jstring15 = "Runtime.getRuntime().exec(request.getParameter(" nocase wide ascii
+		$jstring16 = "GIF98a<%@page" wide ascii
 	condition:
 		filesize < 100KB and 
-		capa_jsp and 
+		capa_jsp_safe and 
+        not capa_bin_files and
 		any of ( $jstring* )
 }
 
 
-rule webshell_jsp_input_upload_write {
+rule webshell_jsp_input_upload_write : WEBSHELL PROD {
 	meta:
 		description = "JSP uploader which gets input, writes files and contains \"upload\""
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -2190,7 +2947,7 @@ rule webshell_jsp_input_upload_write {
 		$write2 = "FileOutputStream" fullword wide ascii
 	condition:
 		filesize < 10KB and 
-		capa_jsp and 
+		capa_jsp_safe and 
 		capa_jsp_input and 
 		$upload and 
 		1 of ( $write* )
@@ -2204,7 +2961,7 @@ rule webshell_jsp_input_upload_write {
 //   | | | | | | |>  < 
 //   |_| |_| |_|_/_/\_\
                   
-rule webshell_generic_os_strings {
+rule webshell_generic_os_strings : WEBSHELL PROD {
 	meta:
 		description = "typical webshell strings"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -2216,18 +2973,20 @@ rule webshell_generic_os_strings {
 		$fp2 = "denormalize('/etc/shadow" wide ascii
 	condition:
 		filesize < 70KB and 
-		( capa_asp or capa_php_old_safe or capa_jsp ) and 
+		( capa_asp or capa_php_old_safe or capa_jsp_safe ) and 
 		capa_os_strings and
 		not any of ( $fp* )
 }
 
-rule webshell_in_image {
+rule webshell_in_image : WEBSHELL PROD {
 	meta:
 		description = "Webshell in GIF, PNG or JPG"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		hash = "d4fde4e691db3e70a6320e78657480e563a9f87935af873a99db72d6a9a83c78"
 		date = "2021/02/27"
+        score = 55
+        // TODO: consider extending the rule to catch webshell like 97adf0bc8acffaedaad7d8ce3557d57dcb5759125183d9d4920a1c0d73a1b847 which don't use a valid image header but only random data
 	strings:
         $png = { 89 50 4E 47 }
         $jpg = { FF D8 FF E0 }
@@ -2247,17 +3006,109 @@ rule webshell_in_image {
         and (
             ( 
                 capa_php_old_safe and
-                capa_php_payload 
+                (
+                    ( capa_php_payload_evals or capa_php_payload_execs ) or
+                    capa_php_write_file
+                )
             ) or (
                 capa_jsp and
                 capa_jsp_payload 
             ) or ( 
                 capa_asp and
-                capa_asp_payload 
+                ( 
+                    capa_asp_payload or 
+                    capa_asp_write_file
+                )
             )
         )
 }
 
+rule webshell_case_anomly : WEBSHELL PROD {
+	meta:
+		description = "Casing anomly in typical webshell commands"
+		license = "https://creativecommons.org/licenses/by-nc/4.0/"
+		author = "Arnim Rupp"
+		date = "2021/05/11"
+        reference = "Idea from https://github.com/Neo23x0/signature-base/blob/master/yara/gen_case_anomalies.yar"
+        score = 70
+	strings:
+        $e = "eval" nocase fullword wide ascii
+        $en1 = "eval" fullword wide ascii
+        $en2 = "Eval" fullword wide ascii
+        $en3 = "EVAL" fullword wide ascii
+        $en4 = "$eVal" nocase fullword wide ascii
+        $a = "assert" nocase fullword wide ascii
+        $an1 = "assert" fullword wide ascii
+        $an2 = "Assert" fullword wide ascii
+        $an3 = "ASSERT" fullword wide ascii
+        $c = "CreateObject" nocase fullword wide ascii
+        $cn1 = "CreateObject" fullword wide ascii
+        $cn2 = "createobject" fullword wide ascii
+        $cn3 = "createObject" fullword wide ascii
+        $cn4 = "Createobject" fullword wide ascii
+        $cn5 = "CREATEOBJECT" fullword wide ascii
+        $f = "CreateTextFile" nocase fullword wide ascii
+        $fn1 = "CreateTextFile" fullword wide ascii
+        $fn2 = "createtextfile" fullword wide ascii
+        $fn3 = "createTextFile" fullword wide ascii
+        $fn4 = "CreatetextFile" fullword wide ascii
+        $fn5 = "CreateTextfile" fullword wide ascii
+        $fn6 = "createtextFile" fullword wide ascii
+        $fn7 = "Createtextfile" fullword wide ascii
+        $fn8 = "CREATETEXTFILE" fullword wide ascii
+        $s = "sqlclient" nocase fullword wide ascii
+        $sn1 = "sqlclient" fullword wide ascii
+        $sn2 = "SQLclient" fullword wide ascii
+        $sn3 = "SQLClient" fullword wide ascii
+        $sn4 = "sqlClient" fullword wide ascii
+        $sn5 = "SqlClient" fullword wide ascii
+        $sn6 = "SQLCLIENT" fullword wide ascii
+        $t = "ExecuteStatement" nocase fullword wide ascii
+        $tn1 = "ExecuteStatement" fullword wide ascii
+        $tn2 = "executestatement" fullword wide ascii
+        $tn3 = "Executestatement" fullword wide ascii
+        $tn4 = "executeStatement" fullword wide ascii
+        $tn5 = "EXECUTESTATEMENT" fullword wide ascii
+        $q = "select" nocase fullword wide ascii
+        $qn1 = "select" fullword wide ascii
+        $qn2 = "Select" fullword wide ascii
+        $qn3 = "SELECT" fullword wide ascii
+        $x = "execute" nocase fullword wide ascii
+        $xn1 = "execute" fullword wide ascii
+        $xn2 = "Execute" fullword wide ascii
+        $xn3 = "EXECUTE" fullword wide ascii
+        $r = "request" nocase fullword wide ascii
+        $rn1 = "request" fullword wide ascii
+        $rn2 = "Request" fullword wide ascii
+        $rn3 = "REQUEST" fullword wide ascii
+        // common typo
+        $rn4 = "REquest" fullword wide ascii
+	condition:
+        (
+            capa_php_old_safe or
+            capa_asp or
+            capa_jsp
+        ) and
+        (
+            (
+                filesize < 500KB and
+                (
+                    ( #a > ( #an1 + #an2 + #an3 ) ) or
+                    ( #r > ( #rn1 + #rn2 + #rn3 + #rn4 ) ) or
+                    ( #q > ( #qn1 + #qn2 + #qn3 ) ) or
+                    ( #c > ( #cn1 + #cn2+ #cn3 + #cn4 + #cn5 ) ) or
+                    ( #t > ( #tn1 + #tn2+ #tn3 + #tn4 + #tn5 ) ) or
+                    ( #s > ( #sn1 + #sn2+ #sn3 + #sn4 + #sn5 + #sn6 ) ) or
+                    ( #f > ( #fn1 + #fn2+ #fn3 + #fn4 + #fn5 + #fn6 +#fn7 + #fn8 ) ) or
+                    ( #x > ( #xn1 + #xn2 + #xn3 ) )
+                )
+            ) or (
+                // eval is a short string, look only in small files to avoid fp in binary garbage:
+                filesize < 30KB and
+                ( #e > ( #en1 + #en2 + #en3 + #en4 ) )
+            )
+        )
+}
 
 //  _                 _   _
 // | |__  _   _ _ __ | |_(_)_ __   __ _
@@ -2269,14 +3120,36 @@ rule webshell_in_image {
 // Hunting rules. Uncomment to find suspicous files but also more false positives
 // (To find more stuff, you can also (manually) increase the filesize conditions for all rules)
 
-/*
-rule webshell_hunting_jsp_input_write_nano {
+rule webshell_hunting_php_generic_nano_input : WEBSHELL HUNT {
+	meta:
+		description = "php webshell having some kind of input and whatever mechanism to execute it. restricted to small files or would give lots of false positives"
+		license = "https://creativecommons.org/licenses/by-nc/4.0/"
+		author = "Arnim Rupp"
+		hash = "b492336ac5907684c1b922e1c25c113ffc303ffbef645b4e95d36bc50e932033"
+		date = "2021/01/13"
+        score = 40
+	strings:
+		$fp1 = "echo $_POST['" 
+		$fp2 = "echo $_POST[\""
+		$fp3 = "$http_raw_post_data = file_get_contents('php://input');"
+		$fp4 = "highlight_file(basename(urldecode($_GET['target'])));"
+		$fp5 = "header( \"HTTP/1.0 $_GET[status] $_GET[text]\" );"
+		$fp6 = "<?php echo file_get_contents('php://input'); ?>"
+		$fp7 = "sleep((int)$_GET['sleep']);"
+	condition:
+		filesize < 300 and 
+		capa_php_old_safe and
+		capa_php_input and
+		not any of ( $fp* )
+}
+
+rule webshell_hunting_jsp_input_write_nano : WEBSHELL HUNT {
 	meta:
 		description = "Suspicious: JSP file writer: Gets input and writes to disk"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		date = "2021/01/24"
-		score = 50
+		score = 40
 		hash = "108c5eeb85f9a2bfb896a1c42a00978f5770e195"
 		hash = "30dae7c1473b767d44f8e30600891a524ac8dea0"
 		hash = "22609061c167befd5c32b0798eb52e89d68c74ef"
@@ -2284,19 +3157,19 @@ rule webshell_hunting_jsp_input_write_nano {
 		$write1 = "os.write" fullword wide ascii
 		$write2 = "FileOutputStream" fullword wide ascii
 	condition:
-		filesize < 1500 and 
+		filesize < 2500 and 
 		capa_jsp and 
 		capa_jsp_input and 
 		1 of ( $write* )
 }
 
-rule webshell_hunting_input_password_sql {
+rule webshell_hunting_input_password_sql : WEBSHELL HUNT {
 	meta:
 		description = "Suspicious: JSP SQL tool with password"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		date = "2021/01/24"
-		score = 50
+		score = 40
 		hash = "a20dcd6bfafb313da2ed9e8bf006b0cf6026084c"
 		hash = "e6a33e17569749612b06e3001544b2f04345d5ae"
 	strings:
@@ -2308,57 +3181,73 @@ rule webshell_hunting_input_password_sql {
 		$sql4 = "createStatement" fullword nocase wide ascii
 
 	condition:
-		filesize < 20KB and 
+		filesize < 40KB and 
         capa_jsp and
 		1 of ( $pwd* ) and 
 		3 of ( $sql* ) and 
 		capa_jsp_input
 }
 
-rule webshell_hunting_php_generic_nano_payload_or_callback {
+rule webshell_hunting_php_generic_nano_payload_or_callback : WEBSHELL HUNT {
 	meta:
 		description = "Suspicious: PHP webshell having some method to execute code, no check where it comes from. Restricted to small files or would give lots of false positives"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		date = "2021/01/14"
-		score = 50
+		score = 40
 		hash = "29c80a36f0919c39fb0de4732c506da5eee89783"
 		hash = "76e3491998b76f83b570a4bb66e65dd0de629e9a"
 	strings:
 		$fp1 = "__DIR__" wide ascii
 	condition:
-		filesize < 100 and 
-		capa_php and
-		( capa_php_payload or capa_php_callback ) and not
-		any of ( $fp* )
+		filesize < 500 and 
+		capa_php_old_safe and
+		( 
+            ( capa_php_payload_evals or capa_php_payload_execs ) or 
+            capa_php_callback 
+        ) and 
+        not any of ( $fp* )
 }
 
-rule webshell_hunting_asp_included {
+rule webshell_hunting_asp_included : WEBSHELL HUNT {
 	meta:
 		description = "Suspicious: Might be ASP webshell included, check for the including file"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		date = "2021/03/07"
-		score = 50
+		score = 40
+    strings:
+        $sus1 = "cmd.exe" nocase wide ascii
+        $sus2 = "execute" nocase wide ascii
+        $sus3 = "shell" nocase wide ascii
 	condition:
         // not checking for capa_asp here because we assume this file is included, see also webshell_hunting_asp_includer
-        capa_asp_payload and
-        (
-            filesize < 100 or
+        not capa_php_old_safe and
+        ( 
+            capa_asp_payload or 
+            capa_asp_write_file
+        ) and (
+            filesize < 200 or
             (
-                filesize < 200 and 
-                capa_asp_input
+                capa_asp_input and
+                (
+                    filesize < 400 or
+                    (
+                        filesize < 800 and
+                        any of ( $sus* )
+                    )
+                )
             )
-        )
+        ) 
 }
 
-rule webshell_hunting_asp_includer {
+rule webshell_hunting_asp_includer : WEBSHELL HUNT {
 	meta:
-		description = "Suspicious: Might be ASP webshell includer, check for the included file"
+		description = "Suspicious: Might be ASP webshell includer, check the included file"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		date = "2021/03/07"
-		score = 50
+		score = 40
 	strings:
 		$asp_include1 = "#include file=" nocase wide ascii
 		$asp_include2 = "#include virtual=" nocase wide ascii
@@ -2369,47 +3258,36 @@ rule webshell_hunting_asp_includer {
 }
 
 
-rule webshell_hunting_asp_encoded {
+rule webshell_hunting_asp_encoded : WEBSHELL HUNT {
 	meta:
 		description = "Webshell in VBscript or JScript encoded using *.Encode"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
 		date = "2021/03/07"
-        score = 50
+        score = 40
 	strings:
         $asp_encoded1 = "VBScript.Encode" nocase wide ascii
         $asp_encoded2 = "JScript.Encode" nocase wide ascii
         $encoded_data = "#@~^" wide ascii
 	condition:
-        filesize < 2000KB
+        filesize < 2000KB and
         capa_asp and
         any of ( $asp_encoded* ) and
         $encoded_data
 }
 
-rule webshell_hunting_asp_sql {
+
+rule webshell_hunting_php_includer : WEBSHELL HUNT {
 	meta:
-		description = "ASP webshell giving SQL access. Might also be a dual use tool."
+		description = "Suspicious: Might be PHP webshell includer, check the included file"
 		license = "https://creativecommons.org/licenses/by-nc/4.0/"
 		author = "Arnim Rupp"
-		date = "2021/03/14"
-	strings:
-        $sql1 = "SqlConnection" fullword wide ascii
-        $sql2 = "SQLConnection" fullword wide ascii
-        $sql3 = "System" fullword wide ascii
-        $sql4 = "Data" fullword wide ascii
-        $sql5 = "SqlClient" fullword wide ascii
-        $sql6 = "SQLClient" fullword wide ascii
-        $sql7 = "Open" fullword wide ascii
-        $sql8 = "SqlCommand" fullword wide ascii
-        $sql9 = "SQLCommand" fullword wide ascii
-        
+		date = "2021/04/17"
+        score = 40
 	condition:
-        // keep filesize bigger than in webshell_asp_sql TODO: automate
-		filesize > 150KB and
-        capa_asp_input and
-        6 of ( $sql* )
+        capa_php_old_safe and
+        capa_php_include and
+		filesize < 50 
 }
 
 // end of hunting rules
-*/
