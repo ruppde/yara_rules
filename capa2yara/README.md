@@ -5,7 +5,7 @@ Rules from Fireeyes https://github.com/fireeye/capa-rules converted to YARA usin
 ## Advantages:
 * YARA is lots faster than CAPA so it's possible to search with these rules on millions of files
 * Many tools have integration for YARA rules, just throw them in. 
-* The rules and strings can be reused as building blocks for creating your own YARA rules for PE files, like I use the webshell capa_ rules in https://github.com/ruppde/yara_rules/blob/main/gen_webshells.yar + https://github.com/ruppde/yara_optimizer/blob/main/yara_push_private_rules.py (These rules provide a big part of the hits in https://www.virustotal.com/gui/search/webshell/comments)
+* The rules and strings can be reused as building blocks for creating your own YARA rules for PE files, like I use the webshell capa_ rules in https://github.com/ruppde/yara_rules/blob/main/gen_webshells.yar (These rules provide a big part of the hits in https://www.virustotal.com/gui/search/webshell/comments). Main obstacle is a missing way in YARA to have referenced child rules which show their matching strings in parent rules. That's why I use https://github.com/ruppde/yara_optimizer/blob/main/yara_push_private_rules.py to move all the child rules into the parent rules, result: https://github.com/ruppde/signature-base/blob/master/yara/gen_webshells.yar
 
 ## Disadvantages:
 * These are less rules than capa (because not all fit into YARA, see stats below) and is less precise because e.g. capas function scopes are applied to the whole file.
