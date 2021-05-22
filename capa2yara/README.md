@@ -36,6 +36,7 @@ These are technically possible but not done yet:
 * count(string    (1 rule: /executable/subfile/pe/contain-an-embedded-pe-file.yml)
 * count(match( could be done by creating the referenced rule a 2nd time with the condition, that it hits x times (only 1 rule: ./anti-analysis/anti-disasm/contain-anti-disasm-techniques.yml)
 * it would be technically possible to get the "basic blocks" working, but the rules contain mostly other non supported statements in there => not worth the effort.
+* make -t also include all the needed childs for the tagged rules
 
 
 
