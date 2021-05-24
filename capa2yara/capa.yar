@@ -1,5 +1,7 @@
 // Rules from FireEye's https://github.com/fireeye/capa-rules converted to YARA using https://github.com/fireeye/capa/blob/master/scripts/capa2yara.py by Arnim Rupp
 
+// These are not classical YARA rules for finding malware but can be used as building blocks for your own YARA rules or may assist in grouping similar PE binaries inside your malware collection.
+
 // Beware: These are less rules than capa (because not all fit into YARA, stats at EOF) and is less precise because e.g. capas function scopes are applied to the whole file
 
 // Beware: Some rules are incomplete because an optional branch was not supported by YARA. These rules are marked in a comment in meta: (search for "incomplete")
@@ -27,7 +29,7 @@ private rule capa_pe_file : CAPA {
 }
 
 
-rule capa_create_or_open_file : CAPA C0016  { 
+rule capa_create_or_open_file : CAPA BASICBLOCK C0016  { 
   meta: 
  	description = "create or open file (converted from capa rule)"
 	author = "michael.hunhoff@fireeye.com"
@@ -36,7 +38,7 @@ rule capa_create_or_open_file : CAPA C0016  {
 	mbc = "File System::Create File [C0016]"
 	hash = "B5F85C26D7AA5A1FB4AF5821B6B5AB9B"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/lib/create-or-open-file.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -64,7 +66,7 @@ rule capa_create_or_open_file : CAPA C0016  {
 	) 
 }
 
-rule capa_open_thread : CAPA  { 
+rule capa_open_thread : CAPA BASICBLOCK  { 
   meta: 
  	description = "open thread (converted from capa rule)"
 	author = "0x534a@mailbox.org"
@@ -72,7 +74,7 @@ rule capa_open_thread : CAPA  {
 	scope = "basic block"
 	hash = "787cbc8a6d1bc58ea169e51e1ad029a637f22560660cc129ab8a099a745bd50e:00502F4C"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/lib/open-thread.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -89,7 +91,7 @@ rule capa_open_thread : CAPA  {
 	) 
 }
 
-rule capa_allocate_memory : CAPA C0007  { 
+rule capa_allocate_memory : CAPA BASICBLOCK C0007  { 
   meta: 
  	description = "allocate memory (converted from capa rule)"
 	author = "0x534a@mailbox.org"
@@ -99,7 +101,7 @@ rule capa_allocate_memory : CAPA C0007  {
 	hash = "Practical Malware Analysis Lab 03-03.exe_:0x4010EA"
 	hash = "563653399B82CD443F120ECEFF836EA3678D4CF11D9B351BB737573C2D856299"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/lib/allocate-memory.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -124,7 +126,7 @@ rule capa_allocate_memory : CAPA C0007  {
 	) 
 }
 
-rule capa_delay_execution : CAPA B0003_003  { 
+rule capa_delay_execution : CAPA BASICBLOCK B0003_003  { 
   meta: 
  	description = "delay execution (converted from capa rule)"
 	author = "michael.hunhoff@fireeye.com"
@@ -134,7 +136,7 @@ rule capa_delay_execution : CAPA B0003_003  {
 	hash = "al-khaser_x86.exe_:0x449770"
 	hash = "B5F85C26D7AA5A1FB4AF5821B6B5AB9B"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/lib/delay-execution.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -164,7 +166,7 @@ rule capa_delay_execution : CAPA B0003_003  {
 	) 
 }
 
-rule capa_write_process_memory : CAPA T1055  { 
+rule capa_write_process_memory : CAPA FUNCTION T1055  { 
   meta: 
  	description = "write process memory (converted from capa rule)"
 	author = "moritz.raabe@fireeye.com"
@@ -173,7 +175,7 @@ rule capa_write_process_memory : CAPA T1055  {
 	attack = "Defense Evasion::Process Injection [T1055]"
 	hash = "2D3EDC218A90F03089CC01715A9F047F"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/lib/write-process-memory.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -190,7 +192,7 @@ rule capa_write_process_memory : CAPA T1055  {
 	) 
 }
 
-rule capa_open_process : CAPA  { 
+rule capa_open_process : CAPA BASICBLOCK  { 
   meta: 
  	description = "open process (converted from capa rule)"
 	author = "0x534a@mailbox.org"
@@ -198,7 +200,7 @@ rule capa_open_process : CAPA  {
 	scope = "basic block"
 	hash = "Practical Malware Analysis Lab 17-02.dll_:0x1000D10D"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/lib/open-process.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -215,7 +217,7 @@ rule capa_open_process : CAPA  {
 	) 
 }
 
-rule capa_delete_volume_shadow_copies : CAPA T1490 T1070_004 F0014_001  { 
+rule capa_delete_volume_shadow_copies : CAPA IMPACT INHIBIT_SYSTEM_RECOVERY FUNCTION T1490 T1070_004 F0014_001  { 
   meta: 
  	description = "delete volume shadow copies (converted from capa rule)"
 	namespace = "impact/inhibit-system-recovery"
@@ -226,7 +228,7 @@ rule capa_delete_volume_shadow_copies : CAPA T1490 T1070_004 F0014_001  {
 	mbc = "Impact::Disk Content Wipe::Delete Shadow Drive [F0014.001]"
 	hash = "B87E9DD18A5533A09D3E48A7A1EFBCF6"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/impact/inhibit-system-recovery/delete-volume-shadow-copies.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -244,7 +246,7 @@ rule capa_delete_volume_shadow_copies : CAPA T1490 T1070_004 F0014_001  {
 	) 
 }
 
-rule capa_reference_analysis_tools_strings : CAPA B0013_001  { 
+rule capa_reference_analysis_tools_strings : CAPA ANTI_ANALYSIS FILE B0013_001  { 
   meta: 
  	description = "reference analysis tools strings (converted from capa rule)"
 	namespace = "anti-analysis"
@@ -253,7 +255,7 @@ rule capa_reference_analysis_tools_strings : CAPA B0013_001  {
 	mbc = "Discovery::Analysis Tool Discovery::Process Detection [B0013.001]"
 	hash = "al-khaser_x86.exe_"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/reference-analysis-tools-strings.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -333,7 +335,7 @@ rule capa_reference_analysis_tools_strings : CAPA B0013_001  {
 	) 
 }
 
-rule capa_timestomp_file : CAPA T1070_006  { 
+rule capa_timestomp_file : CAPA ANTI_ANALYSIS ANTI_FORENSIC TIMESTOMP FUNCTION T1070_006  { 
   meta: 
  	description = "timestomp file (converted from capa rule)"
 	namespace = "anti-analysis/anti-forensic/timestomp"
@@ -342,7 +344,7 @@ rule capa_timestomp_file : CAPA T1070_006  {
 	attack = "Defense Evasion::Indicator Removal on Host::Timestomp [T1070.006]"
 	hash = "Practical Malware Analysis Lab 03-04.exe_:0x4014e0"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-forensic/timestomp/timestomp-file.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -360,7 +362,7 @@ rule capa_timestomp_file : CAPA T1070_006  {
 	) 
 }
 
-rule capa_clear_the_Windows_event_log : CAPA T1070_001  { 
+rule capa_clear_the_Windows_event_log : CAPA ANTI_ANALYSIS ANTI_FORENSIC CLEAR_LOGS BASICBLOCK T1070_001  { 
   meta: 
  	description = "clear the Windows event log (converted from capa rule)"
 	namespace = "anti-analysis/anti-forensic/clear-logs"
@@ -369,7 +371,7 @@ rule capa_clear_the_Windows_event_log : CAPA T1070_001  {
 	attack = "Defense Evasion::Indicator Removal on Host::Clear Windows Event Logs [T1070.001]"
 	hash = "82BF6347ACF15E5D883715DC289D8A2B"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-forensic/clear-logs/clear-the-windows-event-log.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -380,7 +382,7 @@ rule capa_clear_the_Windows_event_log : CAPA T1070_001  {
 	) 
 }
 
-rule capa_check_for_sandbox_and_av_modules : CAPA B0009 B0007  { 
+rule capa_check_for_sandbox_and_av_modules : CAPA ANTI_ANALYSIS ANTI_AV BASICBLOCK B0009 B0007  { 
   meta: 
  	description = "check for sandbox and av modules (converted from capa rule)"
 	namespace = "anti-analysis/anti-av"
@@ -390,7 +392,7 @@ rule capa_check_for_sandbox_and_av_modules : CAPA B0009 B0007  {
 	mbc = "Anti-Behavioral Analysis::Sandbox Detection [B0007]"
 	hash = "ccbf7cba35bab56563c0fbe4237fdc41"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-av/check-for-sandbox-and-av-modules.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -434,7 +436,7 @@ rule capa_check_for_sandbox_and_av_modules : CAPA B0009 B0007  {
 	) 
 }
 
-rule capa_packed_with_pebundle : CAPA T1027_002 F0001  { 
+rule capa_packed_with_pebundle : CAPA ANTI_ANALYSIS PACKER PEBUNDLE FILE T1027_002 F0001  { 
   meta: 
  	description = "packed with pebundle (converted from capa rule)"
 	namespace = "anti-analysis/packer/pebundle"
@@ -444,7 +446,7 @@ rule capa_packed_with_pebundle : CAPA T1027_002 F0001  {
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	hash = "db9fe790b4e18abf55df31aa0b81e558"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/packer/pebundle/packed-with-pebundle.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -456,7 +458,7 @@ rule capa_packed_with_pebundle : CAPA T1027_002 F0001  {
 	) 
 }
 
-rule capa_packed_with_ASPack : CAPA T1027_002 F0001  { 
+rule capa_packed_with_ASPack : CAPA ANTI_ANALYSIS PACKER ASPACK FILE T1027_002 F0001  { 
   meta: 
  	description = "packed with ASPack (converted from capa rule)"
 	namespace = "anti-analysis/packer/aspack"
@@ -466,7 +468,7 @@ rule capa_packed_with_ASPack : CAPA T1027_002 F0001  {
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	hash = "2055994ff75b4309eee3a49c5749d306"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/packer/aspack/packed-with-aspack.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -486,7 +488,7 @@ rule capa_packed_with_ASPack : CAPA T1027_002 F0001  {
 	) 
 }
 
-rule capa_packed_with_nspack : CAPA T1027_002 F0001  { 
+rule capa_packed_with_nspack : CAPA ANTI_ANALYSIS PACKER NSPACK FILE T1027_002 F0001  { 
   meta: 
  	description = "packed with nspack (converted from capa rule)"
 	namespace = "anti-analysis/packer/nspack"
@@ -496,7 +498,7 @@ rule capa_packed_with_nspack : CAPA T1027_002 F0001  {
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	hash = "02179f3ba93663074740b5c0d283bae2"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/packer/nspack/packed-with-nspack.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -509,7 +511,7 @@ rule capa_packed_with_nspack : CAPA T1027_002 F0001  {
 	) 
 }
 
-rule capa_packed_with_kkrunchy : CAPA T1027_002 F0001  { 
+rule capa_packed_with_kkrunchy : CAPA ANTI_ANALYSIS PACKER KKRUNCHY FILE T1027_002 F0001  { 
   meta: 
  	description = "packed with kkrunchy (converted from capa rule)"
 	namespace = "anti-analysis/packer/kkrunchy"
@@ -519,7 +521,7 @@ rule capa_packed_with_kkrunchy : CAPA T1027_002 F0001  {
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	hash = "f9ac6b16273556b3a57bf2c6d7e7db97"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/packer/kkrunchy/packed-with-kkrunchy.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -530,7 +532,7 @@ rule capa_packed_with_kkrunchy : CAPA T1027_002 F0001  {
 	) 
 }
 
-rule capa_packed_with_petite : CAPA T1027_002 F0001  { 
+rule capa_packed_with_petite : CAPA ANTI_ANALYSIS PACKER PETITE FILE T1027_002 F0001  { 
   meta: 
  	description = "packed with petite (converted from capa rule)"
 	namespace = "anti-analysis/packer/petite"
@@ -540,7 +542,7 @@ rule capa_packed_with_petite : CAPA T1027_002 F0001  {
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	hash = "2a7429d60040465f9bd27bbae2beef88"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/packer/petite/packed-with-petite.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -551,7 +553,7 @@ rule capa_packed_with_petite : CAPA T1027_002 F0001  {
 	) 
 }
 
-rule capa_packed_with_pelocknt : CAPA T1027_002 F0001  { 
+rule capa_packed_with_pelocknt : CAPA ANTI_ANALYSIS PACKER PELOCKNT FILE T1027_002 F0001  { 
   meta: 
  	description = "packed with pelocknt (converted from capa rule)"
 	namespace = "anti-analysis/packer/pelocknt"
@@ -561,7 +563,7 @@ rule capa_packed_with_pelocknt : CAPA T1027_002 F0001  {
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	hash = "f0a6a1bd6d760497623611e8297a81df"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/packer/pelocknt/packed-with-pelocknt.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -572,7 +574,7 @@ rule capa_packed_with_pelocknt : CAPA T1027_002 F0001  {
 	) 
 }
 
-rule capa_packed_with_upack : CAPA T1027_002 F0001  { 
+rule capa_packed_with_upack : CAPA ANTI_ANALYSIS PACKER UPACK FILE T1027_002 F0001  { 
   meta: 
  	description = "packed with upack (converted from capa rule)"
 	namespace = "anti-analysis/packer/upack"
@@ -582,7 +584,7 @@ rule capa_packed_with_upack : CAPA T1027_002 F0001  {
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	hash = "9d98f8519d9fee8219caca5b31eef0bd"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/packer/upack/packed-with-upack.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -598,7 +600,7 @@ rule capa_packed_with_upack : CAPA T1027_002 F0001  {
 	) 
 }
 
-rule capa_packed_with_y0da_crypter : CAPA T1027_002 F0001  { 
+rule capa_packed_with_y0da_crypter : CAPA ANTI_ANALYSIS PACKER Y0DA FILE T1027_002 F0001  { 
   meta: 
  	description = "packed with y0da crypter (converted from capa rule)"
 	namespace = "anti-analysis/packer/y0da"
@@ -608,7 +610,7 @@ rule capa_packed_with_y0da_crypter : CAPA T1027_002 F0001  {
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	hash = "0cd2b334aede270b14868db28211cde3"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/packer/y0da/packed-with-y0da-crypter.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -621,7 +623,7 @@ rule capa_packed_with_y0da_crypter : CAPA T1027_002 F0001  {
 	) 
 }
 
-rule capa_packed_with_Confuser : CAPA T1027_002 F0001_009  { 
+rule capa_packed_with_Confuser : CAPA ANTI_ANALYSIS PACKER CONFUSER FILE T1027_002 F0001_009  { 
   meta: 
  	description = "packed with Confuser (converted from capa rule)"
 	namespace = "anti-analysis/packer/confuser"
@@ -631,7 +633,7 @@ rule capa_packed_with_Confuser : CAPA T1027_002 F0001_009  {
 	mbc = "Anti-Static Analysis::Software Packing::Confuser [F0001.009]"
 	hash = "b9f5bd514485fb06da39beff051b9fdc"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/packer/confuser/packed-with-confuser.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -645,7 +647,7 @@ rule capa_packed_with_Confuser : CAPA T1027_002 F0001_009  {
 	) 
 }
 
-rule capa_packed_with_amber : CAPA T1027_002 F0001  { 
+rule capa_packed_with_amber : CAPA ANTI_ANALYSIS PACKER AMBER FILE T1027_002 F0001  { 
   meta: 
  	description = "packed with amber (converted from capa rule)"
 	namespace = "anti-analysis/packer/amber"
@@ -655,7 +657,7 @@ rule capa_packed_with_amber : CAPA T1027_002 F0001  {
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	hash = "bb7922d368a9a9c8d981837b5ad988f1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/packer/amber/packed-with-amber.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -669,7 +671,7 @@ rule capa_packed_with_amber : CAPA T1027_002 F0001  {
 	) 
 }
 
-rule capa_packed_with_VMProtect : CAPA T1027_002 F0001_010  { 
+rule capa_packed_with_VMProtect : CAPA ANTI_ANALYSIS PACKER VMPROTECT FILE T1027_002 F0001_010  { 
   meta: 
  	description = "packed with VMProtect (converted from capa rule)"
 	namespace = "anti-analysis/packer/vmprotect"
@@ -679,7 +681,7 @@ rule capa_packed_with_VMProtect : CAPA T1027_002 F0001_010  {
 	mbc = "Anti-Static Analysis::Software Packing::VMProtect [F0001.010]"
 	hash = "971e599e6e707349eccea2fd4c8e5f67"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/packer/vmprotect/packed-with-vmprotect.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -702,7 +704,7 @@ rule capa_packed_with_VMProtect : CAPA T1027_002 F0001_010  {
 	) 
 }
 
-rule capa_packed_with_rlpack : CAPA T1027_002 F0001  { 
+rule capa_packed_with_rlpack : CAPA ANTI_ANALYSIS PACKER RLPACK FILE T1027_002 F0001  { 
   meta: 
  	description = "packed with rlpack (converted from capa rule)"
 	namespace = "anti-analysis/packer/rlpack"
@@ -712,7 +714,7 @@ rule capa_packed_with_rlpack : CAPA T1027_002 F0001  {
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	hash = "068a76d4823419b376d418cf03215d5c"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/packer/rlpack/packed-with-rlpack.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -724,7 +726,7 @@ rule capa_packed_with_rlpack : CAPA T1027_002 F0001  {
 	) 
 }
 
-rule capa_packed_with_UPX : CAPA T1027_002 F0001_008  { 
+rule capa_packed_with_UPX : CAPA ANTI_ANALYSIS PACKER UPX FILE T1027_002 F0001_008  { 
   meta: 
  	description = "packed with UPX (converted from capa rule)"
 	namespace = "anti-analysis/packer/upx"
@@ -735,7 +737,7 @@ rule capa_packed_with_UPX : CAPA T1027_002 F0001_008  {
 	hash = "CD2CBA9E6313E8DF2C1273593E649682"
 	hash = "Practical Malware Analysis Lab 01-02.exe_:0x0401000"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/packer/upx/packed-with-upx.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -747,7 +749,7 @@ rule capa_packed_with_UPX : CAPA T1027_002 F0001_008  {
 	) 
 }
 
-rule capa_packed_with_peshield : CAPA T1027_002 F0001  { 
+rule capa_packed_with_peshield : CAPA ANTI_ANALYSIS PACKER PESHIELD FILE T1027_002 F0001  { 
   meta: 
  	description = "packed with peshield (converted from capa rule)"
 	namespace = "anti-analysis/packer/peshield"
@@ -757,7 +759,7 @@ rule capa_packed_with_peshield : CAPA T1027_002 F0001  {
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	hash = "a3c0a2425ea84103adde03a92176424c"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/packer/peshield/packed-with-peshield.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -773,7 +775,7 @@ rule capa_packed_with_peshield : CAPA T1027_002 F0001  {
 	) 
 }
 
-rule capa_reference_anti_VM_strings_targeting_VMWare : CAPA T1497_001 B0009  { 
+rule capa_reference_anti_VM_strings_targeting_VMWare : CAPA ANTI_ANALYSIS ANTI_VM VM_DETECTION FILE T1497_001 B0009  { 
   meta: 
  	description = "reference anti-VM strings targeting VMWare (converted from capa rule)"
 	namespace = "anti-analysis/anti-vm/vm-detection"
@@ -783,7 +785,7 @@ rule capa_reference_anti_VM_strings_targeting_VMWare : CAPA T1497_001 B0009  {
 	mbc = "Anti-Behavioral Analysis::Virtual Machine Detection [B0009]"
 	hash = "al-khaser_x86.exe_"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-vm/vm-detection/reference-anti-vm-strings-targeting-vmware.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -863,7 +865,7 @@ rule capa_reference_anti_VM_strings_targeting_VMWare : CAPA T1497_001 B0009  {
 	) 
 }
 
-rule capa_check_for_windows_sandbox_via_device : CAPA T1497_001 B0009  { 
+rule capa_check_for_windows_sandbox_via_device : CAPA ANTI_ANALYSIS ANTI_VM VM_DETECTION BASICBLOCK T1497_001 B0009  { 
   meta: 
  	description = "check for windows sandbox via device (converted from capa rule)"
 	namespace = "anti-analysis/anti-vm/vm-detection"
@@ -873,7 +875,7 @@ rule capa_check_for_windows_sandbox_via_device : CAPA T1497_001 B0009  {
 	mbc = "Anti-Behavioral Analysis::Virtual Machine Detection [B0009]"
 	hash = "773290480d5445f11d3dc1b800728966"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-vm/vm-detection/check-for-windows-sandbox-via-device.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -889,7 +891,7 @@ rule capa_check_for_windows_sandbox_via_device : CAPA T1497_001 B0009  {
 	) 
 }
 
-rule capa_check_for_microsoft_office_emulation : CAPA T1497_001 B0007_005  { 
+rule capa_check_for_microsoft_office_emulation : CAPA ANTI_ANALYSIS ANTI_VM VM_DETECTION FUNCTION T1497_001 B0007_005  { 
   meta: 
  	description = "check for microsoft office emulation (converted from capa rule)"
 	namespace = "anti-analysis/anti-vm/vm-detection"
@@ -899,7 +901,7 @@ rule capa_check_for_microsoft_office_emulation : CAPA T1497_001 B0007_005  {
 	mbc = "Anti-Behavioral Analysis::Virtual Machine Detection::Product Key/ID Testing [B0007.005]"
 	hash = "773290480d5445f11d3dc1b800728966"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-vm/vm-detection/check-for-microsoft-office-emulation.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -915,7 +917,7 @@ rule capa_check_for_microsoft_office_emulation : CAPA T1497_001 B0007_005  {
 	) 
 }
 
-rule capa_check_for_sandbox_username : CAPA T1497 B0009  { 
+rule capa_check_for_sandbox_username : CAPA ANTI_ANALYSIS ANTI_VM VM_DETECTION FUNCTION T1497 B0009  { 
   meta: 
  	description = "check for sandbox username (converted from capa rule)"
 	namespace = "anti-analysis/anti-vm/vm-detection"
@@ -925,7 +927,7 @@ rule capa_check_for_sandbox_username : CAPA T1497 B0009  {
 	mbc = "Anti-Behavioral Analysis::Virtual Machine Detection [B0009]"
 	hash = "ccbf7cba35bab56563c0fbe4237fdc41"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-vm/vm-detection/check-for-sandbox-username.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -991,7 +993,7 @@ rule capa_check_for_sandbox_username : CAPA T1497 B0009  {
 	) 
 }
 
-rule capa_reference_anti_VM_strings_targeting_Parallels : CAPA T1497_001 B0009  { 
+rule capa_reference_anti_VM_strings_targeting_Parallels : CAPA ANTI_ANALYSIS ANTI_VM VM_DETECTION FILE T1497_001 B0009  { 
   meta: 
  	description = "reference anti-VM strings targeting Parallels (converted from capa rule)"
 	namespace = "anti-analysis/anti-vm/vm-detection"
@@ -1001,7 +1003,7 @@ rule capa_reference_anti_VM_strings_targeting_Parallels : CAPA T1497_001 B0009  
 	mbc = "Anti-Behavioral Analysis::Virtual Machine Detection [B0009]"
 	hash = "al-khaser_x86.exe_"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-vm/vm-detection/reference-anti-vm-strings-targeting-parallels.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1021,7 +1023,7 @@ rule capa_reference_anti_VM_strings_targeting_Parallels : CAPA T1497_001 B0009  
 	) 
 }
 
-rule capa_reference_anti_VM_strings_targeting_VirtualBox : CAPA T1497_001 B0009  { 
+rule capa_reference_anti_VM_strings_targeting_VirtualBox : CAPA ANTI_ANALYSIS ANTI_VM VM_DETECTION FILE T1497_001 B0009  { 
   meta: 
  	description = "reference anti-VM strings targeting VirtualBox (converted from capa rule)"
 	namespace = "anti-analysis/anti-vm/vm-detection"
@@ -1031,7 +1033,7 @@ rule capa_reference_anti_VM_strings_targeting_VirtualBox : CAPA T1497_001 B0009 
 	mbc = "Anti-Behavioral Analysis::Virtual Machine Detection [B0009]"
 	hash = "al-khaser_x86.exe_"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-vm/vm-detection/reference-anti-vm-strings-targeting-virtualbox.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1161,7 +1163,7 @@ rule capa_reference_anti_VM_strings_targeting_VirtualBox : CAPA T1497_001 B0009 
 	) 
 }
 
-rule capa_check_for_windows_sandbox_via_registry : CAPA T1497_001 B0009  { 
+rule capa_check_for_windows_sandbox_via_registry : CAPA ANTI_ANALYSIS ANTI_VM VM_DETECTION FUNCTION T1497_001 B0009  { 
   meta: 
  	description = "check for windows sandbox via registry (converted from capa rule)"
 	namespace = "anti-analysis/anti-vm/vm-detection"
@@ -1171,7 +1173,7 @@ rule capa_check_for_windows_sandbox_via_registry : CAPA T1497_001 B0009  {
 	mbc = "Anti-Behavioral Analysis::Virtual Machine Detection [B0009]"
 	hash = "773290480d5445f11d3dc1b800728966"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-vm/vm-detection/check-for-windows-sandbox-via-registry.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1191,7 +1193,7 @@ rule capa_check_for_windows_sandbox_via_registry : CAPA T1497_001 B0009  {
 	) 
 }
 
-rule capa_reference_anti_VM_strings_targeting_Xen : CAPA T1497_001 B0009  { 
+rule capa_reference_anti_VM_strings_targeting_Xen : CAPA ANTI_ANALYSIS ANTI_VM VM_DETECTION FILE T1497_001 B0009  { 
   meta: 
  	description = "reference anti-VM strings targeting Xen (converted from capa rule)"
 	namespace = "anti-analysis/anti-vm/vm-detection"
@@ -1201,7 +1203,7 @@ rule capa_reference_anti_VM_strings_targeting_Xen : CAPA T1497_001 B0009  {
 	mbc = "Anti-Behavioral Analysis::Virtual Machine Detection [B0009]"
 	hash = "al-khaser_x86.exe_"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-vm/vm-detection/reference-anti-vm-strings-targeting-xen.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1223,7 +1225,7 @@ rule capa_reference_anti_VM_strings_targeting_Xen : CAPA T1497_001 B0009  {
 	) 
 }
 
-rule capa_reference_anti_VM_strings : CAPA T1497_001 B0009  { 
+rule capa_reference_anti_VM_strings : CAPA ANTI_ANALYSIS ANTI_VM VM_DETECTION FILE T1497_001 B0009  { 
   meta: 
  	description = "reference anti-VM strings (converted from capa rule)"
 	namespace = "anti-analysis/anti-vm/vm-detection"
@@ -1233,7 +1235,7 @@ rule capa_reference_anti_VM_strings : CAPA T1497_001 B0009  {
 	mbc = "Anti-Behavioral Analysis::Virtual Machine Detection [B0009]"
 	hash = "Practical Malware Analysis Lab 17-02.dll_"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-vm/vm-detection/reference-anti-vm-strings.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1301,7 +1303,7 @@ rule capa_reference_anti_VM_strings : CAPA T1497_001 B0009  {
 	) 
 }
 
-rule capa_reference_anti_VM_strings_targeting_Qemu : CAPA T1497_001 B0009  { 
+rule capa_reference_anti_VM_strings_targeting_Qemu : CAPA ANTI_ANALYSIS ANTI_VM VM_DETECTION FILE T1497_001 B0009  { 
   meta: 
  	description = "reference anti-VM strings targeting Qemu (converted from capa rule)"
 	namespace = "anti-analysis/anti-vm/vm-detection"
@@ -1311,7 +1313,7 @@ rule capa_reference_anti_VM_strings_targeting_Qemu : CAPA T1497_001 B0009  {
 	mbc = "Anti-Behavioral Analysis::Virtual Machine Detection [B0009]"
 	hash = "al-khaser_x86.exe_"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-vm/vm-detection/reference-anti-vm-strings-targeting-qemu.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1331,7 +1333,7 @@ rule capa_reference_anti_VM_strings_targeting_Qemu : CAPA T1497_001 B0009  {
 	) 
 }
 
-rule capa_reference_anti_VM_strings_targeting_VirtualPC : CAPA T1497_001 B0009  { 
+rule capa_reference_anti_VM_strings_targeting_VirtualPC : CAPA ANTI_ANALYSIS ANTI_VM VM_DETECTION FILE T1497_001 B0009  { 
   meta: 
  	description = "reference anti-VM strings targeting VirtualPC (converted from capa rule)"
 	namespace = "anti-analysis/anti-vm/vm-detection"
@@ -1341,7 +1343,7 @@ rule capa_reference_anti_VM_strings_targeting_VirtualPC : CAPA T1497_001 B0009  
 	mbc = "Anti-Behavioral Analysis::Virtual Machine Detection [B0009]"
 	hash = "al-khaser_x86.exe_"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-vm/vm-detection/reference-anti-vm-strings-targeting-virtualpc.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1361,7 +1363,7 @@ rule capa_reference_anti_VM_strings_targeting_VirtualPC : CAPA T1497_001 B0009  
 	) 
 }
 
-rule capa_check_if_process_is_running_under_wine : CAPA T1497_001 B0004  { 
+rule capa_check_if_process_is_running_under_wine : CAPA ANTI_ANALYSIS ANTI_EMULATION WINE FUNCTION T1497_001 B0004  { 
   meta: 
  	description = "check if process is running under wine (converted from capa rule)"
 	namespace = "anti-analysis/anti-emulation/wine"
@@ -1371,7 +1373,7 @@ rule capa_check_if_process_is_running_under_wine : CAPA T1497_001 B0004  {
 	mbc = "Anti-Behavioral Analysis::Emulator Detection [B0004]"
 	hash = "ccbf7cba35bab56563c0fbe4237fdc41"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-emulation/wine/check-if-process-is-running-under-wine.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1399,7 +1401,7 @@ rule capa_check_if_process_is_running_under_wine : CAPA T1497_001 B0004  {
 	) 
 }
 
-rule capa_check_for_debugger_via_API : CAPA B0001_002 B0001_031  { 
+rule capa_check_for_debugger_via_API : CAPA ANTI_ANALYSIS ANTI_DEBUGGING DEBUGGER_DETECTION FUNCTION B0001_002 B0001_031  { 
   meta: 
  	description = "check for debugger via API (converted from capa rule)"
 	namespace = "anti-analysis/anti-debugging/debugger-detection"
@@ -1409,7 +1411,7 @@ rule capa_check_for_debugger_via_API : CAPA B0001_002 B0001_031  {
 	mbc = "Anti-Behavioral Analysis::Debugger Detection::WudfIsAnyDebuggerPresent [B0001.031]"
 	hash = "al-khaser_x86.exe_:0x420000"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-debugging/debugger-detection/check-for-debugger-via-api.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1423,7 +1425,7 @@ rule capa_check_for_debugger_via_API : CAPA B0001_002 B0001_031  {
 	) 
 }
 
-rule capa_check_for_OutputDebugString_error : CAPA B0001_016  { 
+rule capa_check_for_OutputDebugString_error : CAPA ANTI_ANALYSIS ANTI_DEBUGGING DEBUGGER_DETECTION BASICBLOCK B0001_016  { 
   meta: 
  	description = "check for OutputDebugString error (converted from capa rule)"
 	namespace = "anti-analysis/anti-debugging/debugger-detection"
@@ -1432,7 +1434,7 @@ rule capa_check_for_OutputDebugString_error : CAPA B0001_016  {
 	mbc = "Anti-Behavioral Analysis::Debugger Detection::OutputDebugString [B0001.016]"
 	hash = "Practical Malware Analysis Lab 16-02.exe_:0x401020"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-debugging/debugger-detection/check-for-outputdebugstring-error.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1445,7 +1447,7 @@ rule capa_check_for_OutputDebugString_error : CAPA B0001_016  {
 	) 
 }
 
-rule capa_contains_PDB_path : CAPA  { 
+rule capa_contains_PDB_path : CAPA EXECUTABLE PE PDB FILE  { 
   meta: 
  	description = "contains PDB path (converted from capa rule)"
 	namespace = "executable/pe/pdb"
@@ -1453,7 +1455,7 @@ rule capa_contains_PDB_path : CAPA  {
 	scope = "file"
 	hash = "464EF2CA59782CE697BC329713698CCC"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/executable/pe/pdb/contains-pdb-path.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1467,7 +1469,7 @@ rule capa_contains_PDB_path : CAPA  {
 		$re_alf 
 }
 
-rule capa_contain_a_resource___rsrc__section : CAPA  { 
+rule capa_contain_a_resource___rsrc__section : CAPA EXECUTABLE PE SECTION RSRC FILE  { 
   meta: 
  	description = "contain a resource (.rsrc) section (converted from capa rule)"
 	namespace = "executable/pe/section/rsrc"
@@ -1475,7 +1477,7 @@ rule capa_contain_a_resource___rsrc__section : CAPA  {
 	scope = "file"
 	hash = "A933A1A402775CFA94B6BEE0963F4B46"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/executable/pe/section/rsrc/contain-a-resource-rsrc-section.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1485,7 +1487,7 @@ rule capa_contain_a_resource___rsrc__section : CAPA  {
 		for any alg in pe.sections : ( alg.name == ".rsrc" ) 
 }
 
-rule capa_contain_a_thread_local_storage___tls__section : CAPA  { 
+rule capa_contain_a_thread_local_storage___tls__section : CAPA EXECUTABLE PE SECTION TLS FILE  { 
   meta: 
  	description = "contain a thread local storage (.tls) section (converted from capa rule)"
 	namespace = "executable/pe/section/tls"
@@ -1493,7 +1495,7 @@ rule capa_contain_a_thread_local_storage___tls__section : CAPA  {
 	scope = "file"
 	hash = "Practical Malware Analysis Lab 16-02.exe_"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/executable/pe/section/tls/contain-a-thread-local-storage-tls-section.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1503,7 +1505,7 @@ rule capa_contain_a_thread_local_storage___tls__section : CAPA  {
 		for any alh in pe.sections : ( alh.name == ".tls" ) 
 }
 
-rule capa_extract_resource_via_kernel32_functions : CAPA  { 
+rule capa_extract_resource_via_kernel32_functions : CAPA EXECUTABLE RESOURCE FUNCTION  { 
   meta: 
  	description = "extract resource via kernel32 functions (converted from capa rule)"
 	namespace = "executable/resource"
@@ -1513,7 +1515,7 @@ rule capa_extract_resource_via_kernel32_functions : CAPA  {
 	hash = "Practical Malware Analysis Lab 01-04.exe_:0x4011FC"
 	hash = "563653399B82CD443F120ECEFF836EA3678D4CF11D9B351BB737573C2D856299"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/executable/resource/extract-resource-via-kernel32-functions.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1534,7 +1536,7 @@ rule capa_extract_resource_via_kernel32_functions : CAPA  {
 	) 
 }
 
-rule capa_packaged_as_an_IExpress_self_extracting_archive : CAPA  { 
+rule capa_packaged_as_an_IExpress_self_extracting_archive : CAPA EXECUTABLE INSTALLER IEXPRESS FILE  { 
   meta: 
  	description = "packaged as an IExpress self-extracting archive (converted from capa rule)"
 	namespace = "executable/installer/iexpress"
@@ -1542,7 +1544,7 @@ rule capa_packaged_as_an_IExpress_self_extracting_archive : CAPA  {
 	scope = "file"
 	hash = "ac742739cae0d411dfcb78ae99a7baee"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/executable/installer/iexpress/packaged-as-an-iexpress-self-extracting-archive.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1562,7 +1564,7 @@ rule capa_packaged_as_an_IExpress_self_extracting_archive : CAPA  {
 	) 
 }
 
-rule capa_create_thread : CAPA C0038  { 
+rule capa_create_thread : CAPA HOST_INTERACTION THREAD CREATE BASICBLOCK C0038  { 
   meta: 
  	description = "create thread (converted from capa rule)"
 	namespace = "host-interaction/thread/create"
@@ -1571,7 +1573,7 @@ rule capa_create_thread : CAPA C0038  {
 	hash = "946A99F36A46D335DEC080D9A4371940"
 	hash = "B5F85C26D7AA5A1FB4AF5821B6B5AB9B"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/thread/create/create-thread.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1601,7 +1603,7 @@ rule capa_create_thread : CAPA C0038  {
 	) 
 }
 
-rule capa_resume_thread : CAPA C0054  { 
+rule capa_resume_thread : CAPA HOST_INTERACTION THREAD RESUME BASICBLOCK C0054  { 
   meta: 
  	description = "resume thread (converted from capa rule)"
 	namespace = "host-interaction/thread/resume"
@@ -1611,7 +1613,7 @@ rule capa_resume_thread : CAPA C0054  {
 	hash = "Practical Malware Analysis Lab 12-02.exe_:0x4010EA"
 	hash = "787cbc8a6d1bc58ea169e51e1ad029a637f22560660cc129ab8a099a745bd50e"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/thread/resume/resume-thread.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1624,7 +1626,7 @@ rule capa_resume_thread : CAPA C0054  {
 	) 
 }
 
-rule capa_suspend_thread : CAPA C0055  { 
+rule capa_suspend_thread : CAPA HOST_INTERACTION THREAD SUSPEND BASICBLOCK C0055  { 
   meta: 
  	description = "suspend thread (converted from capa rule)"
 	namespace = "host-interaction/thread/suspend"
@@ -1633,7 +1635,7 @@ rule capa_suspend_thread : CAPA C0055  {
 	mbc = "Process::Suspend Thread [C0055]"
 	hash = "787cbc8a6d1bc58ea169e51e1ad029a637f22560660cc129ab8a099a745bd50e"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/thread/suspend/suspend-thread.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1646,7 +1648,7 @@ rule capa_suspend_thread : CAPA C0055  {
 	) 
 }
 
-rule capa_terminate_thread : CAPA C0039  { 
+rule capa_terminate_thread : CAPA HOST_INTERACTION THREAD TERMINATE BASICBLOCK C0039  { 
   meta: 
  	description = "terminate thread (converted from capa rule)"
 	namespace = "host-interaction/thread/terminate"
@@ -1655,7 +1657,7 @@ rule capa_terminate_thread : CAPA C0039  {
 	hash = "Practical Malware Analysis Lab 03-02.dll_:0x10003286"
 	hash = "B5F85C26D7AA5A1FB4AF5821B6B5AB9B"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/thread/terminate/terminate-thread.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1670,7 +1672,7 @@ rule capa_terminate_thread : CAPA C0039  {
 	) 
 }
 
-rule capa_manipulate_console : CAPA C0033  { 
+rule capa_manipulate_console : CAPA HOST_INTERACTION CONSOLE FUNCTION C0033  { 
   meta: 
  	description = "manipulate console (converted from capa rule)"
 	namespace = "host-interaction/console"
@@ -1679,7 +1681,7 @@ rule capa_manipulate_console : CAPA C0033  {
 	mbc = "Operating System::Console [C0033]"
 	hash = "3aa7ee4d67f562933bc998f352b1f319"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/console/manipulate-console.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1696,7 +1698,7 @@ rule capa_manipulate_console : CAPA C0033  {
 	) 
 }
 
-rule capa_access_firewall_settings_via_INetFwMgr : CAPA T1518_001 T1562_004  { 
+rule capa_access_firewall_settings_via_INetFwMgr : CAPA HOST_INTERACTION FIREWALL MODIFY FUNCTION T1518_001 T1562_004  { 
   meta: 
  	description = "access firewall settings via INetFwMgr (converted from capa rule)"
 	namespace = "host-interaction/firewall/modify"
@@ -1706,7 +1708,7 @@ rule capa_access_firewall_settings_via_INetFwMgr : CAPA T1518_001 T1562_004  {
 	attack = "Defense Evasion::Impair Defenses::Disable or Modify System Firewall [T1562.004]"
 	hash = "EB355BD63BDDCE02955792B4CD6539FB"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/firewall/modify/access-firewall-settings-via-inetfwmgr.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1723,7 +1725,7 @@ rule capa_access_firewall_settings_via_INetFwMgr : CAPA T1518_001 T1562_004  {
 	) 
 }
 
-rule capa_start_minifilter_driver : CAPA  { 
+rule capa_start_minifilter_driver : CAPA HOST_INTERACTION FILTER BASICBLOCK  { 
   meta: 
  	description = "start minifilter driver (converted from capa rule)"
 	namespace = "host-interaction/filter"
@@ -1731,7 +1733,7 @@ rule capa_start_minifilter_driver : CAPA  {
 	scope = "basic block"
 	hash = "B5F85C26D7AA5A1FB4AF5821B6B5AB9B"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/filter/start-minifilter-driver.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1745,7 +1747,7 @@ rule capa_start_minifilter_driver : CAPA  {
 	) 
 }
 
-rule capa_register_minifilter_driver : CAPA  { 
+rule capa_register_minifilter_driver : CAPA HOST_INTERACTION FILTER BASICBLOCK  { 
   meta: 
  	description = "register minifilter driver (converted from capa rule)"
 	namespace = "host-interaction/filter"
@@ -1753,7 +1755,7 @@ rule capa_register_minifilter_driver : CAPA  {
 	scope = "basic block"
 	hash = "B5F85C26D7AA5A1FB4AF5821B6B5AB9B"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/filter/register-minifilter-driver.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1767,7 +1769,7 @@ rule capa_register_minifilter_driver : CAPA  {
 	) 
 }
 
-rule capa_get_common_file_path : CAPA T1083  { 
+rule capa_get_common_file_path : CAPA HOST_INTERACTION FILE_SYSTEM FUNCTION T1083  { 
   meta: 
  	description = "get common file path (converted from capa rule)"
 	namespace = "host-interaction/file-system"
@@ -1777,7 +1779,7 @@ rule capa_get_common_file_path : CAPA T1083  {
 	hash = "Practical Malware Analysis Lab 03-02.dll_:0x10003415"
 	hash = "972B219F18379907A045431303F4DA7D"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/get-common-file-path.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1812,7 +1814,7 @@ rule capa_get_common_file_path : CAPA T1083  {
 	) 
 }
 
-rule capa_bypass_Mark_of_the_Web : CAPA T1553_005  { 
+rule capa_bypass_Mark_of_the_Web : CAPA HOST_INTERACTION FILE_SYSTEM FUNCTION T1553_005  { 
   meta: 
  	description = "bypass Mark of the Web (converted from capa rule)"
 	namespace = "host-interaction/file-system"
@@ -1821,7 +1823,7 @@ rule capa_bypass_Mark_of_the_Web : CAPA T1553_005  {
 	attack = "Defense Evasion::Subvert Trust Controls::Mark-of-the-Web Bypass [T1553.005]"
 	hash = "48c7ad2d9d482cb11898f2719638ceed"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/bypass-mark-of-the-web.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1841,7 +1843,7 @@ rule capa_bypass_Mark_of_the_Web : CAPA T1553_005  {
 	) 
 }
 
-rule capa_get_file_system_object_information : CAPA T1083  { 
+rule capa_get_file_system_object_information : CAPA HOST_INTERACTION FILE_SYSTEM BASICBLOCK T1083  { 
   meta: 
  	description = "get file system object information (converted from capa rule)"
 	namespace = "host-interaction/file-system"
@@ -1850,7 +1852,7 @@ rule capa_get_file_system_object_information : CAPA T1083  {
 	attack = "Discovery::File and Directory Discovery [T1083]"
 	hash = "50D5EE1CE2CA5E30C6B1019EE64EEEC2"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/get-file-system-object-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1864,7 +1866,7 @@ rule capa_get_file_system_object_information : CAPA T1083  {
 	) 
 }
 
-rule capa_delete_directory : CAPA C0048  { 
+rule capa_delete_directory : CAPA HOST_INTERACTION FILE_SYSTEM DELETE FUNCTION C0048  { 
   meta: 
  	description = "delete directory (converted from capa rule)"
 	namespace = "host-interaction/file-system/delete"
@@ -1874,7 +1876,7 @@ rule capa_delete_directory : CAPA C0048  {
 	hash = "Practical Malware Analysis Lab 05-01.dll_:0x10009236"
 	hash = "AFB6EC3D721A5CB67863487B0E51A34C167F629CF701F8BC7A038C117B4DDA44"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/delete/delete-directory.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1894,7 +1896,7 @@ rule capa_delete_directory : CAPA C0048  {
 	) 
 }
 
-rule capa_create_directory : CAPA C0046  { 
+rule capa_create_directory : CAPA HOST_INTERACTION FILE_SYSTEM CREATE FUNCTION C0046  { 
   meta: 
  	description = "create directory (converted from capa rule)"
 	namespace = "host-interaction/file-system/create"
@@ -1903,7 +1905,7 @@ rule capa_create_directory : CAPA C0046  {
 	mbc = "File System::Create Directory [C0046]"
 	hash = "Practical Malware Analysis Lab 17-02.dll_:0x10008f62"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/create/create-directory.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1930,7 +1932,7 @@ rule capa_create_directory : CAPA C0046  {
 	) 
 }
 
-rule capa_write_file : CAPA C0052  { 
+rule capa_write_file : CAPA HOST_INTERACTION FILE_SYSTEM WRITE FUNCTION C0052  { 
   meta: 
  	description = "write file (converted from capa rule)"
 	namespace = "host-interaction/file-system/write"
@@ -1940,7 +1942,7 @@ rule capa_write_file : CAPA C0052  {
 	hash = "Practical Malware Analysis Lab 01-04.exe_:0x4011FC"
 	hash = "563653399B82CD443F120ECEFF836EA3678D4CF11D9B351BB737573C2D856299"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/write/write-file.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1964,7 +1966,7 @@ rule capa_write_file : CAPA C0052  {
 	) 
 }
 
-rule capa_get_file_attributes : CAPA C0049  { 
+rule capa_get_file_attributes : CAPA HOST_INTERACTION FILE_SYSTEM META BASICBLOCK C0049  { 
   meta: 
  	description = "get file attributes (converted from capa rule)"
 	namespace = "host-interaction/file-system/meta"
@@ -1974,7 +1976,7 @@ rule capa_get_file_attributes : CAPA C0049  {
 	hash = "03B236B23B1EC37C663527C1F53AF3FE"
 	hash = "B5F85C26D7AA5A1FB4AF5821B6B5AB9B"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/meta/get-file-attributes.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1995,7 +1997,7 @@ rule capa_get_file_attributes : CAPA C0049  {
 	) 
 }
 
-rule capa_set_file_attributes : CAPA T1222 C0050  { 
+rule capa_set_file_attributes : CAPA HOST_INTERACTION FILE_SYSTEM META BASICBLOCK T1222 C0050  { 
   meta: 
  	description = "set file attributes (converted from capa rule)"
 	namespace = "host-interaction/file-system/meta"
@@ -2005,7 +2007,7 @@ rule capa_set_file_attributes : CAPA T1222 C0050  {
 	hash = "946A99F36A46D335DEC080D9A4371940"
 	hash = "B5F85C26D7AA5A1FB4AF5821B6B5AB9B"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/meta/set-file-attributes.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2022,7 +2024,7 @@ rule capa_set_file_attributes : CAPA T1222 C0050  {
 	) 
 }
 
-rule capa_read_virtual_disk : CAPA C0056  { 
+rule capa_read_virtual_disk : CAPA HOST_INTERACTION FILE_SYSTEM READ FUNCTION C0056  { 
   meta: 
  	description = "read virtual disk (converted from capa rule)"
 	namespace = "host-interaction/file-system/read"
@@ -2031,7 +2033,7 @@ rule capa_read_virtual_disk : CAPA C0056  {
 	mbc = "File System::Read Virtual Disk [C0056]"
 	hash = "3265b2b0afc6d2ad0bdd55af8edb9b37"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/read/read-virtual-disk.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2049,7 +2051,7 @@ rule capa_read_virtual_disk : CAPA C0056  {
 	) 
 }
 
-rule capa_read_file : CAPA C0051  { 
+rule capa_read_file : CAPA HOST_INTERACTION FILE_SYSTEM READ FUNCTION C0051  { 
   meta: 
  	description = "read file (converted from capa rule)"
 	namespace = "host-interaction/file-system/read"
@@ -2058,7 +2060,7 @@ rule capa_read_file : CAPA C0051  {
 	mbc = "File System::Read File [C0051]"
 	hash = "BFB9B5391A13D0AFD787E87AB90F14F5"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/read/read-file.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2085,7 +2087,7 @@ rule capa_read_file : CAPA C0051  {
 	) 
 }
 
-rule capa_read__ini_file : CAPA C0051  { 
+rule capa_read__ini_file : CAPA HOST_INTERACTION FILE_SYSTEM READ FUNCTION C0051  { 
   meta: 
  	description = "read .ini file (converted from capa rule)"
 	namespace = "host-interaction/file-system/read"
@@ -2094,7 +2096,7 @@ rule capa_read__ini_file : CAPA C0051  {
 	hash = "1d8fd13c890060464019c0f07b928b1a"
 	hash = "E6234FB98F17201C232F4502015B47B3"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/read/read-ini-file.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2118,7 +2120,7 @@ rule capa_read__ini_file : CAPA C0051  {
 	) 
 }
 
-rule capa_enumerate_files_via_kernel32_functions : CAPA T1083  { 
+rule capa_enumerate_files_via_kernel32_functions : CAPA HOST_INTERACTION FILE_SYSTEM FILES LIST FUNCTION T1083  { 
   meta: 
  	description = "enumerate files via kernel32 functions (converted from capa rule)"
 	namespace = "host-interaction/file-system/files/list"
@@ -2128,7 +2130,7 @@ rule capa_enumerate_files_via_kernel32_functions : CAPA T1083  {
 	hash = "Practical Malware Analysis Lab 01-01.exe_:0x4011E0"
 	hash = "Practical Malware Analysis Lab 20-02.exe_:0x401000"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/files/list/enumerate-files-via-kernel32-functions.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2149,7 +2151,7 @@ rule capa_enumerate_files_via_kernel32_functions : CAPA T1083  {
 	) 
 }
 
-rule capa_shutdown_system : CAPA T1529  { 
+rule capa_shutdown_system : CAPA HOST_INTERACTION OS FUNCTION T1529  { 
   meta: 
  	description = "shutdown system (converted from capa rule)"
 	namespace = "host-interaction/os"
@@ -2158,7 +2160,7 @@ rule capa_shutdown_system : CAPA T1529  {
 	attack = "Impact::System Shutdown/Reboot [T1529]"
 	hash = "39C05B15E9834AC93F206BC114D0A00C357C888DB567BA8F5345DA0529CBED41"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/os/shutdown-system.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2170,7 +2172,7 @@ rule capa_shutdown_system : CAPA T1529  {
 	) 
 }
 
-rule capa_get_system_information : CAPA T1082  { 
+rule capa_get_system_information : CAPA HOST_INTERACTION OS INFO FUNCTION T1082  { 
   meta: 
  	description = "get system information (converted from capa rule)"
 	namespace = "host-interaction/os/info"
@@ -2179,7 +2181,7 @@ rule capa_get_system_information : CAPA T1082  {
 	attack = "Discovery::System Information Discovery [T1082]"
 	hash = "563653399B82CD443F120ECEFF836EA3678D4CF11D9B351BB737573C2D856299"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/os/info/get-system-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2202,7 +2204,7 @@ rule capa_get_system_information : CAPA T1082  {
 	) 
 }
 
-rule capa_get_hostname : CAPA T1082  { 
+rule capa_get_hostname : CAPA HOST_INTERACTION OS HOSTNAME FUNCTION T1082  { 
   meta: 
  	description = "get hostname (converted from capa rule)"
 	namespace = "host-interaction/os/hostname"
@@ -2211,7 +2213,7 @@ rule capa_get_hostname : CAPA T1082  {
 	attack = "Discovery::System Information Discovery [T1082]"
 	hash = "9324D1A8AE37A36AE560C37448C9705A"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/os/hostname/get-hostname.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2228,7 +2230,7 @@ rule capa_get_hostname : CAPA T1082  {
 	) 
 }
 
-rule capa_query_service_status : CAPA T1007  { 
+rule capa_query_service_status : CAPA HOST_INTERACTION SERVICE FUNCTION T1007  { 
   meta: 
  	description = "query service status (converted from capa rule)"
 	namespace = "host-interaction/service"
@@ -2237,7 +2239,7 @@ rule capa_query_service_status : CAPA T1007  {
 	attack = "Discovery::System Service Discovery [T1007]"
 	hash = "9DC209F66DA77858E362E624D0BE86B3"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/service/query-service-status.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2249,7 +2251,7 @@ rule capa_query_service_status : CAPA T1007  {
 	) 
 }
 
-rule capa_delete_service : CAPA T1543_003  { 
+rule capa_delete_service : CAPA HOST_INTERACTION SERVICE DELETE FUNCTION T1543_003  { 
   meta: 
  	description = "delete service (converted from capa rule)"
 	namespace = "host-interaction/service/delete"
@@ -2259,7 +2261,7 @@ rule capa_delete_service : CAPA T1543_003  {
 	hash = "E544A4D616B60147D9774B48C2B65EF2"
 	hash = "Practical Malware Analysis Lab 03-02.dll_:0x10004B18"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/service/delete/delete-service.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2270,7 +2272,7 @@ rule capa_delete_service : CAPA T1543_003  {
 	) 
 }
 
-rule capa_enumerate_services : CAPA T1007  { 
+rule capa_enumerate_services : CAPA HOST_INTERACTION SERVICE LIST FUNCTION T1007  { 
   meta: 
  	description = "enumerate services (converted from capa rule)"
 	namespace = "host-interaction/service/list"
@@ -2279,7 +2281,7 @@ rule capa_enumerate_services : CAPA T1007  {
 	attack = "Discovery::System Service Discovery [T1007]"
 	hash = "Practical Malware Analysis Lab 05-01.dll_:0x1000B823"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/service/list/enumerate-services.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2291,7 +2293,7 @@ rule capa_enumerate_services : CAPA T1007  {
 	) 
 }
 
-rule capa_create_service : CAPA T1543_003 T1569_002  { 
+rule capa_create_service : CAPA HOST_INTERACTION SERVICE CREATE FUNCTION T1543_003 T1569_002  { 
   meta: 
  	description = "create service (converted from capa rule)"
 	namespace = "host-interaction/service/create"
@@ -2301,7 +2303,7 @@ rule capa_create_service : CAPA T1543_003 T1569_002  {
 	attack = "Execution::System Services::Service Execution [T1569.002]"
 	hash = "Practical Malware Analysis Lab 03-02.dll_:0x10004706"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/service/create/create-service.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2312,7 +2314,7 @@ rule capa_create_service : CAPA T1543_003 T1569_002  {
 	) 
 }
 
-rule capa_modify_service : CAPA T1543_003 T1569_002  { 
+rule capa_modify_service : CAPA HOST_INTERACTION SERVICE MODIFY FUNCTION T1543_003 T1569_002  { 
   meta: 
  	description = "modify service (converted from capa rule)"
 	namespace = "host-interaction/service/modify"
@@ -2322,7 +2324,7 @@ rule capa_modify_service : CAPA T1543_003 T1569_002  {
 	attack = "Execution::System Services::Service Execution [T1569.002]"
 	hash = "7D16EFD0078F22C17A4BD78B0F0CC468"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/service/modify/modify-service.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2336,7 +2338,7 @@ rule capa_modify_service : CAPA T1543_003 T1569_002  {
 	) 
 }
 
-rule capa_start_service : CAPA T1543_003  { 
+rule capa_start_service : CAPA HOST_INTERACTION SERVICE START FUNCTION T1543_003  { 
   meta: 
  	description = "start service (converted from capa rule)"
 	namespace = "host-interaction/service/start"
@@ -2345,7 +2347,7 @@ rule capa_start_service : CAPA T1543_003  {
 	attack = "Persistence::Create or Modify System Process::Windows Service [T1543.003]"
 	hash = "E544A4D616B60147D9774B48C2B65EF2"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/service/start/start-service.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2356,7 +2358,7 @@ rule capa_start_service : CAPA T1543_003  {
 	) 
 }
 
-rule capa_get_number_of_processor_cores : CAPA T1082  { 
+rule capa_get_number_of_processor_cores : CAPA HOST_INTERACTION HARDWARE CPU FUNCTION T1082  { 
   meta: 
  	description = "get number of processor cores (converted from capa rule)"
 	namespace = "host-interaction/hardware/cpu"
@@ -2365,7 +2367,7 @@ rule capa_get_number_of_processor_cores : CAPA T1082  {
 	attack = "Discovery::System Information Discovery [T1082]"
 	hash = "al-khaser_x86.exe_:0x435BA0"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/hardware/cpu/get-number-of-processor-cores.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2381,7 +2383,7 @@ rule capa_get_number_of_processor_cores : CAPA T1082  {
 	) 
 }
 
-rule capa_get_disk_information : CAPA T1082  { 
+rule capa_get_disk_information : CAPA HOST_INTERACTION HARDWARE STORAGE FUNCTION T1082  { 
   meta: 
  	description = "get disk information (converted from capa rule)"
 	namespace = "host-interaction/hardware/storage"
@@ -2391,7 +2393,7 @@ rule capa_get_disk_information : CAPA T1082  {
 	hash = "9324D1A8AE37A36AE560C37448C9705A"
 	hash = "972B219F18379907A045431303F4DA7D"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/hardware/storage/get-disk-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2408,7 +2410,7 @@ rule capa_get_disk_information : CAPA T1082  {
 	) 
 }
 
-rule capa_manipulate_CD_ROM_drive : CAPA B0042_001  { 
+rule capa_manipulate_CD_ROM_drive : CAPA HOST_INTERACTION HARDWARE CDROM FUNCTION B0042_001  { 
   meta: 
  	description = "manipulate CD-ROM drive (converted from capa rule)"
 	namespace = "host-interaction/hardware/cdrom"
@@ -2417,7 +2419,7 @@ rule capa_manipulate_CD_ROM_drive : CAPA B0042_001  {
 	mbc = "Impact::Modify Hardware::CDROM [B0042.001]"
 	hash = "39C05B15E9834AC93F206BC114D0A00C357C888DB567BA8F5345DA0529CBED41"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/hardware/cdrom/manipulate-cd-rom-drive.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2436,7 +2438,7 @@ rule capa_manipulate_CD_ROM_drive : CAPA B0042_001  {
 	) 
 }
 
-rule capa_get_memory_capacity : CAPA T1082  { 
+rule capa_get_memory_capacity : CAPA HOST_INTERACTION HARDWARE MEMORY FUNCTION T1082  { 
   meta: 
  	description = "get memory capacity (converted from capa rule)"
 	namespace = "host-interaction/hardware/memory"
@@ -2445,7 +2447,7 @@ rule capa_get_memory_capacity : CAPA T1082  {
 	attack = "Discovery::System Information Discovery [T1082]"
 	hash = "9324D1A8AE37A36AE560C37448C9705A"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/hardware/memory/get-memory-capacity.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2457,7 +2459,7 @@ rule capa_get_memory_capacity : CAPA T1082  {
 	) 
 }
 
-rule capa_swap_mouse_buttons : CAPA B0042_002  { 
+rule capa_swap_mouse_buttons : CAPA HOST_INTERACTION HARDWARE MOUSE FUNCTION B0042_002  { 
   meta: 
  	description = "swap mouse buttons (converted from capa rule)"
 	namespace = "host-interaction/hardware/mouse"
@@ -2466,7 +2468,7 @@ rule capa_swap_mouse_buttons : CAPA B0042_002  {
 	mbc = "Impact::Modify Hardware::Mouse [B0042.002]"
 	hash = "B7841B9D5DC1F511A93CC7576672EC0C"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/hardware/mouse/swap-mouse-buttons.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2477,7 +2479,7 @@ rule capa_swap_mouse_buttons : CAPA B0042_002  {
 	) 
 }
 
-rule capa_get_keyboard_layout : CAPA T1082  { 
+rule capa_get_keyboard_layout : CAPA HOST_INTERACTION HARDWARE KEYBOARD LAYOUT FUNCTION T1082  { 
   meta: 
  	description = "get keyboard layout (converted from capa rule)"
 	namespace = "host-interaction/hardware/keyboard/layout"
@@ -2487,7 +2489,7 @@ rule capa_get_keyboard_layout : CAPA T1082  {
 	hash = "6F99A2C8944CB02FF28C6F9CED59B161"
 	hash = "C91887D861D9BD4A5872249B641BC9F9"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/hardware/keyboard/layout/get-keyboard-layout.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2502,7 +2504,7 @@ rule capa_get_keyboard_layout : CAPA T1082  {
 	) 
 }
 
-rule capa_open_clipboard : CAPA T1115  { 
+rule capa_open_clipboard : CAPA HOST_INTERACTION CLIPBOARD FUNCTION T1115  { 
   meta: 
  	description = "open clipboard (converted from capa rule)"
 	namespace = "host-interaction/clipboard"
@@ -2511,7 +2513,7 @@ rule capa_open_clipboard : CAPA T1115  {
 	attack = "Collection::Clipboard Data [T1115]"
 	hash = "6f99a2c8944cb02ff28c6f9ced59b161"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/clipboard/open-clipboard.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2522,7 +2524,7 @@ rule capa_open_clipboard : CAPA T1115  {
 	) 
 }
 
-rule capa_write_clipboard_data : CAPA E1510  { 
+rule capa_write_clipboard_data : CAPA HOST_INTERACTION CLIPBOARD FUNCTION E1510  { 
   meta: 
  	description = "write clipboard data (converted from capa rule)"
 	namespace = "host-interaction/clipboard"
@@ -2531,7 +2533,7 @@ rule capa_write_clipboard_data : CAPA E1510  {
 	mbc = "Impact::Clipboard Modification [E1510]"
 	hash = "6F99A2C8944CB02FF28C6F9CED59B161"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/clipboard/write-clipboard-data.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2542,7 +2544,7 @@ rule capa_write_clipboard_data : CAPA E1510  {
 	) 
 }
 
-rule capa_read_clipboard_data : CAPA T1115  { 
+rule capa_read_clipboard_data : CAPA HOST_INTERACTION CLIPBOARD FUNCTION T1115  { 
   meta: 
  	description = "read clipboard data (converted from capa rule)"
 	namespace = "host-interaction/clipboard"
@@ -2552,7 +2554,7 @@ rule capa_read_clipboard_data : CAPA T1115  {
 	hash = "C91887D861D9BD4A5872249B641BC9F9"
 	hash = "93dfc146f60bd796eb28d4e4f348f2e4"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/clipboard/read-clipboard-data.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2563,7 +2565,7 @@ rule capa_read_clipboard_data : CAPA T1115  {
 	) 
 }
 
-rule capa_replace_clipboard_data : CAPA E1510  { 
+rule capa_replace_clipboard_data : CAPA HOST_INTERACTION CLIPBOARD FUNCTION E1510  { 
   meta: 
  	description = "replace clipboard data (converted from capa rule)"
 	namespace = "host-interaction/clipboard"
@@ -2572,7 +2574,7 @@ rule capa_replace_clipboard_data : CAPA E1510  {
 	mbc = "Impact::Clipboard Modification [E1510]"
 	hash = "6f99a2c8944cb02ff28c6f9ced59b161"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/clipboard/replace-clipboard-data.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2585,7 +2587,7 @@ rule capa_replace_clipboard_data : CAPA E1510  {
 	) 
 }
 
-rule capa_install_driver : CAPA T1543_003 C0037  { 
+rule capa_install_driver : CAPA HOST_INTERACTION DRIVER BASICBLOCK T1543_003 C0037  { 
   meta: 
  	description = "install driver (converted from capa rule)"
 	namespace = "host-interaction/driver"
@@ -2595,7 +2597,7 @@ rule capa_install_driver : CAPA T1543_003 C0037  {
 	mbc = "Hardware::Install Driver [C0037]"
 	hash = "af60700383b75727f5256a0000c1476f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/driver/install-driver.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2610,7 +2612,7 @@ rule capa_install_driver : CAPA T1543_003 C0037  {
 	) 
 }
 
-rule capa_disable_driver_code_integrity : CAPA  { 
+rule capa_disable_driver_code_integrity : CAPA HOST_INTERACTION DRIVER FUNCTION  { 
   meta: 
  	description = "disable driver code integrity (converted from capa rule)"
 	namespace = "host-interaction/driver"
@@ -2618,7 +2620,7 @@ rule capa_disable_driver_code_integrity : CAPA  {
 	scope = "function"
 	hash = "31CEE4F66CF3B537E3D2D37A71F339F4"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/driver/disable-driver-code-integrity.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2638,7 +2640,7 @@ rule capa_disable_driver_code_integrity : CAPA  {
 	) 
 }
 
-rule capa_manipulate_boot_configuration : CAPA  { 
+rule capa_manipulate_boot_configuration : CAPA HOST_INTERACTION BOOTLOADER FUNCTION  { 
   meta: 
  	description = "manipulate boot configuration (converted from capa rule)"
 	namespace = "host-interaction/bootloader"
@@ -2646,7 +2648,7 @@ rule capa_manipulate_boot_configuration : CAPA  {
 	scope = "function"
 	hash = "7FBC17A09CF5320C515FC1C5BA42C8B3"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/bootloader/manipulate-boot-configuration.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2666,7 +2668,7 @@ rule capa_manipulate_boot_configuration : CAPA  {
 	) 
 }
 
-rule capa_set_application_hook : CAPA  { 
+rule capa_set_application_hook : CAPA HOST_INTERACTION GUI FUNCTION  { 
   meta: 
  	description = "set application hook (converted from capa rule)"
 	namespace = "host-interaction/gui"
@@ -2674,7 +2676,7 @@ rule capa_set_application_hook : CAPA  {
 	scope = "function"
 	hash = "Practical Malware Analysis Lab 12-03.exe_:0x401000"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/gui/set-application-hook.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2688,7 +2690,7 @@ rule capa_set_application_hook : CAPA  {
 	) 
 }
 
-rule capa_enumerate_gui_resources : CAPA T1010  { 
+rule capa_enumerate_gui_resources : CAPA HOST_INTERACTION GUI FUNCTION T1010  { 
   meta: 
  	description = "enumerate gui resources (converted from capa rule)"
 	namespace = "host-interaction/gui"
@@ -2700,7 +2702,7 @@ rule capa_enumerate_gui_resources : CAPA T1010  {
 	hash = "74fa32d2b277f583010b692a3f91b627"
 	hash = "021f49678cd633dc8cf99c61b3af3dda"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/gui/enumerate-gui-resources.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2720,7 +2722,7 @@ rule capa_enumerate_gui_resources : CAPA T1010  {
 	) 
 }
 
-rule capa_find_graphical_window : CAPA T1010  { 
+rule capa_find_graphical_window : CAPA HOST_INTERACTION GUI WINDOW FIND FUNCTION T1010  { 
   meta: 
  	description = "find graphical window (converted from capa rule)"
 	namespace = "host-interaction/gui/window/find"
@@ -2729,7 +2731,7 @@ rule capa_find_graphical_window : CAPA T1010  {
 	attack = "Discovery::Application Window Discovery [T1010]"
 	hash = "7C843E75D4F02087B932FE280DF9C90C"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/gui/window/find/find-graphical-window.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2741,7 +2743,7 @@ rule capa_find_graphical_window : CAPA T1010  {
 	) 
 }
 
-rule capa_references_logon_banner : CAPA  { 
+rule capa_references_logon_banner : CAPA HOST_INTERACTION GUI LOGON BASICBLOCK  { 
   meta: 
  	description = "references logon banner (converted from capa rule)"
 	namespace = "host-interaction/gui/logon"
@@ -2749,7 +2751,7 @@ rule capa_references_logon_banner : CAPA  {
 	scope = "basic block"
 	hash = "c3341b7dfbb9d43bca8c812e07b4299f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/gui/logon/references-logon-banner.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2769,7 +2771,7 @@ rule capa_references_logon_banner : CAPA  {
 	) 
 }
 
-rule capa_lock_the_desktop : CAPA T1499  { 
+rule capa_lock_the_desktop : CAPA HOST_INTERACTION GUI SESSION LOCK FUNCTION T1499  { 
   meta: 
  	description = "lock the desktop (converted from capa rule)"
 	namespace = "host-interaction/gui/session/lock"
@@ -2778,7 +2780,7 @@ rule capa_lock_the_desktop : CAPA T1499  {
 	attack = "Impact::Endpoint Denial of Service [T1499]"
 	hash = "39C05B15E9834AC93F206BC114D0A00C357C888DB567BA8F5345DA0529CBED41"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/gui/session/lock/lock-the-desktop.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2788,7 +2790,7 @@ rule capa_lock_the_desktop : CAPA T1499  {
 		pe.imports(/user32/i, /LockWorkStation/) 
 }
 
-rule capa_resolve_path_using_msvcrt : CAPA T1083  { 
+rule capa_resolve_path_using_msvcrt : CAPA HOST_INTERACTION CLI BASICBLOCK T1083  { 
   meta: 
  	description = "resolve path using msvcrt (converted from capa rule)"
 	namespace = "host-interaction/cli"
@@ -2797,7 +2799,7 @@ rule capa_resolve_path_using_msvcrt : CAPA T1083  {
 	attack = "Discovery::File and Directory Discovery [T1083]"
 	hash = "31600ad0d1a7ea615690df111ae36c73"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/cli/resolve-path-using-msvcrt.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2813,7 +2815,7 @@ rule capa_resolve_path_using_msvcrt : CAPA T1083  {
 	) 
 }
 
-rule capa_accept_command_line_arguments : CAPA T1059  { 
+rule capa_accept_command_line_arguments : CAPA HOST_INTERACTION CLI FUNCTION T1059  { 
   meta: 
  	description = "accept command line arguments (converted from capa rule)"
 	namespace = "host-interaction/cli"
@@ -2823,7 +2825,7 @@ rule capa_accept_command_line_arguments : CAPA T1059  {
 	hash = "Practical Malware Analysis Lab 10-03.exe_:0x401140"
 	hash = "AFB6EC3D721A5CB67863487B0E51A34C167F629CF701F8BC7A038C117B4DDA44"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/cli/accept-command-line-arguments.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2839,7 +2841,7 @@ rule capa_accept_command_line_arguments : CAPA T1059  {
 	) 
 }
 
-rule capa_set_thread_local_storage_value : CAPA C0041  { 
+rule capa_set_thread_local_storage_value : CAPA HOST_INTERACTION PROCESS FUNCTION C0041  { 
   meta: 
  	description = "set thread local storage value (converted from capa rule)"
 	namespace = "host-interaction/process"
@@ -2848,7 +2850,7 @@ rule capa_set_thread_local_storage_value : CAPA C0041  {
 	mbc = "Process::Set Thread Local Storage Value [C0041]"
 	hash = "03B236B23B1EC37C663527C1F53AF3FE"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/set-thread-local-storage-value.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2859,7 +2861,7 @@ rule capa_set_thread_local_storage_value : CAPA C0041  {
 	) 
 }
 
-rule capa_allocate_thread_local_storage : CAPA C0040  { 
+rule capa_allocate_thread_local_storage : CAPA HOST_INTERACTION PROCESS FUNCTION C0040  { 
   meta: 
  	description = "allocate thread local storage (converted from capa rule)"
 	namespace = "host-interaction/process"
@@ -2868,7 +2870,7 @@ rule capa_allocate_thread_local_storage : CAPA C0040  {
 	mbc = "Process::Allocate Thread Local Storage [C0040]"
 	hash = "03B236B23B1EC37C663527C1F53AF3FE"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/allocate-thread-local-storage.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2879,7 +2881,7 @@ rule capa_allocate_thread_local_storage : CAPA C0040  {
 	) 
 }
 
-rule capa_attach_user_process_memory : CAPA T1055  { 
+rule capa_attach_user_process_memory : CAPA HOST_INTERACTION PROCESS INJECT FUNCTION T1055  { 
   meta: 
  	description = "attach user process memory (converted from capa rule)"
 	namespace = "host-interaction/process/inject"
@@ -2888,7 +2890,7 @@ rule capa_attach_user_process_memory : CAPA T1055  {
 	attack = "Defense Evasion::Process Injection [T1055]"
 	hash = "493167E85E45363D09495D0841C30648"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/inject/attach-user-process-memory.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2900,7 +2902,7 @@ rule capa_attach_user_process_memory : CAPA T1055  {
 	) 
 }
 
-rule capa_use_process_doppelganging : CAPA T1055_013  { 
+rule capa_use_process_doppelganging : CAPA HOST_INTERACTION PROCESS INJECT FILE T1055_013  { 
   meta: 
  	description = "use process doppelganging (converted from capa rule)"
 	namespace = "host-interaction/process/inject"
@@ -2909,7 +2911,7 @@ rule capa_use_process_doppelganging : CAPA T1055_013  {
 	attack = "Defense Evasion::Process Injection::Process Doppelganging [T1055.013]"
 	hash = "A5D66324DAAEE5672B913AA461D4BD3A"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/inject/use-process-doppelganging.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2931,7 +2933,7 @@ rule capa_use_process_doppelganging : CAPA T1055_013  {
 	) 
 }
 
-rule capa_inject_APC : CAPA T1055_004  { 
+rule capa_inject_APC : CAPA HOST_INTERACTION PROCESS INJECT FUNCTION T1055_004  { 
   meta: 
  	description = "inject APC (converted from capa rule)"
 	namespace = "host-interaction/process/inject"
@@ -2940,7 +2942,7 @@ rule capa_inject_APC : CAPA T1055_004  {
 	attack = "Defense Evasion::Process Injection::Asynchronous Procedure Call [T1055.004]"
 	hash = "al-khaser_x64.exe_:0x140019348"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/inject/inject-apc.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2965,7 +2967,7 @@ rule capa_inject_APC : CAPA T1055_004  {
 	) 
 }
 
-rule capa_enumerate_processes : CAPA T1057 T1518  { 
+rule capa_enumerate_processes : CAPA HOST_INTERACTION PROCESS LIST FUNCTION T1057 T1518  { 
   meta: 
  	description = "enumerate processes (converted from capa rule)"
 	namespace = "host-interaction/process/list"
@@ -2976,7 +2978,7 @@ rule capa_enumerate_processes : CAPA T1057 T1518  {
 	hash = "2D3EDC218A90F03089CC01715A9F047F"
 	hash = "35d04ecd797041eee796f4ddaa96cae8"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/list/enumerate-processes.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2988,7 +2990,7 @@ rule capa_enumerate_processes : CAPA T1057 T1518  {
 	) 
 }
 
-rule capa_enumerate_processes_on_remote_desktop_session_host : CAPA T1057  { 
+rule capa_enumerate_processes_on_remote_desktop_session_host : CAPA HOST_INTERACTION PROCESS LIST FUNCTION T1057  { 
   meta: 
  	description = "enumerate processes on remote desktop session host (converted from capa rule)"
 	namespace = "host-interaction/process/list"
@@ -2997,7 +2999,7 @@ rule capa_enumerate_processes_on_remote_desktop_session_host : CAPA T1057  {
 	attack = "Discovery::Process Discovery [T1057]"
 	hash = "6f99a2c8944cb02ff28c6f9ced59b161"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/list/enumerate-processes-on-remote-desktop-session-host.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3011,7 +3013,7 @@ rule capa_enumerate_processes_on_remote_desktop_session_host : CAPA T1057  {
 	) 
 }
 
-rule capa_get_Explorer_PID : CAPA T1057  { 
+rule capa_get_Explorer_PID : CAPA HOST_INTERACTION PROCESS LIST BASICBLOCK T1057  { 
   meta: 
  	description = "get Explorer PID (converted from capa rule)"
 	namespace = "host-interaction/process/list"
@@ -3020,7 +3022,7 @@ rule capa_get_Explorer_PID : CAPA T1057  {
 	attack = "Discovery::Process Discovery [T1057]"
 	hash = "al-khaser_x86.exe_:0x425210"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/list/get-explorer-pid.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3036,7 +3038,7 @@ rule capa_get_Explorer_PID : CAPA T1057  {
 	) 
 }
 
-rule capa_find_process_by_PID : CAPA T1057  { 
+rule capa_find_process_by_PID : CAPA HOST_INTERACTION PROCESS LIST FUNCTION T1057  { 
   meta: 
  	description = "find process by PID (converted from capa rule)"
 	namespace = "host-interaction/process/list"
@@ -3045,7 +3047,7 @@ rule capa_find_process_by_PID : CAPA T1057  {
 	attack = "Discovery::Process Discovery [T1057]"
 	hash = "493167E85E45363D09495D0841C30648"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/list/find-process-by-pid.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3056,7 +3058,7 @@ rule capa_find_process_by_PID : CAPA T1057  {
 	) 
 }
 
-rule capa_create_process : CAPA C0017  { 
+rule capa_create_process : CAPA HOST_INTERACTION PROCESS CREATE BASICBLOCK C0017  { 
   meta: 
  	description = "create process (converted from capa rule)"
 	namespace = "host-interaction/process/create"
@@ -3066,7 +3068,7 @@ rule capa_create_process : CAPA C0017  {
 	hash = "9324D1A8AE37A36AE560C37448C9705A"
 	hash = "Practical Malware Analysis Lab 01-04.exe_:0x4011FC"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/create/create-process.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3094,7 +3096,7 @@ rule capa_create_process : CAPA C0017  {
 	) 
 }
 
-rule capa_modify_access_privileges : CAPA T1134  { 
+rule capa_modify_access_privileges : CAPA HOST_INTERACTION PROCESS MODIFY FUNCTION T1134  { 
   meta: 
  	description = "modify access privileges (converted from capa rule)"
 	namespace = "host-interaction/process/modify"
@@ -3103,7 +3105,7 @@ rule capa_modify_access_privileges : CAPA T1134  {
 	attack = "Privilege Escalation::Access Token Manipulation [T1134]"
 	hash = "9324D1A8AE37A36AE560C37448C9705A"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/modify/modify-access-privileges.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3114,7 +3116,7 @@ rule capa_modify_access_privileges : CAPA T1134  {
 	) 
 }
 
-rule capa_terminate_process : CAPA C0018  { 
+rule capa_terminate_process : CAPA HOST_INTERACTION PROCESS TERMINATE FUNCTION C0018  { 
   meta: 
  	description = "terminate process (converted from capa rule)"
 	namespace = "host-interaction/process/terminate"
@@ -3124,7 +3126,7 @@ rule capa_terminate_process : CAPA C0018  {
 	hash = "C91887D861D9BD4A5872249B641BC9F9"
 	hash = "9B7CCAA2AE6A5B96E3110EBCBC4311F6"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/terminate/terminate-process.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3139,7 +3141,7 @@ rule capa_terminate_process : CAPA C0018  {
 	) 
 }
 
-rule capa_enumerate_process_modules : CAPA T1057  { 
+rule capa_enumerate_process_modules : CAPA HOST_INTERACTION PROCESS MODULES LIST FUNCTION T1057  { 
   meta: 
  	description = "enumerate process modules (converted from capa rule)"
 	namespace = "host-interaction/process/modules/list"
@@ -3149,7 +3151,7 @@ rule capa_enumerate_process_modules : CAPA T1057  {
 	hash = "6F99A2C8944CB02FF28C6F9CED59B161"
 	hash = "9B2FD471274C41626B75DDBB5C897877"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/modules/list/enumerate-process-modules.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3172,7 +3174,7 @@ rule capa_enumerate_process_modules : CAPA T1057  {
 	) 
 }
 
-rule capa_get_domain_information : CAPA T1016  { 
+rule capa_get_domain_information : CAPA HOST_INTERACTION NETWORK DOMAIN FUNCTION T1016  { 
   meta: 
  	description = "get domain information (converted from capa rule)"
 	namespace = "host-interaction/network/domain"
@@ -3182,7 +3184,7 @@ rule capa_get_domain_information : CAPA T1016  {
 	attack = "Discovery::System Network Configuration Discovery [T1016]"
 	hash = "9B7CCAA2AE6A5B96E3110EBCBC4311F6"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/network/domain/get-domain-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3192,7 +3194,7 @@ rule capa_get_domain_information : CAPA T1016  {
 		pe.imports(/netapi32/i, /DsRoleGetPrimaryDomainInformation/) 
 }
 
-rule capa_get_networking_interfaces : CAPA T1016  { 
+rule capa_get_networking_interfaces : CAPA HOST_INTERACTION NETWORK INTERFACE FUNCTION T1016  { 
   meta: 
  	description = "get networking interfaces (converted from capa rule)"
 	namespace = "host-interaction/network/interface"
@@ -3201,7 +3203,7 @@ rule capa_get_networking_interfaces : CAPA T1016  {
 	attack = "Discovery::System Network Configuration Discovery [T1016]"
 	hash = "B7841B9D5DC1F511A93CC7576672EC0C"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/network/interface/get-networking-interfaces.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3213,7 +3215,7 @@ rule capa_get_networking_interfaces : CAPA T1016  {
 	) 
 }
 
-rule capa_register_network_filter_via_WFP_API : CAPA T1565  { 
+rule capa_register_network_filter_via_WFP_API : CAPA HOST_INTERACTION NETWORK TRAFFIC FILTER FUNCTION T1565  { 
   meta: 
  	description = "register network filter via WFP API (converted from capa rule)"
 	namespace = "host-interaction/network/traffic/filter"
@@ -3222,7 +3224,7 @@ rule capa_register_network_filter_via_WFP_API : CAPA T1565  {
 	attack = "Impact::Data Manipulation::Transmitted Data Manipulation [T1565]"
 	hash = "493167E85E45363D09495D0841C30648"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/network/traffic/filter/register-network-filter-via-wfp-api.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3233,7 +3235,7 @@ rule capa_register_network_filter_via_WFP_API : CAPA T1565  {
 	) 
 }
 
-rule capa_copy_network_traffic : CAPA T1040  { 
+rule capa_copy_network_traffic : CAPA HOST_INTERACTION NETWORK TRAFFIC COPY FUNCTION T1040  { 
   meta: 
  	description = "copy network traffic (converted from capa rule)"
 	namespace = "host-interaction/network/traffic/copy"
@@ -3242,7 +3244,7 @@ rule capa_copy_network_traffic : CAPA T1040  {
 	attack = "Discovery::Network Sniffing [T1040]"
 	hash = "493167E85E45363D09495D0841C30648"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/network/traffic/copy/copy-network-traffic.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3253,7 +3255,7 @@ rule capa_copy_network_traffic : CAPA T1040  {
 	) 
 }
 
-rule capa_resolve_DNS : CAPA C0011_001  { 
+rule capa_resolve_DNS : CAPA HOST_INTERACTION NETWORK DNS RESOLVE FUNCTION C0011_001  { 
   meta: 
  	description = "resolve DNS (converted from capa rule)"
 	namespace = "host-interaction/network/dns/resolve"
@@ -3261,7 +3263,7 @@ rule capa_resolve_DNS : CAPA C0011_001  {
 	mbc = "Communication::DNS Communication::Resolve [C0011.001]"
 	hash = "17264e3126a97c319a6a0c61e6da951e"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/network/dns/resolve/resolve-dns.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3288,7 +3290,7 @@ rule capa_resolve_DNS : CAPA C0011_001  {
 	) 
 }
 
-rule capa_check_Internet_connectivity_via_WinINet : CAPA T1016_001  { 
+rule capa_check_Internet_connectivity_via_WinINet : CAPA HOST_INTERACTION NETWORK CONNECTIVITY BASICBLOCK T1016_001  { 
   meta: 
  	description = "check Internet connectivity via WinINet (converted from capa rule)"
 	namespace = "host-interaction/network/connectivity"
@@ -3296,7 +3298,7 @@ rule capa_check_Internet_connectivity_via_WinINet : CAPA T1016_001  {
 	attack = "Discovery::System Network Configuration Discovery::Internet Connection Discovery [T1016.001]"
 	hash = "648FC498110B11B4313A47A776E6BA40"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/network/connectivity/check-internet-connectivity-via-wininet.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3310,7 +3312,7 @@ rule capa_check_Internet_connectivity_via_WinINet : CAPA T1016_001  {
 	) 
 }
 
-rule capa_create_mutex : CAPA C0042  { 
+rule capa_create_mutex : CAPA HOST_INTERACTION MUTEX FUNCTION C0042  { 
   meta: 
  	description = "create mutex (converted from capa rule)"
 	namespace = "host-interaction/mutex"
@@ -3319,7 +3321,7 @@ rule capa_create_mutex : CAPA C0042  {
 	mbc = "Process::Create Mutex [C0042]"
 	hash = "Practical Malware Analysis Lab 01-01.dll_:0x10001010"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/mutex/create-mutex.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3331,7 +3333,7 @@ rule capa_create_mutex : CAPA C0042  {
 	) 
 }
 
-rule capa_bypass_UAC_via_token_manipulation : CAPA T1548_002  { 
+rule capa_bypass_UAC_via_token_manipulation : CAPA HOST_INTERACTION UAC BYPASS FUNCTION T1548_002  { 
   meta: 
  	description = "bypass UAC via token manipulation (converted from capa rule)"
 	namespace = "host-interaction/uac/bypass"
@@ -3340,7 +3342,7 @@ rule capa_bypass_UAC_via_token_manipulation : CAPA T1548_002  {
 	attack = "Defense Evasion::Abuse Elevation Control Mechanism::Bypass User Access Control [T1548.002]"
 	hash = "2f43138aa75fb12ac482b486cbc98569"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/uac/bypass/bypass-uac-via-token-manipulation.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3362,7 +3364,7 @@ rule capa_bypass_UAC_via_token_manipulation : CAPA T1548_002  {
 	) 
 }
 
-rule capa_bypass_UAC_via_AppInfo_ALPC : CAPA T1548_002  { 
+rule capa_bypass_UAC_via_AppInfo_ALPC : CAPA HOST_INTERACTION UAC BYPASS FUNCTION T1548_002  { 
   meta: 
  	description = "bypass UAC via AppInfo ALPC (converted from capa rule)"
 	namespace = "host-interaction/uac/bypass"
@@ -3371,7 +3373,7 @@ rule capa_bypass_UAC_via_AppInfo_ALPC : CAPA T1548_002  {
 	attack = "Defense Evasion::Abuse Elevation Control Mechanism::Bypass User Access Control [T1548.002]"
 	hash = "2f43138aa75fb12ac482b486cbc98569"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/uac/bypass/bypass-uac-via-appinfo-alpc.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3395,7 +3397,7 @@ rule capa_bypass_UAC_via_AppInfo_ALPC : CAPA T1548_002  {
 	) 
 }
 
-rule capa_access_the_Windows_event_log : CAPA E1083_m01  { 
+rule capa_access_the_Windows_event_log : CAPA HOST_INTERACTION LOG WINEVT ACCESS FUNCTION E1083_m01  { 
   meta: 
  	description = "access the Windows event log (converted from capa rule)"
 	namespace = "host-interaction/log/winevt/access"
@@ -3404,7 +3406,7 @@ rule capa_access_the_Windows_event_log : CAPA E1083_m01  {
 	mbc = "Discovery::File and Directory Discovery::Log File [E1083.m01]"
 	hash = "mimikatz.exe_:0x45228B"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/log/winevt/access/access-the-windows-event-log.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3424,7 +3426,7 @@ rule capa_access_the_Windows_event_log : CAPA E1083_m01  {
 	) 
 }
 
-rule capa_print_debug_messages : CAPA  { 
+rule capa_print_debug_messages : CAPA HOST_INTERACTION LOG DEBUG WRITE_EVENT FUNCTION  { 
   meta: 
  	description = "print debug messages (converted from capa rule)"
 	namespace = "host-interaction/log/debug/write-event"
@@ -3432,7 +3434,7 @@ rule capa_print_debug_messages : CAPA  {
 	scope = "function"
 	hash = "493167E85E45363D09495D0841C30648"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/log/debug/write-event/print-debug-messages.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3444,7 +3446,7 @@ rule capa_print_debug_messages : CAPA  {
 	) 
 }
 
-rule capa_set_environment_variable : CAPA C0034_001  { 
+rule capa_set_environment_variable : CAPA HOST_INTERACTION ENVIRONMENT_VARIABLE FUNCTION C0034_001  { 
   meta: 
  	description = "set environment variable (converted from capa rule)"
 	namespace = "host-interaction/environment-variable"
@@ -3453,7 +3455,7 @@ rule capa_set_environment_variable : CAPA C0034_001  {
 	mbc = "Operating System::Environment Variable::Set Variable [C0034.001]"
 	hash = "Practical Malware Analysis Lab 11-03.exe_:0x406580"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/environment-variable/set-environment-variable.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3465,7 +3467,7 @@ rule capa_set_environment_variable : CAPA C0034_001  {
 	) 
 }
 
-rule capa_query_environment_variable : CAPA T1082  { 
+rule capa_query_environment_variable : CAPA HOST_INTERACTION ENVIRONMENT_VARIABLE FUNCTION T1082  { 
   meta: 
  	description = "query environment variable (converted from capa rule)"
 	namespace = "host-interaction/environment-variable"
@@ -3474,7 +3476,7 @@ rule capa_query_environment_variable : CAPA T1082  {
 	hash = "Practical Malware Analysis Lab 14-02.exe_:0x401880"
 	hash = "0761142efbda6c4b1e801223de723578"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/environment-variable/query-environment-variable.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3489,7 +3491,7 @@ rule capa_query_environment_variable : CAPA T1082  {
 	) 
 }
 
-rule capa_open_registry_key_via_offline_registry_library : CAPA C0036_003  { 
+rule capa_open_registry_key_via_offline_registry_library : CAPA HOST_INTERACTION REGISTRY FUNCTION C0036_003  { 
   meta: 
  	description = "open registry key via offline registry library (converted from capa rule)"
 	namespace = "host-interaction/registry"
@@ -3498,7 +3500,7 @@ rule capa_open_registry_key_via_offline_registry_library : CAPA C0036_003  {
 	mbc = "Operating System::Registry::Open Registry Key [C0036.003]"
 	hash = "5fbbfeed28b258c42e0cfeb16718b31c"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/registry/open-registry-key-via-offline-registry-library.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3514,7 +3516,7 @@ rule capa_open_registry_key_via_offline_registry_library : CAPA C0036_003  {
 	) 
 }
 
-rule capa_query_or_enumerate_registry_value : CAPA T1012 C0036_006  { 
+rule capa_query_or_enumerate_registry_value : CAPA HOST_INTERACTION REGISTRY FUNCTION T1012 C0036_006  { 
   meta: 
  	description = "query or enumerate registry value (converted from capa rule)"
 	namespace = "host-interaction/registry"
@@ -3524,7 +3526,7 @@ rule capa_query_or_enumerate_registry_value : CAPA T1012 C0036_006  {
 	hash = "BFB9B5391A13D0AFD787E87AB90F14F5"
 	hash = "Practical Malware Analysis Lab 03-02.dll_:0x100047AD"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/registry/query-or-enumerate-registry-value.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3581,7 +3583,7 @@ rule capa_query_or_enumerate_registry_value : CAPA T1012 C0036_006  {
 	) 
 }
 
-rule capa_set_registry_key_via_offline_registry_library : CAPA T1112 C0036_001  { 
+rule capa_set_registry_key_via_offline_registry_library : CAPA HOST_INTERACTION REGISTRY FUNCTION T1112 C0036_001  { 
   meta: 
  	description = "set registry key via offline registry library (converted from capa rule)"
 	namespace = "host-interaction/registry"
@@ -3591,7 +3593,7 @@ rule capa_set_registry_key_via_offline_registry_library : CAPA T1112 C0036_001  
 	mbc = "Operating System::Registry::Set Registry Key [C0036.001]"
 	hash = "5fbbfeed28b258c42e0cfeb16718b31c"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/registry/set-registry-key-via-offline-registry-library.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3605,7 +3607,7 @@ rule capa_set_registry_key_via_offline_registry_library : CAPA T1112 C0036_001  
 	) 
 }
 
-rule capa_query_registry_key_via_offline_registry_library : CAPA T1012 C0036_006  { 
+rule capa_query_registry_key_via_offline_registry_library : CAPA HOST_INTERACTION REGISTRY FUNCTION T1012 C0036_006  { 
   meta: 
  	description = "query registry key via offline registry library (converted from capa rule)"
 	namespace = "host-interaction/registry"
@@ -3615,7 +3617,7 @@ rule capa_query_registry_key_via_offline_registry_library : CAPA T1012 C0036_006
 	mbc = "Operating System::Registry::Query Registry Value [C0036.006]"
 	hash = "5fbbfeed28b258c42e0cfeb16718b31c"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/registry/query-registry-key-via-offline-registry-library.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3629,7 +3631,7 @@ rule capa_query_registry_key_via_offline_registry_library : CAPA T1012 C0036_006
 	) 
 }
 
-rule capa_query_or_enumerate_registry_key : CAPA T1012 C0036_005  { 
+rule capa_query_or_enumerate_registry_key : CAPA HOST_INTERACTION REGISTRY FUNCTION T1012 C0036_005  { 
   meta: 
  	description = "query or enumerate registry key (converted from capa rule)"
 	namespace = "host-interaction/registry"
@@ -3640,7 +3642,7 @@ rule capa_query_or_enumerate_registry_key : CAPA T1012 C0036_005  {
 	hash = "493167E85E45363D09495D0841C30648"
 	hash = "B5F85C26D7AA5A1FB4AF5821B6B5AB9B"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/registry/query-or-enumerate-registry-key.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3675,7 +3677,7 @@ rule capa_query_or_enumerate_registry_key : CAPA T1012 C0036_005  {
 	) 
 }
 
-rule capa_create_registry_key_via_offline_registry_library : CAPA T1112 C0036_004  { 
+rule capa_create_registry_key_via_offline_registry_library : CAPA HOST_INTERACTION REGISTRY FUNCTION T1112 C0036_004  { 
   meta: 
  	description = "create registry key via offline registry library (converted from capa rule)"
 	namespace = "host-interaction/registry"
@@ -3685,7 +3687,7 @@ rule capa_create_registry_key_via_offline_registry_library : CAPA T1112 C0036_00
 	mbc = "Operating System::Registry::Create Registry Key [C0036.004]"
 	hash = "5fbbfeed28b258c42e0cfeb16718b31c"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/registry/create-registry-key-via-offline-registry-library.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3701,7 +3703,7 @@ rule capa_create_registry_key_via_offline_registry_library : CAPA T1112 C0036_00
 	) 
 }
 
-rule capa_create_or_open_registry_key : CAPA C0036_004 C0036_003  { 
+rule capa_create_or_open_registry_key : CAPA HOST_INTERACTION REGISTRY BASICBLOCK C0036_004 C0036_003  { 
   meta: 
  	description = "create or open registry key (converted from capa rule)"
 	namespace = "host-interaction/registry"
@@ -3714,7 +3716,7 @@ rule capa_create_or_open_registry_key : CAPA C0036_004 C0036_003  {
 	hash = "493167E85E45363D09495D0841C30648"
 	hash = "B5F85C26D7AA5A1FB4AF5821B6B5AB9B"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/registry/create-or-open-registry-key.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3756,7 +3758,7 @@ rule capa_create_or_open_registry_key : CAPA C0036_004 C0036_003  {
 	) 
 }
 
-rule capa_delete_registry_key : CAPA T1112 C0036_002  { 
+rule capa_delete_registry_key : CAPA HOST_INTERACTION REGISTRY DELETE FUNCTION T1112 C0036_002  { 
   meta: 
  	description = "delete registry key (converted from capa rule)"
 	namespace = "host-interaction/registry/delete"
@@ -3766,7 +3768,7 @@ rule capa_delete_registry_key : CAPA T1112 C0036_002  {
 	hash = "4f11bdb380dafa2518053c6d20147a05"
 	hash = "493167E85E45363D09495D0841C30648"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/registry/delete/delete-registry-key.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3794,7 +3796,7 @@ rule capa_delete_registry_key : CAPA T1112 C0036_002  {
 	) 
 }
 
-rule capa_delete_registry_value : CAPA T1112 C0036_007  { 
+rule capa_delete_registry_value : CAPA HOST_INTERACTION REGISTRY DELETE FUNCTION T1112 C0036_007  { 
   meta: 
  	description = "delete registry value (converted from capa rule)"
 	namespace = "host-interaction/registry/delete"
@@ -3804,7 +3806,7 @@ rule capa_delete_registry_value : CAPA T1112 C0036_007  {
 	mbc = "Operating System::Registry::Delete Registry Value [C0036.007]"
 	hash = "B5F85C26D7AA5A1FB4AF5821B6B5AB9B"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/registry/delete/delete-registry-value.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3830,7 +3832,7 @@ rule capa_delete_registry_value : CAPA T1112 C0036_007  {
 	) 
 }
 
-rule capa_set_registry_value : CAPA C0036_001  { 
+rule capa_set_registry_value : CAPA HOST_INTERACTION REGISTRY CREATE FUNCTION C0036_001  { 
   meta: 
  	description = "set registry value (converted from capa rule)"
 	namespace = "host-interaction/registry/create"
@@ -3839,7 +3841,7 @@ rule capa_set_registry_value : CAPA C0036_001  {
 	hash = "BFB9B5391A13D0AFD787E87AB90F14F5"
 	hash = "B5F85C26D7AA5A1FB4AF5821B6B5AB9B"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/registry/create/set-registry-value.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3880,7 +3882,7 @@ rule capa_set_registry_value : CAPA C0036_001  {
 	) 
 }
 
-rule capa_get_logon_sessions : CAPA T1087  { 
+rule capa_get_logon_sessions : CAPA HOST_INTERACTION SESSION FUNCTION T1087  { 
   meta: 
  	description = "get logon sessions (converted from capa rule)"
 	namespace = "host-interaction/session"
@@ -3890,7 +3892,7 @@ rule capa_get_logon_sessions : CAPA T1087  {
 	attack = "Discovery::Account Discovery [T1087]"
 	hash = "9B7CCAA2AE6A5B96E3110EBCBC4311F6"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/session/get-logon-sessions.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3901,7 +3903,7 @@ rule capa_get_logon_sessions : CAPA T1087  {
 	) 
 }
 
-rule capa_get_session_integrity_level : CAPA T1033  { 
+rule capa_get_session_integrity_level : CAPA HOST_INTERACTION SESSION FUNCTION T1033  { 
   meta: 
  	description = "get session integrity level (converted from capa rule)"
 	namespace = "host-interaction/session"
@@ -3910,7 +3912,7 @@ rule capa_get_session_integrity_level : CAPA T1033  {
 	attack = "Discovery::System Owner/User Discovery [T1033]"
 	hash = "9879D201DC5ACA863F357184CD1F170E"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/session/get-session-integrity-level.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3921,7 +3923,7 @@ rule capa_get_session_integrity_level : CAPA T1033  {
 	) 
 }
 
-rule capa_link_function_at_runtime : CAPA T1129  { 
+rule capa_link_function_at_runtime : CAPA LINKING RUNTIME_LINKING FUNCTION T1129  { 
   meta: 
  	description = "link function at runtime (converted from capa rule)"
 	namespace = "linking/runtime-linking"
@@ -3931,7 +3933,7 @@ rule capa_link_function_at_runtime : CAPA T1129  {
 	hash = "9324D1A8AE37A36AE560C37448C9705A"
 	hash = "Practical Malware Analysis Lab 01-04.exe_:0x401350"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/linking/runtime-linking/link-function-at-runtime.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3951,7 +3953,7 @@ rule capa_link_function_at_runtime : CAPA T1129  {
 	) 
 }
 
-rule capa_linked_against_Crypto__ : CAPA C0059  { 
+rule capa_linked_against_Crypto__ : CAPA LINKING STATIC CRYPTOPP FILE C0059  { 
   meta: 
  	description = "linked against Crypto++ (converted from capa rule)"
 	namespace = "linking/static/cryptopp"
@@ -3961,7 +3963,7 @@ rule capa_linked_against_Crypto__ : CAPA C0059  {
 	hash = "8BA66E4B618FFDC8255F1DF01F875DDE6FD0561305D9F8307BE7BB11D02AE363"
 	hash = "66602B5FAB602CB4E6F754748D249542"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/linking/static/cryptopp/linked-against-crypto.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3985,7 +3987,7 @@ rule capa_linked_against_Crypto__ : CAPA C0059  {
 	) 
 }
 
-rule capa_linked_against_OpenSSL : CAPA C0059  { 
+rule capa_linked_against_OpenSSL : CAPA LINKING STATIC OPENSSL FILE C0059  { 
   meta: 
  	description = "linked against OpenSSL (converted from capa rule)"
 	namespace = "linking/static/openssl"
@@ -3994,7 +3996,7 @@ rule capa_linked_against_OpenSSL : CAPA C0059  {
 	mbc = "Cryptography::Crypto Library [C0059]"
 	hash = "6cc148363200798a12091b97a17181a1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/linking/static/openssl/linked-against-openssl.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4012,7 +4014,7 @@ rule capa_linked_against_OpenSSL : CAPA C0059  {
 	) 
 }
 
-rule capa_linked_against_PolarSSL_mbed_TLS : CAPA C0059  { 
+rule capa_linked_against_PolarSSL_mbed_TLS : CAPA LINKING STATIC POLARSSL FILE C0059  { 
   meta: 
  	description = "linked against PolarSSL/mbed TLS (converted from capa rule)"
 	namespace = "linking/static/polarssl"
@@ -4021,7 +4023,7 @@ rule capa_linked_against_PolarSSL_mbed_TLS : CAPA C0059  {
 	mbc = "Cryptography::Crypto Library [C0059]"
 	hash = "232b0a8546035d9017fadf68398826edb0a1e055566bc1d356d6c9fdf1d7e485"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/linking/static/polarssl/linked-against-polarsslmbed-tls.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4043,7 +4045,7 @@ rule capa_linked_against_PolarSSL_mbed_TLS : CAPA C0059  {
 	) 
 }
 
-rule capa_linked_against_libcurl : CAPA  { 
+rule capa_linked_against_libcurl : CAPA LINKING STATIC LIBCURL FILE  { 
   meta: 
  	description = "linked against libcurl (converted from capa rule)"
 	namespace = "linking/static/libcurl"
@@ -4051,7 +4053,7 @@ rule capa_linked_against_libcurl : CAPA  {
 	scope = "file"
 	hash = "A90E5B3454AA71D9700B2EA54615F44B"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/linking/static/libcurl/linked-against-libcurl.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4067,7 +4069,7 @@ rule capa_linked_against_libcurl : CAPA  {
 	) 
 }
 
-rule capa_linked_against_Microsoft_Detours : CAPA T1574  { 
+rule capa_linked_against_Microsoft_Detours : CAPA LINKING STATIC MSDETOURS FILE T1574  { 
   meta: 
  	description = "linked against Microsoft Detours (converted from capa rule)"
 	namespace = "linking/static/msdetours"
@@ -4076,7 +4078,7 @@ rule capa_linked_against_Microsoft_Detours : CAPA T1574  {
 	attack = "Defense Evasion::Hijack Execution Flow [T1574]"
 	hash = "071F2D1C4C2201EE95FFE2AA965000F5F615A11A12D345E33B9FB060E5597740"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/linking/static/msdetours/linked-against-microsoft-detours.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4088,7 +4090,7 @@ rule capa_linked_against_Microsoft_Detours : CAPA T1574  {
 	) 
 }
 
-rule capa_linked_against_ZLIB : CAPA C0060  { 
+rule capa_linked_against_ZLIB : CAPA LINKING STATIC ZLIB FILE C0060  { 
   meta: 
  	description = "linked against ZLIB (converted from capa rule)"
 	namespace = "linking/static/zlib"
@@ -4097,7 +4099,7 @@ rule capa_linked_against_ZLIB : CAPA C0060  {
 	mbc = "Data::Compression Library [C0060]"
 	hash = "6cc148363200798a12091b97a17181a1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/linking/static/zlib/linked-against-zlib.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4113,7 +4115,7 @@ rule capa_linked_against_ZLIB : CAPA C0060  {
 	) 
 }
 
-rule capa_reference_Base64_string : CAPA T1027 C0026_001 C0019  { 
+rule capa_reference_Base64_string : CAPA DATA_MANIPULATION ENCODING BASE64 FILE T1027 C0026_001 C0019  { 
   meta: 
  	description = "reference Base64 string (converted from capa rule)"
 	namespace = "data-manipulation/encoding/base64"
@@ -4126,7 +4128,7 @@ rule capa_reference_Base64_string : CAPA T1027 C0026_001 C0019  {
 	hash = "074072B261FC27B65C72671F13510C05"
 	hash = "5DB2D2BE20D59AA0BE6709A6850F1775"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encoding/base64/reference-base64-string.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4140,7 +4142,7 @@ rule capa_reference_Base64_string : CAPA T1027 C0026_001 C0019  {
 		$re_atv 
 }
 
-rule capa_import_public_key : CAPA C0028_001  { 
+rule capa_import_public_key : CAPA DATA_MANIPULATION ENCRYPTION FUNCTION C0028_001  { 
   meta: 
  	description = "import public key (converted from capa rule)"
 	namespace = "data-manipulation/encryption"
@@ -4149,7 +4151,7 @@ rule capa_import_public_key : CAPA C0028_001  {
 	mbc = "Cryptography::Encryption Key::Import Public Key [C0028.001]"
 	hash = "ffeae4a391a1d5203bd04b4161557227"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/import-public-key.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4161,7 +4163,7 @@ rule capa_import_public_key : CAPA C0028_001  {
 	) 
 }
 
-rule capa_encrypt_or_decrypt_via_WinCrypt : CAPA T1027 C0031 C0027  { 
+rule capa_encrypt_or_decrypt_via_WinCrypt : CAPA DATA_MANIPULATION ENCRYPTION FUNCTION T1027 C0031 C0027  { 
   meta: 
  	description = "encrypt or decrypt via WinCrypt (converted from capa rule)"
 	namespace = "data-manipulation/encryption"
@@ -4172,7 +4174,7 @@ rule capa_encrypt_or_decrypt_via_WinCrypt : CAPA T1027 C0031 C0027  {
 	mbc = "Cryptography::Encrypt Data [C0027]"
 	hash = "A45E377DBB98A6B44FD4034BC3FFF9B0"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/encrypt-or-decrypt-via-wincrypt.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4190,7 +4192,7 @@ rule capa_encrypt_or_decrypt_via_WinCrypt : CAPA T1027 C0031 C0027  {
 	) 
 }
 
-rule capa_encrypt_data_using_DPAPI : CAPA T1027 C0027  { 
+rule capa_encrypt_data_using_DPAPI : CAPA DATA_MANIPULATION ENCRYPTION DPAPI FUNCTION T1027 C0027  { 
   meta: 
  	description = "encrypt data using DPAPI (converted from capa rule)"
 	namespace = "data-manipulation/encryption/dpapi"
@@ -4200,7 +4202,7 @@ rule capa_encrypt_data_using_DPAPI : CAPA T1027 C0027  {
 	mbc = "Cryptography::Encrypt Data [C0027]"
 	hash = "6cc148363200798a12091b97a17181a1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/dpapi/encrypt-data-using-dpapi.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4218,7 +4220,7 @@ rule capa_encrypt_data_using_DPAPI : CAPA T1027 C0027  {
 	) 
 }
 
-rule capa_encrypt_data_using_Camellia : CAPA T1027 E1027_m05 C0027_003  { 
+rule capa_encrypt_data_using_Camellia : CAPA DATA_MANIPULATION ENCRYPTION CAMELLIA BASICBLOCK T1027 E1027_m05 C0027_003  { 
   meta: 
  	description = "encrypt data using Camellia (converted from capa rule)"
 	namespace = "data-manipulation/encryption/camellia"
@@ -4230,7 +4232,7 @@ rule capa_encrypt_data_using_Camellia : CAPA T1027 E1027_m05 C0027_003  {
 	hash = "0761142efbda6c4b1e801223de723578"
 	hash = "112f9f0e8d349858a80dd8c14190e620"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/camellia/encrypt-data-using-camellia.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4308,7 +4310,7 @@ rule capa_encrypt_data_using_Camellia : CAPA T1027 E1027_m05 C0027_003  {
 	) 
 }
 
-rule capa_encrypt_data_using_RC6 : CAPA T1027 E1027_m05 C0027_010  { 
+rule capa_encrypt_data_using_RC6 : CAPA DATA_MANIPULATION ENCRYPTION RC6 FUNCTION T1027 E1027_m05 C0027_010  { 
   meta: 
  	description = "encrypt data using RC6 (converted from capa rule)"
 	namespace = "data-manipulation/encryption/rc6"
@@ -4319,7 +4321,7 @@ rule capa_encrypt_data_using_RC6 : CAPA T1027 E1027_m05 C0027_010  {
 	mbc = "Cryptography::Encrypt Data::RC6 [C0027.010]"
 	hash = "D87BA0BFCE1CDB17FD243B8B1D247E88"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/rc6/encrypt-data-using-rc6.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4339,7 +4341,7 @@ rule capa_encrypt_data_using_RC6 : CAPA T1027 E1027_m05 C0027_010  {
 	) 
 }
 
-rule capa_encrypt_data_using_twofish : CAPA T1027 E1027_m05 C0027_005  { 
+rule capa_encrypt_data_using_twofish : CAPA DATA_MANIPULATION ENCRYPTION TWOFISH BASICBLOCK T1027 E1027_m05 C0027_005  { 
   meta: 
  	description = "encrypt data using twofish (converted from capa rule)"
 	namespace = "data-manipulation/encryption/twofish"
@@ -4350,7 +4352,7 @@ rule capa_encrypt_data_using_twofish : CAPA T1027 E1027_m05 C0027_005  {
 	mbc = "Cryptography::Encrypt Data::Twofish [C0027.005]"
 	hash = "0761142efbda6c4b1e801223de723578"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/twofish/encrypt-data-using-twofish.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4378,7 +4380,7 @@ rule capa_encrypt_data_using_twofish : CAPA T1027 E1027_m05 C0027_005  {
 	) 
 }
 
-rule capa_encrypt_data_using_AES_via__NET : CAPA T1027 E1027_m05 C0027_001  { 
+rule capa_encrypt_data_using_AES_via__NET : CAPA DATA_MANIPULATION ENCRYPTION AES FILE T1027 E1027_m05 C0027_001  { 
   meta: 
  	description = "encrypt data using AES via .NET (converted from capa rule)"
 	namespace = "data-manipulation/encryption/aes"
@@ -4389,7 +4391,7 @@ rule capa_encrypt_data_using_AES_via__NET : CAPA T1027 E1027_m05 C0027_001  {
 	mbc = "Cryptography::Encrypt Data::AES [C0027.001]"
 	hash = "b9f5bd514485fb06da39beff051b9fdc"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/aes/encrypt-data-using-aes-via-net.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4407,7 +4409,7 @@ rule capa_encrypt_data_using_AES_via__NET : CAPA T1027 E1027_m05 C0027_001  {
 	) 
 }
 
-rule capa_encrypt_data_using_skipjack : CAPA T1027 E1027_m05 C0027_013  { 
+rule capa_encrypt_data_using_skipjack : CAPA DATA_MANIPULATION ENCRYPTION SKIPJACK BASICBLOCK T1027 E1027_m05 C0027_013  { 
   meta: 
  	description = "encrypt data using skipjack (converted from capa rule)"
 	namespace = "data-manipulation/encryption/skipjack"
@@ -4418,7 +4420,7 @@ rule capa_encrypt_data_using_skipjack : CAPA T1027 E1027_m05 C0027_013  {
 	mbc = "Cryptography::Encrypt Data::Skipjack [C0027.013]"
 	hash = "94d3c854aadbcfde46b2f82801015c31"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/skipjack/encrypt-data-using-skipjack.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4432,7 +4434,7 @@ rule capa_encrypt_data_using_skipjack : CAPA T1027 E1027_m05 C0027_013  {
 	) 
 }
 
-rule capa_reference_public_RSA_key : CAPA C0028  { 
+rule capa_reference_public_RSA_key : CAPA DATA_MANIPULATION ENCRYPTION RSA FUNCTION C0028  { 
   meta: 
  	description = "reference public RSA key (converted from capa rule)"
 	namespace = "data-manipulation/encryption/rsa"
@@ -4441,7 +4443,7 @@ rule capa_reference_public_RSA_key : CAPA C0028  {
 	mbc = "Cryptography::Encryption Key [C0028]"
 	hash = "b7b5e1253710d8927cbe07d52d2d2e10"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/rsa/reference-public-rsa-key.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4455,7 +4457,7 @@ rule capa_reference_public_RSA_key : CAPA C0028  {
 	) 
 }
 
-rule capa_encrypt_data_using_vest : CAPA T1027 E1027_m05 C0027  { 
+rule capa_encrypt_data_using_vest : CAPA DATA_MANIPULATION ENCRYPTION VEST BASICBLOCK T1027 E1027_m05 C0027  { 
   meta: 
  	description = "encrypt data using vest (converted from capa rule)"
 	namespace = "data-manipulation/encryption/vest"
@@ -4466,7 +4468,7 @@ rule capa_encrypt_data_using_vest : CAPA T1027 E1027_m05 C0027  {
 	mbc = "Cryptography::Encrypt Data [C0027]"
 	hash = "9a00ebe67d833edb70ed6dd0f4652592"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/vest/encrypt-data-using-vest.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4484,7 +4486,7 @@ rule capa_encrypt_data_using_vest : CAPA T1027 E1027_m05 C0027  {
 	) 
 }
 
-rule capa_encrypt_data_using_blowfish : CAPA T1027 E1027_m05 C0027_002  { 
+rule capa_encrypt_data_using_blowfish : CAPA DATA_MANIPULATION ENCRYPTION BLOWFISH BASICBLOCK T1027 E1027_m05 C0027_002  { 
   meta: 
  	description = "encrypt data using blowfish (converted from capa rule)"
 	namespace = "data-manipulation/encryption/blowfish"
@@ -4495,7 +4497,7 @@ rule capa_encrypt_data_using_blowfish : CAPA T1027 E1027_m05 C0027_002  {
 	mbc = "Cryptography::Encrypt Data::Blowfish [C0027.002]"
 	hash = "0761142efbda6c4b1e801223de723578"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/blowfish/encrypt-data-using-blowfish.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4529,7 +4531,7 @@ rule capa_encrypt_data_using_blowfish : CAPA T1027 E1027_m05 C0027_002  {
 	) 
 }
 
-rule capa_generate_random_numbers_via_WinAPI : CAPA C0021_003  { 
+rule capa_generate_random_numbers_via_WinAPI : CAPA DATA_MANIPULATION PRNG FUNCTION C0021_003  { 
   meta: 
  	description = "generate random numbers via WinAPI (converted from capa rule)"
 	namespace = "data-manipulation/prng"
@@ -4540,7 +4542,7 @@ rule capa_generate_random_numbers_via_WinAPI : CAPA C0021_003  {
 	hash = "e59ffeaf7acb0c326e452fa30bb71a36"
 	hash = "1195d0d18be9362fb8dd9e1738404c9d"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/prng/generate-random-numbers-via-winapi.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4558,7 +4560,7 @@ rule capa_generate_random_numbers_via_WinAPI : CAPA C0021_003  {
 	) 
 }
 
-rule capa_generate_random_numbers_using_a_Mersenne_Twister : CAPA C0021_005  { 
+rule capa_generate_random_numbers_using_a_Mersenne_Twister : CAPA DATA_MANIPULATION PRNG MERSENNE FUNCTION C0021_005  { 
   meta: 
  	description = "generate random numbers using a Mersenne Twister (converted from capa rule)"
 	namespace = "data-manipulation/prng/mersenne"
@@ -4567,7 +4569,7 @@ rule capa_generate_random_numbers_using_a_Mersenne_Twister : CAPA C0021_005  {
 	mbc = "Cryptography::Generate Pseudo-random Sequence::Mersenne Twister [C0021.005]"
 	hash = "D9630C174B8FF5C0AA26168DF523E63E"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/prng/mersenne/generate-random-numbers-using-a-mersenne-twister.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4593,7 +4595,7 @@ rule capa_generate_random_numbers_using_a_Mersenne_Twister : CAPA C0021_005  {
 	) 
 }
 
-rule capa_compress_data_via_WinAPI : CAPA T1560_002 C0024  { 
+rule capa_compress_data_via_WinAPI : CAPA DATA_MANIPULATION COMPRESSION FUNCTION T1560_002 C0024  { 
   meta: 
  	description = "compress data via WinAPI (converted from capa rule)"
 	namespace = "data-manipulation/compression"
@@ -4603,7 +4605,7 @@ rule capa_compress_data_via_WinAPI : CAPA T1560_002 C0024  {
 	mbc = "Data::Compress Data [C0024]"
 	hash = "638dcc3d37b3a574044233c9637d7288"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/compression/compress-data-via-winapi.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4635,7 +4637,7 @@ rule capa_compress_data_via_WinAPI : CAPA T1560_002 C0024  {
 	) 
 }
 
-rule capa_hash_data_via_WinCrypt : CAPA C0029  { 
+rule capa_hash_data_via_WinCrypt : CAPA DATA_MANIPULATION HASHING FUNCTION C0029  { 
   meta: 
  	description = "hash data via WinCrypt (converted from capa rule)"
 	namespace = "data-manipulation/hashing"
@@ -4644,7 +4646,7 @@ rule capa_hash_data_via_WinCrypt : CAPA C0029  {
 	mbc = "Cryptography::Cryptographic Hash [C0029]"
 	hash = "03B236B23B1EC37C663527C1F53AF3FE"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/hashing/hash-data-via-wincrypt.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4655,7 +4657,7 @@ rule capa_hash_data_via_WinCrypt : CAPA C0029  {
 	) 
 }
 
-rule capa_hash_data_using_SHA256 : CAPA C0029_003  { 
+rule capa_hash_data_using_SHA256 : CAPA DATA_MANIPULATION HASHING SHA256 FUNCTION C0029_003  { 
   meta: 
  	description = "hash data using SHA256 (converted from capa rule)"
 	namespace = "data-manipulation/hashing/sha256"
@@ -4665,7 +4667,7 @@ rule capa_hash_data_using_SHA256 : CAPA C0029_003  {
 	hash = "C0CFFCF211035A839E28D542DE300298"
 	hash = "6CC148363200798A12091B97A17181A1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/hashing/sha256/hash-data-using-sha256.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4693,7 +4695,7 @@ rule capa_hash_data_using_SHA256 : CAPA C0029_003  {
 	) 
 }
 
-rule capa_hash_data_using_SHA224 : CAPA C0029_004  { 
+rule capa_hash_data_using_SHA224 : CAPA DATA_MANIPULATION HASHING SHA224 FUNCTION C0029_004  { 
   meta: 
  	description = "hash data using SHA224 (converted from capa rule)"
 	namespace = "data-manipulation/hashing/sha224"
@@ -4702,7 +4704,7 @@ rule capa_hash_data_using_SHA224 : CAPA C0029_004  {
 	mbc = "Cryptography::Cryptographic Hash::SHA224 [C0029.004]"
 	hash = "6CC148363200798A12091B97A17181A1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/hashing/sha224/hash-data-using-sha224.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4730,7 +4732,7 @@ rule capa_hash_data_using_SHA224 : CAPA C0029_004  {
 	) 
 }
 
-rule capa_schedule_task_via_command_line : CAPA T1053_005  { 
+rule capa_schedule_task_via_command_line : CAPA PERSISTENCE SCHEDULED_TASKS FUNCTION T1053_005  { 
   meta: 
  	description = "schedule task via command line (converted from capa rule)"
 	namespace = "persistence/scheduled-tasks"
@@ -4739,7 +4741,7 @@ rule capa_schedule_task_via_command_line : CAPA T1053_005  {
 	attack = "Persistence::Scheduled Task/Job::Scheduled Task [T1053.005]"
 	hash = "79cde1aa711e321b4939805d27e160be"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/persistence/scheduled-tasks/schedule-task-via-command-line.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4763,7 +4765,7 @@ rule capa_schedule_task_via_command_line : CAPA T1053_005  {
 	) 
 }
 
-rule capa_persist_via_Active_Setup_registry_key : CAPA T1547_014  { 
+rule capa_persist_via_Active_Setup_registry_key : CAPA PERSISTENCE REGISTRY FUNCTION T1547_014  { 
   meta: 
  	description = "persist via Active Setup registry key (converted from capa rule)"
 	namespace = "persistence/registry"
@@ -4772,7 +4774,7 @@ rule capa_persist_via_Active_Setup_registry_key : CAPA T1547_014  {
 	attack = "Persistence::Boot or Logon Autostart Execution::Active Setup [T1547.014]"
 	hash = "c335a9d41185a32ad918c5389ee54235"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/persistence/registry/persist-via-active-setup-registry-key.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4794,7 +4796,7 @@ rule capa_persist_via_Active_Setup_registry_key : CAPA T1547_014  {
 	) 
 }
 
-rule capa_persist_via_GinaDLL_registry_key : CAPA T1546  { 
+rule capa_persist_via_GinaDLL_registry_key : CAPA PERSISTENCE REGISTRY GINADLL FUNCTION T1546  { 
   meta: 
  	description = "persist via GinaDLL registry key (converted from capa rule)"
 	namespace = "persistence/registry/ginadll"
@@ -4803,7 +4805,7 @@ rule capa_persist_via_GinaDLL_registry_key : CAPA T1546  {
 	attack = "Persistence::Event Triggered Execution [T1546]"
 	hash = "Practical Malware Analysis Lab 11-01.exe_:0x401000"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/persistence/registry/ginadll/persist-via-ginadll-registry-key.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4825,7 +4827,7 @@ rule capa_persist_via_GinaDLL_registry_key : CAPA T1546  {
 	) 
 }
 
-rule capa_persist_via_AppInit_DLLs_registry_key : CAPA T1546_010  { 
+rule capa_persist_via_AppInit_DLLs_registry_key : CAPA PERSISTENCE REGISTRY APPINITDLLS FUNCTION T1546_010  { 
   meta: 
  	description = "persist via AppInit_DLLs registry key (converted from capa rule)"
 	namespace = "persistence/registry/appinitdlls"
@@ -4834,7 +4836,7 @@ rule capa_persist_via_AppInit_DLLs_registry_key : CAPA T1546_010  {
 	attack = "Persistence::Event Triggered Execution::AppInit DLLs [T1546.010]"
 	hash = "Practical Malware Analysis Lab 11-02.dll_:0x1000158b"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/persistence/registry/appinitdlls/persist-via-appinit_dlls-registry-key.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4860,7 +4862,7 @@ rule capa_persist_via_AppInit_DLLs_registry_key : CAPA T1546_010  {
 	) 
 }
 
-rule capa_persist_via_Run_registry_key : CAPA T1547_001  { 
+rule capa_persist_via_Run_registry_key : CAPA PERSISTENCE REGISTRY RUN FUNCTION T1547_001  { 
   meta: 
  	description = "persist via Run registry key (converted from capa rule)"
 	namespace = "persistence/registry/run"
@@ -4871,7 +4873,7 @@ rule capa_persist_via_Run_registry_key : CAPA T1547_001  {
 	hash = "b87e9dd18a5533a09d3e48a7a1efbcf6"
 	hash = "9ff8e68343cc29c1036650fc153e69f7"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/persistence/registry/run/persist-via-run-registry-key.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4913,7 +4915,7 @@ rule capa_persist_via_Run_registry_key : CAPA T1547_001  {
 	) 
 }
 
-rule capa_persist_via_Winlogon_Helper_DLL_registry_key : CAPA T1547_004  { 
+rule capa_persist_via_Winlogon_Helper_DLL_registry_key : CAPA PERSISTENCE REGISTRY WINLOGON_HELPER FUNCTION T1547_004  { 
   meta: 
  	description = "persist via Winlogon Helper DLL registry key (converted from capa rule)"
 	namespace = "persistence/registry/winlogon-helper"
@@ -4922,7 +4924,7 @@ rule capa_persist_via_Winlogon_Helper_DLL_registry_key : CAPA T1547_004  {
 	attack = "Persistence::Boot or Logon Autostart Execution::Winlogon Helper DLL [T1547.004]"
 	hash = "9ff8e68343cc29c1036650fc153e69f7"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/persistence/registry/winlogon-helper/persist-via-winlogon-helper-dll-registry-key.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4952,7 +4954,7 @@ rule capa_persist_via_Winlogon_Helper_DLL_registry_key : CAPA T1547_004  {
 	) 
 }
 
-rule capa_compiled_to_the__NET_platform : CAPA  { 
+rule capa_compiled_to_the__NET_platform : CAPA RUNTIME DOTNET FILE  { 
   meta: 
  	description = "compiled to the .NET platform (converted from capa rule)"
 	namespace = "runtime/dotnet"
@@ -4960,7 +4962,7 @@ rule capa_compiled_to_the__NET_platform : CAPA  {
 	scope = "file"
 	hash = "b9f5bd514485fb06da39beff051b9fdc"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/runtime/dotnet/compiled-to-the-net-platform.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4974,7 +4976,7 @@ rule capa_compiled_to_the__NET_platform : CAPA  {
 	) 
 }
 
-rule capa_get_COMSPEC_environment_variable : CAPA  { 
+rule capa_get_COMSPEC_environment_variable : CAPA HOST_INTERACTION ENVIRONMENT_VARIABLE FUNCTION  { 
   meta: 
  	description = "get COMSPEC environment variable (converted from capa rule)"
 	namespace = "host-interaction/environment-variable"
@@ -4982,7 +4984,7 @@ rule capa_get_COMSPEC_environment_variable : CAPA  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/get-comspec-environment-variable.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5002,7 +5004,7 @@ rule capa_get_COMSPEC_environment_variable : CAPA  {
 	) 
 }
 
-rule capa_packed_with_MaskPE : CAPA T1027_002 F0001  { 
+rule capa_packed_with_MaskPE : CAPA ANTI_ANALYSIS PACKER MASKPE FILE T1027_002 F0001  { 
   meta: 
  	description = "packed with MaskPE (converted from capa rule)"
 	namespace = "anti-analysis/packer/maskpe"
@@ -5012,7 +5014,7 @@ rule capa_packed_with_MaskPE : CAPA T1027_002 F0001  {
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-maskpe.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5023,7 +5025,7 @@ rule capa_packed_with_MaskPE : CAPA T1027_002 F0001  {
 	) 
 }
 
-rule capa_add_file_to_cabinet_file : CAPA  { 
+rule capa_add_file_to_cabinet_file : CAPA HOST_INTERACTION FILE_SYSTEM FUNCTION  { 
   meta: 
  	description = "add file to cabinet file (converted from capa rule)"
 	namespace = "host-interaction/file-system"
@@ -5032,7 +5034,7 @@ rule capa_add_file_to_cabinet_file : CAPA  {
 	references = "https://docs.microsoft.com/en-us/windows/win32/msi/cabinet-files"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/add-file-to-cabinet-file.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5043,7 +5045,7 @@ rule capa_add_file_to_cabinet_file : CAPA  {
 	) 
 }
 
-rule capa_reference_Quad9_DNS_server : CAPA  { 
+rule capa_reference_Quad9_DNS_server : CAPA COMMUNICATION DNS FUNCTION  { 
   meta: 
  	description = "reference Quad9 DNS server (converted from capa rule)"
 	namespace = "communication/dns"
@@ -5051,7 +5053,7 @@ rule capa_reference_Quad9_DNS_server : CAPA  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/reference-quad9-dns-server.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5067,7 +5069,7 @@ rule capa_reference_Quad9_DNS_server : CAPA  {
 	) 
 }
 
-rule capa_run_PowerShell_expression : CAPA T1059_001  { 
+rule capa_run_PowerShell_expression : CAPA LOAD_CODE POWERSHELL  FUNCTION T1059_001  { 
   meta: 
  	description = "run PowerShell expression (converted from capa rule)"
 	namespace = "load-code/powershell/"
@@ -5076,7 +5078,7 @@ rule capa_run_PowerShell_expression : CAPA T1059_001  {
 	attack = "Execution::Command and Scripting Interpreter::PowerShell [T1059.001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/run-powershell-expression.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5096,7 +5098,7 @@ rule capa_run_PowerShell_expression : CAPA T1059_001  {
 	) 
 }
 
-rule capa_get_file_size : CAPA T1083  { 
+rule capa_get_file_size : CAPA HOST_INTERACTION FILE_SYSTEM META FUNCTION T1083  { 
   meta: 
  	description = "get file size (converted from capa rule)"
 	namespace = "host-interaction/file-system/meta"
@@ -5105,7 +5107,7 @@ rule capa_get_file_size : CAPA T1083  {
 	attack = "Discovery::File and Directory Discovery [T1083]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/get-file-size.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5117,7 +5119,7 @@ rule capa_get_file_size : CAPA T1083  {
 	) 
 }
 
-rule capa_open_cabinet_file : CAPA  { 
+rule capa_open_cabinet_file : CAPA HOST_INTERACTION FILE_SYSTEM FUNCTION  { 
   meta: 
  	description = "open cabinet file (converted from capa rule)"
 	namespace = "host-interaction/file-system"
@@ -5126,7 +5128,7 @@ rule capa_open_cabinet_file : CAPA  {
 	references = "https://docs.microsoft.com/en-us/windows/win32/msi/cabinet-files"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/open-cabinet-file.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5137,7 +5139,7 @@ rule capa_open_cabinet_file : CAPA  {
 	) 
 }
 
-rule capa_packed_with_Dragon_Armor : CAPA T1027_002 F0001  { 
+rule capa_packed_with_Dragon_Armor : CAPA ANTI_ANALYSIS PACKER DRAGON_ARMOR FILE T1027_002 F0001  { 
   meta: 
  	description = "packed with Dragon Armor (converted from capa rule)"
 	namespace = "anti-analysis/packer/dragon-armor"
@@ -5147,7 +5149,7 @@ rule capa_packed_with_Dragon_Armor : CAPA T1027_002 F0001  {
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-dragon-armor.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5158,7 +5160,7 @@ rule capa_packed_with_Dragon_Armor : CAPA T1027_002 F0001  {
 	) 
 }
 
-rule capa_hooked_by_API_Override : CAPA  { 
+rule capa_hooked_by_API_Override : CAPA EXECUTABLE HOOKED API_OVERRIDE FILE  { 
   meta: 
  	description = "hooked by API Override (converted from capa rule)"
 	namespace = "executable/hooked/api-override"
@@ -5166,7 +5168,7 @@ rule capa_hooked_by_API_Override : CAPA  {
 	scope = "file"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/hooked-by-api-override.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5177,7 +5179,7 @@ rule capa_hooked_by_API_Override : CAPA  {
 	) 
 }
 
-rule capa_get_service_handle : CAPA  { 
+rule capa_get_service_handle : CAPA FUNCTION  { 
   meta: 
  	description = "get service handle (converted from capa rule)"
 	author = "moritz.raabe@fireeye.com"
@@ -5185,7 +5187,7 @@ rule capa_get_service_handle : CAPA  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/get-service-handle.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5197,7 +5199,7 @@ rule capa_get_service_handle : CAPA  {
 	) 
 }
 
-rule capa_packed_with_Neolite : CAPA T1027_002 F0001  { 
+rule capa_packed_with_Neolite : CAPA ANTI_ANALYSIS PACKER NEOLITE FILE T1027_002 F0001  { 
   meta: 
  	description = "packed with Neolite (converted from capa rule)"
 	namespace = "anti-analysis/packer/neolite"
@@ -5207,7 +5209,7 @@ rule capa_packed_with_Neolite : CAPA T1027_002 F0001  {
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-neolite.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5219,7 +5221,7 @@ rule capa_packed_with_Neolite : CAPA T1027_002 F0001  {
 	) 
 }
 
-rule capa_encrypt_data_using_Salsa20_or_ChaCha : CAPA T1027  { 
+rule capa_encrypt_data_using_Salsa20_or_ChaCha : CAPA DATA_MANIPULATION ENCRYPTION SALSA20 FUNCTION T1027  { 
   meta: 
  	description = "encrypt data using Salsa20 or ChaCha (converted from capa rule)"
 	namespace = "data-manipulation/encryption/salsa20"
@@ -5228,7 +5230,7 @@ rule capa_encrypt_data_using_Salsa20_or_ChaCha : CAPA T1027  {
 	attack = "Defense Evasion::Obfuscated Files or Information [T1027]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/encrypt-data-using-salsa20-or-chacha.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5267,7 +5269,7 @@ rule capa_encrypt_data_using_Salsa20_or_ChaCha : CAPA T1027  {
 	) 
 }
 
-rule capa_listen_for_remote_procedure_calls : CAPA  { 
+rule capa_listen_for_remote_procedure_calls : CAPA COMMUNICATION RPC SERVER BASICBLOCK  { 
   meta: 
  	description = "listen for remote procedure calls (converted from capa rule)"
 	namespace = "communication/rpc/server"
@@ -5275,7 +5277,7 @@ rule capa_listen_for_remote_procedure_calls : CAPA  {
 	scope = "basic block"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/listen-for-remote-procedure-calls.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5286,7 +5288,7 @@ rule capa_listen_for_remote_procedure_calls : CAPA  {
 	) 
 }
 
-rule capa_enumerate_internet_cache : CAPA  { 
+rule capa_enumerate_internet_cache : CAPA HOST_INTERACTION INTERNET CACHE FUNCTION  { 
   meta: 
  	description = "enumerate internet cache (converted from capa rule)"
 	namespace = "host-interaction/internet/cache"
@@ -5294,7 +5296,7 @@ rule capa_enumerate_internet_cache : CAPA  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/enumerate-internet-cache.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5305,7 +5307,7 @@ rule capa_enumerate_internet_cache : CAPA  {
 	) 
 }
 
-rule capa_reference_Verisign_DNS_server : CAPA  { 
+rule capa_reference_Verisign_DNS_server : CAPA COMMUNICATION DNS FUNCTION  { 
   meta: 
  	description = "reference Verisign DNS server (converted from capa rule)"
 	namespace = "communication/dns"
@@ -5313,7 +5315,7 @@ rule capa_reference_Verisign_DNS_server : CAPA  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/reference-verisign-dns-server.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5329,7 +5331,7 @@ rule capa_reference_Verisign_DNS_server : CAPA  {
 	) 
 }
 
-rule capa_packaged_as_a_NSIS_installer : CAPA  { 
+rule capa_packaged_as_a_NSIS_installer : CAPA EXECUTABLE INSTALLER NSIS FILE  { 
   meta: 
  	description = "packaged as a NSIS installer (converted from capa rule)"
 	namespace = "executable/installer/nsis"
@@ -5337,7 +5339,7 @@ rule capa_packaged_as_a_NSIS_installer : CAPA  {
 	scope = "file"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packaged-as-a-nsis-installer.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5351,7 +5353,7 @@ rule capa_packaged_as_a_NSIS_installer : CAPA  {
 	) 
 }
 
-rule capa_reference_AliDNS_DNS_server : CAPA  { 
+rule capa_reference_AliDNS_DNS_server : CAPA COMMUNICATION DNS FUNCTION  { 
   meta: 
  	description = "reference AliDNS DNS server (converted from capa rule)"
 	namespace = "communication/dns"
@@ -5359,7 +5361,7 @@ rule capa_reference_AliDNS_DNS_server : CAPA  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/reference-alidns-dns-server.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5379,7 +5381,7 @@ rule capa_reference_AliDNS_DNS_server : CAPA  {
 	) 
 }
 
-rule capa_get_networking_parameters : CAPA T1016  { 
+rule capa_get_networking_parameters : CAPA HOST_INTERACTION NETWORK FUNCTION T1016  { 
   meta: 
  	description = "get networking parameters (converted from capa rule)"
 	namespace = "host-interaction/network"
@@ -5388,7 +5390,7 @@ rule capa_get_networking_parameters : CAPA T1016  {
 	attack = "Discovery::System Network Configuration Discovery [T1016]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/get-networking-parameters.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5399,7 +5401,7 @@ rule capa_get_networking_parameters : CAPA T1016  {
 	) 
 }
 
-rule capa_packed_with_TSULoader : CAPA T1027_002 F0001  { 
+rule capa_packed_with_TSULoader : CAPA ANTI_ANALYSIS PACKER TSULOADER FILE T1027_002 F0001  { 
   meta: 
  	description = "packed with TSULoader (converted from capa rule)"
 	namespace = "anti-analysis/packer/tsuloader"
@@ -5409,7 +5411,7 @@ rule capa_packed_with_TSULoader : CAPA T1027_002 F0001  {
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-tsuloader.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5421,7 +5423,7 @@ rule capa_packed_with_TSULoader : CAPA T1027_002 F0001  {
 	) 
 }
 
-rule capa_packaged_as_a_WinZip_self_extracting_archive : CAPA  { 
+rule capa_packaged_as_a_WinZip_self_extracting_archive : CAPA EXECUTABLE INSTALLER WINZIP FILE  { 
   meta: 
  	description = "packaged as a WinZip self-extracting archive (converted from capa rule)"
 	namespace = "executable/installer/winzip"
@@ -5429,7 +5431,7 @@ rule capa_packaged_as_a_WinZip_self_extracting_archive : CAPA  {
 	scope = "file"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packaged-as-a-winzip-self-extracting-archive.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5440,7 +5442,7 @@ rule capa_packaged_as_a_WinZip_self_extracting_archive : CAPA  {
 	) 
 }
 
-rule capa_get_file_version_info : CAPA T1083  { 
+rule capa_get_file_version_info : CAPA HOST_INTERACTION FILE_SYSTEM META FUNCTION T1083  { 
   meta: 
  	description = "get file version info (converted from capa rule)"
 	namespace = "host-interaction/file-system/meta"
@@ -5449,7 +5451,7 @@ rule capa_get_file_version_info : CAPA T1083  {
 	attack = "Discovery::File and Directory Discovery [T1083]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/get-file-version-info.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5463,7 +5465,7 @@ rule capa_get_file_version_info : CAPA T1083  {
 	) 
 }
 
-rule capa_packed_with_RPCrypt : CAPA T1027_002 F0001  { 
+rule capa_packed_with_RPCrypt : CAPA ANTI_ANALYSIS PACKER RPCRYPT FILE T1027_002 F0001  { 
   meta: 
  	description = "packed with RPCrypt (converted from capa rule)"
 	namespace = "anti-analysis/packer/rpcrypt"
@@ -5473,7 +5475,7 @@ rule capa_packed_with_RPCrypt : CAPA T1027_002 F0001  {
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-rpcrypt.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5485,7 +5487,7 @@ rule capa_packed_with_RPCrypt : CAPA T1027_002 F0001  {
 	) 
 }
 
-rule capa_get_proxy : CAPA T1016  { 
+rule capa_get_proxy : CAPA HOST_INTERACTION NETWORK PROXY FUNCTION T1016  { 
   meta: 
  	description = "get proxy (converted from capa rule)"
 	namespace = "host-interaction/network/proxy"
@@ -5494,7 +5496,7 @@ rule capa_get_proxy : CAPA T1016  {
 	attack = "Discovery::System Network Configuration Discovery [T1016]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/get-proxy.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5510,7 +5512,7 @@ rule capa_get_proxy : CAPA T1016  {
 	) 
 }
 
-rule capa_reference_DNS_over_HTTPS_endpoints : CAPA  { 
+rule capa_reference_DNS_over_HTTPS_endpoints : CAPA COMMUNICATION DNS FILE  { 
   meta: 
  	description = "reference DNS over HTTPS endpoints (converted from capa rule)"
 	namespace = "communication/dns"
@@ -5519,7 +5521,7 @@ rule capa_reference_DNS_over_HTTPS_endpoints : CAPA  {
 	hash = "749e7becf00fccc6dff324a83976dc0d"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/reference-dns-over-https-endpoints.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5657,7 +5659,7 @@ rule capa_reference_DNS_over_HTTPS_endpoints : CAPA  {
 	) 
 }
 
-rule capa_packed_with_Crunch : CAPA T1027_002 F0001  { 
+rule capa_packed_with_Crunch : CAPA ANTI_ANALYSIS PACKER CRUNCH FILE T1027_002 F0001  { 
   meta: 
  	description = "packed with Crunch (converted from capa rule)"
 	namespace = "anti-analysis/packer/crunch"
@@ -5667,7 +5669,7 @@ rule capa_packed_with_Crunch : CAPA T1027_002 F0001  {
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-crunch.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5678,7 +5680,7 @@ rule capa_packed_with_Crunch : CAPA T1027_002 F0001  {
 	) 
 }
 
-rule capa_delete_registry_key_via_offline_registry_library : CAPA T1112 C0036_002 C0036_007  { 
+rule capa_delete_registry_key_via_offline_registry_library : CAPA HOST_INTERACTION REGISTRY FUNCTION T1112 C0036_002 C0036_007  { 
   meta: 
  	description = "delete registry key via offline registry library (converted from capa rule)"
 	namespace = "host-interaction/registry"
@@ -5689,7 +5691,7 @@ rule capa_delete_registry_key_via_offline_registry_library : CAPA T1112 C0036_00
 	mbc = "Operating System::Registry::Delete Registry Value [C0036.007]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/delete-registry-key-via-offline-registry-library.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5705,7 +5707,7 @@ rule capa_delete_registry_key_via_offline_registry_library : CAPA T1112 C0036_00
 	) 
 }
 
-rule capa_get_token_membership : CAPA T1033  { 
+rule capa_get_token_membership : CAPA HOST_INTERACTION SESSION FUNCTION T1033  { 
   meta: 
  	description = "get token membership (converted from capa rule)"
 	namespace = "host-interaction/session"
@@ -5714,7 +5716,7 @@ rule capa_get_token_membership : CAPA T1033  {
 	attack = "Discovery::System Owner/User Discovery [T1033]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/get-token-membership.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5725,7 +5727,7 @@ rule capa_get_token_membership : CAPA T1033  {
 	) 
 }
 
-rule capa_packed_with_PECompact : CAPA T1027_002 F0001  { 
+rule capa_packed_with_PECompact : CAPA ANTI_ANALYSIS PACKER PECOMPACT FILE T1027_002 F0001  { 
   meta: 
  	description = "packed with PECompact (converted from capa rule)"
 	namespace = "anti-analysis/packer/pecompact"
@@ -5735,7 +5737,7 @@ rule capa_packed_with_PECompact : CAPA T1027_002 F0001  {
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-pecompact.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5755,7 +5757,7 @@ rule capa_packed_with_PECompact : CAPA T1027_002 F0001  {
 	) 
 }
 
-rule capa_packaged_as_a_CreateInstall_installer : CAPA  { 
+rule capa_packaged_as_a_CreateInstall_installer : CAPA EXECUTABLE INSTALLER CREATEINSTALL FILE  { 
   meta: 
  	description = "packaged as a CreateInstall installer (converted from capa rule)"
 	namespace = "executable/installer/createinstall"
@@ -5763,7 +5765,7 @@ rule capa_packaged_as_a_CreateInstall_installer : CAPA  {
 	scope = "file"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packaged-as-a-createinstall-installer.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5774,7 +5776,7 @@ rule capa_packaged_as_a_CreateInstall_installer : CAPA  {
 	) 
 }
 
-rule capa_packed_with_Pepack : CAPA T1027_002 F0001  { 
+rule capa_packed_with_Pepack : CAPA ANTI_ANALYSIS PACKER PEPACK FILE T1027_002 F0001  { 
   meta: 
  	description = "packed with Pepack (converted from capa rule)"
 	namespace = "anti-analysis/packer/pepack"
@@ -5784,7 +5786,7 @@ rule capa_packed_with_Pepack : CAPA T1027_002 F0001  {
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-pepack.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5795,7 +5797,7 @@ rule capa_packed_with_Pepack : CAPA T1027_002 F0001  {
 	) 
 }
 
-rule capa_reference_Google_Public_DNS_server : CAPA  { 
+rule capa_reference_Google_Public_DNS_server : CAPA COMMUNICATION DNS FUNCTION  { 
   meta: 
  	description = "reference Google Public DNS server (converted from capa rule)"
 	namespace = "communication/dns"
@@ -5803,7 +5805,7 @@ rule capa_reference_Google_Public_DNS_server : CAPA  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/reference-google-public-dns-server.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5823,7 +5825,7 @@ rule capa_reference_Google_Public_DNS_server : CAPA  {
 	) 
 }
 
-rule capa_linked_against_C___regex_library : CAPA  { 
+rule capa_linked_against_C___regex_library : CAPA LINKING STATIC CPPREGEX FILE  { 
   meta: 
  	description = "linked against C++ regex library (converted from capa rule)"
 	namespace = "linking/static/cppregex"
@@ -5831,7 +5833,7 @@ rule capa_linked_against_C___regex_library : CAPA  {
 	scope = "file"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/linked-against-c-regex-library.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5847,7 +5849,7 @@ rule capa_linked_against_C___regex_library : CAPA  {
 	) 
 }
 
-rule capa_packed_with_MEW : CAPA T1027_002 F0001  { 
+rule capa_packed_with_MEW : CAPA ANTI_ANALYSIS PACKER MEW FILE T1027_002 F0001  { 
   meta: 
  	description = "packed with MEW (converted from capa rule)"
 	namespace = "anti-analysis/packer/mew"
@@ -5857,7 +5859,7 @@ rule capa_packed_with_MEW : CAPA T1027_002 F0001  {
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-mew.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5868,7 +5870,7 @@ rule capa_packed_with_MEW : CAPA T1027_002 F0001  {
 	) 
 }
 
-rule capa_reference_114DNS_DNS_server : CAPA  { 
+rule capa_reference_114DNS_DNS_server : CAPA COMMUNICATION DNS FUNCTION  { 
   meta: 
  	description = "reference 114DNS DNS server (converted from capa rule)"
 	namespace = "communication/dns"
@@ -5876,7 +5878,7 @@ rule capa_reference_114DNS_DNS_server : CAPA  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/reference-114dns-dns-server.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5900,7 +5902,7 @@ rule capa_reference_114DNS_DNS_server : CAPA  {
 	) 
 }
 
-rule capa_migrate_process_to_active_window_station : CAPA  { 
+rule capa_migrate_process_to_active_window_station : CAPA HOST_INTERACTION GUI WINDOW_STATION FUNCTION  { 
   meta: 
  	description = "migrate process to active window station (converted from capa rule)"
 	namespace = "host-interaction/gui/window-station"
@@ -5909,7 +5911,7 @@ rule capa_migrate_process_to_active_window_station : CAPA  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/migrate-process-to-active-window-station.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5935,7 +5937,7 @@ rule capa_migrate_process_to_active_window_station : CAPA  {
 	) 
 }
 
-rule capa_packed_with_Epack : CAPA T1027_002 F0001  { 
+rule capa_packed_with_Epack : CAPA ANTI_ANALYSIS PACKER EPACK FILE T1027_002 F0001  { 
   meta: 
  	description = "packed with Epack (converted from capa rule)"
 	namespace = "anti-analysis/packer/epack"
@@ -5945,7 +5947,7 @@ rule capa_packed_with_Epack : CAPA T1027_002 F0001  {
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-epack.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5956,7 +5958,7 @@ rule capa_packed_with_Epack : CAPA T1027_002 F0001  {
 	) 
 }
 
-rule capa_packaged_as_a_Pintool : CAPA  { 
+rule capa_packaged_as_a_Pintool : CAPA EXECUTABLE PINTOOL FILE  { 
   meta: 
  	description = "packaged as a Pintool (converted from capa rule)"
 	namespace = "executable/pintool"
@@ -5964,7 +5966,7 @@ rule capa_packaged_as_a_Pintool : CAPA  {
 	scope = "file"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packaged-as-a-pintool.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5976,7 +5978,7 @@ rule capa_packaged_as_a_Pintool : CAPA  {
 	) 
 }
 
-rule capa_get_thread_local_storage_value : CAPA  { 
+rule capa_get_thread_local_storage_value : CAPA HOST_INTERACTION PROCESS FUNCTION  { 
   meta: 
  	description = "get thread local storage value (converted from capa rule)"
 	namespace = "host-interaction/process"
@@ -5984,7 +5986,7 @@ rule capa_get_thread_local_storage_value : CAPA  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/get-thread-local-storage-value.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5995,7 +5997,7 @@ rule capa_get_thread_local_storage_value : CAPA  {
 	) 
 }
 
-rule capa_rebuilt_by_ImpRec : CAPA  { 
+rule capa_rebuilt_by_ImpRec : CAPA EXECUTABLE IMPREC FILE  { 
   meta: 
  	description = "rebuilt by ImpRec (converted from capa rule)"
 	namespace = "executable/imprec"
@@ -6003,7 +6005,7 @@ rule capa_rebuilt_by_ImpRec : CAPA  {
 	scope = "file"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/rebuilt-by-imprec.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6014,7 +6016,7 @@ rule capa_rebuilt_by_ImpRec : CAPA  {
 	) 
 }
 
-rule capa_enumerate_threads : CAPA  { 
+rule capa_enumerate_threads : CAPA HOST_INTERACTION THREAD LIST FUNCTION  { 
   meta: 
  	description = "enumerate threads (converted from capa rule)"
 	namespace = "host-interaction/thread/list"
@@ -6022,7 +6024,7 @@ rule capa_enumerate_threads : CAPA  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/enumerate-threads.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6034,7 +6036,7 @@ rule capa_enumerate_threads : CAPA  {
 	) 
 }
 
-rule capa_reference_Comodo_Secure_DNS_server : CAPA  { 
+rule capa_reference_Comodo_Secure_DNS_server : CAPA COMMUNICATION DNS FUNCTION  { 
   meta: 
  	description = "reference Comodo Secure DNS server (converted from capa rule)"
 	namespace = "communication/dns"
@@ -6042,7 +6044,7 @@ rule capa_reference_Comodo_Secure_DNS_server : CAPA  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/reference-comodo-secure-dns-server.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6058,7 +6060,7 @@ rule capa_reference_Comodo_Secure_DNS_server : CAPA  {
 	) 
 }
 
-rule capa_decrypt_data_via_SSPI : CAPA T1140  { 
+rule capa_decrypt_data_via_SSPI : CAPA DATA_MANIPULATION ENCRYPTION BASICBLOCK T1140  { 
   meta: 
  	description = "decrypt data via SSPI (converted from capa rule)"
 	namespace = "data-manipulation/encryption"
@@ -6067,7 +6069,7 @@ rule capa_decrypt_data_via_SSPI : CAPA T1140  {
 	attack = "Defense Evasion::Deobfuscate/Decode Files or Information [T1140]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/decrypt-data-via-sspi.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6078,7 +6080,7 @@ rule capa_decrypt_data_via_SSPI : CAPA T1140  {
 	) 
 }
 
-rule capa_reference_L3_DNS_server : CAPA  { 
+rule capa_reference_L3_DNS_server : CAPA COMMUNICATION DNS FUNCTION  { 
   meta: 
  	description = "reference L3 DNS server (converted from capa rule)"
 	namespace = "communication/dns"
@@ -6086,7 +6088,7 @@ rule capa_reference_L3_DNS_server : CAPA  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/reference-l3-dns-server.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6110,7 +6112,7 @@ rule capa_reference_L3_DNS_server : CAPA  {
 	) 
 }
 
-rule capa_packaged_as_a_Wise_installer : CAPA  { 
+rule capa_packaged_as_a_Wise_installer : CAPA EXECUTABLE INSTALLER WISEINSTALL FILE  { 
   meta: 
  	description = "packaged as a Wise installer (converted from capa rule)"
 	namespace = "executable/installer/wiseinstall"
@@ -6118,7 +6120,7 @@ rule capa_packaged_as_a_Wise_installer : CAPA  {
 	scope = "file"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packaged-as-a-wise-installer.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6134,7 +6136,7 @@ rule capa_packaged_as_a_Wise_installer : CAPA  {
 	) 
 }
 
-rule capa_acquire_debug_privileges : CAPA T1134  { 
+rule capa_acquire_debug_privileges : CAPA HOST_INTERACTION PROCESS MODIFY BASICBLOCK T1134  { 
   meta: 
  	description = "acquire debug privileges (converted from capa rule)"
 	namespace = "host-interaction/process/modify"
@@ -6143,7 +6145,7 @@ rule capa_acquire_debug_privileges : CAPA T1134  {
 	attack = "Privilege Escalation::Access Token Manipulation [T1134]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/acquire-debug-privileges.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6157,7 +6159,7 @@ rule capa_acquire_debug_privileges : CAPA T1134  {
 	) 
 }
 
-rule capa_empty_the_recycle_bin : CAPA  { 
+rule capa_empty_the_recycle_bin : CAPA HOST_INTERACTION RECYCLE_BIN FUNCTION  { 
   meta: 
  	description = "empty the recycle bin (converted from capa rule)"
 	namespace = "host-interaction/recycle-bin"
@@ -6165,7 +6167,7 @@ rule capa_empty_the_recycle_bin : CAPA  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/empty-the-recycle-bin.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6179,7 +6181,7 @@ rule capa_empty_the_recycle_bin : CAPA  {
 	) 
 }
 
-rule capa_compare_security_identifiers : CAPA  { 
+rule capa_compare_security_identifiers : CAPA HOST_INTERACTION SID BASICBLOCK  { 
   meta: 
  	description = "compare security identifiers (converted from capa rule)"
 	namespace = "host-interaction/sid"
@@ -6187,7 +6189,7 @@ rule capa_compare_security_identifiers : CAPA  {
 	scope = "basic block"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/compare-security-identifiers.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6198,7 +6200,7 @@ rule capa_compare_security_identifiers : CAPA  {
 	) 
 }
 
-rule capa_query_remote_server_for_available_data : CAPA  { 
+rule capa_query_remote_server_for_available_data : CAPA COMMUNICATION BASICBLOCK  { 
   meta: 
  	description = "query remote server for available data (converted from capa rule)"
 	namespace = "communication"
@@ -6206,7 +6208,7 @@ rule capa_query_remote_server_for_available_data : CAPA  {
 	scope = "basic block"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/query-remote-server-for-available-data.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6217,7 +6219,7 @@ rule capa_query_remote_server_for_available_data : CAPA  {
 	) 
 }
 
-rule capa_packed_with_enigma : CAPA T1027_002 F0001  { 
+rule capa_packed_with_enigma : CAPA ANTI_ANALYSIS PACKER ENIGMA FILE T1027_002 F0001  { 
   meta: 
  	description = "packed with enigma (converted from capa rule)"
 	namespace = "anti-analysis/packer/enigma"
@@ -6227,7 +6229,7 @@ rule capa_packed_with_enigma : CAPA T1027_002 F0001  {
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-enigma.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6239,7 +6241,7 @@ rule capa_packed_with_enigma : CAPA T1027_002 F0001  {
 	) 
 }
 
-rule capa_initialize_hashing_via_WinCrypt : CAPA  { 
+rule capa_initialize_hashing_via_WinCrypt : CAPA DATA_MANIPULATION HASHING FUNCTION  { 
   meta: 
  	description = "initialize hashing via WinCrypt (converted from capa rule)"
 	namespace = "data-manipulation/hashing"
@@ -6247,7 +6249,7 @@ rule capa_initialize_hashing_via_WinCrypt : CAPA  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/initialize-hashing-via-wincrypt.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6258,7 +6260,7 @@ rule capa_initialize_hashing_via_WinCrypt : CAPA  {
 	) 
 }
 
-rule capa_packed_with_StarForce : CAPA T1027_002 F0001  { 
+rule capa_packed_with_StarForce : CAPA ANTI_ANALYSIS PACKER STARFORCE FILE T1027_002 F0001  { 
   meta: 
  	description = "packed with StarForce (converted from capa rule)"
 	namespace = "anti-analysis/packer/starforce"
@@ -6268,7 +6270,7 @@ rule capa_packed_with_StarForce : CAPA T1027_002 F0001  {
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-starforce.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6279,7 +6281,7 @@ rule capa_packed_with_StarForce : CAPA T1027_002 F0001  {
 	) 
 }
 
-rule capa_encrypt_data_via_SSPI : CAPA T1027  { 
+rule capa_encrypt_data_via_SSPI : CAPA DATA_MANIPULATION ENCRYPTION BASICBLOCK T1027  { 
   meta: 
  	description = "encrypt data via SSPI (converted from capa rule)"
 	namespace = "data-manipulation/encryption"
@@ -6288,7 +6290,7 @@ rule capa_encrypt_data_via_SSPI : CAPA T1027  {
 	attack = "Defense Evasion::Obfuscated Files or Information [T1027]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/encrypt-data-via-sspi.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6299,7 +6301,7 @@ rule capa_encrypt_data_via_SSPI : CAPA T1027  {
 	) 
 }
 
-rule capa_packed_with_ProCrypt : CAPA T1027_002 F0001  { 
+rule capa_packed_with_ProCrypt : CAPA ANTI_ANALYSIS PACKER PROCRYPT FILE T1027_002 F0001  { 
   meta: 
  	description = "packed with ProCrypt (converted from capa rule)"
 	namespace = "anti-analysis/packer/procrypt"
@@ -6309,7 +6311,7 @@ rule capa_packed_with_ProCrypt : CAPA T1027_002 F0001  {
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-procrypt.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6320,7 +6322,7 @@ rule capa_packed_with_ProCrypt : CAPA T1027_002 F0001  {
 	) 
 }
 
-rule capa_packed_with_WWPACK : CAPA T1027_002 F0001  { 
+rule capa_packed_with_WWPACK : CAPA ANTI_ANALYSIS PACKER WWPACK FILE T1027_002 F0001  { 
   meta: 
  	description = "packed with WWPACK (converted from capa rule)"
 	namespace = "anti-analysis/packer/wwpack"
@@ -6330,7 +6332,7 @@ rule capa_packed_with_WWPACK : CAPA T1027_002 F0001  {
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-wwpack.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6342,7 +6344,7 @@ rule capa_packed_with_WWPACK : CAPA T1027_002 F0001  {
 	) 
 }
 
-rule capa_reference_Cloudflare_DNS_server : CAPA  { 
+rule capa_reference_Cloudflare_DNS_server : CAPA COMMUNICATION DNS FUNCTION  { 
   meta: 
  	description = "reference Cloudflare DNS server (converted from capa rule)"
 	namespace = "communication/dns"
@@ -6350,7 +6352,7 @@ rule capa_reference_Cloudflare_DNS_server : CAPA  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/reference-cloudflare-dns-server.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6366,7 +6368,7 @@ rule capa_reference_Cloudflare_DNS_server : CAPA  {
 	) 
 }
 
-rule capa_get_system_firmware_table : CAPA  { 
+rule capa_get_system_firmware_table : CAPA HOST_INTERACTION HARDWARE FIRMWARE FUNCTION  { 
   meta: 
  	description = "get system firmware table (converted from capa rule)"
 	namespace = "host-interaction/hardware/firmware"
@@ -6374,7 +6376,7 @@ rule capa_get_system_firmware_table : CAPA  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/get-system-firmware-table.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6385,7 +6387,7 @@ rule capa_get_system_firmware_table : CAPA  {
 	) 
 }
 
-rule capa_get_socket_information : CAPA T1016  { 
+rule capa_get_socket_information : CAPA COMMUNICATION SOCKET FUNCTION T1016  { 
   meta: 
  	description = "get socket information (converted from capa rule)"
 	namespace = "communication/socket"
@@ -6394,7 +6396,7 @@ rule capa_get_socket_information : CAPA T1016  {
 	attack = "Discovery::System Network Configuration Discovery [T1016]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/get-socket-information.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6405,7 +6407,7 @@ rule capa_get_socket_information : CAPA T1016  {
 	) 
 }
 
-rule capa_check_license_value : CAPA T1497_001  { 
+rule capa_check_license_value : CAPA ANTI_ANALYSIS ANTI_VM VM_DETECTION FUNCTION T1497_001  { 
   meta: 
  	description = "check license value (converted from capa rule)"
 	namespace = "anti-analysis/anti-vm/vm-detection"
@@ -6414,7 +6416,7 @@ rule capa_check_license_value : CAPA T1497_001  {
 	attack = "Defense Evasion::Virtualization/Sandbox Evasion::System Checks [T1497.001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/check-license-value.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6430,7 +6432,7 @@ rule capa_check_license_value : CAPA T1497_001  {
 	) 
 }
 
-rule capa_bypass_UAC_via_ICMLuaUtil : CAPA T1548_002  { 
+rule capa_bypass_UAC_via_ICMLuaUtil : CAPA HOST_INTERACTION UAC BYPASS FUNCTION T1548_002  { 
   meta: 
  	description = "bypass UAC via ICMLuaUtil (converted from capa rule)"
 	namespace = "host-interaction/uac/bypass"
@@ -6439,7 +6441,7 @@ rule capa_bypass_UAC_via_ICMLuaUtil : CAPA T1548_002  {
 	attack = "Defense Evasion::Abuse Elevation Control Mechanism::Bypass User Access Control [T1548.002]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/bypass-uac-via-icmluautil.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6457,7 +6459,7 @@ rule capa_bypass_UAC_via_ICMLuaUtil : CAPA T1548_002  {
 	) 
 }
 
-rule capa_reference_screen_saver_executable : CAPA T1546_002  { 
+rule capa_reference_screen_saver_executable : CAPA PERSISTENCE SCREENSAVER FUNCTION T1546_002  { 
   meta: 
  	description = "reference screen saver executable (converted from capa rule)"
 	namespace = "persistence/screensaver"
@@ -6467,7 +6469,7 @@ rule capa_reference_screen_saver_executable : CAPA T1546_002  {
 	attack = "Persistence::Event Triggered Execution::Screensaver [T1546.002]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/reference-screen-saver-executable.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6481,7 +6483,7 @@ rule capa_reference_screen_saver_executable : CAPA T1546_002  {
 	) 
 }
 
-rule capa_create_Restart_Manager_session : CAPA  { 
+rule capa_create_Restart_Manager_session : CAPA HOST_INTERACTION PROCESS FUNCTION  { 
   meta: 
  	description = "create Restart Manager session (converted from capa rule)"
 	namespace = "host-interaction/process"
@@ -6491,7 +6493,7 @@ rule capa_create_Restart_Manager_session : CAPA  {
 	references = "https://www.carbonblack.com/blog/tau-threat-discovery-conti-ransomware/"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/create-restart-manager-session.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6502,7 +6504,7 @@ rule capa_create_Restart_Manager_session : CAPA  {
 	) 
 }
 
-rule capa_reference_kornet_DNS_server : CAPA  { 
+rule capa_reference_kornet_DNS_server : CAPA COMMUNICATION DNS FUNCTION  { 
   meta: 
  	description = "reference kornet DNS server (converted from capa rule)"
 	namespace = "communication/dns"
@@ -6510,7 +6512,7 @@ rule capa_reference_kornet_DNS_server : CAPA  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/reference-kornet-dns-server.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6524,7 +6526,7 @@ rule capa_reference_kornet_DNS_server : CAPA  {
 	) 
 }
 
-rule capa_packed_with_Themida : CAPA T1027_002 F0001  { 
+rule capa_packed_with_Themida : CAPA ANTI_ANALYSIS PACKER THEMIDA FILE T1027_002 F0001  { 
   meta: 
  	description = "packed with Themida (converted from capa rule)"
 	namespace = "anti-analysis/packer/themida"
@@ -6534,7 +6536,7 @@ rule capa_packed_with_Themida : CAPA T1027_002 F0001  {
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-themida.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6547,7 +6549,7 @@ rule capa_packed_with_Themida : CAPA T1027_002 F0001  {
 	) 
 }
 
-rule capa_impersonate_user : CAPA T1134_001  { 
+rule capa_impersonate_user : CAPA HOST_INTERACTION USER FUNCTION T1134_001  { 
   meta: 
  	description = "impersonate user (converted from capa rule)"
 	namespace = "host-interaction/user"
@@ -6556,7 +6558,7 @@ rule capa_impersonate_user : CAPA T1134_001  {
 	attack = "Privilege Escalation::Access Token Manipulation::Token Impersonation/Theft [T1134.001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/impersonate-user.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6570,7 +6572,7 @@ rule capa_impersonate_user : CAPA T1134_001  {
 	) 
 }
 
-rule capa_get_user_security_identifier : CAPA T1087  { 
+rule capa_get_user_security_identifier : CAPA HOST_INTERACTION SID BASICBLOCK T1087  { 
   meta: 
  	description = "get user security identifier (converted from capa rule)"
 	namespace = "host-interaction/sid"
@@ -6579,7 +6581,7 @@ rule capa_get_user_security_identifier : CAPA T1087  {
 	attack = "Discovery::Account Discovery [T1087]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/get-user-security-identifier.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6592,7 +6594,7 @@ rule capa_get_user_security_identifier : CAPA T1087  {
 	) 
 }
 
-rule capa_read_raw_disk_data : CAPA  { 
+rule capa_read_raw_disk_data : CAPA HOST_INTERACTION FILE_SYSTEM FILE  { 
   meta: 
  	description = "read raw disk data (converted from capa rule)"
 	namespace = "host-interaction/file-system"
@@ -6600,7 +6602,7 @@ rule capa_read_raw_disk_data : CAPA  {
 	scope = "file"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/read-raw-disk-data.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6616,7 +6618,7 @@ rule capa_read_raw_disk_data : CAPA  {
 	) 
 }
 
-rule capa_bypass_UAC_via_scheduled_task_environment_variable : CAPA T1548_002  { 
+rule capa_bypass_UAC_via_scheduled_task_environment_variable : CAPA HOST_INTERACTION UAC BYPASS FUNCTION T1548_002  { 
   meta: 
  	description = "bypass UAC via scheduled task environment variable (converted from capa rule)"
 	namespace = "host-interaction/uac/bypass"
@@ -6625,7 +6627,7 @@ rule capa_bypass_UAC_via_scheduled_task_environment_variable : CAPA T1548_002  {
 	attack = "Defense Evasion::Abuse Elevation Control Mechanism::Bypass User Access Control [T1548.002]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/bypass-uac-via-scheduled-task-environment-variable.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6643,7 +6645,7 @@ rule capa_bypass_UAC_via_scheduled_task_environment_variable : CAPA T1548_002  {
 	) 
 }
 
-rule capa_reference_AES_constants : CAPA T1027  { 
+rule capa_reference_AES_constants : CAPA DATA_MANIPULATION ENCRYPTION AES FUNCTION T1027  { 
   meta: 
  	description = "reference AES constants (converted from capa rule)"
 	namespace = "data-manipulation/encryption/aes"
@@ -6652,7 +6654,7 @@ rule capa_reference_AES_constants : CAPA T1027  {
 	attack = "Defense Evasion::Obfuscated Files or Information [T1027]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/reference-aes-constants.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6670,7 +6672,7 @@ rule capa_reference_AES_constants : CAPA T1027  {
 	) 
 }
 
-rule capa_compiled_with_Nim : CAPA  { 
+rule capa_compiled_with_Nim : CAPA COMPILER NIM FILE  { 
   meta: 
  	description = "compiled with Nim (converted from capa rule)"
 	namespace = "compiler/nim"
@@ -6678,7 +6680,7 @@ rule capa_compiled_with_Nim : CAPA  {
 	scope = "file"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/compiled-with-nim.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6706,14 +6708,14 @@ rule capa_compiled_with_Nim : CAPA  {
 	) 
 }
 
-rule capa_hook_routines_via_microsoft_detours : CAPA  { 
+rule capa_hook_routines_via_microsoft_detours : CAPA FUNCTION  { 
   meta: 
  	description = "hook routines via microsoft detours (converted from capa rule)"
 	author = "william.ballenthin@fireeye.com"
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/hook-routines-via-microsoft-detours.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6727,7 +6729,7 @@ rule capa_hook_routines_via_microsoft_detours : CAPA  {
 	) 
 }
 
-rule capa_packed_with_SVKP : CAPA T1027_002 F0001  { 
+rule capa_packed_with_SVKP : CAPA ANTI_ANALYSIS PACKER SVKP FILE T1027_002 F0001  { 
   meta: 
  	description = "packed with SVKP (converted from capa rule)"
 	namespace = "anti-analysis/packer/svkp"
@@ -6737,7 +6739,7 @@ rule capa_packed_with_SVKP : CAPA T1027_002 F0001  {
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-svkp.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6748,7 +6750,7 @@ rule capa_packed_with_SVKP : CAPA T1027_002 F0001  {
 	) 
 }
 
-rule capa_flush_cabinet_file : CAPA  { 
+rule capa_flush_cabinet_file : CAPA HOST_INTERACTION FILE_SYSTEM FUNCTION  { 
   meta: 
  	description = "flush cabinet file (converted from capa rule)"
 	namespace = "host-interaction/file-system"
@@ -6757,7 +6759,7 @@ rule capa_flush_cabinet_file : CAPA  {
 	references = "https://docs.microsoft.com/en-us/windows/win32/msi/cabinet-files"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/flush-cabinet-file.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6769,7 +6771,7 @@ rule capa_flush_cabinet_file : CAPA  {
 	) 
 }
 
-rule capa_enumerate_system_firmware_tables : CAPA  { 
+rule capa_enumerate_system_firmware_tables : CAPA HOST_INTERACTION HARDWARE FIRMWARE FUNCTION  { 
   meta: 
  	description = "enumerate system firmware tables (converted from capa rule)"
 	namespace = "host-interaction/hardware/firmware"
@@ -6777,7 +6779,7 @@ rule capa_enumerate_system_firmware_tables : CAPA  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/enumerate-system-firmware-tables.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6788,7 +6790,7 @@ rule capa_enumerate_system_firmware_tables : CAPA  {
 	) 
 }
 
-rule capa_reference_startup_folder : CAPA T1547_001  { 
+rule capa_reference_startup_folder : CAPA PERSISTENCE STARTUP_FOLDER FILE T1547_001  { 
   meta: 
  	description = "reference startup folder (converted from capa rule)"
 	namespace = "persistence/startup-folder"
@@ -6797,7 +6799,7 @@ rule capa_reference_startup_folder : CAPA T1547_001  {
 	attack = "Persistence::Boot or Logon Autostart Execution::Registry Run Keys / Startup Folder [T1547.001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/reference-startup-folder.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6811,7 +6813,7 @@ rule capa_reference_startup_folder : CAPA T1547_001  {
 	) 
 }
 
-rule capa_encrypt_or_decrypt_data_via_BCrypt : CAPA T1027 C0031 C0027  { 
+rule capa_encrypt_or_decrypt_data_via_BCrypt : CAPA DATA_MANIPULATION ENCRYPTION FUNCTION T1027 C0031 C0027  { 
   meta: 
  	description = "encrypt or decrypt data via BCrypt (converted from capa rule)"
 	namespace = "data-manipulation/encryption"
@@ -6822,7 +6824,7 @@ rule capa_encrypt_or_decrypt_data_via_BCrypt : CAPA T1027 C0031 C0027  {
 	mbc = "Cryptography::Encrypt Data [C0027]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/encrypt-or-decrypt-data-via-bcrypt.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6840,7 +6842,7 @@ rule capa_encrypt_or_decrypt_data_via_BCrypt : CAPA T1027 C0031 C0027  {
 	) 
 }
 
-rule capa_connect_network_resource : CAPA  { 
+rule capa_connect_network_resource : CAPA COMMUNICATION HTTP FUNCTION  { 
   meta: 
  	description = "connect network resource (converted from capa rule)"
 	namespace = "communication/http"
@@ -6849,7 +6851,7 @@ rule capa_connect_network_resource : CAPA  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/connect-network-resource.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6864,7 +6866,7 @@ rule capa_connect_network_resource : CAPA  {
 	) 
 }
 
-rule capa_packed_with_Shrinker : CAPA T1027_002 F0001  { 
+rule capa_packed_with_Shrinker : CAPA ANTI_ANALYSIS PACKER SHRINKER FILE T1027_002 F0001  { 
   meta: 
  	description = "packed with Shrinker (converted from capa rule)"
 	namespace = "anti-analysis/packer/shrinker"
@@ -6874,7 +6876,7 @@ rule capa_packed_with_Shrinker : CAPA T1027_002 F0001  {
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-shrinker.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6887,7 +6889,7 @@ rule capa_packed_with_Shrinker : CAPA T1027_002 F0001  {
 	) 
 }
 
-rule capa_packed_with_VProtect : CAPA T1027_002 F0001  { 
+rule capa_packed_with_VProtect : CAPA ANTI_ANALYSIS PACKER VPROTECT FILE T1027_002 F0001  { 
   meta: 
  	description = "packed with VProtect (converted from capa rule)"
 	namespace = "anti-analysis/packer/vprotect"
@@ -6897,7 +6899,7 @@ rule capa_packed_with_VProtect : CAPA T1027_002 F0001  {
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-vprotect.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6908,7 +6910,7 @@ rule capa_packed_with_VProtect : CAPA T1027_002 F0001  {
 	) 
 }
 
-rule capa_packed_with_CCG : CAPA T1027_002 F0001  { 
+rule capa_packed_with_CCG : CAPA ANTI_ANALYSIS PACKER CCG FILE T1027_002 F0001  { 
   meta: 
  	description = "packed with CCG (converted from capa rule)"
 	namespace = "anti-analysis/packer/ccg"
@@ -6918,7 +6920,7 @@ rule capa_packed_with_CCG : CAPA T1027_002 F0001  {
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-ccg.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6929,7 +6931,7 @@ rule capa_packed_with_CCG : CAPA T1027_002 F0001  {
 	) 
 }
 
-rule capa_set_console_window_title : CAPA  { 
+rule capa_set_console_window_title : CAPA HOST_INTERACTION GUI CONSOLE FUNCTION  { 
   meta: 
  	description = "set console window title (converted from capa rule)"
 	namespace = "host-interaction/gui/console"
@@ -6937,7 +6939,7 @@ rule capa_set_console_window_title : CAPA  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/set-console-window-title.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6948,7 +6950,7 @@ rule capa_set_console_window_title : CAPA  {
 	) 
 }
 
-rule capa_get_routing_table : CAPA T1016  { 
+rule capa_get_routing_table : CAPA HOST_INTERACTION NETWORK ROUTING_TABLE FUNCTION T1016  { 
   meta: 
  	description = "get routing table (converted from capa rule)"
 	namespace = "host-interaction/network/routing-table"
@@ -6957,7 +6959,7 @@ rule capa_get_routing_table : CAPA T1016  {
 	attack = "Discovery::System Network Configuration Discovery [T1016]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/get-routing-table.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6969,7 +6971,7 @@ rule capa_get_routing_table : CAPA T1016  {
 	) 
 }
 
-rule capa_reference_Hurricane_Electric_DNS_server : CAPA  { 
+rule capa_reference_Hurricane_Electric_DNS_server : CAPA COMMUNICATION DNS FUNCTION  { 
   meta: 
  	description = "reference Hurricane Electric DNS server (converted from capa rule)"
 	namespace = "communication/dns"
@@ -6977,7 +6979,7 @@ rule capa_reference_Hurricane_Electric_DNS_server : CAPA  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/reference-hurricane-electric-dns-server.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6999,7 +7001,7 @@ rule capa_reference_Hurricane_Electric_DNS_server : CAPA  {
 	) 
 }
 
-rule capa_packed_with_Mpress : CAPA T1027_002 F0001  { 
+rule capa_packed_with_Mpress : CAPA ANTI_ANALYSIS PACKER MPRESS FILE T1027_002 F0001  { 
   meta: 
  	description = "packed with Mpress (converted from capa rule)"
 	namespace = "anti-analysis/packer/mpress"
@@ -7009,7 +7011,7 @@ rule capa_packed_with_Mpress : CAPA T1027_002 F0001  {
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-mpress.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7021,7 +7023,7 @@ rule capa_packed_with_Mpress : CAPA T1027_002 F0001  {
 	) 
 }
 
-rule capa_packaged_as_an_InstallShield_installer : CAPA  { 
+rule capa_packaged_as_an_InstallShield_installer : CAPA EXECUTABLE INSTALLER INSTALLSHIELD FILE  { 
   meta: 
  	description = "packaged as an InstallShield installer (converted from capa rule)"
 	namespace = "executable/installer/installshield"
@@ -7029,7 +7031,7 @@ rule capa_packaged_as_an_InstallShield_installer : CAPA  {
 	scope = "file"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packaged-as-an-installshield-installer.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7043,7 +7045,7 @@ rule capa_packaged_as_an_InstallShield_installer : CAPA  {
 	) 
 }
 
-rule capa_mine_cryptocurrency : CAPA T1496  { 
+rule capa_mine_cryptocurrency : CAPA IMPACT CRYPTOCURRENCY FILE T1496  { 
   meta: 
  	description = "mine cryptocurrency (converted from capa rule)"
 	namespace = "impact/cryptocurrency"
@@ -7052,7 +7054,7 @@ rule capa_mine_cryptocurrency : CAPA T1496  {
 	attack = "Impact::Resource Hijacking [T1496]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/mine-cryptocurrency.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7138,7 +7140,7 @@ rule capa_mine_cryptocurrency : CAPA T1496  {
 	) 
 }
 
-rule capa_packed_with_SeauSFX : CAPA T1027_002 F0001  { 
+rule capa_packed_with_SeauSFX : CAPA ANTI_ANALYSIS PACKER SEAUSFX FILE T1027_002 F0001  { 
   meta: 
  	description = "packed with SeauSFX (converted from capa rule)"
 	namespace = "anti-analysis/packer/seausfx"
@@ -7148,7 +7150,7 @@ rule capa_packed_with_SeauSFX : CAPA T1027_002 F0001  {
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-seausfx.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7159,7 +7161,7 @@ rule capa_packed_with_SeauSFX : CAPA T1027_002 F0001  {
 	) 
 }
 
-rule capa_debug_build : CAPA  { 
+rule capa_debug_build : CAPA EXECUTABLE PE DEBUG FILE  { 
   meta: 
  	description = "debug build (converted from capa rule)"
 	namespace = "executable/pe/debug"
@@ -7167,7 +7169,7 @@ rule capa_debug_build : CAPA  {
 	scope = "file"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/debug-build.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7183,7 +7185,7 @@ rule capa_debug_build : CAPA  {
 	) 
 }
 
-rule capa_packed_with_Simple_Pack : CAPA T1027_002 F0001  { 
+rule capa_packed_with_Simple_Pack : CAPA ANTI_ANALYSIS PACKER SIMPLE_PACK FILE T1027_002 F0001  { 
   meta: 
  	description = "packed with Simple Pack (converted from capa rule)"
 	namespace = "anti-analysis/packer/simple-pack"
@@ -7193,7 +7195,7 @@ rule capa_packed_with_Simple_Pack : CAPA T1027_002 F0001  {
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-simple-pack.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7204,7 +7206,7 @@ rule capa_packed_with_Simple_Pack : CAPA T1027_002 F0001  {
 	) 
 }
 
-rule capa_resolve_function_by_hash : CAPA T1027_005  { 
+rule capa_resolve_function_by_hash : CAPA LINKING RUNTIME_LINKING FUNCTION T1027_005  { 
   meta: 
  	description = "resolve function by hash (converted from capa rule)"
 	namespace = "linking/runtime-linking"
@@ -7213,7 +7215,7 @@ rule capa_resolve_function_by_hash : CAPA T1027_005  {
 	attack = "Defense Evasion::Obfuscated Files or Information::Indicator Removal from Tools [T1027.005]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/resolve-function-by-hash.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7241,7 +7243,7 @@ rule capa_resolve_function_by_hash : CAPA T1027_005  {
 	) 
 }
 
-rule capa_hash_data_via_BCrypt : CAPA T1027 C0029  { 
+rule capa_hash_data_via_BCrypt : CAPA DATA_MANIPULATION HASHING FUNCTION T1027 C0029  { 
   meta: 
  	description = "hash data via BCrypt (converted from capa rule)"
 	namespace = "data-manipulation/hashing"
@@ -7251,7 +7253,7 @@ rule capa_hash_data_via_BCrypt : CAPA T1027 C0029  {
 	mbc = "Cryptography::Cryptographic Hash [C0029]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/hash-data-via-bcrypt.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7271,7 +7273,7 @@ rule capa_hash_data_via_BCrypt : CAPA T1027 C0029  {
 	) 
 }
 
-rule capa_delete_internet_cache : CAPA  { 
+rule capa_delete_internet_cache : CAPA HOST_INTERACTION INTERNET CACHE FUNCTION  { 
   meta: 
  	description = "delete internet cache (converted from capa rule)"
 	namespace = "host-interaction/internet/cache"
@@ -7279,7 +7281,7 @@ rule capa_delete_internet_cache : CAPA  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/delete-internet-cache.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7292,7 +7294,7 @@ rule capa_delete_internet_cache : CAPA  {
 	) 
 }
 
-rule capa_reference_OpenDNS_DNS_server : CAPA  { 
+rule capa_reference_OpenDNS_DNS_server : CAPA COMMUNICATION DNS FUNCTION  { 
   meta: 
  	description = "reference OpenDNS DNS server (converted from capa rule)"
 	namespace = "communication/dns"
@@ -7300,7 +7302,7 @@ rule capa_reference_OpenDNS_DNS_server : CAPA  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/reference-opendns-dns-server.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7316,14 +7318,14 @@ rule capa_reference_OpenDNS_DNS_server : CAPA  {
 	) 
 }
 
-rule capa_read_process_memory : CAPA  { 
+rule capa_read_process_memory : CAPA HOST_INTERACTION PROCESS FUNCTION  { 
   meta: 
  	description = "read process memory (converted from capa rule)"
 	namespace = "host-interaction/process"
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/read-process-memory.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7334,7 +7336,7 @@ rule capa_read_process_memory : CAPA  {
 	) 
 }
 
-rule capa_linked_against_XZip : CAPA C0060  { 
+rule capa_linked_against_XZip : CAPA LINKING STATIC XZIP FILE C0060  { 
   meta: 
  	description = "linked against XZip (converted from capa rule)"
 	namespace = "linking/static/xzip"
@@ -7343,7 +7345,7 @@ rule capa_linked_against_XZip : CAPA C0060  {
 	mbc = "Data::Compression Library [C0060]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/linked-against-xzip.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7391,7 +7393,7 @@ rule capa_linked_against_XZip : CAPA C0060  {
 	) 
 }
 
-rule capa_compiled_from_EPL : CAPA  { 
+rule capa_compiled_from_EPL : CAPA COMPILER EPL FILE  { 
   meta: 
  	description = "compiled from EPL (converted from capa rule)"
 	namespace = "compiler/epl"
@@ -7399,7 +7401,7 @@ rule capa_compiled_from_EPL : CAPA  {
 	scope = "file"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/compiled-from-epl.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7427,7 +7429,7 @@ rule capa_compiled_from_EPL : CAPA  {
 	) 
 }
 
-rule capa_get_session_information : CAPA T1033  { 
+rule capa_get_session_information : CAPA HOST_INTERACTION SESSION FUNCTION T1033  { 
   meta: 
  	description = "get session information (converted from capa rule)"
 	namespace = "host-interaction/session"
@@ -7436,7 +7438,7 @@ rule capa_get_session_information : CAPA T1033  {
 	attack = "Discovery::System Owner/User Discovery [T1033]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/get-session-information.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7447,7 +7449,7 @@ rule capa_get_session_information : CAPA T1033  {
 	) 
 }
 
-rule capa_packed_with_Perplex : CAPA T1027_002 F0001  { 
+rule capa_packed_with_Perplex : CAPA ANTI_ANALYSIS PACKER PERPLEX FILE T1027_002 F0001  { 
   meta: 
  	description = "packed with Perplex (converted from capa rule)"
 	namespace = "anti-analysis/packer/perplex"
@@ -7457,7 +7459,7 @@ rule capa_packed_with_Perplex : CAPA T1027_002 F0001  {
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-perplex.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7468,7 +7470,7 @@ rule capa_packed_with_Perplex : CAPA T1027_002 F0001  {
 	) 
 }
 
-rule capa_compiled_with_Go : CAPA  { 
+rule capa_compiled_with_Go : CAPA COMPILER GO FILE  { 
   meta: 
  	description = "compiled with Go (converted from capa rule)"
 	namespace = "compiler/go"
@@ -7476,7 +7478,7 @@ rule capa_compiled_with_Go : CAPA  {
 	scope = "file"
 	hash = "49a34cfbeed733c24392c9217ef46bb6"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/compiler/go/compiled-with-go.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7494,7 +7496,7 @@ rule capa_compiled_with_Go : CAPA  {
 	) 
 }
 
-rule capa_compiled_with_ps2exe : CAPA  { 
+rule capa_compiled_with_ps2exe : CAPA COMPILER PS2EXE FILE  { 
   meta: 
  	description = "compiled with ps2exe (converted from capa rule)"
 	namespace = "compiler/ps2exe"
@@ -7502,7 +7504,7 @@ rule capa_compiled_with_ps2exe : CAPA  {
 	scope = "file"
 	hash = "8775ed26068788279726e08ff9665aab"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/compiler/ps2exe/compiled-with-ps2exe.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7522,7 +7524,7 @@ rule capa_compiled_with_ps2exe : CAPA  {
 	) 
 }
 
-rule capa_compiled_with_MinGW_for_Windows : CAPA  { 
+rule capa_compiled_with_MinGW_for_Windows : CAPA COMPILER MINGW FILE  { 
   meta: 
  	description = "compiled with MinGW for Windows (converted from capa rule)"
 	namespace = "compiler/mingw"
@@ -7530,7 +7532,7 @@ rule capa_compiled_with_MinGW_for_Windows : CAPA  {
 	scope = "file"
 	hash = "5b3968b47eb16a1cb88525e3b565eab1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/compiler/mingw/compiled-with-mingw-for-windows.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7546,7 +7548,7 @@ rule capa_compiled_with_MinGW_for_Windows : CAPA  {
 	) 
 }
 
-rule capa_compiled_from_Visual_Basic : CAPA  { 
+rule capa_compiled_from_Visual_Basic : CAPA COMPILER VB FILE  { 
   meta: 
  	description = "compiled from Visual Basic (converted from capa rule)"
 	namespace = "compiler/vb"
@@ -7554,7 +7556,7 @@ rule capa_compiled_from_Visual_Basic : CAPA  {
 	scope = "file"
 	hash = "9bca6b99e7981208af4c7925b96fb9cf"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/compiler/vb/compiled-from-visual-basic.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7569,7 +7571,7 @@ rule capa_compiled_from_Visual_Basic : CAPA  {
 	) 
 }
 
-rule capa_compiled_with_pyarmor : CAPA T1059_006  { 
+rule capa_compiled_with_pyarmor : CAPA COMPILER PYARMOR FILE T1059_006  { 
   meta: 
  	description = "compiled with pyarmor (converted from capa rule)"
 	namespace = "compiler/pyarmor"
@@ -7578,7 +7580,7 @@ rule capa_compiled_with_pyarmor : CAPA T1059_006  {
 	attack = "Execution::Command and Scripting Interpreter::Python [T1059.006]"
 	hash = "a0fb20bc9aa944c3a0a6c4545c195818"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/compiler/pyarmor/compiled-with-pyarmor.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7598,7 +7600,7 @@ rule capa_compiled_with_pyarmor : CAPA T1059_006  {
 	) 
 }
 
-rule capa_compiled_with_exe4j : CAPA  { 
+rule capa_compiled_with_exe4j : CAPA COMPILER EXE4J FILE  { 
   meta: 
  	description = "compiled with exe4j (converted from capa rule)"
 	namespace = "compiler/exe4j"
@@ -7606,7 +7608,7 @@ rule capa_compiled_with_exe4j : CAPA  {
 	scope = "file"
 	hash = "6b25f1e754ef486bbb28a66d46bababe"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/compiler/exe4j/compiled-with-exe4j.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7642,7 +7644,7 @@ rule capa_compiled_with_exe4j : CAPA  {
 	) 
 }
 
-rule capa_compiled_with_AutoIt : CAPA T1059  { 
+rule capa_compiled_with_AutoIt : CAPA COMPILER AUTOIT FILE T1059  { 
   meta: 
  	description = "compiled with AutoIt (converted from capa rule)"
 	namespace = "compiler/autoit"
@@ -7651,7 +7653,7 @@ rule capa_compiled_with_AutoIt : CAPA T1059  {
 	attack = "Execution::Command and Scripting Interpreter [T1059]"
 	hash = "55D77AB16377A8A314982F723FCC6FAE"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/compiler/autoit/compiled-with-autoit.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7675,7 +7677,7 @@ rule capa_compiled_with_AutoIt : CAPA T1059  {
 	) 
 }
 
-rule capa_compiled_with_Borland_Delphi : CAPA  { 
+rule capa_compiled_with_Borland_Delphi : CAPA COMPILER DELPHI FILE  { 
   meta: 
  	description = "compiled with Borland Delphi (converted from capa rule)"
 	namespace = "compiler/delphi"
@@ -7683,7 +7685,7 @@ rule capa_compiled_with_Borland_Delphi : CAPA  {
 	scope = "file"
 	hash = "4BDD67FF852C221112337FECD0681EAC"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/compiler/delphi/compiled-with-borland-delphi.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7704,7 +7706,7 @@ rule capa_compiled_with_Borland_Delphi : CAPA  {
 	) 
 }
 
-rule capa_compiled_with_dmd : CAPA  { 
+rule capa_compiled_with_dmd : CAPA COMPILER D FILE  { 
   meta: 
  	description = "compiled with dmd (converted from capa rule)"
 	namespace = "compiler/d"
@@ -7712,7 +7714,7 @@ rule capa_compiled_with_dmd : CAPA  {
 	scope = "file"
 	hash = "321338196a46b600ea330fc5d98d0699"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/compiler/d/compiled-with-dmd.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7726,7 +7728,7 @@ rule capa_compiled_with_dmd : CAPA  {
 	) 
 }
 
-rule capa_compiled_with_py2exe : CAPA  { 
+rule capa_compiled_with_py2exe : CAPA COMPILER PY2EXE BASICBLOCK  { 
   meta: 
  	description = "compiled with py2exe (converted from capa rule)"
 	namespace = "compiler/py2exe"
@@ -7734,7 +7736,7 @@ rule capa_compiled_with_py2exe : CAPA  {
 	scope = "basic block"
 	hash = "ed888dc2f04f5eac83d6d14088d002de"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/compiler/py2exe/compiled-with-py2exe.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7750,7 +7752,7 @@ rule capa_compiled_with_py2exe : CAPA  {
 	) 
 }
 
-rule capa_identify_ATM_dispenser_service_provider : CAPA  { 
+rule capa_identify_ATM_dispenser_service_provider : CAPA TARGETING AUTOMATED_TELLER_MACHINE FILE  { 
   meta: 
  	description = "identify ATM dispenser service provider (converted from capa rule)"
 	namespace = "targeting/automated-teller-machine"
@@ -7759,7 +7761,7 @@ rule capa_identify_ATM_dispenser_service_provider : CAPA  {
 	hash = "b2ad4409323147b63e370745e5209996"
 	hash = "1f094dd65be477d15d871e72f0fdce5e"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/targeting/automated-teller-machine/identify-atm-dispenser-service-provider.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7777,7 +7779,7 @@ rule capa_identify_ATM_dispenser_service_provider : CAPA  {
 	) 
 }
 
-rule capa_load_NCR_ATM_library : CAPA  { 
+rule capa_load_NCR_ATM_library : CAPA TARGETING AUTOMATED_TELLER_MACHINE NCR FILE  { 
   meta: 
  	description = "load NCR ATM library (converted from capa rule)"
 	namespace = "targeting/automated-teller-machine/ncr"
@@ -7790,7 +7792,7 @@ rule capa_load_NCR_ATM_library : CAPA  {
 	hash = "5b3968b47eb16a1cb88525e3b565eab1"
 	hash = "dc4dc746d8a14060fb5fc7edd4ef5282"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/targeting/automated-teller-machine/ncr/load-ncr-atm-library.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7807,7 +7809,7 @@ rule capa_load_NCR_ATM_library : CAPA  {
 	) 
 }
 
-rule capa_reference_NCR_ATM_library_routines : CAPA  { 
+rule capa_reference_NCR_ATM_library_routines : CAPA TARGETING AUTOMATED_TELLER_MACHINE NCR FUNCTION  { 
   meta: 
  	description = "reference NCR ATM library routines (converted from capa rule)"
 	namespace = "targeting/automated-teller-machine/ncr"
@@ -7815,7 +7817,7 @@ rule capa_reference_NCR_ATM_library_routines : CAPA  {
 	scope = "function"
 	hash = "84a1212f4a91066babcf594d87a85894"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/targeting/automated-teller-machine/ncr/reference-ncr-atm-library-routines.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7859,7 +7861,7 @@ rule capa_reference_NCR_ATM_library_routines : CAPA  {
 	) 
 }
 
-rule capa_reference_Diebold_ATM_routines : CAPA  { 
+rule capa_reference_Diebold_ATM_routines : CAPA TARGETING AUTOMATED_TELLER_MACHINE DIEBOLD_NIXDORF FILE  { 
   meta: 
  	description = "reference Diebold ATM routines (converted from capa rule)"
 	namespace = "targeting/automated-teller-machine/diebold-nixdorf"
@@ -7867,7 +7869,7 @@ rule capa_reference_Diebold_ATM_routines : CAPA  {
 	scope = "file"
 	hash = "b2ad4409323147b63e370745e5209996"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/targeting/automated-teller-machine/diebold-nixdorf/reference-diebold-atm-routines.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7883,7 +7885,7 @@ rule capa_reference_Diebold_ATM_routines : CAPA  {
 	) 
 }
 
-rule capa_load_Diebold_Nixdorf_ATM_library : CAPA  { 
+rule capa_load_Diebold_Nixdorf_ATM_library : CAPA TARGETING AUTOMATED_TELLER_MACHINE DIEBOLD_NIXDORF FILE  { 
   meta: 
  	description = "load Diebold Nixdorf ATM library (converted from capa rule)"
 	namespace = "targeting/automated-teller-machine/diebold-nixdorf"
@@ -7893,7 +7895,7 @@ rule capa_load_Diebold_Nixdorf_ATM_library : CAPA  {
 	hash = "8683c43f1e22363ce98f0a89ca4ed389"
 	hash = "953bc3e68f0a49c6ade30b52a2bfaaab"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/targeting/automated-teller-machine/diebold-nixdorf/load-diebold-nixdorf-atm-library.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7989,7 +7991,7 @@ rule capa_load_Diebold_Nixdorf_ATM_library : CAPA  {
 	) 
 }
 
-rule capa_initialize_WinHTTP_library : CAPA C0002_008  { 
+rule capa_initialize_WinHTTP_library : CAPA COMMUNICATION HTTP FUNCTION C0002_008  { 
   meta: 
  	description = "initialize WinHTTP library (converted from capa rule)"
 	namespace = "communication/http"
@@ -7998,7 +8000,7 @@ rule capa_initialize_WinHTTP_library : CAPA C0002_008  {
 	mbc = "Communication::HTTP Communication::WinHTTP [C0002.008]"
 	hash = "6A352C3E55E8AE5ED39DC1BE7FB964B1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/http/initialize-winhttp-library.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8009,7 +8011,7 @@ rule capa_initialize_WinHTTP_library : CAPA C0002_008  {
 	) 
 }
 
-rule capa_set_HTTP_header : CAPA C0002_013  { 
+rule capa_set_HTTP_header : CAPA COMMUNICATION HTTP FUNCTION C0002_013  { 
   meta: 
  	description = "set HTTP header (converted from capa rule)"
 	namespace = "communication/http"
@@ -8018,7 +8020,7 @@ rule capa_set_HTTP_header : CAPA C0002_013  {
 	mbc = "Communication::HTTP Communication::Set Header [C0002.013]"
 	hash = "6A352C3E55E8AE5ED39DC1BE7FB964B1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/http/set-http-header.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8029,7 +8031,7 @@ rule capa_set_HTTP_header : CAPA C0002_013  {
 	) 
 }
 
-rule capa_initialize_IWebBrowser2 : CAPA C0002_010  { 
+rule capa_initialize_IWebBrowser2 : CAPA COMMUNICATION HTTP BASICBLOCK C0002_010  { 
   meta: 
  	description = "initialize IWebBrowser2 (converted from capa rule)"
 	namespace = "communication/http"
@@ -8038,7 +8040,7 @@ rule capa_initialize_IWebBrowser2 : CAPA C0002_010  {
 	mbc = "Communication::HTTP Communication::IWebBrowser [C0002.010]"
 	hash = "395EB0DDD99D2C9E37B6D0B73485EE9C"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/http/initialize-iwebbrowser2.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8055,7 +8057,7 @@ rule capa_initialize_IWebBrowser2 : CAPA C0002_010  {
 	) 
 }
 
-rule capa_read_HTTP_header : CAPA C0002_014  { 
+rule capa_read_HTTP_header : CAPA COMMUNICATION HTTP FUNCTION C0002_014  { 
   meta: 
  	description = "read HTTP header (converted from capa rule)"
 	namespace = "communication/http"
@@ -8064,7 +8066,7 @@ rule capa_read_HTTP_header : CAPA C0002_014  {
 	mbc = "Communication::HTTP Communication::Read Header [C0002.014]"
 	hash = "6A352C3E55E8AE5ED39DC1BE7FB964B1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/http/read-http-header.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8075,7 +8077,7 @@ rule capa_read_HTTP_header : CAPA C0002_014  {
 	) 
 }
 
-rule capa_send_HTTP_response : CAPA C0002_016  { 
+rule capa_send_HTTP_response : CAPA COMMUNICATION HTTP SERVER FUNCTION C0002_016  { 
   meta: 
  	description = "send HTTP response (converted from capa rule)"
 	namespace = "communication/http/server"
@@ -8084,7 +8086,7 @@ rule capa_send_HTTP_response : CAPA C0002_016  {
 	mbc = "Communication::HTTP Communication::Send Response [C0002.016]"
 	hash = "6A352C3E55E8AE5ED39DC1BE7FB964B1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/http/server/send-http-response.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8095,7 +8097,7 @@ rule capa_send_HTTP_response : CAPA C0002_016  {
 	) 
 }
 
-rule capa_start_HTTP_server : CAPA C0002_018  { 
+rule capa_start_HTTP_server : CAPA COMMUNICATION HTTP SERVER FUNCTION C0002_018  { 
   meta: 
  	description = "start HTTP server (converted from capa rule)"
 	namespace = "communication/http/server"
@@ -8104,7 +8106,7 @@ rule capa_start_HTTP_server : CAPA C0002_018  {
 	mbc = "Communication::HTTP Communication::Start Server [C0002.018]"
 	hash = "6A352C3E55E8AE5ED39DC1BE7FB964B1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/http/server/start-http-server.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8115,7 +8117,7 @@ rule capa_start_HTTP_server : CAPA C0002_018  {
 	) 
 }
 
-rule capa_receive_HTTP_response : CAPA C0002_017  { 
+rule capa_receive_HTTP_response : CAPA COMMUNICATION HTTP CLIENT FUNCTION C0002_017  { 
   meta: 
  	description = "receive HTTP response (converted from capa rule)"
 	namespace = "communication/http/client"
@@ -8124,7 +8126,7 @@ rule capa_receive_HTTP_response : CAPA C0002_017  {
 	mbc = "Communication::HTTP Communication::Get Response [C0002.017]"
 	hash = "6A352C3E55E8AE5ED39DC1BE7FB964B1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/http/client/receive-http-response.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8138,7 +8140,7 @@ rule capa_receive_HTTP_response : CAPA C0002_017  {
 	) 
 }
 
-rule capa_create_HTTP_request : CAPA C0002_012  { 
+rule capa_create_HTTP_request : CAPA COMMUNICATION HTTP CLIENT FUNCTION C0002_012  { 
   meta: 
  	description = "create HTTP request (converted from capa rule)"
 	namespace = "communication/http/client"
@@ -8147,7 +8149,7 @@ rule capa_create_HTTP_request : CAPA C0002_012  {
 	mbc = "Communication::HTTP Communication::Create Request [C0002.012]"
 	hash = "6f99a2c8944cb02ff28c6f9ced59b161"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/http/client/create-http-request.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8158,7 +8160,7 @@ rule capa_create_HTTP_request : CAPA C0002_012  {
 	) 
 }
 
-rule capa_connect_to_URL : CAPA C0002_004  { 
+rule capa_connect_to_URL : CAPA COMMUNICATION HTTP CLIENT FUNCTION C0002_004  { 
   meta: 
  	description = "connect to URL (converted from capa rule)"
 	namespace = "communication/http/client"
@@ -8167,7 +8169,7 @@ rule capa_connect_to_URL : CAPA C0002_004  {
 	mbc = "Communication::HTTP Communication::Open URL [C0002.004]"
 	hash = "6f99a2c8944cb02ff28c6f9ced59b161"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/http/client/connect-to-url.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8178,7 +8180,7 @@ rule capa_connect_to_URL : CAPA C0002_004  {
 	) 
 }
 
-rule capa_send_file_via_HTTP : CAPA C0002_005  { 
+rule capa_send_file_via_HTTP : CAPA COMMUNICATION HTTP CLIENT BASICBLOCK C0002_005  { 
   meta: 
  	description = "send file via HTTP (converted from capa rule)"
 	namespace = "communication/http/client"
@@ -8187,7 +8189,7 @@ rule capa_send_file_via_HTTP : CAPA C0002_005  {
 	mbc = "Communication::HTTP Communication::Send Data [C0002.005]"
 	hash = "EAAD7DFC78304B977D3844CC63577152"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/http/client/send-file-via-http.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8198,7 +8200,7 @@ rule capa_send_file_via_HTTP : CAPA C0002_005  {
 	) 
 }
 
-rule capa_download_URL_to_file : CAPA C0002_006  { 
+rule capa_download_URL_to_file : CAPA COMMUNICATION HTTP CLIENT FUNCTION C0002_006  { 
   meta: 
  	description = "download URL to file (converted from capa rule)"
 	namespace = "communication/http/client"
@@ -8208,7 +8210,7 @@ rule capa_download_URL_to_file : CAPA C0002_006  {
 	hash = "F5C93AC768C8206E87544DDD76B3277C"
 	hash = "Practical Malware Analysis Lab 20-01.exe_:0x401040"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/http/client/download-url-to-file.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8220,7 +8222,7 @@ rule capa_download_URL_to_file : CAPA C0002_006  {
 	) 
 }
 
-rule capa_prepare_HTTP_request : CAPA C0002_012  { 
+rule capa_prepare_HTTP_request : CAPA COMMUNICATION HTTP CLIENT FUNCTION C0002_012  { 
   meta: 
  	description = "prepare HTTP request (converted from capa rule)"
 	namespace = "communication/http/client"
@@ -8229,7 +8231,7 @@ rule capa_prepare_HTTP_request : CAPA C0002_012  {
 	mbc = "Communication::HTTP Communication::Create Request [C0002.012]"
 	hash = "6A352C3E55E8AE5ED39DC1BE7FB964B1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/http/client/prepare-http-request.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8240,7 +8242,7 @@ rule capa_prepare_HTTP_request : CAPA C0002_012  {
 	) 
 }
 
-rule capa_read_data_from_Internet : CAPA C0002_017  { 
+rule capa_read_data_from_Internet : CAPA COMMUNICATION HTTP CLIENT FUNCTION C0002_017  { 
   meta: 
  	description = "read data from Internet (converted from capa rule)"
 	namespace = "communication/http/client"
@@ -8249,7 +8251,7 @@ rule capa_read_data_from_Internet : CAPA C0002_017  {
 	mbc = "Communication::HTTP Communication::Get Response [C0002.017]"
 	hash = "6f99a2c8944cb02ff28c6f9ced59b161"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/http/client/read-data-from-internet.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8263,7 +8265,7 @@ rule capa_read_data_from_Internet : CAPA C0002_017  {
 	) 
 }
 
-rule capa_connect_to_HTTP_server : CAPA C0002_009  { 
+rule capa_connect_to_HTTP_server : CAPA COMMUNICATION HTTP CLIENT FUNCTION C0002_009  { 
   meta: 
  	description = "connect to HTTP server (converted from capa rule)"
 	namespace = "communication/http/client"
@@ -8272,7 +8274,7 @@ rule capa_connect_to_HTTP_server : CAPA C0002_009  {
 	mbc = "Communication::HTTP Communication::Connect to Server [C0002.009]"
 	hash = "6f99a2c8944cb02ff28c6f9ced59b161"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/http/client/connect-to-http-server.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8283,7 +8285,7 @@ rule capa_connect_to_HTTP_server : CAPA C0002_009  {
 	) 
 }
 
-rule capa_send_file_using_FTP_via_wininet : CAPA C0004_001 C0004_002  { 
+rule capa_send_file_using_FTP_via_wininet : CAPA COMMUNICATION FTP SEND FUNCTION C0004_001 C0004_002  { 
   meta: 
  	description = "send file using FTP via wininet (converted from capa rule)"
 	namespace = "communication/ftp/send"
@@ -8293,7 +8295,7 @@ rule capa_send_file_using_FTP_via_wininet : CAPA C0004_001 C0004_002  {
 	mbc = "Communication::FTP Communication::WinINet [C0004.002]"
 	hash = "Practical Malware Analysis Lab 20-02.exe_:0x401380"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/ftp/send/send-file-using-ftp-via-wininet.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8304,7 +8306,7 @@ rule capa_send_file_using_FTP_via_wininet : CAPA C0004_001 C0004_002  {
 	) 
 }
 
-rule capa_send_ICMP_echo_request : CAPA C0014_002  { 
+rule capa_send_ICMP_echo_request : CAPA COMMUNICATION ICMP FUNCTION C0014_002  { 
   meta: 
  	description = "send ICMP echo request (converted from capa rule)"
 	namespace = "communication/icmp"
@@ -8313,7 +8315,7 @@ rule capa_send_ICMP_echo_request : CAPA C0014_002  {
 	mbc = "Communication::ICMP Communication::Echo Request [C0014.002]"
 	hash = "al-khaser_x86.exe_:0x449510"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/icmp/send-icmp-echo-request.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8335,7 +8337,7 @@ rule capa_send_ICMP_echo_request : CAPA C0014_002  {
 	) 
 }
 
-rule capa_initialize_Winsock_library : CAPA C0001_009  { 
+rule capa_initialize_Winsock_library : CAPA COMMUNICATION SOCKET FUNCTION C0001_009  { 
   meta: 
  	description = "initialize Winsock library (converted from capa rule)"
 	namespace = "communication/socket"
@@ -8344,7 +8346,7 @@ rule capa_initialize_Winsock_library : CAPA C0001_009  {
 	mbc = "Communication::Socket Communication::Initialize Winsock Library [C0001.009]"
 	hash = "6A352C3E55E8AE5ED39DC1BE7FB964B1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/socket/initialize-winsock-library.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8355,7 +8357,7 @@ rule capa_initialize_Winsock_library : CAPA C0001_009  {
 	) 
 }
 
-rule capa_get_socket_status : CAPA T1016 C0001_012  { 
+rule capa_get_socket_status : CAPA COMMUNICATION SOCKET FUNCTION T1016 C0001_012  { 
   meta: 
  	description = "get socket status (converted from capa rule)"
 	namespace = "communication/socket"
@@ -8365,7 +8367,7 @@ rule capa_get_socket_status : CAPA T1016 C0001_012  {
 	mbc = "Communication::Socket Communication::Get Socket Status [C0001.012]"
 	hash = "6A352C3E55E8AE5ED39DC1BE7FB964B1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/socket/get-socket-status.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8376,7 +8378,7 @@ rule capa_get_socket_status : CAPA T1016 C0001_012  {
 	) 
 }
 
-rule capa_set_socket_configuration : CAPA C0001_001  { 
+rule capa_set_socket_configuration : CAPA COMMUNICATION SOCKET FUNCTION C0001_001  { 
   meta: 
  	description = "set socket configuration (converted from capa rule)"
 	namespace = "communication/socket"
@@ -8385,7 +8387,7 @@ rule capa_set_socket_configuration : CAPA C0001_001  {
 	mbc = "Communication::Socket Communication::Set Socket Config [C0001.001]"
 	hash = "6A352C3E55E8AE5ED39DC1BE7FB964B1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/socket/set-socket-configuration.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8397,7 +8399,7 @@ rule capa_set_socket_configuration : CAPA C0001_001  {
 	) 
 }
 
-rule capa_receive_data_on_socket : CAPA C0001_006  { 
+rule capa_receive_data_on_socket : CAPA COMMUNICATION SOCKET RECEIVE FUNCTION C0001_006  { 
   meta: 
  	description = "receive data on socket (converted from capa rule)"
 	namespace = "communication/socket/receive"
@@ -8406,7 +8408,7 @@ rule capa_receive_data_on_socket : CAPA C0001_006  {
 	mbc = "Communication::Socket Communication::Receive Data [C0001.006]"
 	hash = "Practical Malware Analysis Lab 01-01.dll_:0x10001010"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/socket/receive/receive-data-on-socket.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8423,7 +8425,7 @@ rule capa_receive_data_on_socket : CAPA C0001_006  {
 	) 
 }
 
-rule capa_send_data_on_socket : CAPA C0001_007  { 
+rule capa_send_data_on_socket : CAPA COMMUNICATION SOCKET SEND FUNCTION C0001_007  { 
   meta: 
  	description = "send data on socket (converted from capa rule)"
 	namespace = "communication/socket/send"
@@ -8432,7 +8434,7 @@ rule capa_send_data_on_socket : CAPA C0001_007  {
 	mbc = "Communication::Socket Communication::Send Data [C0001.007]"
 	hash = "Practical Malware Analysis Lab 01-01.dll_:0x10001010"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/socket/send/send-data-on-socket.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8447,7 +8449,7 @@ rule capa_send_data_on_socket : CAPA C0001_007  {
 	) 
 }
 
-rule capa_create_pipe : CAPA C0003_001  { 
+rule capa_create_pipe : CAPA COMMUNICATION NAMED_PIPE CREATE FUNCTION C0003_001  { 
   meta: 
  	description = "create pipe (converted from capa rule)"
 	namespace = "communication/named-pipe/create"
@@ -8456,7 +8458,7 @@ rule capa_create_pipe : CAPA C0003_001  {
 	mbc = "Communication::Interprocess Communication::Create Pipe [C0003.001]"
 	hash = "Practical Malware Analysis Lab 03-02.dll_:0x10003a13"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/named-pipe/create/create-pipe.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8468,7 +8470,7 @@ rule capa_create_pipe : CAPA C0003_001  {
 	) 
 }
 
-rule capa_connect_pipe : CAPA C0003_002  { 
+rule capa_connect_pipe : CAPA COMMUNICATION NAMED_PIPE CONNECT FUNCTION C0003_002  { 
   meta: 
  	description = "connect pipe (converted from capa rule)"
 	namespace = "communication/named-pipe/connect"
@@ -8476,7 +8478,7 @@ rule capa_connect_pipe : CAPA C0003_002  {
 	mbc = "Communication::Interprocess Communication::Connect Pipe [C0003.002]"
 	hash = "152d4c9f63efb332ccb134c6953c0104"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/named-pipe/connect/connect-pipe.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8488,7 +8490,7 @@ rule capa_connect_pipe : CAPA C0003_002  {
 	) 
 }
 
-rule capa_read_pipe : CAPA C0003_003  { 
+rule capa_read_pipe : CAPA COMMUNICATION NAMED_PIPE READ FUNCTION C0003_003  { 
   meta: 
  	description = "read pipe (converted from capa rule)"
 	namespace = "communication/named-pipe/read"
@@ -8497,7 +8499,7 @@ rule capa_read_pipe : CAPA C0003_003  {
 	mbc = "Communication::Interprocess Communication::Read Pipe [C0003.003]"
 	hash = "Practical Malware Analysis Lab 14-02.exe_:0x4014C0"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/named-pipe/read/read-pipe.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8513,7 +8515,7 @@ rule capa_read_pipe : CAPA C0003_003  {
 	) 
 }
 
-rule capa_access_PE_header : CAPA T1129  { 
+rule capa_access_PE_header : CAPA LOAD_CODE PE FUNCTION T1129  { 
   meta: 
  	description = "access PE header (converted from capa rule)"
 	namespace = "load-code/pe"
@@ -8522,7 +8524,7 @@ rule capa_access_PE_header : CAPA T1129  {
 	attack = "Execution::Shared Modules [T1129]"
 	hash = "563653399B82CD443F120ECEFF836EA3678D4CF11D9B351BB737573C2D856299"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/load-code/pe/access-pe-header.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8537,7 +8539,7 @@ rule capa_access_PE_header : CAPA T1129  {
 	) 
 }
 
-rule capa_acquire_credentials_from_Windows_Credential_Manager : CAPA T1555_004  { 
+rule capa_acquire_credentials_from_Windows_Credential_Manager : CAPA COLLECTION FUNCTION T1555_004  { 
   meta: 
  	description = "acquire credentials from Windows Credential Manager (converted from capa rule)"
 	namespace = "collection"
@@ -8546,7 +8548,7 @@ rule capa_acquire_credentials_from_Windows_Credential_Manager : CAPA T1555_004  
 	attack = "Credential Access::Credentials from Password Stores::Windows Credential Manager [T1555.004]"
 	hash = "c56af5561e3f20bed435fb4355cffc29"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/acquire-credentials-from-windows-credential-manager.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8578,7 +8580,7 @@ rule capa_acquire_credentials_from_Windows_Credential_Manager : CAPA T1555_004  
 	) 
 }
 
-rule capa_get_geographical_location : CAPA T1614  { 
+rule capa_get_geographical_location : CAPA COLLECTION FUNCTION T1614  { 
   meta: 
  	description = "get geographical location (converted from capa rule)"
 	namespace = "collection"
@@ -8587,7 +8589,7 @@ rule capa_get_geographical_location : CAPA T1614  {
 	attack = "Discovery::System Location Discovery [T1614]"
 	hash = "9879D201DC5ACA863F357184CD1F170E"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/get-geographical-location.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8629,7 +8631,7 @@ rule capa_get_geographical_location : CAPA T1614  {
 	) 
 }
 
-rule capa_log_keystrokes_via_polling : CAPA T1056_001 F0002_002  { 
+rule capa_log_keystrokes_via_polling : CAPA COLLECTION KEYLOG FUNCTION T1056_001 F0002_002  { 
   meta: 
  	description = "log keystrokes via polling (converted from capa rule)"
 	namespace = "collection/keylog"
@@ -8639,7 +8641,7 @@ rule capa_log_keystrokes_via_polling : CAPA T1056_001 F0002_002  {
 	mbc = "Collection::Keylogging::Polling [F0002.002]"
 	hash = "Practical Malware Analysis Lab 11-03.dll_:0x10001030"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/keylog/log-keystrokes-via-polling.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8655,7 +8657,7 @@ rule capa_log_keystrokes_via_polling : CAPA T1056_001 F0002_002  {
 	) 
 }
 
-rule capa_log_keystrokes : CAPA T1056_001  { 
+rule capa_log_keystrokes : CAPA COLLECTION KEYLOG FUNCTION T1056_001  { 
   meta: 
  	description = "log keystrokes (converted from capa rule)"
 	namespace = "collection/keylog"
@@ -8664,7 +8666,7 @@ rule capa_log_keystrokes : CAPA T1056_001  {
 	attack = "Collection::Input Capture::Keylogging [T1056.001]"
 	hash = "C91887D861D9BD4A5872249B641BC9F9"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/keylog/log-keystrokes.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8698,7 +8700,7 @@ rule capa_log_keystrokes : CAPA T1056_001  {
 	) 
 }
 
-rule capa_capture_microphone_audio : CAPA T1123  { 
+rule capa_capture_microphone_audio : CAPA COLLECTION MICROPHONE FUNCTION T1123  { 
   meta: 
  	description = "capture microphone audio (converted from capa rule)"
 	namespace = "collection/microphone"
@@ -8707,7 +8709,7 @@ rule capa_capture_microphone_audio : CAPA T1123  {
 	attack = "Collection::Audio Capture [T1123]"
 	hash = "a70052c45e907820187c7e6bcdc7ecca"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/microphone/capture-microphone-audio.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8727,7 +8729,7 @@ rule capa_capture_microphone_audio : CAPA T1123  {
 	) 
 }
 
-rule capa_get_domain_trust_relationships : CAPA T1482  { 
+rule capa_get_domain_trust_relationships : CAPA COLLECTION NETWORK FUNCTION T1482  { 
   meta: 
  	description = "get domain trust relationships (converted from capa rule)"
 	namespace = "collection/network"
@@ -8737,7 +8739,7 @@ rule capa_get_domain_trust_relationships : CAPA T1482  {
 	hash = "0796f1c1ea0a142fc1eb7109a44c86cb"
 	hash = "0731679c5f99e8ee65d8b29a3cabfc6b"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/network/get-domain-trust-relationships.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8763,7 +8765,7 @@ rule capa_get_domain_trust_relationships : CAPA T1482  {
 	) 
 }
 
-rule capa_capture_network_configuration_via_ipconfig : CAPA T1016  { 
+rule capa_capture_network_configuration_via_ipconfig : CAPA COLLECTION NETWORK BASICBLOCK T1016  { 
   meta: 
  	description = "capture network configuration via ipconfig (converted from capa rule)"
 	namespace = "collection/network"
@@ -8772,7 +8774,7 @@ rule capa_capture_network_configuration_via_ipconfig : CAPA T1016  {
 	attack = "Discovery::System Network Configuration Discovery [T1016]"
 	hash = "7204e3efc2434012e13ca939db0d0b02"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/network/capture-network-configuration-via-ipconfig.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8787,7 +8789,7 @@ rule capa_capture_network_configuration_via_ipconfig : CAPA T1016  {
 	) 
 }
 
-rule capa_capture_public_ip : CAPA T1016  { 
+rule capa_capture_public_ip : CAPA COLLECTION NETWORK FUNCTION T1016  { 
   meta: 
  	description = "capture public ip (converted from capa rule)"
 	namespace = "collection/network"
@@ -8796,7 +8798,7 @@ rule capa_capture_public_ip : CAPA T1016  {
 	attack = "Discovery::System Network Configuration Discovery [T1016]"
 	hash = "84f1b049fa8962b215a77f51af6714b3"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/network/capture-public-ip.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8838,7 +8840,7 @@ rule capa_capture_public_ip : CAPA T1016  {
 	) 
 }
 
-rule capa_gather_cuteftp_information : CAPA T1555  { 
+rule capa_gather_cuteftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather cuteftp information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -8847,7 +8849,7 @@ rule capa_gather_cuteftp_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-cuteftp-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8869,7 +8871,7 @@ rule capa_gather_cuteftp_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_ftprush_information : CAPA T1555  { 
+rule capa_gather_ftprush_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather ftprush information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -8878,7 +8880,7 @@ rule capa_gather_ftprush_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-ftprush-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8894,7 +8896,7 @@ rule capa_gather_ftprush_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_smart_ftp_information : CAPA T1555  { 
+rule capa_gather_smart_ftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather smart-ftp information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -8903,7 +8905,7 @@ rule capa_gather_smart_ftp_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-smart-ftp-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8925,7 +8927,7 @@ rule capa_gather_smart_ftp_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_cyberduck_information : CAPA T1555  { 
+rule capa_gather_cyberduck_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather cyberduck information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -8934,7 +8936,7 @@ rule capa_gather_cyberduck_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-cyberduck-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8954,7 +8956,7 @@ rule capa_gather_cyberduck_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_ws_ftp_information : CAPA T1555  { 
+rule capa_gather_ws_ftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather ws-ftp information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -8963,7 +8965,7 @@ rule capa_gather_ws_ftp_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-ws-ftp-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8981,7 +8983,7 @@ rule capa_gather_ws_ftp_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_fling_ftp_information : CAPA T1555  { 
+rule capa_gather_fling_ftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather fling-ftp information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -8990,7 +8992,7 @@ rule capa_gather_fling_ftp_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-fling-ftp-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -9016,7 +9018,7 @@ rule capa_gather_fling_ftp_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_directory_opus_information : CAPA T1555  { 
+rule capa_gather_directory_opus_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather directory-opus information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -9025,7 +9027,7 @@ rule capa_gather_directory_opus_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-directory-opus-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -9045,7 +9047,7 @@ rule capa_gather_directory_opus_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_coreftp_information : CAPA T1555  { 
+rule capa_gather_coreftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather coreftp information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -9054,7 +9056,7 @@ rule capa_gather_coreftp_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-coreftp-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -9078,7 +9080,7 @@ rule capa_gather_coreftp_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_wise_ftp_information : CAPA T1555  { 
+rule capa_gather_wise_ftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather wise-ftp information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -9087,7 +9089,7 @@ rule capa_gather_wise_ftp_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-wise-ftp-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -9117,7 +9119,7 @@ rule capa_gather_wise_ftp_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_winzip_information : CAPA T1555  { 
+rule capa_gather_winzip_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather winzip information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -9126,7 +9128,7 @@ rule capa_gather_winzip_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-winzip-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -9156,7 +9158,7 @@ rule capa_gather_winzip_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_southriver_webdrive_information : CAPA T1555  { 
+rule capa_gather_southriver_webdrive_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather southriver-webdrive information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -9165,7 +9167,7 @@ rule capa_gather_southriver_webdrive_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-southriver-webdrive-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -9191,7 +9193,7 @@ rule capa_gather_southriver_webdrive_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_freshftp_information : CAPA T1555  { 
+rule capa_gather_freshftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather freshftp information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -9200,7 +9202,7 @@ rule capa_gather_freshftp_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-freshftp-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -9216,7 +9218,7 @@ rule capa_gather_freshftp_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_fasttrack_ftp_information : CAPA T1555  { 
+rule capa_gather_fasttrack_ftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather fasttrack-ftp information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -9225,7 +9227,7 @@ rule capa_gather_fasttrack_ftp_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-fasttrack-ftp-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -9243,7 +9245,7 @@ rule capa_gather_fasttrack_ftp_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_classicftp_information : CAPA T1555  { 
+rule capa_gather_classicftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather classicftp information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -9252,7 +9254,7 @@ rule capa_gather_classicftp_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-classicftp-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -9266,7 +9268,7 @@ rule capa_gather_classicftp_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_softx_ftp_information : CAPA T1555  { 
+rule capa_gather_softx_ftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather softx-ftp information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -9275,7 +9277,7 @@ rule capa_gather_softx_ftp_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-softx-ftp-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -9291,7 +9293,7 @@ rule capa_gather_softx_ftp_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_ffftp_information : CAPA T1555  { 
+rule capa_gather_ffftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather ffftp information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -9300,7 +9302,7 @@ rule capa_gather_ffftp_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-ffftp-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -9338,7 +9340,7 @@ rule capa_gather_ffftp_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_ftpshell_information : CAPA T1555  { 
+rule capa_gather_ftpshell_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather ftpshell information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -9347,7 +9349,7 @@ rule capa_gather_ftpshell_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-ftpshell-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -9363,7 +9365,7 @@ rule capa_gather_ftpshell_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_winscp_information : CAPA T1555  { 
+rule capa_gather_winscp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather winscp information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -9372,7 +9374,7 @@ rule capa_gather_winscp_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-winscp-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -9396,7 +9398,7 @@ rule capa_gather_winscp_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_frigate3_information : CAPA T1555  { 
+rule capa_gather_frigate3_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather frigate3 information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -9405,7 +9407,7 @@ rule capa_gather_frigate3_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-frigate3-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -9421,7 +9423,7 @@ rule capa_gather_frigate3_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_staff_ftp_information : CAPA T1555  { 
+rule capa_gather_staff_ftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather staff-ftp information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -9430,7 +9432,7 @@ rule capa_gather_staff_ftp_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-staff-ftp-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -9446,7 +9448,7 @@ rule capa_gather_staff_ftp_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_xftp_information : CAPA T1555  { 
+rule capa_gather_xftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather xftp information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -9455,7 +9457,7 @@ rule capa_gather_xftp_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-xftp-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -9471,7 +9473,7 @@ rule capa_gather_xftp_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_ftpnow_information : CAPA T1555  { 
+rule capa_gather_ftpnow_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather ftpnow information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -9480,7 +9482,7 @@ rule capa_gather_ftpnow_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-ftpnow-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -9498,7 +9500,7 @@ rule capa_gather_ftpnow_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_ftpgetter_information : CAPA T1555  { 
+rule capa_gather_ftpgetter_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather ftpgetter information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -9507,7 +9509,7 @@ rule capa_gather_ftpgetter_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-ftpgetter-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -9523,7 +9525,7 @@ rule capa_gather_ftpgetter_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_nova_ftp_information : CAPA T1555  { 
+rule capa_gather_nova_ftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather nova-ftp information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -9532,7 +9534,7 @@ rule capa_gather_nova_ftp_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-nova-ftp-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -9550,7 +9552,7 @@ rule capa_gather_nova_ftp_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_ftp_explorer_information : CAPA T1555  { 
+rule capa_gather_ftp_explorer_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather ftp-explorer information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -9559,7 +9561,7 @@ rule capa_gather_ftp_explorer_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-ftp-explorer-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -9597,7 +9599,7 @@ rule capa_gather_ftp_explorer_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_bitkinex_information : CAPA T1555  { 
+rule capa_gather_bitkinex_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather bitkinex information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -9606,7 +9608,7 @@ rule capa_gather_bitkinex_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-bitkinex-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -9622,7 +9624,7 @@ rule capa_gather_bitkinex_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_turbo_ftp_information : CAPA T1555  { 
+rule capa_gather_turbo_ftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather turbo-ftp information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -9631,7 +9633,7 @@ rule capa_gather_turbo_ftp_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-turbo-ftp-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -9659,7 +9661,7 @@ rule capa_gather_turbo_ftp_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_nexusfile_information : CAPA T1555  { 
+rule capa_gather_nexusfile_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather nexusfile information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -9668,7 +9670,7 @@ rule capa_gather_nexusfile_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-nexusfile-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -9684,7 +9686,7 @@ rule capa_gather_nexusfile_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_ftp_voyager_information : CAPA T1555  { 
+rule capa_gather_ftp_voyager_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather ftp-voyager information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -9693,7 +9695,7 @@ rule capa_gather_ftp_voyager_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-ftp-voyager-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -9711,7 +9713,7 @@ rule capa_gather_ftp_voyager_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_blazeftp_information : CAPA T1555  { 
+rule capa_gather_blazeftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather blazeftp information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -9720,7 +9722,7 @@ rule capa_gather_blazeftp_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-blazeftp-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -9748,7 +9750,7 @@ rule capa_gather_blazeftp_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_ftp_commander_information : CAPA T1555  { 
+rule capa_gather_ftp_commander_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather ftp-commander information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -9757,7 +9759,7 @@ rule capa_gather_ftp_commander_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-ftp-commander-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -9779,7 +9781,7 @@ rule capa_gather_ftp_commander_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_filezilla_information : CAPA T1555  { 
+rule capa_gather_filezilla_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather filezilla information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -9788,7 +9790,7 @@ rule capa_gather_filezilla_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-filezilla-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -9816,7 +9818,7 @@ rule capa_gather_filezilla_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_global_downloader_information : CAPA T1555  { 
+rule capa_gather_global_downloader_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather global-downloader information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -9825,7 +9827,7 @@ rule capa_gather_global_downloader_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-global-downloader-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -9841,7 +9843,7 @@ rule capa_gather_global_downloader_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_direct_ftp_information : CAPA T1555  { 
+rule capa_gather_direct_ftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather direct-ftp information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -9850,7 +9852,7 @@ rule capa_gather_direct_ftp_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-direct-ftp-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -9892,7 +9894,7 @@ rule capa_gather_direct_ftp_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_faststone_browser_information : CAPA T1555  { 
+rule capa_gather_faststone_browser_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather faststone-browser information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -9901,7 +9903,7 @@ rule capa_gather_faststone_browser_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-faststone-browser-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -9917,7 +9919,7 @@ rule capa_gather_faststone_browser_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_ultrafxp_information : CAPA T1555  { 
+rule capa_gather_ultrafxp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather ultrafxp information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -9926,7 +9928,7 @@ rule capa_gather_ultrafxp_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-ultrafxp-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -9942,7 +9944,7 @@ rule capa_gather_ultrafxp_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_netdrive_information : CAPA T1555  { 
+rule capa_gather_netdrive_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather netdrive information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -9951,7 +9953,7 @@ rule capa_gather_netdrive_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-netdrive-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -9967,7 +9969,7 @@ rule capa_gather_netdrive_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_total_commander_information : CAPA T1555  { 
+rule capa_gather_total_commander_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather total-commander information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -9976,7 +9978,7 @@ rule capa_gather_total_commander_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-total-commander-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10004,7 +10006,7 @@ rule capa_gather_total_commander_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_ftpinfo_information : CAPA T1555  { 
+rule capa_gather_ftpinfo_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather ftpinfo information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -10013,7 +10015,7 @@ rule capa_gather_ftpinfo_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-ftpinfo-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10035,7 +10037,7 @@ rule capa_gather_ftpinfo_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_flashfxp_information : CAPA T1555  { 
+rule capa_gather_flashfxp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather flashfxp information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -10044,7 +10046,7 @@ rule capa_gather_flashfxp_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-flashfxp-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10072,7 +10074,7 @@ rule capa_gather_flashfxp_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_securefx_information : CAPA T1555  { 
+rule capa_gather_securefx_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather securefx information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -10081,7 +10083,7 @@ rule capa_gather_securefx_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-securefx-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10105,7 +10107,7 @@ rule capa_gather_securefx_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_robo_ftp_information : CAPA T1555  { 
+rule capa_gather_robo_ftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather robo-ftp information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -10114,7 +10116,7 @@ rule capa_gather_robo_ftp_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-robo-ftp-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10152,7 +10154,7 @@ rule capa_gather_robo_ftp_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_bulletproof_ftp_information : CAPA T1555  { 
+rule capa_gather_bulletproof_ftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather bulletproof-ftp information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -10161,7 +10163,7 @@ rule capa_gather_bulletproof_ftp_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-bulletproof-ftp-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10199,7 +10201,7 @@ rule capa_gather_bulletproof_ftp_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_alftp_information : CAPA T1555  { 
+rule capa_gather_alftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather alftp information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -10208,7 +10210,7 @@ rule capa_gather_alftp_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-alftp-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10226,7 +10228,7 @@ rule capa_gather_alftp_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_expandrive_information : CAPA T1555  { 
+rule capa_gather_expandrive_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather expandrive information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -10235,7 +10237,7 @@ rule capa_gather_expandrive_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-expandrive-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10259,7 +10261,7 @@ rule capa_gather_expandrive_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_goftp_information : CAPA T1555  { 
+rule capa_gather_goftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather goftp information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -10268,7 +10270,7 @@ rule capa_gather_goftp_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-goftp-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10284,7 +10286,7 @@ rule capa_gather_goftp_information : CAPA T1555  {
 	) 
 }
 
-rule capa_gather_3d_ftp_information : CAPA T1555  { 
+rule capa_gather_3d_ftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555  { 
   meta: 
  	description = "gather 3d-ftp information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -10293,7 +10295,7 @@ rule capa_gather_3d_ftp_information : CAPA T1555  {
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-3d-ftp-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10309,7 +10311,7 @@ rule capa_gather_3d_ftp_information : CAPA T1555  {
 	) 
 }
 
-rule capa_reference_SQL_statements : CAPA T1213  { 
+rule capa_reference_SQL_statements : CAPA COLLECTION DATABASE SQL FUNCTION T1213  { 
   meta: 
  	description = "reference SQL statements (converted from capa rule)"
 	namespace = "collection/database/sql"
@@ -10318,7 +10320,7 @@ rule capa_reference_SQL_statements : CAPA T1213  {
 	attack = "Collection::Data from Information Repositories [T1213]"
 	hash = "5F66B82558CA92E54E77F216EF4C066C"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/database/sql/reference-sql-statements.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10332,7 +10334,7 @@ rule capa_reference_SQL_statements : CAPA T1213  {
 	) 
 }
 
-rule capa_reference_WMI_statements : CAPA T1213  { 
+rule capa_reference_WMI_statements : CAPA COLLECTION DATABASE WMI FUNCTION T1213  { 
   meta: 
  	description = "reference WMI statements (converted from capa rule)"
 	namespace = "collection/database/wmi"
@@ -10341,7 +10343,7 @@ rule capa_reference_WMI_statements : CAPA T1213  {
 	attack = "Collection::Data from Information Repositories [T1213]"
 	hash = "al-khaser_x86.exe_:0x433490"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/database/wmi/reference-wmi-statements.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10359,7 +10361,7 @@ rule capa_reference_WMI_statements : CAPA T1213  {
 	) 
 }
 
-rule capa_write_and_execute_a_file : CAPA B0023  { 
+rule capa_write_and_execute_a_file : CAPA C2 FILE_TRANSFER FUNCTION B0023  { 
   meta: 
  	description = "write and execute a file (converted from capa rule)"
 	namespace = "c2/file-transfer"
@@ -10370,7 +10372,7 @@ rule capa_write_and_execute_a_file : CAPA B0023  {
 	hash = "9324D1A8AE37A36AE560C37448C9705A"
 	hash = "Practical Malware Analysis Lab 01-04.exe_:0x4011FC"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/c2/file-transfer/write-and-execute-a-file.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10384,7 +10386,7 @@ rule capa_write_and_execute_a_file : CAPA B0023  {
 	) 
 }
 
-rule capa_self_delete_via_COMSPEC_environment_variable : CAPA T1070_004 F0007_001  { 
+rule capa_self_delete_via_COMSPEC_environment_variable : CAPA ANTI_ANALYSIS ANTI_FORENSIC SELF_DELETION FUNCTION T1070_004 F0007_001  { 
   meta: 
  	description = "self delete via COMSPEC environment variable (converted from capa rule)"
 	namespace = "anti-analysis/anti-forensic/self-deletion"
@@ -10394,7 +10396,7 @@ rule capa_self_delete_via_COMSPEC_environment_variable : CAPA T1070_004 F0007_00
 	mbc = "Defense Evasion::Self Deletion::COMSPEC Environment Variable [F0007.001]"
 	hash = "Practical Malware Analysis Lab 14-02.exe_:0x401880"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-forensic/self-deletion/self-delete-via-comspec-environment-variable.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10412,7 +10414,7 @@ rule capa_self_delete_via_COMSPEC_environment_variable : CAPA T1070_004 F0007_00
 	) 
 }
 
-rule capa_check_for_windows_sandbox_via_process_name : CAPA T1497_001 B0009  { 
+rule capa_check_for_windows_sandbox_via_process_name : CAPA ANTI_ANALYSIS ANTI_VM VM_DETECTION FUNCTION T1497_001 B0009  { 
   meta: 
  	description = "check for windows sandbox via process name (converted from capa rule)"
 	namespace = "anti-analysis/anti-vm/vm-detection"
@@ -10422,7 +10424,7 @@ rule capa_check_for_windows_sandbox_via_process_name : CAPA T1497_001 B0009  {
 	mbc = "Anti-Behavioral Analysis::Virtual Machine Detection [B0009]"
 	hash = "773290480d5445f11d3dc1b800728966"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-vm/vm-detection/check-for-windows-sandbox-via-process-name.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10438,7 +10440,7 @@ rule capa_check_for_windows_sandbox_via_process_name : CAPA T1497_001 B0009  {
 	) 
 }
 
-rule capa_get_CPU_information : CAPA T1082  { 
+rule capa_get_CPU_information : CAPA HOST_INTERACTION HARDWARE CPU FUNCTION T1082  { 
   meta: 
  	description = "get CPU information (converted from capa rule)"
 	namespace = "host-interaction/hardware/cpu"
@@ -10447,7 +10449,7 @@ rule capa_get_CPU_information : CAPA T1082  {
 	attack = "Discovery::System Information Discovery [T1082]"
 	hash = "BFB9B5391A13D0AFD787E87AB90F14F5"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/hardware/cpu/get-cpu-information.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10463,7 +10465,7 @@ rule capa_get_CPU_information : CAPA T1082  {
 	) 
 }
 
-rule capa_disable_code_signing : CAPA T1553_006  { 
+rule capa_disable_code_signing : CAPA HOST_INTERACTION BOOTLOADER FUNCTION T1553_006  { 
   meta: 
  	description = "disable code signing (converted from capa rule)"
 	namespace = "host-interaction/bootloader"
@@ -10472,7 +10474,7 @@ rule capa_disable_code_signing : CAPA T1553_006  {
 	attack = "Defense Evasion::Subvert Trust Controls::Code Signing Policy Modification [T1553.006]"
 	hash = "0596C4EA5AA8DEF47F22C85D75AACA95"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/bootloader/disable-code-signing.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10488,7 +10490,7 @@ rule capa_disable_code_signing : CAPA T1553_006  {
 	) 
 }
 
-rule capa_find_taskbar : CAPA B0043  { 
+rule capa_find_taskbar : CAPA HOST_INTERACTION GUI TASKBAR FIND FUNCTION B0043  { 
   meta: 
  	description = "find taskbar (converted from capa rule)"
 	namespace = "host-interaction/gui/taskbar/find"
@@ -10497,7 +10499,7 @@ rule capa_find_taskbar : CAPA B0043  {
 	mbc = "Discovery::Taskbar Discovery [B0043]"
 	hash = "B7841B9D5DC1F511A93CC7576672EC0C"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/gui/taskbar/find/find-taskbar.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10513,7 +10515,7 @@ rule capa_find_taskbar : CAPA B0043  {
 	) 
 }
 
-rule capa_check_mutex : CAPA C0043  { 
+rule capa_check_mutex : CAPA HOST_INTERACTION MUTEX BASICBLOCK C0043  { 
   meta: 
  	description = "check mutex (converted from capa rule)"
 	namespace = "host-interaction/mutex"
@@ -10522,7 +10524,7 @@ rule capa_check_mutex : CAPA C0043  {
 	mbc = "Process::Check Mutex [C0043]"
 	hash = "Practical Malware Analysis Lab 01-01.dll_:0x10001010"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/mutex/check-mutex.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10537,7 +10539,7 @@ rule capa_check_mutex : CAPA C0043  {
 	) 
 }
 
-rule capa_linked_against_Go_process_enumeration_library : CAPA T1057 T1518  { 
+rule capa_linked_against_Go_process_enumeration_library : CAPA HOST_INTERACTION PROCESS LIST FILE T1057 T1518  { 
   meta: 
  	description = "linked against Go process enumeration library (converted from capa rule)"
 	namespace = "host-interaction/process/list"
@@ -10547,7 +10549,7 @@ rule capa_linked_against_Go_process_enumeration_library : CAPA T1057 T1518  {
 	attack = "Discovery::Software Discovery [T1518]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/linked-against-go-process-enumeration-library.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10567,7 +10569,7 @@ rule capa_linked_against_Go_process_enumeration_library : CAPA T1057 T1518  {
 	) 
 }
 
-rule capa_linked_against_Go_WMI_library : CAPA T1213  { 
+rule capa_linked_against_Go_WMI_library : CAPA COLLECTION DATABASE WMI FILE T1213  { 
   meta: 
  	description = "linked against Go WMI library (converted from capa rule)"
 	namespace = "collection/database/wmi"
@@ -10576,7 +10578,7 @@ rule capa_linked_against_Go_WMI_library : CAPA T1213  {
 	attack = "Collection::Data from Information Repositories [T1213]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/linked-against-go-wmi-library.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10596,7 +10598,7 @@ rule capa_linked_against_Go_WMI_library : CAPA T1213  {
 	) 
 }
 
-rule capa_check_for_windows_sandbox_via_mutex : CAPA T1497_001 B0009  { 
+rule capa_check_for_windows_sandbox_via_mutex : CAPA ANTI_ANALYSIS ANTI_VM VM_DETECTION FUNCTION T1497_001 B0009  { 
   meta: 
  	description = "check for windows sandbox via mutex (converted from capa rule)"
 	namespace = "anti-analysis/anti-vm/vm-detection"
@@ -10606,7 +10608,7 @@ rule capa_check_for_windows_sandbox_via_mutex : CAPA T1497_001 B0009  {
 	mbc = "Anti-Behavioral Analysis::Virtual Machine Detection [B0009]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/check-for-windows-sandbox-via-mutex.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10622,7 +10624,7 @@ rule capa_check_for_windows_sandbox_via_mutex : CAPA T1497_001 B0009  {
 	) 
 }
 
-rule capa_linked_against_Go_registry_library : CAPA  { 
+rule capa_linked_against_Go_registry_library : CAPA HOST_INTERACTION REGISTRY FILE  { 
   meta: 
  	description = "linked against Go registry library (converted from capa rule)"
 	namespace = "host-interaction/registry"
@@ -10630,7 +10632,7 @@ rule capa_linked_against_Go_registry_library : CAPA  {
 	scope = "file"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/linked-against-go-registry-library.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10650,7 +10652,7 @@ rule capa_linked_against_Go_registry_library : CAPA  {
 	) 
 }
 
-rule capa_capture_screenshot_in_Go : CAPA T1113 E1113_m01  { 
+rule capa_capture_screenshot_in_Go : CAPA COLLECTION SCREENSHOT FILE T1113 E1113_m01  { 
   meta: 
  	description = "capture screenshot in Go (converted from capa rule)"
 	namespace = "collection/screenshot"
@@ -10660,7 +10662,7 @@ rule capa_capture_screenshot_in_Go : CAPA T1113 E1113_m01  {
 	mbc = "Collection::Screen Capture::WinAPI [E1113.m01]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/capture-screenshot-in-go.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10702,7 +10704,7 @@ rule capa_capture_screenshot_in_Go : CAPA T1113 E1113_m01  {
 	) 
 }
 
-rule capa_linked_against_Go_static_asset_library : CAPA  { 
+rule capa_linked_against_Go_static_asset_library : CAPA EXECUTABLE RESOURCE FILE  { 
   meta: 
  	description = "linked against Go static asset library (converted from capa rule)"
 	namespace = "executable/resource"
@@ -10710,7 +10712,7 @@ rule capa_linked_against_Go_static_asset_library : CAPA  {
 	scope = "file"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/linked-against-go-static-asset-library.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10772,7 +10774,7 @@ rule capa_linked_against_Go_static_asset_library : CAPA  {
 	) 
 }
 
-rule capa_receive_data : CAPA B0030_002  { 
+rule capa_receive_data : CAPA COMMUNICATION FUNCTION B0030_002  { 
   meta: 
  	description = "receive data (converted from capa rule)"
 	namespace = "communication"
@@ -10782,7 +10784,7 @@ rule capa_receive_data : CAPA B0030_002  {
 	mbc = "Command and Control::C2 Communication::Receive Data [B0030.002]"
 	hash = "BFB9B5391A13D0AFD787E87AB90F14F5"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/receive-data.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10798,7 +10800,7 @@ rule capa_receive_data : CAPA B0030_002  {
 	) 
 }
 
-rule capa_send_HTTP_request : CAPA C0002_003  { 
+rule capa_send_HTTP_request : CAPA COMMUNICATION HTTP CLIENT FUNCTION C0002_003  { 
   meta: 
  	description = "send HTTP request (converted from capa rule)"
 	namespace = "communication/http/client"
@@ -10808,7 +10810,7 @@ rule capa_send_HTTP_request : CAPA C0002_003  {
 	hash = "BFB9B5391A13D0AFD787E87AB90F14F5"
 	hash = "6A352C3E55E8AE5ED39DC1BE7FB964B1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/http/client/send-http-request.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10840,7 +10842,7 @@ rule capa_send_HTTP_request : CAPA C0002_003  {
 	) 
 }
 
-rule capa_write_pipe : CAPA C0003_004  { 
+rule capa_write_pipe : CAPA COMMUNICATION NAMED_PIPE WRITE FUNCTION C0003_004  { 
   meta: 
  	description = "write pipe (converted from capa rule)"
 	namespace = "communication/named-pipe/write"
@@ -10848,7 +10850,7 @@ rule capa_write_pipe : CAPA C0003_004  {
 	mbc = "Communication::Interprocess Communication::Write Pipe [C0003.004]"
 	hash = "C91887D861D9BD4A5872249B641BC9F9"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/named-pipe/write/write-pipe.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10869,7 +10871,7 @@ rule capa_write_pipe : CAPA C0003_004  {
 	) 
 }
 
-rule capa_download_and_write_a_file : CAPA T1105 B0030_003  { 
+rule capa_download_and_write_a_file : CAPA C2 FILE_TRANSFER FUNCTION T1105 B0030_003  { 
   meta: 
  	description = "download and write a file (converted from capa rule)"
 	namespace = "c2/file-transfer"
@@ -10880,7 +10882,7 @@ rule capa_download_and_write_a_file : CAPA T1105 B0030_003  {
 	mbc = "Command and Control::C2 Communication::Server to Client File Transfer [B0030.003]"
 	hash = "5D7C34B6854D48D3DA4F96B71550A221"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/c2/file-transfer/download-and-write-a-file.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10894,7 +10896,7 @@ rule capa_download_and_write_a_file : CAPA T1105 B0030_003  {
 	) 
 }
 
-rule capa_create_container : CAPA T1610  { 
+rule capa_create_container : CAPA HOST_INTERACTION CONTAINER DOCKER FUNCTION T1610  { 
   meta: 
  	description = "create container (converted from capa rule)"
 	namespace = "host-interaction/container/docker"
@@ -10903,7 +10905,7 @@ rule capa_create_container : CAPA T1610  {
 	attack = "Execution::Deploy Container [T1610]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/create-container.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10931,7 +10933,7 @@ rule capa_create_container : CAPA T1610  {
 	) 
 }
 
-rule capa_list_containers : CAPA T1613  { 
+rule capa_list_containers : CAPA HOST_INTERACTION CONTAINER DOCKER FUNCTION T1613  { 
   meta: 
  	description = "list containers (converted from capa rule)"
 	namespace = "host-interaction/container/docker"
@@ -10940,7 +10942,7 @@ rule capa_list_containers : CAPA T1613  {
 	attack = "Discovery::Container and Resource Discovery [T1613]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/list-containers.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10960,7 +10962,7 @@ rule capa_list_containers : CAPA T1613  {
 	) 
 }
 
-rule capa_receive_and_write_data_from_server_to_client : CAPA  { 
+rule capa_receive_and_write_data_from_server_to_client : CAPA C2 FILE_TRANSFER FUNCTION  { 
   meta: 
  	description = "receive and write data from server to client (converted from capa rule)"
 	namespace = "c2/file-transfer"
@@ -10968,7 +10970,7 @@ rule capa_receive_and_write_data_from_server_to_client : CAPA  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/receive-and-write-data-from-server-to-client.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10982,7 +10984,7 @@ rule capa_receive_and_write_data_from_server_to_client : CAPA  {
 	) 
 }
 
-rule capa_build_Docker_image : CAPA T1612  { 
+rule capa_build_Docker_image : CAPA HOST_INTERACTION CONTAINER DOCKER FUNCTION T1612  { 
   meta: 
  	description = "build Docker image (converted from capa rule)"
 	namespace = "host-interaction/container/docker"
@@ -10991,7 +10993,7 @@ rule capa_build_Docker_image : CAPA T1612  {
 	attack = "Defense Evasion::Build Image on Host [T1612]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/build-docker-image.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11011,7 +11013,7 @@ rule capa_build_Docker_image : CAPA T1612  {
 	) 
 }
 
-rule capa_run_in_container : CAPA T1609  { 
+rule capa_run_in_container : CAPA HOST_INTERACTION CONTAINER DOCKER FUNCTION T1609  { 
   meta: 
  	description = "run in container (converted from capa rule)"
 	namespace = "host-interaction/container/docker"
@@ -11020,7 +11022,7 @@ rule capa_run_in_container : CAPA T1609  {
 	attack = "Execution::Container Administration Command [T1609]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/run-in-container.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11050,7 +11052,7 @@ rule capa_run_in_container : CAPA T1609  {
 	) 
 }
 
-rule capa_send_HTTP_request_with_Host_header : CAPA  { 
+rule capa_send_HTTP_request_with_Host_header : CAPA COMMUNICATION HTTP FUNCTION  { 
   meta: 
  	description = "send HTTP request with Host header (converted from capa rule)"
 	namespace = "communication/http"
@@ -11058,7 +11060,7 @@ rule capa_send_HTTP_request_with_Host_header : CAPA  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/send-http-request-with-host-header.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11074,7 +11076,7 @@ rule capa_send_HTTP_request_with_Host_header : CAPA  {
 	) 
 }
 
-rule capa_make_an_HTTP_request_with_a_Cookie : CAPA  { 
+rule capa_make_an_HTTP_request_with_a_Cookie : CAPA COMMUNICATION HTTP CLIENT FUNCTION  { 
   meta: 
  	description = "make an HTTP request with a Cookie (converted from capa rule)"
 	namespace = "communication/http/client"
@@ -11082,7 +11084,7 @@ rule capa_make_an_HTTP_request_with_a_Cookie : CAPA  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/make-an-http-request-with-a-cookie.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11098,7 +11100,7 @@ rule capa_make_an_HTTP_request_with_a_Cookie : CAPA  {
 	) 
 }
 
-rule capa_send_data : CAPA B0030_001  { 
+rule capa_send_data : CAPA COMMUNICATION FUNCTION B0030_001  { 
   meta: 
  	description = "send data (converted from capa rule)"
 	namespace = "communication"
@@ -11108,7 +11110,7 @@ rule capa_send_data : CAPA B0030_001  {
 	mbc = "Command and Control::C2 Communication::Send Data [B0030.001]"
 	hash = "BFB9B5391A13D0AFD787E87AB90F14F5"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/send-data.yml"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11124,7 +11126,7 @@ rule capa_send_data : CAPA B0030_001  {
 	) 
 }
 
-rule capa_read_and_send_data_from_client_to_server : CAPA  { 
+rule capa_read_and_send_data_from_client_to_server : CAPA C2 FILE_TRANSFER FUNCTION  { 
   meta: 
  	description = "read and send data from client to server (converted from capa rule)"
 	namespace = "c2/file-transfer"
@@ -11132,7 +11134,7 @@ rule capa_read_and_send_data_from_client_to_server : CAPA  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/read-and-send-data-from-client-to-server.yml"
 	capa_nursery = "True"
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11146,7 +11148,7 @@ rule capa_read_and_send_data_from_client_to_server : CAPA  {
 	) 
 }
 
-rule capa_create_reverse_shell : CAPA T1059_003 B0022_001  { 
+rule capa_create_reverse_shell : CAPA C2 SHELL FUNCTION T1059_003 B0022_001 INCOMPLETE  { 
   meta: 
  	description = "create reverse shell (converted from capa rule)"
 	namespace = "c2/shell"
@@ -11157,7 +11159,7 @@ rule capa_create_reverse_shell : CAPA T1059_003 B0022_001  {
 	hash = "C91887D861D9BD4A5872249B641BC9F9"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/c2/shell/create-reverse-shell.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11183,7 +11185,7 @@ rule capa_create_reverse_shell : CAPA T1059_003 B0022_001  {
 	) 
 }
 
-rule capa_delete_file : CAPA C0047  { 
+rule capa_delete_file : CAPA HOST_INTERACTION FILE_SYSTEM DELETE FUNCTION C0047 INCOMPLETE  { 
   meta: 
  	description = "delete file (converted from capa rule)"
 	namespace = "host-interaction/file-system/delete"
@@ -11195,7 +11197,7 @@ rule capa_delete_file : CAPA C0047  {
 	hash = "563653399B82CD443F120ECEFF836EA3678D4CF11D9B351BB737573C2D856299"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/delete/delete-file.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11218,7 +11220,7 @@ rule capa_delete_file : CAPA C0047  {
 	) 
 }
 
-rule capa_check_if_file_exists : CAPA T1083  { 
+rule capa_check_if_file_exists : CAPA HOST_INTERACTION FILE_SYSTEM EXISTS FUNCTION T1083 INCOMPLETE  { 
   meta: 
  	description = "check if file exists (converted from capa rule)"
 	namespace = "host-interaction/file-system/exists"
@@ -11228,7 +11230,7 @@ rule capa_check_if_file_exists : CAPA T1083  {
 	hash = "31600AD0D1A7EA615690DF111AE36C73"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/exists/check-if-file-exists.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11239,7 +11241,7 @@ rule capa_check_if_file_exists : CAPA T1083  {
 	) 
 }
 
-rule capa_copy_file : CAPA C0045  { 
+rule capa_copy_file : CAPA HOST_INTERACTION FILE_SYSTEM COPY FUNCTION C0045 INCOMPLETE  { 
   meta: 
  	description = "copy file (converted from capa rule)"
 	namespace = "host-interaction/file-system/copy"
@@ -11249,7 +11251,7 @@ rule capa_copy_file : CAPA C0045  {
 	hash = "Practical Malware Analysis Lab 01-01.exe_:0x401440"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/copy/copy-file.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11267,7 +11269,7 @@ rule capa_copy_file : CAPA C0045  {
 	) 
 }
 
-rule capa_run_as_service : CAPA E1480_m07  { 
+rule capa_run_as_service : CAPA HOST_INTERACTION SERVICE FILE E1480_m07 INCOMPLETE  { 
   meta: 
  	description = "run as service (converted from capa rule)"
 	namespace = "host-interaction/service"
@@ -11276,7 +11278,7 @@ rule capa_run_as_service : CAPA E1480_m07  {
 	hash = "Practical Malware Analysis Lab 03-02.dll_"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/service/run-as-service.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11287,7 +11289,7 @@ rule capa_run_as_service : CAPA E1480_m07  {
 	) 
 }
 
-rule capa_get_disk_size : CAPA T1082  { 
+rule capa_get_disk_size : CAPA HOST_INTERACTION HARDWARE STORAGE FUNCTION T1082 INCOMPLETE  { 
   meta: 
  	description = "get disk size (converted from capa rule)"
 	namespace = "host-interaction/hardware/storage"
@@ -11298,7 +11300,7 @@ rule capa_get_disk_size : CAPA T1082  {
 	hash = "al-khaser_x86.exe_:0x434010"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/hardware/storage/get-disk-size.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11322,7 +11324,7 @@ rule capa_get_disk_size : CAPA T1082  {
 	) 
 }
 
-rule capa_interact_with_driver_via_control_codes : CAPA T1569_002  { 
+rule capa_interact_with_driver_via_control_codes : CAPA HOST_INTERACTION DRIVER FUNCTION T1569_002 INCOMPLETE  { 
   meta: 
  	description = "interact with driver via control codes (converted from capa rule)"
 	namespace = "host-interaction/driver"
@@ -11333,7 +11335,7 @@ rule capa_interact_with_driver_via_control_codes : CAPA T1569_002  {
 	hash = "9412A66BC81F51A1FA916AC47C77E02AC1A7C9DFF543233ED70AA265EF6A1E76"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/driver/interact-with-driver-via-control-codes.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11351,7 +11353,7 @@ rule capa_interact_with_driver_via_control_codes : CAPA T1569_002  {
 	) 
 }
 
-rule capa_get_local_IPv4_addresses : CAPA T1016  { 
+rule capa_get_local_IPv4_addresses : CAPA HOST_INTERACTION NETWORK ADDRESS FUNCTION T1016 INCOMPLETE  { 
   meta: 
  	description = "get local IPv4 addresses (converted from capa rule)"
 	namespace = "host-interaction/network/address"
@@ -11362,7 +11364,7 @@ rule capa_get_local_IPv4_addresses : CAPA T1016  {
 	hash = "4C0553285D724DCAF5909924B4E3E90A"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/network/address/get-local-ipv4-addresses.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11378,7 +11380,7 @@ rule capa_get_local_IPv4_addresses : CAPA T1016  {
 	) 
 }
 
-rule capa_get_session_user_name : CAPA T1033 T1087  { 
+rule capa_get_session_user_name : CAPA HOST_INTERACTION SESSION FUNCTION T1033 T1087 INCOMPLETE  { 
   meta: 
  	description = "get session user name (converted from capa rule)"
 	namespace = "host-interaction/session"
@@ -11389,7 +11391,7 @@ rule capa_get_session_user_name : CAPA T1033 T1087  {
 	hash = "Practical Malware Analysis Lab 14-01.exe_:0x401285"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/session/get-session-user-name.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11401,7 +11403,7 @@ rule capa_get_session_user_name : CAPA T1033 T1087  {
 	) 
 }
 
-rule capa_encrypt_data_using_Sosemanuk : CAPA T1027 E1027_m05 C0027_008  { 
+rule capa_encrypt_data_using_Sosemanuk : CAPA DATA_MANIPULATION ENCRYPTION SOSEMANUK BASICBLOCK T1027 E1027_m05 C0027_008 INCOMPLETE  { 
   meta: 
  	description = "encrypt data using Sosemanuk (converted from capa rule)"
 	namespace = "data-manipulation/encryption/sosemanuk"
@@ -11414,7 +11416,7 @@ rule capa_encrypt_data_using_Sosemanuk : CAPA T1027 E1027_m05 C0027_008  {
 	hash = "ea7bb99e03606702c1cbe543bb32b27e"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/sosemanuk/encrypt-data-using-sosemanuk.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11434,7 +11436,7 @@ rule capa_encrypt_data_using_Sosemanuk : CAPA T1027 E1027_m05 C0027_008  {
 	) 
 }
 
-rule capa_encrypt_data_using_DES : CAPA T1027 E1027_m05 C0027_004  { 
+rule capa_encrypt_data_using_DES : CAPA DATA_MANIPULATION ENCRYPTION DES BASICBLOCK T1027 E1027_m05 C0027_004 INCOMPLETE  { 
   meta: 
  	description = "encrypt data using DES (converted from capa rule)"
 	namespace = "data-manipulation/encryption/des"
@@ -11446,7 +11448,7 @@ rule capa_encrypt_data_using_DES : CAPA T1027 E1027_m05 C0027_004  {
 	hash = "91a12a4cf437589ba70b1687f5acad19"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/des/encrypt-data-using-des.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11486,7 +11488,7 @@ rule capa_encrypt_data_using_DES : CAPA T1027 E1027_m05 C0027_004  {
 	) 
 }
 
-rule capa_hash_data_with_CRC32 : CAPA C0032_001  { 
+rule capa_hash_data_with_CRC32 : CAPA DATA_MANIPULATION CHECKSUM CRC32 FUNCTION C0032_001 INCOMPLETE  { 
   meta: 
  	description = "hash data with CRC32 (converted from capa rule)"
 	namespace = "data-manipulation/checksum/crc32"
@@ -11498,7 +11500,7 @@ rule capa_hash_data_with_CRC32 : CAPA C0032_001  {
 	hash = "7EFF498DE13CC734262F87E6B3EF38AB"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/checksum/crc32/hash-data-with-crc32.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11512,7 +11514,7 @@ rule capa_hash_data_with_CRC32 : CAPA C0032_001  {
 	) 
 }
 
-rule capa_hash_data_using_SHA1 : CAPA C0029_002  { 
+rule capa_hash_data_using_SHA1 : CAPA DATA_MANIPULATION HASHING SHA1 FUNCTION C0029_002 INCOMPLETE  { 
   meta: 
  	description = "hash data using SHA1 (converted from capa rule)"
 	namespace = "data-manipulation/hashing/sha1"
@@ -11522,7 +11524,7 @@ rule capa_hash_data_using_SHA1 : CAPA C0029_002  {
 	hash = "D063B1804E8D2BB26BD2E097141C1BBC"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/hashing/sha1/hash-data-using-sha1.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11547,7 +11549,7 @@ rule capa_hash_data_using_SHA1 : CAPA C0029_002  {
 	) 
 }
 
-rule capa_hash_data_using_tiger : CAPA C0029_005  { 
+rule capa_hash_data_using_tiger : CAPA DATA_MANIPULATION HASHING TIGER BASICBLOCK C0029_005 INCOMPLETE  { 
   meta: 
  	description = "hash data using tiger (converted from capa rule)"
 	namespace = "data-manipulation/hashing/tiger"
@@ -11557,7 +11559,7 @@ rule capa_hash_data_using_tiger : CAPA C0029_005  {
 	hash = "0761142efbda6c4b1e801223de723578"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/hashing/tiger/hash-data-using-tiger.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11577,7 +11579,7 @@ rule capa_hash_data_using_tiger : CAPA C0029_005  {
 	) 
 }
 
-rule capa_hash_data_using_murmur3 : CAPA C0030_001  { 
+rule capa_hash_data_using_murmur3 : CAPA DATA_MANIPULATION HASHING MURMUR FUNCTION C0030_001 INCOMPLETE  { 
   meta: 
  	description = "hash data using murmur3 (converted from capa rule)"
 	namespace = "data-manipulation/hashing/murmur"
@@ -11587,7 +11589,7 @@ rule capa_hash_data_using_murmur3 : CAPA C0030_001  {
 	hash = "c66172b12971a329f8d5ff01665f204b"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/hashing/murmur/hash-data-using-murmur3.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11633,7 +11635,7 @@ rule capa_hash_data_using_murmur3 : CAPA C0030_001  {
 	) 
 }
 
-rule capa_persist_via_Windows_service : CAPA T1543_003 T1569_002  { 
+rule capa_persist_via_Windows_service : CAPA PERSISTENCE SERVICE FUNCTION T1543_003 T1569_002 INCOMPLETE  { 
   meta: 
  	description = "persist via Windows service (converted from capa rule)"
 	namespace = "persistence/service"
@@ -11644,7 +11646,7 @@ rule capa_persist_via_Windows_service : CAPA T1543_003 T1569_002  {
 	hash = "Practical Malware Analysis Lab 03-02.dll_:0x10004706"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/persistence/service/persist-via-windows-service.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11672,7 +11674,7 @@ rule capa_persist_via_Windows_service : CAPA T1543_003 T1569_002  {
 	) 
 }
 
-rule capa_move_file : CAPA  { 
+rule capa_move_file : CAPA HOST_INTERACTION FILE_SYSTEM MOVE FUNCTION INCOMPLETE  { 
   meta: 
  	description = "move file (converted from capa rule)"
 	namespace = "host-interaction/file-system/move"
@@ -11681,7 +11683,7 @@ rule capa_move_file : CAPA  {
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/move-file.yml"
 	capa_nursery = "True"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11703,7 +11705,7 @@ rule capa_move_file : CAPA  {
 	) 
 }
 
-rule capa_hash_data_with_MD5 : CAPA  { 
+rule capa_hash_data_with_MD5 : CAPA DATA_MANIPULATION HASHING MD5 FUNCTION INCOMPLETE  { 
   meta: 
  	description = "hash data with MD5 (converted from capa rule)"
 	namespace = "data-manipulation/hashing/md5"
@@ -11712,7 +11714,7 @@ rule capa_hash_data_with_MD5 : CAPA  {
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/hash-data-with-md5.yml"
 	capa_nursery = "True"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11736,7 +11738,7 @@ rule capa_hash_data_with_MD5 : CAPA  {
 	) 
 }
 
-rule capa_capture_screenshot : CAPA T1113 E1113_m01  { 
+rule capa_capture_screenshot : CAPA COLLECTION SCREENSHOT FUNCTION T1113 E1113_m01 INCOMPLETE  { 
   meta: 
  	description = "capture screenshot (converted from capa rule)"
 	namespace = "collection/screenshot"
@@ -11748,7 +11750,7 @@ rule capa_capture_screenshot : CAPA T1113 E1113_m01  {
 	hash = "50D5EE1CE2CA5E30C6B1019EE64EEEC2"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/screenshot/capture-screenshot.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11777,7 +11779,7 @@ rule capa_capture_screenshot : CAPA T1113 E1113_m01  {
 	) 
 }
 
-rule capa_gather_leapftp_information : CAPA T1555  { 
+rule capa_gather_leapftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555 INCOMPLETE  { 
   meta: 
  	description = "gather leapftp information (converted from capa rule)"
 	namespace = "collection/file-managers"
@@ -11787,7 +11789,7 @@ rule capa_gather_leapftp_information : CAPA T1555  {
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-leapftp-information.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-21"
+	date = "2021-05-24"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
