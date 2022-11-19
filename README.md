@@ -4,6 +4,7 @@
 
 See [capa2yara](capa2yara/README.md)
 
+
 ## Webshells
 
 This is the dev repo for my webshell YARA rules in 
@@ -68,3 +69,13 @@ Since the rules are included in [Thor](<https://www.nextron-systems.com/thor/>) 
 * <https://www.virustotal.com/gui/search/webshell_jsp_input_upload_write/comments>
 * <https://www.virustotal.com/gui/search/webshell_generic_os_strings/comments>
 * <https://www.virustotal.com/gui/search/webshell_in_image/comments>
+
+## C# red team tools
+
+YARA rules to find hack tools via C# GUIDs. Easily bypassed but not everybody does the effort :)
+
+<https://github.com/Neo23x0/signature-base/blob/master/yara/gen_github_net_redteam_tools_guids.yar>
+<https://github.com/Neo23x0/signature-base/blob/master/yara/gen_github_net_redteam_tools_names.yar>
+
+VT matches:
+<https://www.virustotal.com/gui/search/sharp%2520guid/comments>
