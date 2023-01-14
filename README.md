@@ -70,12 +70,20 @@ Since the rules are included in [Thor](<https://www.nextron-systems.com/thor/>) 
 * <https://www.virustotal.com/gui/search/webshell_generic_os_strings/comments>
 * <https://www.virustotal.com/gui/search/webshell_in_image/comments>
 
+Most of the rules are also active on Malware-Bazaar, e.g.
+* <https://bazaar.abuse.ch/browse/yara/webshell_asp_obfuscated/>
+* <https://bazaar.abuse.ch/browse/yara/webshell_csharp_generic/>
+
 ## C# red team tools
 
 YARA rules to find hack tools via C# GUIDs. Easily bypassed but not everybody does the effort :)
 
-<https://github.com/Neo23x0/signature-base/blob/master/yara/gen_github_net_redteam_tools_guids.yar>
-<https://github.com/Neo23x0/signature-base/blob/master/yara/gen_github_net_redteam_tools_names.yar>
+* <https://github.com/Neo23x0/signature-base/blob/master/yara/gen_github_net_redteam_tools_guids.yar>
+* <https://github.com/Neo23x0/signature-base/blob/master/yara/gen_github_net_redteam_tools_names.yar>
 
 VT matches:
 <https://www.virustotal.com/gui/search/sharp%2520guid/comments>
+
+On Malware-Bazaar by rulename, e.g.:
+* <https://bazaar.abuse.ch/browse/yara/HKTL_NET_GUID_BlackNET/>
+* <https://bazaar.abuse.ch/browse/yara/HKTL_NET_GUID_wsManager/>
