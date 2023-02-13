@@ -2,7 +2,7 @@ import "hash"
 
 rule POC_secret_rule {
     meta:
-        description = "POC: Detects hashed strings allowing to keep it secret, what the rule is actually looking for. Inspired by Solarwinds fnv1a hashed AV products."
+        description = "POC: Detects hashed strings allowing to keep it secret, what the rule is actually looking for. This rule finds itself. Inspired by Solarwinds fnv1a hashed AV products."
         reference = "https://yara.readthedocs.io/en/v4.2.0/modules/hash.html"
         license = "Detection Rule License 1.1 https://github.com/SigmaHQ/Detection-Rule-License"
         author = "Arnim Rupp"
