@@ -38,7 +38,7 @@ rule capa_create_or_open_file : CAPA BASICBLOCK C0016  {
 	mbc = "File System::Create File [C0016]"
 	hash = "B5F85C26D7AA5A1FB4AF5821B6B5AB9B"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/lib/create-or-open-file.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -74,7 +74,7 @@ rule capa_open_thread : CAPA BASICBLOCK  {
 	scope = "basic block"
 	hash = "787cbc8a6d1bc58ea169e51e1ad029a637f22560660cc129ab8a099a745bd50e:00502F4C"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/lib/open-thread.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -101,7 +101,7 @@ rule capa_allocate_memory : CAPA BASICBLOCK C0007  {
 	hash = "Practical Malware Analysis Lab 03-03.exe_:0x4010EA"
 	hash = "563653399B82CD443F120ECEFF836EA3678D4CF11D9B351BB737573C2D856299"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/lib/allocate-memory.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -136,7 +136,7 @@ rule capa_delay_execution : CAPA BASICBLOCK B0003_003  {
 	hash = "al-khaser_x86.exe_:0x449770"
 	hash = "B5F85C26D7AA5A1FB4AF5821B6B5AB9B"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/lib/delay-execution.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -175,7 +175,7 @@ rule capa_write_process_memory : CAPA FUNCTION T1055  {
 	attack = "Defense Evasion::Process Injection [T1055]"
 	hash = "2D3EDC218A90F03089CC01715A9F047F"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/lib/write-process-memory.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -200,7 +200,7 @@ rule capa_open_process : CAPA BASICBLOCK  {
 	scope = "basic block"
 	hash = "Practical Malware Analysis Lab 17-02.dll_:0x1000D10D"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/lib/open-process.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -228,21 +228,21 @@ rule capa_delete_volume_shadow_copies : CAPA IMPACT INHIBIT_SYSTEM_RECOVERY FUNC
 	mbc = "Impact::Disk Content Wipe::Delete Shadow Drive [F0014.001]"
 	hash = "B87E9DD18A5533A09D3E48A7A1EFBCF6"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/impact/inhibit-system-recovery/delete-volume-shadow-copies.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_aaw = /vssadmin.{,1000} delete shadows/ nocase ascii wide 
-	$re_aax = /vssadmin.{,1000} resize shadowstorage/ nocase ascii wide 
-	$re_aay = /wmic.{,1000} shadowcopy delete/ nocase ascii wide 
+ 	$func_re_aaw = /vssadmin.{,1000} delete shadows/ nocase ascii wide 
+	$func_re_aax = /vssadmin.{,1000} resize shadowstorage/ nocase ascii wide 
+	$func_re_aay = /wmic.{,1000} shadowcopy delete/ nocase ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$re_aaw 
-		or 	$re_aax 
-		or 	$re_aay  
+			$func_re_aaw 
+		or 	$func_re_aax 
+		or 	$func_re_aay  
 	) 
 }
 
@@ -255,83 +255,83 @@ rule capa_reference_analysis_tools_strings : CAPA ANTI_ANALYSIS FILE B0013_001  
 	mbc = "Discovery::Analysis Tool Discovery::Process Detection [B0013.001]"
 	hash = "al-khaser_x86.exe_"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/reference-analysis-tools-strings.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_aaz = /ollydbg\.exe/ nocase ascii wide 
-	$re_aba = /ProcessHacker\.exe/ nocase ascii wide 
-	$re_abb = /tcpview\.exe/ nocase ascii wide 
-	$re_abc = /autoruns\.exe/ nocase ascii wide 
-	$re_abd = /autorunsc\.exe/ nocase ascii wide 
-	$re_abe = /filemon\.exe/ nocase ascii wide 
-	$re_abf = /procmon\.exe/ nocase ascii wide 
-	$re_abg = /regmon\.exe/ nocase ascii wide 
-	$re_abh = /procexp\.exe/ nocase ascii wide 
-	$re_abi = /idaq\.exe/ nocase ascii wide 
-	$re_abj = /idaq64\.exe/ nocase ascii wide 
-	$re_abk = /ImmunityDebugger\.exe/ nocase ascii wide 
-	$re_abl = /Wireshark\.exe/ nocase ascii wide 
-	$re_abm = /dumpcap\.exe/ nocase ascii wide 
-	$re_abn = /HookExplorer\.exe/ nocase ascii wide 
-	$re_abo = /ImportREC\.exe/ nocase ascii wide 
-	$re_abp = /PETools\.exe/ nocase ascii wide 
-	$re_abq = /LordPE\.exe/ nocase ascii wide 
-	$re_abr = /SysInspector\.exe/ nocase ascii wide 
-	$re_abs = /proc_analyzer\.exe/ nocase ascii wide 
-	$re_abt = /sysAnalyzer\.exe/ nocase ascii wide 
-	$re_abu = /sniff_hit\.exe/ nocase ascii wide 
-	$re_abv = /windbg\.exe/ nocase ascii wide 
-	$re_abw = /joeboxcontrol\.exe/ nocase ascii wide 
-	$re_abx = /joeboxserver\.exe/ nocase ascii wide 
-	$re_aby = /ResourceHacker\.exe/ nocase ascii wide 
-	$re_abz = /x32dbg\.exe/ nocase ascii wide 
-	$re_aca = /x64dbg\.exe/ nocase ascii wide 
-	$re_acb = /Fiddler\.exe/ nocase ascii wide 
-	$re_acc = /httpdebugger\.exe/ nocase ascii wide 
-	$re_acd = /fakenet\.exe/ nocase ascii wide 
-	$re_ace = /netmon\.exe/ nocase ascii wide 
-	$re_acf = /WPE PRO\.exe/ nocase ascii wide 
-	$re_acg = /decompile\.exe/ nocase ascii wide 
+ 	$file_re_aaz = /ollydbg\.exe/ nocase ascii wide 
+	$file_re_aba = /ProcessHacker\.exe/ nocase ascii wide 
+	$file_re_abb = /tcpview\.exe/ nocase ascii wide 
+	$file_re_abc = /autoruns\.exe/ nocase ascii wide 
+	$file_re_abd = /autorunsc\.exe/ nocase ascii wide 
+	$file_re_abe = /filemon\.exe/ nocase ascii wide 
+	$file_re_abf = /procmon\.exe/ nocase ascii wide 
+	$file_re_abg = /regmon\.exe/ nocase ascii wide 
+	$file_re_abh = /procexp\.exe/ nocase ascii wide 
+	$file_re_abi = /idaq\.exe/ nocase ascii wide 
+	$file_re_abj = /idaq64\.exe/ nocase ascii wide 
+	$file_re_abk = /ImmunityDebugger\.exe/ nocase ascii wide 
+	$file_re_abl = /Wireshark\.exe/ nocase ascii wide 
+	$file_re_abm = /dumpcap\.exe/ nocase ascii wide 
+	$file_re_abn = /HookExplorer\.exe/ nocase ascii wide 
+	$file_re_abo = /ImportREC\.exe/ nocase ascii wide 
+	$file_re_abp = /PETools\.exe/ nocase ascii wide 
+	$file_re_abq = /LordPE\.exe/ nocase ascii wide 
+	$file_re_abr = /SysInspector\.exe/ nocase ascii wide 
+	$file_re_abs = /proc_analyzer\.exe/ nocase ascii wide 
+	$file_re_abt = /sysAnalyzer\.exe/ nocase ascii wide 
+	$file_re_abu = /sniff_hit\.exe/ nocase ascii wide 
+	$file_re_abv = /windbg\.exe/ nocase ascii wide 
+	$file_re_abw = /joeboxcontrol\.exe/ nocase ascii wide 
+	$file_re_abx = /joeboxserver\.exe/ nocase ascii wide 
+	$file_re_aby = /ResourceHacker\.exe/ nocase ascii wide 
+	$file_re_abz = /x32dbg\.exe/ nocase ascii wide 
+	$file_re_aca = /x64dbg\.exe/ nocase ascii wide 
+	$file_re_acb = /Fiddler\.exe/ nocase ascii wide 
+	$file_re_acc = /httpdebugger\.exe/ nocase ascii wide 
+	$file_re_acd = /fakenet\.exe/ nocase ascii wide 
+	$file_re_ace = /netmon\.exe/ nocase ascii wide 
+	$file_re_acf = /WPE PRO\.exe/ nocase ascii wide 
+	$file_re_acg = /decompile\.exe/ nocase ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$re_aaz 
-		or 	$re_aba 
-		or 	$re_abb 
-		or 	$re_abc 
-		or 	$re_abd 
-		or 	$re_abe 
-		or 	$re_abf 
-		or 	$re_abg 
-		or 	$re_abh 
-		or 	$re_abi 
-		or 	$re_abj 
-		or 	$re_abk 
-		or 	$re_abl 
-		or 	$re_abm 
-		or 	$re_abn 
-		or 	$re_abo 
-		or 	$re_abp 
-		or 	$re_abq 
-		or 	$re_abr 
-		or 	$re_abs 
-		or 	$re_abt 
-		or 	$re_abu 
-		or 	$re_abv 
-		or 	$re_abw 
-		or 	$re_abx 
-		or 	$re_aby 
-		or 	$re_abz 
-		or 	$re_aca 
-		or 	$re_acb 
-		or 	$re_acc 
-		or 	$re_acd 
-		or 	$re_ace 
-		or 	$re_acf 
-		or 	$re_acg  
+			$file_re_aaz 
+		or 	$file_re_aba 
+		or 	$file_re_abb 
+		or 	$file_re_abc 
+		or 	$file_re_abd 
+		or 	$file_re_abe 
+		or 	$file_re_abf 
+		or 	$file_re_abg 
+		or 	$file_re_abh 
+		or 	$file_re_abi 
+		or 	$file_re_abj 
+		or 	$file_re_abk 
+		or 	$file_re_abl 
+		or 	$file_re_abm 
+		or 	$file_re_abn 
+		or 	$file_re_abo 
+		or 	$file_re_abp 
+		or 	$file_re_abq 
+		or 	$file_re_abr 
+		or 	$file_re_abs 
+		or 	$file_re_abt 
+		or 	$file_re_abu 
+		or 	$file_re_abv 
+		or 	$file_re_abw 
+		or 	$file_re_abx 
+		or 	$file_re_aby 
+		or 	$file_re_abz 
+		or 	$file_re_aca 
+		or 	$file_re_acb 
+		or 	$file_re_acc 
+		or 	$file_re_acd 
+		or 	$file_re_ace 
+		or 	$file_re_acf 
+		or 	$file_re_acg  
 	) 
 }
 
@@ -344,7 +344,7 @@ rule capa_timestomp_file : CAPA ANTI_ANALYSIS ANTI_FORENSIC TIMESTOMP FUNCTION T
 	attack = "Defense Evasion::Indicator Removal on Host::Timestomp [T1070.006]"
 	hash = "Practical Malware Analysis Lab 03-04.exe_:0x4014e0"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-forensic/timestomp/timestomp-file.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -371,7 +371,7 @@ rule capa_clear_the_Windows_event_log : CAPA ANTI_ANALYSIS ANTI_FORENSIC CLEAR_L
 	attack = "Defense Evasion::Indicator Removal on Host::Clear Windows Event Logs [T1070.001]"
 	hash = "82BF6347ACF15E5D883715DC289D8A2B"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-forensic/clear-logs/clear-the-windows-event-log.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -392,46 +392,46 @@ rule capa_check_for_sandbox_and_av_modules : CAPA ANTI_ANALYSIS ANTI_AV BASICBLO
 	mbc = "Anti-Behavioral Analysis::Sandbox Detection [B0007]"
 	hash = "ccbf7cba35bab56563c0fbe4237fdc41"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-av/check-for-sandbox-and-av-modules.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
  	$api_ach = /\bGetModuleHandle(A|W)?\b/ ascii wide
-	$re_aci = /avghook(x|a)\.dll/ nocase ascii wide  // AVG
-	$re_acj = /snxhk\.dll/ nocase ascii wide  // Avast
-	$re_ack = /sf2\.dll/ nocase ascii wide  // Avast
-	$re_acl = /sbiedll\.dll/ nocase ascii wide  // Sandboxie
-	$re_acm = /dbghelp\.dll/ nocase ascii wide  // WindBG
-	$re_acn = /api_log\.dll/ nocase ascii wide  // iDefense Lab
-	$re_aco = /dir_watch\.dll/ ascii wide  // iDefense Lab
-	$re_acp = /pstorec\.dll/ nocase ascii wide  // SunBelt Sandbox
-	$re_acq = /vmcheck\.dll/ nocase ascii wide  // Virtual PC
-	$re_acr = /wpespy\.dll/ nocase ascii wide  // WPE Pro
-	$re_acs = /cmdvrt(64|32).dll/ nocase ascii wide  // Comodo Container
-	$re_act = /sxin.dll/ nocase ascii wide  // 360 SOFTWARE
-	$re_acu = /dbghelp\.dll/ nocase ascii wide  // WINE
-	$re_acv = /printfhelp\.dll/ nocase ascii wide  // Unknown Sandbox
+	$basic_re_aci = /avghook(x|a)\.dll/ nocase ascii wide  // AVG
+	$basic_re_acj = /snxhk\.dll/ nocase ascii wide  // Avast
+	$basic_re_ack = /sf2\.dll/ nocase ascii wide  // Avast
+	$basic_re_acl = /sbiedll\.dll/ nocase ascii wide  // Sandboxie
+	$basic_re_acm = /dbghelp\.dll/ nocase ascii wide  // WindBG
+	$basic_re_acn = /api_log\.dll/ nocase ascii wide  // iDefense Lab
+	$basic_re_aco = /dir_watch\.dll/ ascii wide  // iDefense Lab
+	$basic_re_acp = /pstorec\.dll/ nocase ascii wide  // SunBelt Sandbox
+	$basic_re_acq = /vmcheck\.dll/ nocase ascii wide  // Virtual PC
+	$basic_re_acr = /wpespy\.dll/ nocase ascii wide  // WPE Pro
+	$basic_re_acs = /cmdvrt(64|32).dll/ nocase ascii wide  // Comodo Container
+	$basic_re_act = /sxin.dll/ nocase ascii wide  // 360 SOFTWARE
+	$basic_re_acu = /dbghelp\.dll/ nocase ascii wide  // WINE
+	$basic_re_acv = /printfhelp\.dll/ nocase ascii wide  // Unknown Sandbox
  
   condition:
     capa_pe_file and
  (
 			$api_ach 
 		and  (
-			$re_aci 
-		or 	$re_acj 
-		or 	$re_ack 
-		or 	$re_acl 
-		or 	$re_acm 
-		or 	$re_acn 
-		or 	$re_aco 
-		or 	$re_acp 
-		or 	$re_acq 
-		or 	$re_acr 
-		or 	$re_acs 
-		or 	$re_act 
-		or 	$re_acu 
-		or 	$re_acv  
+			$basic_re_aci 
+		or 	$basic_re_acj 
+		or 	$basic_re_ack 
+		or 	$basic_re_acl 
+		or 	$basic_re_acm 
+		or 	$basic_re_acn 
+		or 	$basic_re_aco 
+		or 	$basic_re_acp 
+		or 	$basic_re_acq 
+		or 	$basic_re_acr 
+		or 	$basic_re_acs 
+		or 	$basic_re_act 
+		or 	$basic_re_acu 
+		or 	$basic_re_acv  
 	)  
 	) 
 }
@@ -446,7 +446,7 @@ rule capa_packed_with_pebundle : CAPA ANTI_ANALYSIS PACKER PEBUNDLE FILE T1027_0
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	hash = "db9fe790b4e18abf55df31aa0b81e558"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/packer/pebundle/packed-with-pebundle.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -468,13 +468,13 @@ rule capa_packed_with_ASPack : CAPA ANTI_ANALYSIS PACKER ASPACK FILE T1027_002 F
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	hash = "2055994ff75b4309eee3a49c5749d306"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/packer/aspack/packed-with-aspack.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_adc = "The procedure entry point %s could not be located in the dynamic link library %s" ascii wide
-	$str_add = "The ordinal %u could not be located in the dynamic link library %s" ascii wide
+ 	$file_str_adc = "The procedure entry point %s could not be located in the dynamic link library %s" ascii wide
+	$file_str_add = "The ordinal %u could not be located in the dynamic link library %s" ascii wide
  
   condition:
     capa_pe_file and
@@ -483,8 +483,8 @@ rule capa_packed_with_ASPack : CAPA ANTI_ANALYSIS PACKER ASPACK FILE T1027_002 F
 		or 	for any acz in pe.sections : ( acz.name == ".adata" ) 
 		or 	for any ada in pe.sections : ( ada.name == ".ASPack" ) 
 		or 	for any adb in pe.sections : ( adb.name == "ASPack" ) 
-		or 	$str_adc 
-		or 	$str_add  
+		or 	$file_str_adc 
+		or 	$file_str_add  
 	) 
 }
 
@@ -498,7 +498,7 @@ rule capa_packed_with_nspack : CAPA ANTI_ANALYSIS PACKER NSPACK FILE T1027_002 F
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	hash = "02179f3ba93663074740b5c0d283bae2"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/packer/nspack/packed-with-nspack.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -521,7 +521,7 @@ rule capa_packed_with_kkrunchy : CAPA ANTI_ANALYSIS PACKER KKRUNCHY FILE T1027_0
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	hash = "f9ac6b16273556b3a57bf2c6d7e7db97"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/packer/kkrunchy/packed-with-kkrunchy.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -542,7 +542,7 @@ rule capa_packed_with_petite : CAPA ANTI_ANALYSIS PACKER PETITE FILE T1027_002 F
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	hash = "2a7429d60040465f9bd27bbae2beef88"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/packer/petite/packed-with-petite.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -563,7 +563,7 @@ rule capa_packed_with_pelocknt : CAPA ANTI_ANALYSIS PACKER PELOCKNT FILE T1027_0
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	hash = "f0a6a1bd6d760497623611e8297a81df"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/packer/pelocknt/packed-with-pelocknt.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -584,19 +584,19 @@ rule capa_packed_with_upack : CAPA ANTI_ANALYSIS PACKER UPACK FILE T1027_002 F00
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	hash = "9d98f8519d9fee8219caca5b31eef0bd"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/packer/upack/packed-with-upack.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_adm = "UpackByDwing@" ascii wide
+ 	$file_str_adm = "UpackByDwing@" ascii wide
  
   condition:
     capa_pe_file and
  (
 			for any adk in pe.sections : ( adk.name == ".Upack" ) 
 		or 	for any adl in pe.sections : ( adl.name == ".ByDwing" ) 
-		or 	$str_adm  
+		or 	$file_str_adm  
 	) 
 }
 
@@ -610,7 +610,7 @@ rule capa_packed_with_y0da_crypter : CAPA ANTI_ANALYSIS PACKER Y0DA FILE T1027_0
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	hash = "0cd2b334aede270b14868db28211cde3"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/packer/y0da/packed-with-y0da-crypter.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -633,17 +633,17 @@ rule capa_packed_with_Confuser : CAPA ANTI_ANALYSIS PACKER CONFUSER FILE T1027_0
 	mbc = "Anti-Static Analysis::Software Packing::Confuser [F0001.009]"
 	hash = "b9f5bd514485fb06da39beff051b9fdc"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/packer/confuser/packed-with-confuser.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_adq = "ConfusedByAttribute" ascii wide
+ 	$file_str_adq = "ConfusedByAttribute" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_adq  
+			$file_str_adq  
 	) 
 }
 
@@ -657,17 +657,17 @@ rule capa_packed_with_amber : CAPA ANTI_ANALYSIS PACKER AMBER FILE T1027_002 F00
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	hash = "bb7922d368a9a9c8d981837b5ad988f1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/packer/amber/packed-with-amber.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_adr = "Amber - Reflective PE Packer" ascii wide
+ 	$file_str_adr = "Amber - Reflective PE Packer" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_adr  
+			$file_str_adr  
 	) 
 }
 
@@ -681,23 +681,23 @@ rule capa_packed_with_VMProtect : CAPA ANTI_ANALYSIS PACKER VMPROTECT FILE T1027
 	mbc = "Anti-Static Analysis::Software Packing::VMProtect [F0001.010]"
 	hash = "971e599e6e707349eccea2fd4c8e5f67"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/packer/vmprotect/packed-with-vmprotect.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_ads = "A debugger has been found running in your system." ascii wide
-	$str_adt = "Please, unload it from memory and restart your program." ascii wide
-	$str_adu = "File corrupted!. This program has been manipulated and maybe" ascii wide
-	$str_adv = "it's infected by a Virus or cracked. This file won't work anymore." ascii wide
+ 	$file_str_ads = "A debugger has been found running in your system." ascii wide
+	$file_str_adt = "Please, unload it from memory and restart your program." ascii wide
+	$file_str_adu = "File corrupted!. This program has been manipulated and maybe" ascii wide
+	$file_str_adv = "it's infected by a Virus or cracked. This file won't work anymore." ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_ads 
-		or 	$str_adt 
-		or 	$str_adu 
-		or 	$str_adv 
+			$file_str_ads 
+		or 	$file_str_adt 
+		or 	$file_str_adu 
+		or 	$file_str_adv 
 		or 	for any adw in pe.sections : ( adw.name == ".vmp0" ) 
 		or 	for any adx in pe.sections : ( adx.name == ".vmp1" ) 
 		or 	for any ady in pe.sections : ( ady.name == ".vmp2" )  
@@ -714,7 +714,7 @@ rule capa_packed_with_rlpack : CAPA ANTI_ANALYSIS PACKER RLPACK FILE T1027_002 F
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	hash = "068a76d4823419b376d418cf03215d5c"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/packer/rlpack/packed-with-rlpack.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -737,7 +737,7 @@ rule capa_packed_with_UPX : CAPA ANTI_ANALYSIS PACKER UPX FILE T1027_002 F0001_0
 	hash = "CD2CBA9E6313E8DF2C1273593E649682"
 	hash = "Practical Malware Analysis Lab 01-02.exe_:0x0401000"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/packer/upx/packed-with-upx.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -759,19 +759,19 @@ rule capa_packed_with_peshield : CAPA ANTI_ANALYSIS PACKER PESHIELD FILE T1027_0
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	hash = "a3c0a2425ea84103adde03a92176424c"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/packer/peshield/packed-with-peshield.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_aef = / PE-SHiELD v[0-9]\.[0-9]/ ascii wide 
+ 	$file_re_aef = / PE-SHiELD v[0-9]\.[0-9]/ ascii wide 
  
   condition:
     capa_pe_file and
  (
 			for any aed in pe.sections : ( aed.name == "PESHiELD" ) 
 		or 	for any aee in pe.sections : ( aee.name == "PESHiELD_1" ) 
-		or 	$re_aef  
+		or 	$file_re_aef  
 	) 
 }
 
@@ -785,83 +785,83 @@ rule capa_reference_anti_VM_strings_targeting_VMWare : CAPA ANTI_ANALYSIS ANTI_V
 	mbc = "Anti-Behavioral Analysis::Virtual Machine Detection [B0009]"
 	hash = "al-khaser_x86.exe_"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-vm/vm-detection/reference-anti-vm-strings-targeting-vmware.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_aei = /VMWare/ nocase ascii wide 
-	$re_aej = /VMTools/ nocase ascii wide 
-	$re_aek = /SOFTWARE\\VMware, Inc\.\\VMware Tools/ nocase ascii wide 
-	$re_ael = /vmnet\.sys/ nocase ascii wide 
-	$re_aem = /vmmouse\.sys/ nocase ascii wide 
-	$re_aen = /vmusb\.sys/ nocase ascii wide 
-	$re_aeo = /vm3dmp\.sys/ nocase ascii wide 
-	$re_aep = /vmci\.sys/ nocase ascii wide 
-	$re_aeq = /vmhgfs\.sys/ nocase ascii wide 
-	$re_aer = /vmmemctl\.sys/ nocase ascii wide 
-	$re_aes = /vmx86\.sys/ nocase ascii wide 
-	$re_aet = /vmrawdsk\.sys/ nocase ascii wide 
-	$re_aeu = /vmusbmouse\.sys/ nocase ascii wide 
-	$re_aev = /vmkdb\.sys/ nocase ascii wide 
-	$re_aew = /vmnetuserif\.sys/ nocase ascii wide 
-	$re_aex = /vmnetadapter\.sys/ nocase ascii wide 
-	$re_aey = /\\\\.\\HGFS/ nocase ascii wide 
-	$re_aez = /\\\\.\\vmci/ nocase ascii wide 
-	$re_afa = /vmtoolsd\.exe/ nocase ascii wide 
-	$re_afb = /vmwaretray\.exe/ nocase ascii wide 
-	$re_afc = /vmwareuser\.exe/ nocase ascii wide 
-	$re_afd = /VGAuthService\.exe/ nocase ascii wide 
-	$re_afe = /vmacthlp\.exe/ nocase ascii wide 
-	$re_aff = /vmci/ nocase ascii wide  // VMWare VMCI Bus Driver
-	$re_afg = /vmhgfs/ nocase ascii wide  // VMWare Host Guest Control Redirector
-	$re_afh = /vmmouse/ nocase ascii wide 
-	$re_afi = /vmmemctl/ nocase ascii wide  // VMWare Guest Memory Controller Driver
-	$re_afj = /vmusb/ nocase ascii wide 
-	$re_afk = /vmusbmouse/ nocase ascii wide 
-	$re_afl = /vmx_svga/ nocase ascii wide 
-	$re_afm = /vmxnet/ nocase ascii wide 
-	$re_afn = /vmx86/ nocase ascii wide 
-	$re_afo = /VMwareVMware/ nocase ascii wide 
-	$re_afp = /vmGuestLib\.dll/ nocase ascii wide 
+ 	$file_re_aei = /VMWare/ nocase ascii wide 
+	$file_re_aej = /VMTools/ nocase ascii wide 
+	$file_re_aek = /SOFTWARE\\VMware, Inc\.\\VMware Tools/ nocase ascii wide 
+	$file_re_ael = /vmnet\.sys/ nocase ascii wide 
+	$file_re_aem = /vmmouse\.sys/ nocase ascii wide 
+	$file_re_aen = /vmusb\.sys/ nocase ascii wide 
+	$file_re_aeo = /vm3dmp\.sys/ nocase ascii wide 
+	$file_re_aep = /vmci\.sys/ nocase ascii wide 
+	$file_re_aeq = /vmhgfs\.sys/ nocase ascii wide 
+	$file_re_aer = /vmmemctl\.sys/ nocase ascii wide 
+	$file_re_aes = /vmx86\.sys/ nocase ascii wide 
+	$file_re_aet = /vmrawdsk\.sys/ nocase ascii wide 
+	$file_re_aeu = /vmusbmouse\.sys/ nocase ascii wide 
+	$file_re_aev = /vmkdb\.sys/ nocase ascii wide 
+	$file_re_aew = /vmnetuserif\.sys/ nocase ascii wide 
+	$file_re_aex = /vmnetadapter\.sys/ nocase ascii wide 
+	$file_re_aey = /\\\\.\\HGFS/ nocase ascii wide 
+	$file_re_aez = /\\\\.\\vmci/ nocase ascii wide 
+	$file_re_afa = /vmtoolsd\.exe/ nocase ascii wide 
+	$file_re_afb = /vmwaretray\.exe/ nocase ascii wide 
+	$file_re_afc = /vmwareuser\.exe/ nocase ascii wide 
+	$file_re_afd = /VGAuthService\.exe/ nocase ascii wide 
+	$file_re_afe = /vmacthlp\.exe/ nocase ascii wide 
+	$file_re_aff = /vmci/ nocase ascii wide  // VMWare VMCI Bus Driver
+	$file_re_afg = /vmhgfs/ nocase ascii wide  // VMWare Host Guest Control Redirector
+	$file_re_afh = /vmmouse/ nocase ascii wide 
+	$file_re_afi = /vmmemctl/ nocase ascii wide  // VMWare Guest Memory Controller Driver
+	$file_re_afj = /vmusb/ nocase ascii wide 
+	$file_re_afk = /vmusbmouse/ nocase ascii wide 
+	$file_re_afl = /vmx_svga/ nocase ascii wide 
+	$file_re_afm = /vmxnet/ nocase ascii wide 
+	$file_re_afn = /vmx86/ nocase ascii wide 
+	$file_re_afo = /VMwareVMware/ nocase ascii wide 
+	$file_re_afp = /vmGuestLib\.dll/ nocase ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$re_aei 
-		or 	$re_aej 
-		or 	$re_aek 
-		or 	$re_ael 
-		or 	$re_aem 
-		or 	$re_aen 
-		or 	$re_aeo 
-		or 	$re_aep 
-		or 	$re_aeq 
-		or 	$re_aer 
-		or 	$re_aes 
-		or 	$re_aet 
-		or 	$re_aeu 
-		or 	$re_aev 
-		or 	$re_aew 
-		or 	$re_aex 
-		or 	$re_aey 
-		or 	$re_aez 
-		or 	$re_afa 
-		or 	$re_afb 
-		or 	$re_afc 
-		or 	$re_afd 
-		or 	$re_afe 
-		or 	$re_aff 
-		or 	$re_afg 
-		or 	$re_afh 
-		or 	$re_afi 
-		or 	$re_afj 
-		or 	$re_afk 
-		or 	$re_afl 
-		or 	$re_afm 
-		or 	$re_afn 
-		or 	$re_afo 
-		or 	$re_afp  
+			$file_re_aei 
+		or 	$file_re_aej 
+		or 	$file_re_aek 
+		or 	$file_re_ael 
+		or 	$file_re_aem 
+		or 	$file_re_aen 
+		or 	$file_re_aeo 
+		or 	$file_re_aep 
+		or 	$file_re_aeq 
+		or 	$file_re_aer 
+		or 	$file_re_aes 
+		or 	$file_re_aet 
+		or 	$file_re_aeu 
+		or 	$file_re_aev 
+		or 	$file_re_aew 
+		or 	$file_re_aex 
+		or 	$file_re_aey 
+		or 	$file_re_aez 
+		or 	$file_re_afa 
+		or 	$file_re_afb 
+		or 	$file_re_afc 
+		or 	$file_re_afd 
+		or 	$file_re_afe 
+		or 	$file_re_aff 
+		or 	$file_re_afg 
+		or 	$file_re_afh 
+		or 	$file_re_afi 
+		or 	$file_re_afj 
+		or 	$file_re_afk 
+		or 	$file_re_afl 
+		or 	$file_re_afm 
+		or 	$file_re_afn 
+		or 	$file_re_afo 
+		or 	$file_re_afp  
 	) 
 }
 
@@ -875,19 +875,19 @@ rule capa_check_for_windows_sandbox_via_device : CAPA ANTI_ANALYSIS ANTI_VM VM_D
 	mbc = "Anti-Behavioral Analysis::Virtual Machine Detection [B0009]"
 	hash = "773290480d5445f11d3dc1b800728966"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-vm/vm-detection/check-for-windows-sandbox-via-device.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
  	$api_afq = /\bCreateFile(A|W)?\b/ ascii wide
-	$str_afr = "\\\\.\\GLOBALROOT\\device\\vmsmb" ascii wide
+	$basic_str_afr = "\\\\.\\GLOBALROOT\\device\\vmsmb" ascii wide
  
   condition:
     capa_pe_file and
  (
 			$api_afq 
-		and 	$str_afr  
+		and 	$basic_str_afr  
 	) 
 }
 
@@ -901,18 +901,18 @@ rule capa_check_for_microsoft_office_emulation : CAPA ANTI_ANALYSIS ANTI_VM VM_D
 	mbc = "Anti-Behavioral Analysis::Virtual Machine Detection::Product Key/ID Testing [B0007.005]"
 	hash = "773290480d5445f11d3dc1b800728966"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-vm/vm-detection/check-for-microsoft-office-emulation.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_afs = /OfficePackagesForWDAG/ ascii wide 
+ 	$func_re_afs = /OfficePackagesForWDAG/ ascii wide 
 	$api_aft = /\bGetWindowsDirectory(A|W)?\b/ ascii wide
  
   condition:
     capa_pe_file and
  (
-			$re_afs 
+			$func_re_afs 
 		and 	$api_aft  
 	) 
 }
@@ -927,68 +927,68 @@ rule capa_check_for_sandbox_username : CAPA ANTI_ANALYSIS ANTI_VM VM_DETECTION F
 	mbc = "Anti-Behavioral Analysis::Virtual Machine Detection [B0009]"
 	hash = "ccbf7cba35bab56563c0fbe4237fdc41"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-vm/vm-detection/check-for-sandbox-username.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
  	$api_afu = /\bGetUserName(A|W)?\b/ ascii wide
-	$re_afv = /MALTEST/ nocase ascii wide  // Betabot Username Check
-	$re_afw = /TEQUILABOOMBOOM/ nocase ascii wide  // VirusTotal Sandbox
-	$re_afx = /SANDBOX/ nocase ascii wide  // Gookit Username Check
-	$re_afy = /\x00VIRUS/ nocase ascii wide  // Satan Username Check
-	$re_afz = /MALWARE/ nocase ascii wide  // Betabot Username Check
-	$re_aga = /SAND\sBOX/ nocase ascii wide  // Betabot Username Check
-	$re_agb = /Test\sUser/ nocase ascii wide  // Betabot Username Check
-	$re_agc = /CurrentUser/ nocase ascii wide  // Gookit Username Check
-	$re_agd = /7SILVIA/ nocase ascii wide  // Gookit Username Check
-	$re_age = /FORTINET/ nocase ascii wide  // Shifu Username Check
-	$re_agf = /John\sDoe/ nocase ascii wide  // Emotet Username Check
-	$re_agg = /Emily/ nocase ascii wide  // Trickbot Downloader Username Check
-	$re_agh = /HANSPETER\-PC/ nocase ascii wide  // Trickbot Downloader Username Check
-	$re_agi = /HAPUBWS/ nocase ascii wide  // Trickbot Downloader Username Check
-	$re_agj = /Hong\sLee/ nocase ascii wide  // Trickbot Downloader Username Check
-	$re_agk = /IT\-ADMIN/ nocase ascii wide  // Trickbot Downloader Username Check
-	$re_agl = /JOHN\-PC/ nocase ascii wide  // Trickbot Downloader Username Check
-	$re_agm = /Johnson/ nocase ascii wide  // Trickbot Downloader Username Check
-	$re_agn = /Miller/ nocase ascii wide  // Trickbot Downloader Username Check
-	$re_ago = /MUELLER\-PC/ nocase ascii wide  // Trickbot Downloader Username Check
-	$re_agp = /Peter\sWilson/ nocase ascii wide  // Trickbot Downloader Username Check
-	$re_agq = /SystemIT/ nocase ascii wide  // Trickbot Downloader Username Check
-	$re_agr = /Timmy/ nocase ascii wide  // Trickbot Downloader Username Check
-	$re_ags = /WIN7\-TRAPS/ nocase ascii wide  // Trickbot Downloader Username Check
-	$re_agt = /WDAGUtilityAccount/ nocase ascii wide  // Windows Defender Application Guard
+	$func_re_afv = /MALTEST/ nocase ascii wide  // Betabot Username Check
+	$func_re_afw = /TEQUILABOOMBOOM/ nocase ascii wide  // VirusTotal Sandbox
+	$func_re_afx = /SANDBOX/ nocase ascii wide  // Gookit Username Check
+	$func_re_afy = /\x00VIRUS/ nocase ascii wide  // Satan Username Check
+	$func_re_afz = /MALWARE/ nocase ascii wide  // Betabot Username Check
+	$func_re_aga = /SAND\sBOX/ nocase ascii wide  // Betabot Username Check
+	$func_re_agb = /Test\sUser/ nocase ascii wide  // Betabot Username Check
+	$func_re_agc = /CurrentUser/ nocase ascii wide  // Gookit Username Check
+	$func_re_agd = /7SILVIA/ nocase ascii wide  // Gookit Username Check
+	$func_re_age = /FORTINET/ nocase ascii wide  // Shifu Username Check
+	$func_re_agf = /John\sDoe/ nocase ascii wide  // Emotet Username Check
+	$func_re_agg = /Emily/ nocase ascii wide  // Trickbot Downloader Username Check
+	$func_re_agh = /HANSPETER\-PC/ nocase ascii wide  // Trickbot Downloader Username Check
+	$func_re_agi = /HAPUBWS/ nocase ascii wide  // Trickbot Downloader Username Check
+	$func_re_agj = /Hong\sLee/ nocase ascii wide  // Trickbot Downloader Username Check
+	$func_re_agk = /IT\-ADMIN/ nocase ascii wide  // Trickbot Downloader Username Check
+	$func_re_agl = /JOHN\-PC/ nocase ascii wide  // Trickbot Downloader Username Check
+	$func_re_agm = /Johnson/ nocase ascii wide  // Trickbot Downloader Username Check
+	$func_re_agn = /Miller/ nocase ascii wide  // Trickbot Downloader Username Check
+	$func_re_ago = /MUELLER\-PC/ nocase ascii wide  // Trickbot Downloader Username Check
+	$func_re_agp = /Peter\sWilson/ nocase ascii wide  // Trickbot Downloader Username Check
+	$func_re_agq = /SystemIT/ nocase ascii wide  // Trickbot Downloader Username Check
+	$func_re_agr = /Timmy/ nocase ascii wide  // Trickbot Downloader Username Check
+	$func_re_ags = /WIN7\-TRAPS/ nocase ascii wide  // Trickbot Downloader Username Check
+	$func_re_agt = /WDAGUtilityAccount/ nocase ascii wide  // Windows Defender Application Guard
  
   condition:
     capa_pe_file and
  (
 			$api_afu 
 		and  (
-			$re_afv 
-		or 	$re_afw 
-		or 	$re_afx 
-		or 	$re_afy 
-		or 	$re_afz 
-		or 	$re_aga 
-		or 	$re_agb 
-		or 	$re_agc 
-		or 	$re_agd 
-		or 	$re_age 
-		or 	$re_agf 
-		or 	$re_agg 
-		or 	$re_agh 
-		or 	$re_agi 
-		or 	$re_agj 
-		or 	$re_agk 
-		or 	$re_agl 
-		or 	$re_agm 
-		or 	$re_agn 
-		or 	$re_ago 
-		or 	$re_agp 
-		or 	$re_agq 
-		or 	$re_agr 
-		or 	$re_ags 
-		or 	$re_agt  
+			$func_re_afv 
+		or 	$func_re_afw 
+		or 	$func_re_afx 
+		or 	$func_re_afy 
+		or 	$func_re_afz 
+		or 	$func_re_aga 
+		or 	$func_re_agb 
+		or 	$func_re_agc 
+		or 	$func_re_agd 
+		or 	$func_re_age 
+		or 	$func_re_agf 
+		or 	$func_re_agg 
+		or 	$func_re_agh 
+		or 	$func_re_agi 
+		or 	$func_re_agj 
+		or 	$func_re_agk 
+		or 	$func_re_agl 
+		or 	$func_re_agm 
+		or 	$func_re_agn 
+		or 	$func_re_ago 
+		or 	$func_re_agp 
+		or 	$func_re_agq 
+		or 	$func_re_agr 
+		or 	$func_re_ags 
+		or 	$func_re_agt  
 	)  
 	) 
 }
@@ -1003,23 +1003,23 @@ rule capa_reference_anti_VM_strings_targeting_Parallels : CAPA ANTI_ANALYSIS ANT
 	mbc = "Anti-Behavioral Analysis::Virtual Machine Detection [B0009]"
 	hash = "al-khaser_x86.exe_"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-vm/vm-detection/reference-anti-vm-strings-targeting-parallels.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_agu = /Parallels/ nocase ascii wide 
-	$re_agv = /prl_cc.exe/ nocase ascii wide 
-	$re_agw = /prl_tools.exe/ nocase ascii wide 
-	$re_agx = /prl hyperv/ nocase ascii wide 
+ 	$file_re_agu = /Parallels/ nocase ascii wide 
+	$file_re_agv = /prl_cc.exe/ nocase ascii wide 
+	$file_re_agw = /prl_tools.exe/ nocase ascii wide 
+	$file_re_agx = /prl hyperv/ nocase ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$re_agu 
-		or 	$re_agv 
-		or 	$re_agw 
-		or 	$re_agx  
+			$file_re_agu 
+		or 	$file_re_agv 
+		or 	$file_re_agw 
+		or 	$file_re_agx  
 	) 
 }
 
@@ -1033,133 +1033,133 @@ rule capa_reference_anti_VM_strings_targeting_VirtualBox : CAPA ANTI_ANALYSIS AN
 	mbc = "Anti-Behavioral Analysis::Virtual Machine Detection [B0009]"
 	hash = "al-khaser_x86.exe_"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-vm/vm-detection/reference-anti-vm-strings-targeting-virtualbox.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_agy = /VBOX/ nocase ascii wide 
-	$re_agz = /VEN_VBOX/ nocase ascii wide 
-	$re_aha = /VirtualBox/ nocase ascii wide 
-	$re_ahb = /06\/23\/99/ nocase ascii wide 
-	$re_ahc = /HARDWARE\\ACPI\\DSDT\\VBOX__/ nocase ascii wide 
-	$re_ahd = /HARDWARE\\ACPI\\FADT\\VBOX__/ nocase ascii wide 
-	$re_ahe = /HARDWARE\\ACPI\\RSDT\\VBOX__/ nocase ascii wide 
-	$re_ahf = /SOFTWARE\\Oracle\\VirtualBox Guest Additions/ nocase ascii wide 
-	$re_ahg = /SYSTEM\\ControlSet001\\Services\\VBoxGuest/ nocase ascii wide 
-	$re_ahh = /SYSTEM\\ControlSet001\\Services\\VBoxMouse/ nocase ascii wide 
-	$re_ahi = /SYSTEM\\ControlSet001\\Services\\VBoxService/ nocase ascii wide 
-	$re_ahj = /SYSTEM\\ControlSet001\\Services\\VBoxSF/ nocase ascii wide 
-	$re_ahk = /SYSTEM\\ControlSet001\\Services\\VBoxVideo/ nocase ascii wide 
-	$re_ahl = /VBoxMouse\.sys/ nocase ascii wide 
-	$re_ahm = /VBoxGuest\.sys/ nocase ascii wide 
-	$re_ahn = /VBoxSF\.sys/ nocase ascii wide 
-	$re_aho = /VBoxVideo\.sys/ nocase ascii wide 
-	$re_ahp = /vboxdisp\.dll/ nocase ascii wide 
-	$re_ahq = /vboxhook\.dll/ nocase ascii wide 
-	$re_ahr = /vboxmrxnp\.dll/ nocase ascii wide 
-	$re_ahs = /vboxogl\.dll/ nocase ascii wide 
-	$re_aht = /vboxoglarrayspu\.dll/ nocase ascii wide 
-	$re_ahu = /vboxoglcrutil\.dll/ nocase ascii wide 
-	$re_ahv = /vboxoglerrorspu\.dll/ nocase ascii wide 
-	$re_ahw = /vboxoglfeedbackspu\.dll/ nocase ascii wide 
-	$re_ahx = /vboxoglpackspu\.dll/ nocase ascii wide 
-	$re_ahy = /vboxoglpassthroughspu\.dll/ nocase ascii wide 
-	$re_ahz = /vboxservice\.exe/ nocase ascii wide 
-	$re_aia = /vboxtray\.exe/ nocase ascii wide 
-	$re_aib = /VBoxControl\.exe/ nocase ascii wide 
-	$re_aic = /oracle\\virtualbox guest additions\\/ nocase ascii wide 
-	$re_aid = /\\\\.\\VBoxMiniRdrDN/ nocase ascii wide 
-	$re_aie = /\\\\.\\VBoxGuest/ nocase ascii wide 
-	$re_aif = /\\\\.\\pipe\\VBoxMiniRdDN/ nocase ascii wide 
-	$re_aig = /\\\\.\\VBoxTrayIPC/ nocase ascii wide 
-	$re_aih = /\\\\.\\pipe\\VBoxTrayIPC/ nocase ascii wide 
-	$re_aii = /VBoxTrayToolWndClass/ nocase ascii wide 
-	$re_aij = /VBoxTrayToolWnd/ nocase ascii wide 
-	$re_aik = /vboxservice\.exe/ nocase ascii wide 
-	$re_ail = /vboxtray.exe/ nocase ascii wide 
-	$re_aim = /vboxvideo/ nocase ascii wide 
-	$re_ain = /VBoxVideoW8/ nocase ascii wide 
-	$re_aio = /VBoxWddm/ nocase ascii wide 
-	$re_aip = /PCI\\VEN_80EE&DEV_CAFE/ nocase ascii wide 
-	$re_aiq = /82801FB/ nocase ascii wide 
-	$re_air = /82441FX/ nocase ascii wide 
-	$re_ais = /82371SB/ nocase ascii wide 
-	$re_ait = /OpenHCD/ nocase ascii wide 
-	$re_aiu = /ACPIBus_BUS_0/ nocase ascii wide 
-	$re_aiv = /PCI_BUS_0/ nocase ascii wide 
-	$re_aiw = /PNP_BUS_0/ nocase ascii wide 
-	$re_aix = /Oracle Corporation/ nocase ascii wide 
-	$re_aiy = /VBoxWdd/ nocase ascii wide 
-	$re_aiz = /VBoxS/ nocase ascii wide  // VirtualBox Shared Folders
-	$re_aja = /VBoxMouse/ nocase ascii wide  // VirtualBox Guest Mouse
-	$re_ajb = /VBoxGuest/ nocase ascii wide  // VirtualBox Guest Driver
-	$re_ajc = /VBoxVBoxVBox/ nocase ascii wide 
-	$re_ajd = /innotek GmbH/ nocase ascii wide 
-	$re_aje = /drivers\\vboxdrv/ nocase ascii wide 
+ 	$file_re_agy = /VBOX/ nocase ascii wide 
+	$file_re_agz = /VEN_VBOX/ nocase ascii wide 
+	$file_re_aha = /VirtualBox/ nocase ascii wide 
+	$file_re_ahb = /06\/23\/99/ nocase ascii wide 
+	$file_re_ahc = /HARDWARE\\ACPI\\DSDT\\VBOX__/ nocase ascii wide 
+	$file_re_ahd = /HARDWARE\\ACPI\\FADT\\VBOX__/ nocase ascii wide 
+	$file_re_ahe = /HARDWARE\\ACPI\\RSDT\\VBOX__/ nocase ascii wide 
+	$file_re_ahf = /SOFTWARE\\Oracle\\VirtualBox Guest Additions/ nocase ascii wide 
+	$file_re_ahg = /SYSTEM\\ControlSet001\\Services\\VBoxGuest/ nocase ascii wide 
+	$file_re_ahh = /SYSTEM\\ControlSet001\\Services\\VBoxMouse/ nocase ascii wide 
+	$file_re_ahi = /SYSTEM\\ControlSet001\\Services\\VBoxService/ nocase ascii wide 
+	$file_re_ahj = /SYSTEM\\ControlSet001\\Services\\VBoxSF/ nocase ascii wide 
+	$file_re_ahk = /SYSTEM\\ControlSet001\\Services\\VBoxVideo/ nocase ascii wide 
+	$file_re_ahl = /VBoxMouse\.sys/ nocase ascii wide 
+	$file_re_ahm = /VBoxGuest\.sys/ nocase ascii wide 
+	$file_re_ahn = /VBoxSF\.sys/ nocase ascii wide 
+	$file_re_aho = /VBoxVideo\.sys/ nocase ascii wide 
+	$file_re_ahp = /vboxdisp\.dll/ nocase ascii wide 
+	$file_re_ahq = /vboxhook\.dll/ nocase ascii wide 
+	$file_re_ahr = /vboxmrxnp\.dll/ nocase ascii wide 
+	$file_re_ahs = /vboxogl\.dll/ nocase ascii wide 
+	$file_re_aht = /vboxoglarrayspu\.dll/ nocase ascii wide 
+	$file_re_ahu = /vboxoglcrutil\.dll/ nocase ascii wide 
+	$file_re_ahv = /vboxoglerrorspu\.dll/ nocase ascii wide 
+	$file_re_ahw = /vboxoglfeedbackspu\.dll/ nocase ascii wide 
+	$file_re_ahx = /vboxoglpackspu\.dll/ nocase ascii wide 
+	$file_re_ahy = /vboxoglpassthroughspu\.dll/ nocase ascii wide 
+	$file_re_ahz = /vboxservice\.exe/ nocase ascii wide 
+	$file_re_aia = /vboxtray\.exe/ nocase ascii wide 
+	$file_re_aib = /VBoxControl\.exe/ nocase ascii wide 
+	$file_re_aic = /oracle\\virtualbox guest additions\\/ nocase ascii wide 
+	$file_re_aid = /\\\\.\\VBoxMiniRdrDN/ nocase ascii wide 
+	$file_re_aie = /\\\\.\\VBoxGuest/ nocase ascii wide 
+	$file_re_aif = /\\\\.\\pipe\\VBoxMiniRdDN/ nocase ascii wide 
+	$file_re_aig = /\\\\.\\VBoxTrayIPC/ nocase ascii wide 
+	$file_re_aih = /\\\\.\\pipe\\VBoxTrayIPC/ nocase ascii wide 
+	$file_re_aii = /VBoxTrayToolWndClass/ nocase ascii wide 
+	$file_re_aij = /VBoxTrayToolWnd/ nocase ascii wide 
+	$file_re_aik = /vboxservice\.exe/ nocase ascii wide 
+	$file_re_ail = /vboxtray.exe/ nocase ascii wide 
+	$file_re_aim = /vboxvideo/ nocase ascii wide 
+	$file_re_ain = /VBoxVideoW8/ nocase ascii wide 
+	$file_re_aio = /VBoxWddm/ nocase ascii wide 
+	$file_re_aip = /PCI\\VEN_80EE&DEV_CAFE/ nocase ascii wide 
+	$file_re_aiq = /82801FB/ nocase ascii wide 
+	$file_re_air = /82441FX/ nocase ascii wide 
+	$file_re_ais = /82371SB/ nocase ascii wide 
+	$file_re_ait = /OpenHCD/ nocase ascii wide 
+	$file_re_aiu = /ACPIBus_BUS_0/ nocase ascii wide 
+	$file_re_aiv = /PCI_BUS_0/ nocase ascii wide 
+	$file_re_aiw = /PNP_BUS_0/ nocase ascii wide 
+	$file_re_aix = /Oracle Corporation/ nocase ascii wide 
+	$file_re_aiy = /VBoxWdd/ nocase ascii wide 
+	$file_re_aiz = /VBoxS/ nocase ascii wide  // VirtualBox Shared Folders
+	$file_re_aja = /VBoxMouse/ nocase ascii wide  // VirtualBox Guest Mouse
+	$file_re_ajb = /VBoxGuest/ nocase ascii wide  // VirtualBox Guest Driver
+	$file_re_ajc = /VBoxVBoxVBox/ nocase ascii wide 
+	$file_re_ajd = /innotek GmbH/ nocase ascii wide 
+	$file_re_aje = /drivers\\vboxdrv/ nocase ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$re_agy 
-		or 	$re_agz 
-		or 	$re_aha 
-		or 	$re_ahb 
-		or 	$re_ahc 
-		or 	$re_ahd 
-		or 	$re_ahe 
-		or 	$re_ahf 
-		or 	$re_ahg 
-		or 	$re_ahh 
-		or 	$re_ahi 
-		or 	$re_ahj 
-		or 	$re_ahk 
-		or 	$re_ahl 
-		or 	$re_ahm 
-		or 	$re_ahn 
-		or 	$re_aho 
-		or 	$re_ahp 
-		or 	$re_ahq 
-		or 	$re_ahr 
-		or 	$re_ahs 
-		or 	$re_aht 
-		or 	$re_ahu 
-		or 	$re_ahv 
-		or 	$re_ahw 
-		or 	$re_ahx 
-		or 	$re_ahy 
-		or 	$re_ahz 
-		or 	$re_aia 
-		or 	$re_aib 
-		or 	$re_aic 
-		or 	$re_aid 
-		or 	$re_aie 
-		or 	$re_aif 
-		or 	$re_aig 
-		or 	$re_aih 
-		or 	$re_aii 
-		or 	$re_aij 
-		or 	$re_aik 
-		or 	$re_ail 
-		or 	$re_aim 
-		or 	$re_ain 
-		or 	$re_aio 
-		or 	$re_aip 
-		or 	$re_aiq 
-		or 	$re_air 
-		or 	$re_ais 
-		or 	$re_ait 
-		or 	$re_aiu 
-		or 	$re_aiv 
-		or 	$re_aiw 
-		or 	$re_aix 
-		or 	$re_aiy 
-		or 	$re_aiz 
-		or 	$re_aja 
-		or 	$re_ajb 
-		or 	$re_ajc 
-		or 	$re_ajd 
-		or 	$re_aje  
+			$file_re_agy 
+		or 	$file_re_agz 
+		or 	$file_re_aha 
+		or 	$file_re_ahb 
+		or 	$file_re_ahc 
+		or 	$file_re_ahd 
+		or 	$file_re_ahe 
+		or 	$file_re_ahf 
+		or 	$file_re_ahg 
+		or 	$file_re_ahh 
+		or 	$file_re_ahi 
+		or 	$file_re_ahj 
+		or 	$file_re_ahk 
+		or 	$file_re_ahl 
+		or 	$file_re_ahm 
+		or 	$file_re_ahn 
+		or 	$file_re_aho 
+		or 	$file_re_ahp 
+		or 	$file_re_ahq 
+		or 	$file_re_ahr 
+		or 	$file_re_ahs 
+		or 	$file_re_aht 
+		or 	$file_re_ahu 
+		or 	$file_re_ahv 
+		or 	$file_re_ahw 
+		or 	$file_re_ahx 
+		or 	$file_re_ahy 
+		or 	$file_re_ahz 
+		or 	$file_re_aia 
+		or 	$file_re_aib 
+		or 	$file_re_aic 
+		or 	$file_re_aid 
+		or 	$file_re_aie 
+		or 	$file_re_aif 
+		or 	$file_re_aig 
+		or 	$file_re_aih 
+		or 	$file_re_aii 
+		or 	$file_re_aij 
+		or 	$file_re_aik 
+		or 	$file_re_ail 
+		or 	$file_re_aim 
+		or 	$file_re_ain 
+		or 	$file_re_aio 
+		or 	$file_re_aip 
+		or 	$file_re_aiq 
+		or 	$file_re_air 
+		or 	$file_re_ais 
+		or 	$file_re_ait 
+		or 	$file_re_aiu 
+		or 	$file_re_aiv 
+		or 	$file_re_aiw 
+		or 	$file_re_aix 
+		or 	$file_re_aiy 
+		or 	$file_re_aiz 
+		or 	$file_re_aja 
+		or 	$file_re_ajb 
+		or 	$file_re_ajc 
+		or 	$file_re_ajd 
+		or 	$file_re_aje  
 	) 
 }
 
@@ -1173,23 +1173,23 @@ rule capa_check_for_windows_sandbox_via_registry : CAPA ANTI_ANALYSIS ANTI_VM VM
 	mbc = "Anti-Behavioral Analysis::Virtual Machine Detection [B0009]"
 	hash = "773290480d5445f11d3dc1b800728966"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-vm/vm-detection/check-for-windows-sandbox-via-registry.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
  	$api_ajf = /\bRegOpenKeyEx(A|W)?\b/ ascii wide
 	$api_ajg = /\bRegEnumValue(A|W)?\b/ ascii wide
-	$re_ajh = /\\Microsoft\\Windows\\CurrentVersion\\RunOnce/ ascii wide 
-	$re_aji = /wmic useraccount where \"name='WDAGUtilityAccount'\"/ nocase ascii wide 
+	$func_re_ajh = /\\Microsoft\\Windows\\CurrentVersion\\RunOnce/ ascii wide 
+	$func_re_aji = /wmic useraccount where \"name='WDAGUtilityAccount'\"/ nocase ascii wide 
  
   condition:
     capa_pe_file and
  (
 			$api_ajf 
 		and 	$api_ajg 
-		and 	$re_ajh 
-		and 	$re_aji  
+		and 	$func_re_ajh 
+		and 	$func_re_aji  
 	) 
 }
 
@@ -1203,25 +1203,25 @@ rule capa_reference_anti_VM_strings_targeting_Xen : CAPA ANTI_ANALYSIS ANTI_VM V
 	mbc = "Anti-Behavioral Analysis::Virtual Machine Detection [B0009]"
 	hash = "al-khaser_x86.exe_"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-vm/vm-detection/reference-anti-vm-strings-targeting-xen.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_ajj = /\x00Xen/ nocase ascii wide 
-	$re_ajk = /XenVMMXenVMM/ nocase ascii wide 
-	$re_ajl = /xenservice.exe/ nocase ascii wide 
-	$re_ajm = /XenVMMXenVMM/ nocase ascii wide 
-	$re_ajn = /HVM domU/ nocase ascii wide 
+ 	$file_re_ajj = /\x00Xen/ nocase ascii wide 
+	$file_re_ajk = /XenVMMXenVMM/ nocase ascii wide 
+	$file_re_ajl = /xenservice.exe/ nocase ascii wide 
+	$file_re_ajm = /XenVMMXenVMM/ nocase ascii wide 
+	$file_re_ajn = /HVM domU/ nocase ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$re_ajj 
-		or 	$re_ajk 
-		or 	$re_ajl 
-		or 	$re_ajm 
-		or 	$re_ajn  
+			$file_re_ajj 
+		or 	$file_re_ajk 
+		or 	$file_re_ajl 
+		or 	$file_re_ajm 
+		or 	$file_re_ajn  
 	) 
 }
 
@@ -1235,71 +1235,71 @@ rule capa_reference_anti_VM_strings : CAPA ANTI_ANALYSIS ANTI_VM VM_DETECTION FI
 	mbc = "Anti-Behavioral Analysis::Virtual Machine Detection [B0009]"
 	hash = "Practical Malware Analysis Lab 17-02.dll_"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-vm/vm-detection/reference-anti-vm-strings.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_ajo = /HARDWARE\\ACPI\\(DSDT|FADT|RSDT)\\BOCHS/ nocase ascii wide 
-	$re_ajp = /HARDWARE\\DESCRIPTION\\System\\(SystemBiosVersion|VideoBiosVersion)/ nocase ascii wide 
-	$re_ajq = /HARDWARE\\DESCRIPTION\\System\\CentralProcessor/ nocase ascii wide 
-	$re_ajr = /HARDWARE\\DEVICEMAP\\Scsi\\Scsi Port 0\\Scsi Bus 0\\Target Id 0\\Logical Unit Id 0/ nocase ascii wide 
-	$re_ajs = /SYSTEM\\(CurrentControlSet|ControlSet001)\\Enum\\IDE/ nocase ascii wide 
-	$re_ajt = /SYSTEM\\(CurrentControlSet|ControlSet001)\\Services\\Disk\\Enum\\/ nocase ascii wide 
-	$re_aju = /SYSTEM\\(CurrentControlSet|ControlSet001)\\Control\\SystemInformation\\SystemManufacturer/ nocase ascii wide 
-	$re_ajv = /A M I/ nocase ascii wide 
-	$re_ajw = /Hyper-V/ nocase ascii wide 
-	$re_ajx = /Kernel-VMDetection-Private/ nocase ascii wide 
-	$re_ajy = /KVMKVMKVM/ nocase ascii wide  // KVM
-	$re_ajz = /Microsoft Hv/ nocase ascii wide  // Microsoft Hyper-V or Windows Virtual PC
-	$re_aka = /avghookx.dll/ nocase ascii wide  // AVG
-	$re_akb = /avghooka.dll/ nocase ascii wide  // AVG
-	$re_akc = /snxhk.dll/ nocase ascii wide  // Avast
-	$re_akd = /pstorec.dll/ nocase ascii wide  // SunBelt Sandbox
-	$re_ake = /vmcheck.dll/ nocase ascii wide  // Virtual PC
-	$re_akf = /wpespy.dll/ nocase ascii wide  // WPE Pro
-	$re_akg = /cmdvrt64.dll/ nocase ascii wide  // Comodo Container
-	$re_akh = /cmdvrt32.dll/ nocase ascii wide  // Comodo Container
-	$re_aki = /sample.exe/ nocase ascii wide 
-	$re_akj = /bot.exe/ nocase ascii wide 
-	$re_akk = /sandbox.exe/ nocase ascii wide 
-	$re_akl = /malware.exe/ nocase ascii wide 
-	$re_akm = /test.exe/ nocase ascii wide 
-	$re_akn = /klavme.exe/ nocase ascii wide 
-	$re_ako = /myapp.exe/ nocase ascii wide 
-	$re_akp = /testapp.exe/ nocase ascii wide 
+ 	$file_re_ajo = /HARDWARE\\ACPI\\(DSDT|FADT|RSDT)\\BOCHS/ nocase ascii wide 
+	$file_re_ajp = /HARDWARE\\DESCRIPTION\\System\\(SystemBiosVersion|VideoBiosVersion)/ nocase ascii wide 
+	$file_re_ajq = /HARDWARE\\DESCRIPTION\\System\\CentralProcessor/ nocase ascii wide 
+	$file_re_ajr = /HARDWARE\\DEVICEMAP\\Scsi\\Scsi Port 0\\Scsi Bus 0\\Target Id 0\\Logical Unit Id 0/ nocase ascii wide 
+	$file_re_ajs = /SYSTEM\\(CurrentControlSet|ControlSet001)\\Enum\\IDE/ nocase ascii wide 
+	$file_re_ajt = /SYSTEM\\(CurrentControlSet|ControlSet001)\\Services\\Disk\\Enum\\/ nocase ascii wide 
+	$file_re_aju = /SYSTEM\\(CurrentControlSet|ControlSet001)\\Control\\SystemInformation\\SystemManufacturer/ nocase ascii wide 
+	$file_re_ajv = /A M I/ nocase ascii wide 
+	$file_re_ajw = /Hyper-V/ nocase ascii wide 
+	$file_re_ajx = /Kernel-VMDetection-Private/ nocase ascii wide 
+	$file_re_ajy = /KVMKVMKVM/ nocase ascii wide  // KVM
+	$file_re_ajz = /Microsoft Hv/ nocase ascii wide  // Microsoft Hyper-V or Windows Virtual PC
+	$file_re_aka = /avghookx.dll/ nocase ascii wide  // AVG
+	$file_re_akb = /avghooka.dll/ nocase ascii wide  // AVG
+	$file_re_akc = /snxhk.dll/ nocase ascii wide  // Avast
+	$file_re_akd = /pstorec.dll/ nocase ascii wide  // SunBelt Sandbox
+	$file_re_ake = /vmcheck.dll/ nocase ascii wide  // Virtual PC
+	$file_re_akf = /wpespy.dll/ nocase ascii wide  // WPE Pro
+	$file_re_akg = /cmdvrt64.dll/ nocase ascii wide  // Comodo Container
+	$file_re_akh = /cmdvrt32.dll/ nocase ascii wide  // Comodo Container
+	$file_re_aki = /sample.exe/ nocase ascii wide 
+	$file_re_akj = /bot.exe/ nocase ascii wide 
+	$file_re_akk = /sandbox.exe/ nocase ascii wide 
+	$file_re_akl = /malware.exe/ nocase ascii wide 
+	$file_re_akm = /test.exe/ nocase ascii wide 
+	$file_re_akn = /klavme.exe/ nocase ascii wide 
+	$file_re_ako = /myapp.exe/ nocase ascii wide 
+	$file_re_akp = /testapp.exe/ nocase ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$re_ajo 
-		or 	$re_ajp 
-		or 	$re_ajq 
-		or 	$re_ajr 
-		or 	$re_ajs 
-		or 	$re_ajt 
-		or 	$re_aju 
-		or 	$re_ajv 
-		or 	$re_ajw 
-		or 	$re_ajx 
-		or 	$re_ajy 
-		or 	$re_ajz 
-		or 	$re_aka 
-		or 	$re_akb 
-		or 	$re_akc 
-		or 	$re_akd 
-		or 	$re_ake 
-		or 	$re_akf 
-		or 	$re_akg 
-		or 	$re_akh 
-		or 	$re_aki 
-		or 	$re_akj 
-		or 	$re_akk 
-		or 	$re_akl 
-		or 	$re_akm 
-		or 	$re_akn 
-		or 	$re_ako 
-		or 	$re_akp  
+			$file_re_ajo 
+		or 	$file_re_ajp 
+		or 	$file_re_ajq 
+		or 	$file_re_ajr 
+		or 	$file_re_ajs 
+		or 	$file_re_ajt 
+		or 	$file_re_aju 
+		or 	$file_re_ajv 
+		or 	$file_re_ajw 
+		or 	$file_re_ajx 
+		or 	$file_re_ajy 
+		or 	$file_re_ajz 
+		or 	$file_re_aka 
+		or 	$file_re_akb 
+		or 	$file_re_akc 
+		or 	$file_re_akd 
+		or 	$file_re_ake 
+		or 	$file_re_akf 
+		or 	$file_re_akg 
+		or 	$file_re_akh 
+		or 	$file_re_aki 
+		or 	$file_re_akj 
+		or 	$file_re_akk 
+		or 	$file_re_akl 
+		or 	$file_re_akm 
+		or 	$file_re_akn 
+		or 	$file_re_ako 
+		or 	$file_re_akp  
 	) 
 }
 
@@ -1313,23 +1313,23 @@ rule capa_reference_anti_VM_strings_targeting_Qemu : CAPA ANTI_ANALYSIS ANTI_VM 
 	mbc = "Anti-Behavioral Analysis::Virtual Machine Detection [B0009]"
 	hash = "al-khaser_x86.exe_"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-vm/vm-detection/reference-anti-vm-strings-targeting-qemu.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_akq = /Qemu/ nocase ascii wide 
-	$re_akr = /qemu-ga.exe/ nocase ascii wide 
-	$re_aks = /BOCHS/ nocase ascii wide 
-	$re_akt = /BXPC/ nocase ascii wide 
+ 	$file_re_akq = /Qemu/ nocase ascii wide 
+	$file_re_akr = /qemu-ga.exe/ nocase ascii wide 
+	$file_re_aks = /BOCHS/ nocase ascii wide 
+	$file_re_akt = /BXPC/ nocase ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$re_akq 
-		or 	$re_akr 
-		or 	$re_aks 
-		or 	$re_akt  
+			$file_re_akq 
+		or 	$file_re_akr 
+		or 	$file_re_aks 
+		or 	$file_re_akt  
 	) 
 }
 
@@ -1343,23 +1343,23 @@ rule capa_reference_anti_VM_strings_targeting_VirtualPC : CAPA ANTI_ANALYSIS ANT
 	mbc = "Anti-Behavioral Analysis::Virtual Machine Detection [B0009]"
 	hash = "al-khaser_x86.exe_"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-vm/vm-detection/reference-anti-vm-strings-targeting-virtualpc.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_aku = /VirtualPC/ nocase ascii wide 
-	$re_akv = /VMSrvc.exe/ nocase ascii wide 
-	$re_akw = /VMUSrvc.exe/ nocase ascii wide 
-	$re_akx = /SOFTWARE\\Microsoft\\Virtual Machine\\Guest\\Parameters/ nocase ascii wide 
+ 	$file_re_aku = /VirtualPC/ nocase ascii wide 
+	$file_re_akv = /VMSrvc.exe/ nocase ascii wide 
+	$file_re_akw = /VMUSrvc.exe/ nocase ascii wide 
+	$file_re_akx = /SOFTWARE\\Microsoft\\Virtual Machine\\Guest\\Parameters/ nocase ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$re_aku 
-		or 	$re_akv 
-		or 	$re_akw 
-		or 	$re_akx  
+			$file_re_aku 
+		or 	$file_re_akv 
+		or 	$file_re_akw 
+		or 	$file_re_akx  
 	) 
 }
 
@@ -1373,29 +1373,29 @@ rule capa_check_if_process_is_running_under_wine : CAPA ANTI_ANALYSIS ANTI_EMULA
 	mbc = "Anti-Behavioral Analysis::Emulator Detection [B0004]"
 	hash = "ccbf7cba35bab56563c0fbe4237fdc41"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-emulation/wine/check-if-process-is-running-under-wine.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_aky = /SOFTWARE\\Wine/ nocase ascii wide 
+ 	$func_re_aky = /SOFTWARE\\Wine/ nocase ascii wide 
 	$api_akz = /\bGetModuleHandle(A|W)?\b/ ascii wide
 	$api_ala = /\bGetProcAddress(A|W)?\b/ ascii wide
-	$str_alb = "wine_get_unix_file_name" ascii wide
-	$str_alc = "kernel32.dll" ascii wide
-	$str_ald = "ntdll.dll" ascii wide
+	$func_str_alb = "wine_get_unix_file_name" ascii wide
+	$func_str_alc = "kernel32.dll" ascii wide
+	$func_str_ald = "ntdll.dll" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$re_aky 
+			$func_re_aky 
 		or  (
 			$api_akz 
 		and 	$api_ala 
-		and 	$str_alb 
+		and 	$func_str_alb 
 		and  (
-			$str_alc 
-		or 	$str_ald  
+			$func_str_alc 
+		or 	$func_str_ald  
 	)  
 	)  
 	) 
@@ -1411,7 +1411,7 @@ rule capa_check_for_debugger_via_API : CAPA ANTI_ANALYSIS ANTI_DEBUGGING DEBUGGE
 	mbc = "Anti-Behavioral Analysis::Debugger Detection::WudfIsAnyDebuggerPresent [B0001.031]"
 	hash = "al-khaser_x86.exe_:0x420000"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-debugging/debugger-detection/check-for-debugger-via-api.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1434,7 +1434,7 @@ rule capa_check_for_OutputDebugString_error : CAPA ANTI_ANALYSIS ANTI_DEBUGGING 
 	mbc = "Anti-Behavioral Analysis::Debugger Detection::OutputDebugString [B0001.016]"
 	hash = "Practical Malware Analysis Lab 16-02.exe_:0x401020"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-debugging/debugger-detection/check-for-outputdebugstring-error.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1455,18 +1455,18 @@ rule capa_contains_PDB_path : CAPA EXECUTABLE PE PDB FILE  {
 	scope = "file"
 	hash = "464EF2CA59782CE697BC329713698CCC"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/executable/pe/pdb/contains-pdb-path.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
  
-		$re_alf = /:\\.{,1000}\.pdb/ ascii wide 
+		$file_re_alf = /:\\.{,1000}\.pdb/ ascii wide 
  
   condition:
     capa_pe_file and
 
-		$re_alf 
+		$file_re_alf 
 }
 
 rule capa_contain_a_resource___rsrc__section : CAPA EXECUTABLE PE SECTION RSRC FILE  { 
@@ -1477,7 +1477,7 @@ rule capa_contain_a_resource___rsrc__section : CAPA EXECUTABLE PE SECTION RSRC F
 	scope = "file"
 	hash = "A933A1A402775CFA94B6BEE0963F4B46"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/executable/pe/section/rsrc/contain-a-resource-rsrc-section.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1495,7 +1495,7 @@ rule capa_contain_a_thread_local_storage___tls__section : CAPA EXECUTABLE PE SEC
 	scope = "file"
 	hash = "Practical Malware Analysis Lab 16-02.exe_"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/executable/pe/section/tls/contain-a-thread-local-storage-tls-section.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1515,7 +1515,7 @@ rule capa_extract_resource_via_kernel32_functions : CAPA EXECUTABLE RESOURCE FUN
 	hash = "Practical Malware Analysis Lab 01-04.exe_:0x4011FC"
 	hash = "563653399B82CD443F120ECEFF836EA3678D4CF11D9B351BB737573C2D856299"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/executable/resource/extract-resource-via-kernel32-functions.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1544,23 +1544,23 @@ rule capa_packaged_as_an_IExpress_self_extracting_archive : CAPA EXECUTABLE INST
 	scope = "file"
 	hash = "ac742739cae0d411dfcb78ae99a7baee"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/executable/installer/iexpress/packaged-as-an-iexpress-self-extracting-archive.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_alj = "wextract_cleanup%d" ascii wide
-	$str_alk = "Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce" ascii wide
-	$str_all = "  <description>IExpress extraction tool</description>" ascii wide
+ 	$file_str_alj = "wextract_cleanup%d" ascii wide
+	$file_str_alk = "Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce" ascii wide
+	$file_str_all = "  <description>IExpress extraction tool</description>" ascii wide
  
   condition:
     capa_pe_file and
  (
 		 (
-			$str_alj 
-		and 	$str_alk  
+			$file_str_alj 
+		and 	$file_str_alk  
 	) 
-		or 	$str_all  
+		or 	$file_str_all  
 	) 
 }
 
@@ -1573,7 +1573,7 @@ rule capa_create_thread : CAPA HOST_INTERACTION THREAD CREATE BASICBLOCK C0038  
 	hash = "946A99F36A46D335DEC080D9A4371940"
 	hash = "B5F85C26D7AA5A1FB4AF5821B6B5AB9B"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/thread/create/create-thread.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1613,7 +1613,7 @@ rule capa_resume_thread : CAPA HOST_INTERACTION THREAD RESUME BASICBLOCK C0054  
 	hash = "Practical Malware Analysis Lab 12-02.exe_:0x4010EA"
 	hash = "787cbc8a6d1bc58ea169e51e1ad029a637f22560660cc129ab8a099a745bd50e"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/thread/resume/resume-thread.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1635,7 +1635,7 @@ rule capa_suspend_thread : CAPA HOST_INTERACTION THREAD SUSPEND BASICBLOCK C0055
 	mbc = "Process::Suspend Thread [C0055]"
 	hash = "787cbc8a6d1bc58ea169e51e1ad029a637f22560660cc129ab8a099a745bd50e"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/thread/suspend/suspend-thread.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1657,7 +1657,7 @@ rule capa_terminate_thread : CAPA HOST_INTERACTION THREAD TERMINATE BASICBLOCK C
 	hash = "Practical Malware Analysis Lab 03-02.dll_:0x10003286"
 	hash = "B5F85C26D7AA5A1FB4AF5821B6B5AB9B"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/thread/terminate/terminate-thread.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1681,7 +1681,7 @@ rule capa_manipulate_console : CAPA HOST_INTERACTION CONSOLE FUNCTION C0033  {
 	mbc = "Operating System::Console [C0033]"
 	hash = "3aa7ee4d67f562933bc998f352b1f319"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/console/manipulate-console.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1708,20 +1708,20 @@ rule capa_access_firewall_settings_via_INetFwMgr : CAPA HOST_INTERACTION FIREWAL
 	attack = "Defense Evasion::Impair Defenses::Disable or Modify System Firewall [T1562.004]"
 	hash = "EB355BD63BDDCE02955792B4CD6539FB"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/firewall/modify/access-firewall-settings-via-inetfwmgr.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$als = { 42 E9 4C 30 39 6E D8 40 94 3A B9 13 C4 0C 9C D4 } // CLSID_NetFwMgr
-	$alt = { F5 8A 89 F7 C4 CA 32 46 A2 EC DA 06 E5 11 1A F2 } // IID_INetFwMgr
+ 	$func_als = { 42 E9 4C 30 39 6E D8 40 94 3A B9 13 C4 0C 9C D4 } // CLSID_NetFwMgr
+	$func_alt = { F5 8A 89 F7 C4 CA 32 46 A2 EC DA 06 E5 11 1A F2 } // IID_INetFwMgr
  
   condition:
     capa_pe_file and
  (
 			pe.imports(/ole32/i, /CoCreateInstance/) 
-		and 	$als 
-		and 	$alt  
+		and 	$func_als 
+		and 	$func_alt  
 	) 
 }
 
@@ -1733,7 +1733,7 @@ rule capa_start_minifilter_driver : CAPA HOST_INTERACTION FILTER BASICBLOCK  {
 	scope = "basic block"
 	hash = "B5F85C26D7AA5A1FB4AF5821B6B5AB9B"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/filter/start-minifilter-driver.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1755,7 +1755,7 @@ rule capa_register_minifilter_driver : CAPA HOST_INTERACTION FILTER BASICBLOCK  
 	scope = "basic block"
 	hash = "B5F85C26D7AA5A1FB4AF5821B6B5AB9B"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/filter/register-minifilter-driver.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1779,7 +1779,7 @@ rule capa_get_common_file_path : CAPA HOST_INTERACTION FILE_SYSTEM FUNCTION T108
 	hash = "Practical Malware Analysis Lab 03-02.dll_:0x10003415"
 	hash = "972B219F18379907A045431303F4DA7D"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/get-common-file-path.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1823,22 +1823,22 @@ rule capa_bypass_Mark_of_the_Web : CAPA HOST_INTERACTION FILE_SYSTEM FUNCTION T1
 	attack = "Defense Evasion::Subvert Trust Controls::Mark-of-the-Web Bypass [T1553.005]"
 	hash = "48c7ad2d9d482cb11898f2719638ceed"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/bypass-mark-of-the-web.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
  	$api_amd = /\bDeleteFile(A|W)?\b/ ascii wide
-	$str_ame = ":Zone.Identifier" ascii wide // NTFS ADS name recognized by Windows Defender SmartScreen
-	$str_amf = "%s:Zone.Identifier" ascii wide // NTFS ADS name recognized by Windows Defender SmartScreen
+	$func_str_ame = ":Zone.Identifier" ascii wide // NTFS ADS name recognized by Windows Defender SmartScreen
+	$func_str_amf = "%s:Zone.Identifier" ascii wide // NTFS ADS name recognized by Windows Defender SmartScreen
  
   condition:
     capa_pe_file and
  (
 			$api_amd 
 		and  (
-			$str_ame 
-		or 	$str_amf  
+			$func_str_ame 
+		or 	$func_str_amf  
 	)  
 	) 
 }
@@ -1852,7 +1852,7 @@ rule capa_get_file_system_object_information : CAPA HOST_INTERACTION FILE_SYSTEM
 	attack = "Discovery::File and Directory Discovery [T1083]"
 	hash = "50D5EE1CE2CA5E30C6B1019EE64EEEC2"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/get-file-system-object-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1876,7 +1876,7 @@ rule capa_delete_directory : CAPA HOST_INTERACTION FILE_SYSTEM DELETE FUNCTION C
 	hash = "Practical Malware Analysis Lab 05-01.dll_:0x10009236"
 	hash = "AFB6EC3D721A5CB67863487B0E51A34C167F629CF701F8BC7A038C117B4DDA44"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/delete/delete-directory.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1905,7 +1905,7 @@ rule capa_create_directory : CAPA HOST_INTERACTION FILE_SYSTEM CREATE FUNCTION C
 	mbc = "File System::Create Directory [C0046]"
 	hash = "Practical Malware Analysis Lab 17-02.dll_:0x10008f62"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/create/create-directory.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1942,7 +1942,7 @@ rule capa_write_file : CAPA HOST_INTERACTION FILE_SYSTEM WRITE FUNCTION C0052  {
 	hash = "Practical Malware Analysis Lab 01-04.exe_:0x4011FC"
 	hash = "563653399B82CD443F120ECEFF836EA3678D4CF11D9B351BB737573C2D856299"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/write/write-file.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -1976,7 +1976,7 @@ rule capa_get_file_attributes : CAPA HOST_INTERACTION FILE_SYSTEM META BASICBLOC
 	hash = "03B236B23B1EC37C663527C1F53AF3FE"
 	hash = "B5F85C26D7AA5A1FB4AF5821B6B5AB9B"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/meta/get-file-attributes.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2007,7 +2007,7 @@ rule capa_set_file_attributes : CAPA HOST_INTERACTION FILE_SYSTEM META BASICBLOC
 	hash = "946A99F36A46D335DEC080D9A4371940"
 	hash = "B5F85C26D7AA5A1FB4AF5821B6B5AB9B"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/meta/set-file-attributes.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2033,7 +2033,7 @@ rule capa_read_virtual_disk : CAPA HOST_INTERACTION FILE_SYSTEM READ FUNCTION C0
 	mbc = "File System::Read Virtual Disk [C0056]"
 	hash = "3265b2b0afc6d2ad0bdd55af8edb9b37"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/read/read-virtual-disk.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2060,7 +2060,7 @@ rule capa_read_file : CAPA HOST_INTERACTION FILE_SYSTEM READ FUNCTION C0051  {
 	mbc = "File System::Read File [C0051]"
 	hash = "BFB9B5391A13D0AFD787E87AB90F14F5"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/read/read-file.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2096,7 +2096,7 @@ rule capa_read__ini_file : CAPA HOST_INTERACTION FILE_SYSTEM READ FUNCTION C0051
 	hash = "1d8fd13c890060464019c0f07b928b1a"
 	hash = "E6234FB98F17201C232F4502015B47B3"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/read/read-ini-file.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2130,7 +2130,7 @@ rule capa_enumerate_files_via_kernel32_functions : CAPA HOST_INTERACTION FILE_SY
 	hash = "Practical Malware Analysis Lab 01-01.exe_:0x4011E0"
 	hash = "Practical Malware Analysis Lab 20-02.exe_:0x401000"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/files/list/enumerate-files-via-kernel32-functions.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2160,7 +2160,7 @@ rule capa_shutdown_system : CAPA HOST_INTERACTION OS FUNCTION T1529  {
 	attack = "Impact::System Shutdown/Reboot [T1529]"
 	hash = "39C05B15E9834AC93F206BC114D0A00C357C888DB567BA8F5345DA0529CBED41"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/os/shutdown-system.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2181,7 +2181,7 @@ rule capa_get_system_information : CAPA HOST_INTERACTION OS INFO FUNCTION T1082 
 	attack = "Discovery::System Information Discovery [T1082]"
 	hash = "563653399B82CD443F120ECEFF836EA3678D4CF11D9B351BB737573C2D856299"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/os/info/get-system-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2213,7 +2213,7 @@ rule capa_get_hostname : CAPA HOST_INTERACTION OS HOSTNAME FUNCTION T1082  {
 	attack = "Discovery::System Information Discovery [T1082]"
 	hash = "9324D1A8AE37A36AE560C37448C9705A"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/os/hostname/get-hostname.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2239,7 +2239,7 @@ rule capa_query_service_status : CAPA HOST_INTERACTION SERVICE FUNCTION T1007  {
 	attack = "Discovery::System Service Discovery [T1007]"
 	hash = "9DC209F66DA77858E362E624D0BE86B3"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/service/query-service-status.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2261,7 +2261,7 @@ rule capa_delete_service : CAPA HOST_INTERACTION SERVICE DELETE FUNCTION T1543_0
 	hash = "E544A4D616B60147D9774B48C2B65EF2"
 	hash = "Practical Malware Analysis Lab 03-02.dll_:0x10004B18"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/service/delete/delete-service.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2281,7 +2281,7 @@ rule capa_enumerate_services : CAPA HOST_INTERACTION SERVICE LIST FUNCTION T1007
 	attack = "Discovery::System Service Discovery [T1007]"
 	hash = "Practical Malware Analysis Lab 05-01.dll_:0x1000B823"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/service/list/enumerate-services.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2303,7 +2303,7 @@ rule capa_create_service : CAPA HOST_INTERACTION SERVICE CREATE FUNCTION T1543_0
 	attack = "Execution::System Services::Service Execution [T1569.002]"
 	hash = "Practical Malware Analysis Lab 03-02.dll_:0x10004706"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/service/create/create-service.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2324,7 +2324,7 @@ rule capa_modify_service : CAPA HOST_INTERACTION SERVICE MODIFY FUNCTION T1543_0
 	attack = "Execution::System Services::Service Execution [T1569.002]"
 	hash = "7D16EFD0078F22C17A4BD78B0F0CC468"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/service/modify/modify-service.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2347,7 +2347,7 @@ rule capa_start_service : CAPA HOST_INTERACTION SERVICE START FUNCTION T1543_003
 	attack = "Persistence::Create or Modify System Process::Windows Service [T1543.003]"
 	hash = "E544A4D616B60147D9774B48C2B65EF2"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/service/start/start-service.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2367,19 +2367,19 @@ rule capa_get_number_of_processor_cores : CAPA HOST_INTERACTION HARDWARE CPU FUN
 	attack = "Discovery::System Information Discovery [T1082]"
 	hash = "al-khaser_x86.exe_:0x435BA0"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/hardware/cpu/get-number-of-processor-cores.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_aog = /SELECT\s+\*\s+FROM\s+Win32_Processor/ ascii wide 
-	$str_aoh = "NumberOfCores" ascii wide
+ 	$func_re_aog = /SELECT\s+\*\s+FROM\s+Win32_Processor/ ascii wide 
+	$func_str_aoh = "NumberOfCores" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$re_aog 
-		and 	$str_aoh  
+			$func_re_aog 
+		and 	$func_str_aoh  
 	) 
 }
 
@@ -2393,7 +2393,7 @@ rule capa_get_disk_information : CAPA HOST_INTERACTION HARDWARE STORAGE FUNCTION
 	hash = "9324D1A8AE37A36AE560C37448C9705A"
 	hash = "972B219F18379907A045431303F4DA7D"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/hardware/storage/get-disk-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2419,21 +2419,21 @@ rule capa_manipulate_CD_ROM_drive : CAPA HOST_INTERACTION HARDWARE CDROM FUNCTIO
 	mbc = "Impact::Modify Hardware::CDROM [B0042.001]"
 	hash = "39C05B15E9834AC93F206BC114D0A00C357C888DB567BA8F5345DA0529CBED41"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/hardware/cdrom/manipulate-cd-rom-drive.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_aoi = "set cdaudio door closed wait" ascii wide
-	$str_aoj = "set cdaudio door open" ascii wide
+ 	$func_str_aoi = "set cdaudio door closed wait" ascii wide
+	$func_str_aoj = "set cdaudio door open" ascii wide
  
   condition:
     capa_pe_file and
  (
 			pe.imports(/winmm/i, /mciSendString/) 
 		and  (
-			$str_aoi 
-		or 	$str_aoj  
+			$func_str_aoi 
+		or 	$func_str_aoj  
 	)  
 	) 
 }
@@ -2447,7 +2447,7 @@ rule capa_get_memory_capacity : CAPA HOST_INTERACTION HARDWARE MEMORY FUNCTION T
 	attack = "Discovery::System Information Discovery [T1082]"
 	hash = "9324D1A8AE37A36AE560C37448C9705A"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/hardware/memory/get-memory-capacity.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2468,7 +2468,7 @@ rule capa_swap_mouse_buttons : CAPA HOST_INTERACTION HARDWARE MOUSE FUNCTION B00
 	mbc = "Impact::Modify Hardware::Mouse [B0042.002]"
 	hash = "B7841B9D5DC1F511A93CC7576672EC0C"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/hardware/mouse/swap-mouse-buttons.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2489,7 +2489,7 @@ rule capa_get_keyboard_layout : CAPA HOST_INTERACTION HARDWARE KEYBOARD LAYOUT F
 	hash = "6F99A2C8944CB02FF28C6F9CED59B161"
 	hash = "C91887D861D9BD4A5872249B641BC9F9"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/hardware/keyboard/layout/get-keyboard-layout.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2513,7 +2513,7 @@ rule capa_open_clipboard : CAPA HOST_INTERACTION CLIPBOARD FUNCTION T1115  {
 	attack = "Collection::Clipboard Data [T1115]"
 	hash = "6f99a2c8944cb02ff28c6f9ced59b161"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/clipboard/open-clipboard.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2533,7 +2533,7 @@ rule capa_write_clipboard_data : CAPA HOST_INTERACTION CLIPBOARD FUNCTION E1510 
 	mbc = "Impact::Clipboard Modification [E1510]"
 	hash = "6F99A2C8944CB02FF28C6F9CED59B161"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/clipboard/write-clipboard-data.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2554,7 +2554,7 @@ rule capa_read_clipboard_data : CAPA HOST_INTERACTION CLIPBOARD FUNCTION T1115  
 	hash = "C91887D861D9BD4A5872249B641BC9F9"
 	hash = "93dfc146f60bd796eb28d4e4f348f2e4"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/clipboard/read-clipboard-data.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2574,7 +2574,7 @@ rule capa_replace_clipboard_data : CAPA HOST_INTERACTION CLIPBOARD FUNCTION E151
 	mbc = "Impact::Clipboard Modification [E1510]"
 	hash = "6f99a2c8944cb02ff28c6f9ced59b161"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/clipboard/replace-clipboard-data.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2597,7 +2597,7 @@ rule capa_install_driver : CAPA HOST_INTERACTION DRIVER BASICBLOCK T1543_003 C00
 	mbc = "Hardware::Install Driver [C0037]"
 	hash = "af60700383b75727f5256a0000c1476f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/driver/install-driver.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2620,22 +2620,22 @@ rule capa_disable_driver_code_integrity : CAPA HOST_INTERACTION DRIVER FUNCTION 
 	scope = "function"
 	hash = "31CEE4F66CF3B537E3D2D37A71F339F4"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/driver/disable-driver-code-integrity.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_aol = "CiInitialize" ascii wide // exported symbol name used to resolve code integrity configuration
-	$re_aom = /g_CiEnabled/ ascii wide  // non-exported name for code integrity flag
-	$re_aon = /g_CiOptions/ ascii wide  // non-exported name for code integrity settings
+ 	$func_str_aol = "CiInitialize" ascii wide // exported symbol name used to resolve code integrity configuration
+	$func_re_aom = /g_CiEnabled/ ascii wide  // non-exported name for code integrity flag
+	$func_re_aon = /g_CiOptions/ ascii wide  // non-exported name for code integrity settings
  
   condition:
     capa_pe_file and
  (
 		 (
-			$str_aol 
-		or 	$re_aom 
-		or 	$re_aon  
+			$func_str_aol 
+		or 	$func_re_aom 
+		or 	$func_re_aon  
 	)  
 	) 
 }
@@ -2648,22 +2648,22 @@ rule capa_manipulate_boot_configuration : CAPA HOST_INTERACTION BOOTLOADER FUNCT
 	scope = "function"
 	hash = "7FBC17A09CF5320C515FC1C5BA42C8B3"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/bootloader/manipulate-boot-configuration.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_aor = /bcdedit.exe/ nocase ascii wide 
-	$re_aos = /boot.ini/ nocase ascii wide 
+ 	$func_re_aor = /bcdedit.exe/ nocase ascii wide 
+	$func_re_aos = /boot.ini/ nocase ascii wide 
  
   condition:
     capa_pe_file and
  (
 		 (
-			$re_aor  
+			$func_re_aor  
 	) 
 		or  (
-			$re_aos  
+			$func_re_aos  
 	)  
 	) 
 }
@@ -2676,7 +2676,7 @@ rule capa_set_application_hook : CAPA HOST_INTERACTION GUI FUNCTION  {
 	scope = "function"
 	hash = "Practical Malware Analysis Lab 12-03.exe_:0x401000"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/gui/set-application-hook.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2702,7 +2702,7 @@ rule capa_enumerate_gui_resources : CAPA HOST_INTERACTION GUI FUNCTION T1010  {
 	hash = "74fa32d2b277f583010b692a3f91b627"
 	hash = "021f49678cd633dc8cf99c61b3af3dda"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/gui/enumerate-gui-resources.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2731,7 +2731,7 @@ rule capa_find_graphical_window : CAPA HOST_INTERACTION GUI WINDOW FIND FUNCTION
 	attack = "Discovery::Application Window Discovery [T1010]"
 	hash = "7C843E75D4F02087B932FE280DF9C90C"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/gui/window/find/find-graphical-window.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2751,22 +2751,22 @@ rule capa_references_logon_banner : CAPA HOST_INTERACTION GUI LOGON BASICBLOCK  
 	scope = "basic block"
 	hash = "c3341b7dfbb9d43bca8c812e07b4299f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/gui/logon/references-logon-banner.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_aoy = /\\Microsoft\\Windows\\CurrentVersion\\Policies\\System/ ascii wide 
-	$re_aoz = /LegalNoticeCaption/ ascii wide 
-	$re_apa = /LegalNoticeText/ ascii wide 
+ 	$basic_re_aoy = /\\Microsoft\\Windows\\CurrentVersion\\Policies\\System/ ascii wide 
+	$basic_re_aoz = /LegalNoticeCaption/ ascii wide 
+	$basic_re_apa = /LegalNoticeText/ ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$re_aoy 
+			$basic_re_aoy 
 		and  (
-			$re_aoz 
-		or 	$re_apa  
+			$basic_re_aoz 
+		or 	$basic_re_apa  
 	)  
 	) 
 }
@@ -2780,7 +2780,7 @@ rule capa_lock_the_desktop : CAPA HOST_INTERACTION GUI SESSION LOCK FUNCTION T14
 	attack = "Impact::Endpoint Denial of Service [T1499]"
 	hash = "39C05B15E9834AC93F206BC114D0A00C357C888DB567BA8F5345DA0529CBED41"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/gui/session/lock/lock-the-desktop.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2799,7 +2799,7 @@ rule capa_resolve_path_using_msvcrt : CAPA HOST_INTERACTION CLI BASICBLOCK T1083
 	attack = "Discovery::File and Directory Discovery [T1083]"
 	hash = "31600ad0d1a7ea615690df111ae36c73"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/cli/resolve-path-using-msvcrt.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2825,7 +2825,7 @@ rule capa_accept_command_line_arguments : CAPA HOST_INTERACTION CLI FUNCTION T10
 	hash = "Practical Malware Analysis Lab 10-03.exe_:0x401140"
 	hash = "AFB6EC3D721A5CB67863487B0E51A34C167F629CF701F8BC7A038C117B4DDA44"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/cli/accept-command-line-arguments.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2850,7 +2850,7 @@ rule capa_set_thread_local_storage_value : CAPA HOST_INTERACTION PROCESS FUNCTIO
 	mbc = "Process::Set Thread Local Storage Value [C0041]"
 	hash = "03B236B23B1EC37C663527C1F53AF3FE"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/set-thread-local-storage-value.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2870,7 +2870,7 @@ rule capa_allocate_thread_local_storage : CAPA HOST_INTERACTION PROCESS FUNCTION
 	mbc = "Process::Allocate Thread Local Storage [C0040]"
 	hash = "03B236B23B1EC37C663527C1F53AF3FE"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/allocate-thread-local-storage.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2890,7 +2890,7 @@ rule capa_attach_user_process_memory : CAPA HOST_INTERACTION PROCESS INJECT FUNC
 	attack = "Defense Evasion::Process Injection [T1055]"
 	hash = "493167E85E45363D09495D0841C30648"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/inject/attach-user-process-memory.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2911,25 +2911,25 @@ rule capa_use_process_doppelganging : CAPA HOST_INTERACTION PROCESS INJECT FILE 
 	attack = "Defense Evasion::Process Injection::Process Doppelganging [T1055.013]"
 	hash = "A5D66324DAAEE5672B913AA461D4BD3A"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/inject/use-process-doppelganging.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_ape = /CreateFileTransacted./ ascii wide 
-	$str_apf = "ZwCreateSection" ascii wide
-	$str_apg = "NtCreateSection" ascii wide
-	$str_aph = "RollbackTransaction" ascii wide
+ 	$file_re_ape = /CreateFileTransacted./ ascii wide 
+	$file_str_apf = "ZwCreateSection" ascii wide
+	$file_str_apg = "NtCreateSection" ascii wide
+	$file_str_aph = "RollbackTransaction" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$re_ape 
+			$file_re_ape 
 		and  (
-			$str_apf 
-		or 	$str_apg  
+			$file_str_apf 
+		or 	$file_str_apg  
 	) 
-		and 	$str_aph  
+		and 	$file_str_aph  
 	) 
 }
 
@@ -2942,7 +2942,7 @@ rule capa_inject_APC : CAPA HOST_INTERACTION PROCESS INJECT FUNCTION T1055_004  
 	attack = "Defense Evasion::Process Injection::Asynchronous Procedure Call [T1055.004]"
 	hash = "al-khaser_x64.exe_:0x140019348"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/inject/inject-apc.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2978,7 +2978,7 @@ rule capa_enumerate_processes : CAPA HOST_INTERACTION PROCESS LIST FUNCTION T105
 	hash = "2D3EDC218A90F03089CC01715A9F047F"
 	hash = "35d04ecd797041eee796f4ddaa96cae8"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/list/enumerate-processes.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -2999,7 +2999,7 @@ rule capa_enumerate_processes_on_remote_desktop_session_host : CAPA HOST_INTERAC
 	attack = "Discovery::Process Discovery [T1057]"
 	hash = "6f99a2c8944cb02ff28c6f9ced59b161"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/list/enumerate-processes-on-remote-desktop-session-host.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3022,7 +3022,7 @@ rule capa_get_Explorer_PID : CAPA HOST_INTERACTION PROCESS LIST BASICBLOCK T1057
 	attack = "Discovery::Process Discovery [T1057]"
 	hash = "al-khaser_x86.exe_:0x425210"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/list/get-explorer-pid.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3047,7 +3047,7 @@ rule capa_find_process_by_PID : CAPA HOST_INTERACTION PROCESS LIST FUNCTION T105
 	attack = "Discovery::Process Discovery [T1057]"
 	hash = "493167E85E45363D09495D0841C30648"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/list/find-process-by-pid.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3068,7 +3068,7 @@ rule capa_create_process : CAPA HOST_INTERACTION PROCESS CREATE BASICBLOCK C0017
 	hash = "9324D1A8AE37A36AE560C37448C9705A"
 	hash = "Practical Malware Analysis Lab 01-04.exe_:0x4011FC"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/create/create-process.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3105,7 +3105,7 @@ rule capa_modify_access_privileges : CAPA HOST_INTERACTION PROCESS MODIFY FUNCTI
 	attack = "Privilege Escalation::Access Token Manipulation [T1134]"
 	hash = "9324D1A8AE37A36AE560C37448C9705A"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/modify/modify-access-privileges.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3126,7 +3126,7 @@ rule capa_terminate_process : CAPA HOST_INTERACTION PROCESS TERMINATE FUNCTION C
 	hash = "C91887D861D9BD4A5872249B641BC9F9"
 	hash = "9B7CCAA2AE6A5B96E3110EBCBC4311F6"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/terminate/terminate-process.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3151,7 +3151,7 @@ rule capa_enumerate_process_modules : CAPA HOST_INTERACTION PROCESS MODULES LIST
 	hash = "6F99A2C8944CB02FF28C6F9CED59B161"
 	hash = "9B2FD471274C41626B75DDBB5C897877"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/process/modules/list/enumerate-process-modules.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3184,7 +3184,7 @@ rule capa_get_domain_information : CAPA HOST_INTERACTION NETWORK DOMAIN FUNCTION
 	attack = "Discovery::System Network Configuration Discovery [T1016]"
 	hash = "9B7CCAA2AE6A5B96E3110EBCBC4311F6"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/network/domain/get-domain-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3203,7 +3203,7 @@ rule capa_get_networking_interfaces : CAPA HOST_INTERACTION NETWORK INTERFACE FU
 	attack = "Discovery::System Network Configuration Discovery [T1016]"
 	hash = "B7841B9D5DC1F511A93CC7576672EC0C"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/network/interface/get-networking-interfaces.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3224,7 +3224,7 @@ rule capa_register_network_filter_via_WFP_API : CAPA HOST_INTERACTION NETWORK TR
 	attack = "Impact::Data Manipulation::Transmitted Data Manipulation [T1565]"
 	hash = "493167E85E45363D09495D0841C30648"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/network/traffic/filter/register-network-filter-via-wfp-api.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3244,7 +3244,7 @@ rule capa_copy_network_traffic : CAPA HOST_INTERACTION NETWORK TRAFFIC COPY FUNC
 	attack = "Discovery::Network Sniffing [T1040]"
 	hash = "493167E85E45363D09495D0841C30648"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/network/traffic/copy/copy-network-traffic.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3263,7 +3263,7 @@ rule capa_resolve_DNS : CAPA HOST_INTERACTION NETWORK DNS RESOLVE FUNCTION C0011
 	mbc = "Communication::DNS Communication::Resolve [C0011.001]"
 	hash = "17264e3126a97c319a6a0c61e6da951e"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/network/dns/resolve/resolve-dns.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3298,7 +3298,7 @@ rule capa_check_Internet_connectivity_via_WinINet : CAPA HOST_INTERACTION NETWOR
 	attack = "Discovery::System Network Configuration Discovery::Internet Connection Discovery [T1016.001]"
 	hash = "648FC498110B11B4313A47A776E6BA40"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/network/connectivity/check-internet-connectivity-via-wininet.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3321,7 +3321,7 @@ rule capa_create_mutex : CAPA HOST_INTERACTION MUTEX FUNCTION C0042  {
 	mbc = "Process::Create Mutex [C0042]"
 	hash = "Practical Malware Analysis Lab 01-01.dll_:0x10001010"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/mutex/create-mutex.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3342,12 +3342,12 @@ rule capa_bypass_UAC_via_token_manipulation : CAPA HOST_INTERACTION UAC BYPASS F
 	attack = "Defense Evasion::Abuse Elevation Control Mechanism::Bypass User Access Control [T1548.002]"
 	hash = "2f43138aa75fb12ac482b486cbc98569"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/uac/bypass/bypass-uac-via-token-manipulation.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_aqa = "wusa.exe" ascii wide
+ 	$func_str_aqa = "wusa.exe" ascii wide
 	$api_aqb = /\bShellExecuteExW(A|W)?\b/ ascii wide
 	$api_aqc = /\bImpersonateLoggedOnUser(A|W)?\b/ ascii wide
 	$api_aqd = /\bGetStartupInfoW(A|W)?\b/ ascii wide
@@ -3356,7 +3356,7 @@ rule capa_bypass_UAC_via_token_manipulation : CAPA HOST_INTERACTION UAC BYPASS F
   condition:
     capa_pe_file and
  (
-			$str_aqa 
+			$func_str_aqa 
 		and 	$api_aqb 
 		and 	$api_aqc 
 		and 	$api_aqd 
@@ -3373,14 +3373,14 @@ rule capa_bypass_UAC_via_AppInfo_ALPC : CAPA HOST_INTERACTION UAC BYPASS FUNCTIO
 	attack = "Defense Evasion::Abuse Elevation Control Mechanism::Bypass User Access Control [T1548.002]"
 	hash = "2f43138aa75fb12ac482b486cbc98569"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/uac/bypass/bypass-uac-via-appinfo-alpc.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_aqf = "winver.exe" ascii wide
-	$str_aqg = "WinSta0\\Default" ascii wide
-	$str_aqh = "taskmgr.exe" ascii wide
+ 	$func_str_aqf = "winver.exe" ascii wide
+	$func_str_aqg = "WinSta0\\Default" ascii wide
+	$func_str_aqh = "taskmgr.exe" ascii wide
 	$api_aqi = /\bWaitForDebugEvent(A|W)?\b/ ascii wide
 	$api_aqj = /\bContinueDebugEvent(A|W)?\b/ ascii wide
 	$api_aqk = /\bTerminateProcess(A|W)?\b/ ascii wide
@@ -3388,9 +3388,9 @@ rule capa_bypass_UAC_via_AppInfo_ALPC : CAPA HOST_INTERACTION UAC BYPASS FUNCTIO
   condition:
     capa_pe_file and
  (
-			$str_aqf 
-		and 	$str_aqg 
-		and 	$str_aqh 
+			$func_str_aqf 
+		and 	$func_str_aqg 
+		and 	$func_str_aqh 
 		and 	$api_aqi 
 		and 	$api_aqj 
 		and 	$api_aqk  
@@ -3406,7 +3406,7 @@ rule capa_access_the_Windows_event_log : CAPA HOST_INTERACTION LOG WINEVT ACCESS
 	mbc = "Discovery::File and Directory Discovery::Log File [E1083.m01]"
 	hash = "mimikatz.exe_:0x45228B"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/log/winevt/access/access-the-windows-event-log.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3434,7 +3434,7 @@ rule capa_print_debug_messages : CAPA HOST_INTERACTION LOG DEBUG WRITE_EVENT FUN
 	scope = "function"
 	hash = "493167E85E45363D09495D0841C30648"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/log/debug/write-event/print-debug-messages.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3455,7 +3455,7 @@ rule capa_set_environment_variable : CAPA HOST_INTERACTION ENVIRONMENT_VARIABLE 
 	mbc = "Operating System::Environment Variable::Set Variable [C0034.001]"
 	hash = "Practical Malware Analysis Lab 11-03.exe_:0x406580"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/environment-variable/set-environment-variable.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3476,7 +3476,7 @@ rule capa_query_environment_variable : CAPA HOST_INTERACTION ENVIRONMENT_VARIABL
 	hash = "Practical Malware Analysis Lab 14-02.exe_:0x401880"
 	hash = "0761142efbda6c4b1e801223de723578"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/environment-variable/query-environment-variable.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3500,7 +3500,7 @@ rule capa_open_registry_key_via_offline_registry_library : CAPA HOST_INTERACTION
 	mbc = "Operating System::Registry::Open Registry Key [C0036.003]"
 	hash = "5fbbfeed28b258c42e0cfeb16718b31c"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/registry/open-registry-key-via-offline-registry-library.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3526,7 +3526,7 @@ rule capa_query_or_enumerate_registry_value : CAPA HOST_INTERACTION REGISTRY FUN
 	hash = "BFB9B5391A13D0AFD787E87AB90F14F5"
 	hash = "Practical Malware Analysis Lab 03-02.dll_:0x100047AD"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/registry/query-or-enumerate-registry-value.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3593,7 +3593,7 @@ rule capa_set_registry_key_via_offline_registry_library : CAPA HOST_INTERACTION 
 	mbc = "Operating System::Registry::Set Registry Key [C0036.001]"
 	hash = "5fbbfeed28b258c42e0cfeb16718b31c"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/registry/set-registry-key-via-offline-registry-library.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3617,7 +3617,7 @@ rule capa_query_registry_key_via_offline_registry_library : CAPA HOST_INTERACTIO
 	mbc = "Operating System::Registry::Query Registry Value [C0036.006]"
 	hash = "5fbbfeed28b258c42e0cfeb16718b31c"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/registry/query-registry-key-via-offline-registry-library.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3642,7 +3642,7 @@ rule capa_query_or_enumerate_registry_key : CAPA HOST_INTERACTION REGISTRY FUNCT
 	hash = "493167E85E45363D09495D0841C30648"
 	hash = "B5F85C26D7AA5A1FB4AF5821B6B5AB9B"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/registry/query-or-enumerate-registry-key.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3687,7 +3687,7 @@ rule capa_create_registry_key_via_offline_registry_library : CAPA HOST_INTERACTI
 	mbc = "Operating System::Registry::Create Registry Key [C0036.004]"
 	hash = "5fbbfeed28b258c42e0cfeb16718b31c"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/registry/create-registry-key-via-offline-registry-library.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3716,7 +3716,7 @@ rule capa_create_or_open_registry_key : CAPA HOST_INTERACTION REGISTRY BASICBLOC
 	hash = "493167E85E45363D09495D0841C30648"
 	hash = "B5F85C26D7AA5A1FB4AF5821B6B5AB9B"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/registry/create-or-open-registry-key.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3768,7 +3768,7 @@ rule capa_delete_registry_key : CAPA HOST_INTERACTION REGISTRY DELETE FUNCTION T
 	hash = "4f11bdb380dafa2518053c6d20147a05"
 	hash = "493167E85E45363D09495D0841C30648"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/registry/delete/delete-registry-key.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3806,7 +3806,7 @@ rule capa_delete_registry_value : CAPA HOST_INTERACTION REGISTRY DELETE FUNCTION
 	mbc = "Operating System::Registry::Delete Registry Value [C0036.007]"
 	hash = "B5F85C26D7AA5A1FB4AF5821B6B5AB9B"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/registry/delete/delete-registry-value.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3841,7 +3841,7 @@ rule capa_set_registry_value : CAPA HOST_INTERACTION REGISTRY CREATE FUNCTION C0
 	hash = "BFB9B5391A13D0AFD787E87AB90F14F5"
 	hash = "B5F85C26D7AA5A1FB4AF5821B6B5AB9B"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/registry/create/set-registry-value.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3854,7 +3854,7 @@ rule capa_set_registry_value : CAPA HOST_INTERACTION REGISTRY CREATE FUNCTION C0
 	$api_asx = /\bSHRegSetValue(A|W)?\b/ ascii wide
 	$api_asy = /\bSHRegSetUSValue(A|W)?\b/ ascii wide
 	$api_asz = /\bSHRegWriteUSValue(A|W)?\b/ ascii wide
-	$re_ata = /reg(.exe)? add / nocase ascii wide 
+	$func_re_ata = /reg(.exe)? add / nocase ascii wide 
  
   condition:
     capa_pe_file and
@@ -3877,7 +3877,7 @@ rule capa_set_registry_value : CAPA HOST_INTERACTION REGISTRY CREATE FUNCTION C0
 		or  (
 			capa_create_process
 
-		and 	$re_ata  
+		and 	$func_re_ata  
 	)  
 	) 
 }
@@ -3892,7 +3892,7 @@ rule capa_get_logon_sessions : CAPA HOST_INTERACTION SESSION FUNCTION T1087  {
 	attack = "Discovery::Account Discovery [T1087]"
 	hash = "9B7CCAA2AE6A5B96E3110EBCBC4311F6"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/session/get-logon-sessions.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3912,7 +3912,7 @@ rule capa_get_session_integrity_level : CAPA HOST_INTERACTION SESSION FUNCTION T
 	attack = "Discovery::System Owner/User Discovery [T1033]"
 	hash = "9879D201DC5ACA863F357184CD1F170E"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/session/get-session-integrity-level.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3933,7 +3933,7 @@ rule capa_link_function_at_runtime : CAPA LINKING RUNTIME_LINKING FUNCTION T1129
 	hash = "9324D1A8AE37A36AE560C37448C9705A"
 	hash = "Practical Malware Analysis Lab 01-04.exe_:0x401350"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/linking/runtime-linking/link-function-at-runtime.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -3963,27 +3963,27 @@ rule capa_linked_against_Crypto__ : CAPA LINKING STATIC CRYPTOPP FILE C0059  {
 	hash = "8BA66E4B618FFDC8255F1DF01F875DDE6FD0561305D9F8307BE7BB11D02AE363"
 	hash = "66602B5FAB602CB4E6F754748D249542"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/linking/static/cryptopp/linked-against-crypto.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_atb = "Cryptographic algorithms are disabled after a power-up self test failed." ascii wide
-	$str_atc = ": this object requires an IV" ascii wide
-	$str_atd = "BER decode error" ascii wide
-	$str_ate = ".?AVException@CryptoPP@@" ascii wide
-	$str_atf = "FileStore: error reading file" ascii wide
-	$str_atg = "StreamTransformationFilter: PKCS_PADDING cannot be used with " ascii wide
+ 	$file_str_atb = "Cryptographic algorithms are disabled after a power-up self test failed." ascii wide
+	$file_str_atc = ": this object requires an IV" ascii wide
+	$file_str_atd = "BER decode error" ascii wide
+	$file_str_ate = ".?AVException@CryptoPP@@" ascii wide
+	$file_str_atf = "FileStore: error reading file" ascii wide
+	$file_str_atg = "StreamTransformationFilter: PKCS_PADDING cannot be used with " ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_atb 
-		or 	$str_atc 
-		or 	$str_atd 
-		or 	$str_ate 
-		or 	$str_atf 
-		or 	$str_atg  
+			$file_str_atb 
+		or 	$file_str_atc 
+		or 	$file_str_atd 
+		or 	$file_str_ate 
+		or 	$file_str_atf 
+		or 	$file_str_atg  
 	) 
 }
 
@@ -3996,21 +3996,21 @@ rule capa_linked_against_OpenSSL : CAPA LINKING STATIC OPENSSL FILE C0059  {
 	mbc = "Cryptography::Crypto Library [C0059]"
 	hash = "6cc148363200798a12091b97a17181a1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/linking/static/openssl/linked-against-openssl.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_ath = "RC4 for x86_64, CRYPTOGAMS by <appro@openssl.org>" ascii wide
-	$str_ati = "AES for x86_64, CRYPTOGAMS by <appro@openssl.org>" ascii wide
-	$str_atj = "DSA-SHA1-old" ascii wide
+ 	$file_str_ath = "RC4 for x86_64, CRYPTOGAMS by <appro@openssl.org>" ascii wide
+	$file_str_ati = "AES for x86_64, CRYPTOGAMS by <appro@openssl.org>" ascii wide
+	$file_str_atj = "DSA-SHA1-old" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_ath 
-		or 	$str_ati 
-		or 	$str_atj  
+			$file_str_ath 
+		or 	$file_str_ati 
+		or 	$file_str_atj  
 	) 
 }
 
@@ -4023,25 +4023,25 @@ rule capa_linked_against_PolarSSL_mbed_TLS : CAPA LINKING STATIC POLARSSL FILE C
 	mbc = "Cryptography::Crypto Library [C0059]"
 	hash = "232b0a8546035d9017fadf68398826edb0a1e055566bc1d356d6c9fdf1d7e485"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/linking/static/polarssl/linked-against-polarsslmbed-tls.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_atk = "PolarSSLTest" ascii wide
-	$str_atl = "mbedtls_cipher_setup" ascii wide
-	$str_atm = "mbedtls_pk_verify" ascii wide
-	$str_atn = "mbedtls_ssl_write_record" ascii wide
-	$str_ato = "mbedtls_ssl_fetch_input" ascii wide
+ 	$file_str_atk = "PolarSSLTest" ascii wide
+	$file_str_atl = "mbedtls_cipher_setup" ascii wide
+	$file_str_atm = "mbedtls_pk_verify" ascii wide
+	$file_str_atn = "mbedtls_ssl_write_record" ascii wide
+	$file_str_ato = "mbedtls_ssl_fetch_input" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_atk 
-		or 	$str_atl 
-		or 	$str_atm 
-		or 	$str_atn 
-		or 	$str_ato  
+			$file_str_atk 
+		or 	$file_str_atl 
+		or 	$file_str_atm 
+		or 	$file_str_atn 
+		or 	$file_str_ato  
 	) 
 }
 
@@ -4053,19 +4053,19 @@ rule capa_linked_against_libcurl : CAPA LINKING STATIC LIBCURL FILE  {
 	scope = "file"
 	hash = "A90E5B3454AA71D9700B2EA54615F44B"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/linking/static/libcurl/linked-against-libcurl.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_atp = /CLIENT libcurl/ ascii wide 
-	$re_atq = /curl\.haxx\.se/ ascii wide 
+ 	$file_re_atp = /CLIENT libcurl/ ascii wide 
+	$file_re_atq = /curl\.haxx\.se/ ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$re_atp 
-		or 	$re_atq  
+			$file_re_atp 
+		or 	$file_re_atq  
 	) 
 }
 
@@ -4078,7 +4078,7 @@ rule capa_linked_against_Microsoft_Detours : CAPA LINKING STATIC MSDETOURS FILE 
 	attack = "Defense Evasion::Hijack Execution Flow [T1574]"
 	hash = "071F2D1C4C2201EE95FFE2AA965000F5F615A11A12D345E33B9FB060E5597740"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/linking/static/msdetours/linked-against-microsoft-detours.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4099,19 +4099,19 @@ rule capa_linked_against_ZLIB : CAPA LINKING STATIC ZLIB FILE C0060  {
 	mbc = "Data::Compression Library [C0060]"
 	hash = "6cc148363200798a12091b97a17181a1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/linking/static/zlib/linked-against-zlib.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_att = /deflate .{,1000} Copyright/ ascii wide 
-	$re_atu = /inflate .{,1000} Copyright/ ascii wide 
+ 	$file_re_att = /deflate .{,1000} Copyright/ ascii wide 
+	$file_re_atu = /inflate .{,1000} Copyright/ ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$re_att 
-		or 	$re_atu  
+			$file_re_att 
+		or 	$file_re_atu  
 	) 
 }
 
@@ -4128,18 +4128,18 @@ rule capa_reference_Base64_string : CAPA DATA_MANIPULATION ENCODING BASE64 FILE 
 	hash = "074072B261FC27B65C72671F13510C05"
 	hash = "5DB2D2BE20D59AA0BE6709A6850F1775"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encoding/base64/reference-base64-string.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
  
-		$re_atv = /ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/ ascii wide 
+		$file_re_atv = /ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/ ascii wide 
  
   condition:
     capa_pe_file and
 
-		$re_atv 
+		$file_re_atv 
 }
 
 rule capa_import_public_key : CAPA DATA_MANIPULATION ENCRYPTION FUNCTION C0028_001  { 
@@ -4151,7 +4151,7 @@ rule capa_import_public_key : CAPA DATA_MANIPULATION ENCRYPTION FUNCTION C0028_0
 	mbc = "Cryptography::Encryption Key::Import Public Key [C0028.001]"
 	hash = "ffeae4a391a1d5203bd04b4161557227"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/import-public-key.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4174,7 +4174,7 @@ rule capa_encrypt_or_decrypt_via_WinCrypt : CAPA DATA_MANIPULATION ENCRYPTION FU
 	mbc = "Cryptography::Encrypt Data [C0027]"
 	hash = "A45E377DBB98A6B44FD4034BC3FFF9B0"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/encrypt-or-decrypt-via-wincrypt.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4202,7 +4202,7 @@ rule capa_encrypt_data_using_DPAPI : CAPA DATA_MANIPULATION ENCRYPTION DPAPI FUN
 	mbc = "Cryptography::Encrypt Data [C0027]"
 	hash = "6cc148363200798a12091b97a17181a1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/dpapi/encrypt-data-using-dpapi.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4232,16 +4232,16 @@ rule capa_encrypt_data_using_Camellia : CAPA DATA_MANIPULATION ENCRYPTION CAMELL
 	hash = "0761142efbda6c4b1e801223de723578"
 	hash = "112f9f0e8d349858a80dd8c14190e620"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/camellia/encrypt-data-using-camellia.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$aua = { 00 70 70 70 00 82 82 82 00 2C 2C 2C 00 EC EC EC 00 B3 B3 B3 00 27 27 27 00 C0 C0 C0 00 E5 E5 E5 00 E4 E4 E4 00 85 85 85 00 57 57 57 00 35 35 35 00 EA EA EA 00 0C 0C 0C 00 AE AE AE 00 41 41 41 00 23 23 23 00 EF EF EF 00 6B 6B 6B 00 93 93 93 00 45 45 45 00 19 19 19 00 A5 A5 A5 00 21 21 21 00 ED ED ED 00 0E 0E 0E 00 4F 4F 4F 00 4E 4E 4E 00 1D 1D 1D 00 65 65 65 00 92 92 92 00 BD BD BD 00 86 86 86 00 B8 B8 B8 00 AF AF AF 00 8F 8F 8F 00 7C 7C 7C 00 EB EB EB 00 1F 1F 1F 00 CE CE CE 00 3E 3E 3E 00 30 30 30 00 DC DC } // libgcrypt_sp1110
-	$aub = { E0 E0 E0 00 05 05 05 00 58 58 58 00 D9 D9 D9 00 67 67 67 00 4E 4E 4E 00 81 81 81 00 CB CB CB 00 C9 C9 C9 00 0B 0B 0B 00 AE AE AE 00 6A 6A 6A 00 D5 D5 D5 00 18 18 18 00 5D 5D 5D 00 82 82 82 00 46 46 46 00 DF DF DF 00 D6 D6 D6 00 27 27 27 00 8A 8A 8A 00 32 32 32 00 4B 4B 4B 00 42 42 42 00 DB DB DB 00 1C 1C 1C 00 9E 9E 9E 00 9C 9C 9C 00 3A 3A 3A 00 CA CA CA 00 25 25 25 00 7B 7B 7B 00 0D 0D 0D 00 71 71 71 00 5F 5F 5F 00 1F 1F 1F 00 F8 F8 F8 00 D7 D7 D7 00 3E 3E 3E 00 9D 9D 9D 00 7C 7C 7C 00 60 60 60 00 B9 B9 B9 } // libgcrypt_sp0222
-	$auc = { 38 38 00 38 41 41 00 41 16 16 00 16 76 76 00 76 D9 D9 00 D9 93 93 00 93 60 60 00 60 F2 F2 00 F2 72 72 00 72 C2 C2 00 C2 AB AB 00 AB 9A 9A 00 9A 75 75 00 75 06 06 00 06 57 57 00 57 A0 A0 00 A0 91 91 00 91 F7 F7 00 F7 B5 B5 00 B5 C9 C9 00 C9 A2 A2 00 A2 8C 8C 00 8C D2 D2 00 D2 90 90 00 90 F6 F6 00 F6 07 07 00 07 A7 A7 00 A7 27 27 00 27 8E 8E 00 8E B2 B2 00 B2 49 49 00 49 DE DE 00 DE 43 43 00 43 5C 5C 00 5C D7 D7 00 D7 C7 C7 00 C7 3E 3E 00 3E F5 F5 00 F5 8F 8F 00 8F 67 67 00 67 1F 1F 00 1F 18 18 00 18 6E 6E 00 } // libgcrypt_sp3033
-	$aud = { 70 00 70 70 2C 00 2C 2C B3 00 B3 B3 C0 00 C0 C0 E4 00 E4 E4 57 00 57 57 EA 00 EA EA AE 00 AE AE 23 00 23 23 6B 00 6B 6B 45 00 45 45 A5 00 A5 A5 ED 00 ED ED 4F 00 4F 4F 1D 00 1D 1D 92 00 92 92 86 00 86 86 AF 00 AF AF 7C 00 7C 7C 1F 00 1F 1F 3E 00 3E 3E DC 00 DC DC 5E 00 5E 5E 0B 00 0B 0B A6 00 A6 A6 39 00 39 39 D5 00 D5 D5 5D 00 5D 5D D9 00 D9 D9 5A 00 5A 5A 51 00 51 51 6C 00 6C 6C 8B 00 8B 8B 9A 00 9A 9A FB 00 FB FB B0 00 B0 B0 74 00 74 74 2B 00 2B 2B F0 00 F0 F0 84 00 84 84 DF 00 DF DF CB 00 CB CB 34 00 34 } // libgcrypt_sp4404
-	$aue = { 70 82 2C EC B3 27 C0 E5 E4 85 57 35 EA 0C AE 41 23 EF 6B 93 45 19 A5 21 ED 0E 4F 4E 1D 65 92 BD 86 B8 AF 8F 7C EB 1F CE 3E 30 DC 5F 5E C5 0B 1A A6 E1 39 CA D5 47 5D 3D D9 01 5A D6 51 56 6C 4D 8B 0D 9A 66 FB CC B0 2D 74 12 2B 20 F0 B1 84 99 DF 4C CB C2 34 7E 76 05 6D B7 A9 31 D1 17 04 D7 14 58 3A 61 DE 1B 11 1C 32 0F 9C 16 53 18 F2 22 FE 44 CF B2 C3 B5 7A 91 24 08 E8 A8 60 FC 69 50 AA D0 A0 7D A1 89 62 97 54 5B 1E 95 E0 FF 64 D2 10 C4 00 48 A3 F7 75 DB 8A 03 E6 DA 09 3F DD 94 87 5C 83 02 CD 4A 90 33 73 67 F6 F3 9D 7F BF E2 52 9B D8 26 C8 37 C6 3B 81 96 6F 4B 13 BE 63 2E E9 79 A7 8C 9F 6E BC 8E 29 F5 F9 B6 2F FD B4 59 78 98 06 6A E7 46 71 BA D4 25 AB 42 88 A2 8D FA 72 07 B9 55 F8 EE AC 0A 36 49 2A 68 3C 38 F1 A4 40 28 D3 7B BB C9 43 C1 15 E3 AD F4 77 C7 80 9E } // calccrypto_sbox
+ 	$basic_aua = { 00 70 70 70 00 82 82 82 00 2C 2C 2C 00 EC EC EC 00 B3 B3 B3 00 27 27 27 00 C0 C0 C0 00 E5 E5 E5 00 E4 E4 E4 00 85 85 85 00 57 57 57 00 35 35 35 00 EA EA EA 00 0C 0C 0C 00 AE AE AE 00 41 41 41 00 23 23 23 00 EF EF EF 00 6B 6B 6B 00 93 93 93 00 45 45 45 00 19 19 19 00 A5 A5 A5 00 21 21 21 00 ED ED ED 00 0E 0E 0E 00 4F 4F 4F 00 4E 4E 4E 00 1D 1D 1D 00 65 65 65 00 92 92 92 00 BD BD BD 00 86 86 86 00 B8 B8 B8 00 AF AF AF 00 8F 8F 8F 00 7C 7C 7C 00 EB EB EB 00 1F 1F 1F 00 CE CE CE 00 3E 3E 3E 00 30 30 30 00 DC DC } // libgcrypt_sp1110
+	$basic_aub = { E0 E0 E0 00 05 05 05 00 58 58 58 00 D9 D9 D9 00 67 67 67 00 4E 4E 4E 00 81 81 81 00 CB CB CB 00 C9 C9 C9 00 0B 0B 0B 00 AE AE AE 00 6A 6A 6A 00 D5 D5 D5 00 18 18 18 00 5D 5D 5D 00 82 82 82 00 46 46 46 00 DF DF DF 00 D6 D6 D6 00 27 27 27 00 8A 8A 8A 00 32 32 32 00 4B 4B 4B 00 42 42 42 00 DB DB DB 00 1C 1C 1C 00 9E 9E 9E 00 9C 9C 9C 00 3A 3A 3A 00 CA CA CA 00 25 25 25 00 7B 7B 7B 00 0D 0D 0D 00 71 71 71 00 5F 5F 5F 00 1F 1F 1F 00 F8 F8 F8 00 D7 D7 D7 00 3E 3E 3E 00 9D 9D 9D 00 7C 7C 7C 00 60 60 60 00 B9 B9 B9 } // libgcrypt_sp0222
+	$basic_auc = { 38 38 00 38 41 41 00 41 16 16 00 16 76 76 00 76 D9 D9 00 D9 93 93 00 93 60 60 00 60 F2 F2 00 F2 72 72 00 72 C2 C2 00 C2 AB AB 00 AB 9A 9A 00 9A 75 75 00 75 06 06 00 06 57 57 00 57 A0 A0 00 A0 91 91 00 91 F7 F7 00 F7 B5 B5 00 B5 C9 C9 00 C9 A2 A2 00 A2 8C 8C 00 8C D2 D2 00 D2 90 90 00 90 F6 F6 00 F6 07 07 00 07 A7 A7 00 A7 27 27 00 27 8E 8E 00 8E B2 B2 00 B2 49 49 00 49 DE DE 00 DE 43 43 00 43 5C 5C 00 5C D7 D7 00 D7 C7 C7 00 C7 3E 3E 00 3E F5 F5 00 F5 8F 8F 00 8F 67 67 00 67 1F 1F 00 1F 18 18 00 18 6E 6E 00 } // libgcrypt_sp3033
+	$basic_aud = { 70 00 70 70 2C 00 2C 2C B3 00 B3 B3 C0 00 C0 C0 E4 00 E4 E4 57 00 57 57 EA 00 EA EA AE 00 AE AE 23 00 23 23 6B 00 6B 6B 45 00 45 45 A5 00 A5 A5 ED 00 ED ED 4F 00 4F 4F 1D 00 1D 1D 92 00 92 92 86 00 86 86 AF 00 AF AF 7C 00 7C 7C 1F 00 1F 1F 3E 00 3E 3E DC 00 DC DC 5E 00 5E 5E 0B 00 0B 0B A6 00 A6 A6 39 00 39 39 D5 00 D5 D5 5D 00 5D 5D D9 00 D9 D9 5A 00 5A 5A 51 00 51 51 6C 00 6C 6C 8B 00 8B 8B 9A 00 9A 9A FB 00 FB FB B0 00 B0 B0 74 00 74 74 2B 00 2B 2B F0 00 F0 F0 84 00 84 84 DF 00 DF DF CB 00 CB CB 34 00 34 } // libgcrypt_sp4404
+	$basic_aue = { 70 82 2C EC B3 27 C0 E5 E4 85 57 35 EA 0C AE 41 23 EF 6B 93 45 19 A5 21 ED 0E 4F 4E 1D 65 92 BD 86 B8 AF 8F 7C EB 1F CE 3E 30 DC 5F 5E C5 0B 1A A6 E1 39 CA D5 47 5D 3D D9 01 5A D6 51 56 6C 4D 8B 0D 9A 66 FB CC B0 2D 74 12 2B 20 F0 B1 84 99 DF 4C CB C2 34 7E 76 05 6D B7 A9 31 D1 17 04 D7 14 58 3A 61 DE 1B 11 1C 32 0F 9C 16 53 18 F2 22 FE 44 CF B2 C3 B5 7A 91 24 08 E8 A8 60 FC 69 50 AA D0 A0 7D A1 89 62 97 54 5B 1E 95 E0 FF 64 D2 10 C4 00 48 A3 F7 75 DB 8A 03 E6 DA 09 3F DD 94 87 5C 83 02 CD 4A 90 33 73 67 F6 F3 9D 7F BF E2 52 9B D8 26 C8 37 C6 3B 81 96 6F 4B 13 BE 63 2E E9 79 A7 8C 9F 6E BC 8E 29 F5 F9 B6 2F FD B4 59 78 98 06 6A E7 46 71 BA D4 25 AB 42 88 A2 8D FA 72 07 B9 55 F8 EE AC 0A 36 49 2A 68 3C 38 F1 A4 40 28 D3 7B BB C9 43 C1 15 E3 AD F4 77 C7 80 9E } // calccrypto_sbox
 	$num_auf = { 8B 90 CC 3B } // CAMELLIA_SIGMA1R
 	$num_aug = { 7F 66 9E A0 } // CAMELLIA_SIGMA1L
 	$num_auh = { B2 73 AA 4C } // CAMELLIA_SIGMA2R
@@ -4254,27 +4254,27 @@ rule capa_encrypt_data_using_Camellia : CAPA DATA_MANIPULATION ENCRYPTION CAMELL
 	$num_auo = { 1D 2D 68 DE } // CAMELLIA_SIGMA5R
 	$num_aup = { C2 88 56 B0 } // CAMELLIA_SIGMA6L
 	$num_auq = { FD C1 E6 B3 } // CAMELLIA_SIGMA6R
-	$aur = { 8B 90 CC 3B 7F 66 9E A0 } // sigma1
-	$aus = { B2 73 AA 4C 58 E8 7A B6 } // sigma2
-	$aut = { BE 82 4F E9 2F 37 EF C6 } // sigma3
-	$auu = { 1C 6F D3 F1 A5 53 FF 54 } // sigma4
-	$auv = { 1D 2D 68 DE FA 27 E5 10 } // sigma5
-	$auw = { FD C1 E6 B3 C2 88 56 B0 } // sigma6
-	$re_aux = /A09E667F3BCC908B/ nocase ascii wide  // sigma1_str
-	$str_auy = "/B67AE8584CAA73B" ascii wide // sigma2_str
-	$re_auz = /C6EF372FE94F82BE/ nocase ascii wide  // sigma3_str
-	$re_ava = /54FF53A5F1D36F1C/ nocase ascii wide  // sigma4_str
-	$re_avb = /10E527FADE682D1D/ nocase ascii wide  // sigma5_str
-	$re_avc = /B05688C2B3E6C1FD/ nocase ascii wide  // sigma6_str
+	$basic_aur = { 8B 90 CC 3B 7F 66 9E A0 } // sigma1
+	$basic_aus = { B2 73 AA 4C 58 E8 7A B6 } // sigma2
+	$basic_aut = { BE 82 4F E9 2F 37 EF C6 } // sigma3
+	$basic_auu = { 1C 6F D3 F1 A5 53 FF 54 } // sigma4
+	$basic_auv = { 1D 2D 68 DE FA 27 E5 10 } // sigma5
+	$basic_auw = { FD C1 E6 B3 C2 88 56 B0 } // sigma6
+	$basic_re_aux = /A09E667F3BCC908B/ nocase ascii wide  // sigma1_str
+	$basic_str_auy = "/B67AE8584CAA73B" ascii wide // sigma2_str
+	$basic_re_auz = /C6EF372FE94F82BE/ nocase ascii wide  // sigma3_str
+	$basic_re_ava = /54FF53A5F1D36F1C/ nocase ascii wide  // sigma4_str
+	$basic_re_avb = /10E527FADE682D1D/ nocase ascii wide  // sigma5_str
+	$basic_re_avc = /B05688C2B3E6C1FD/ nocase ascii wide  // sigma6_str
  
   condition:
     capa_pe_file and
  (
-			$aua 
-		or 	$aub 
-		or 	$auc 
-		or 	$aud 
-		or 	$aue 
+			$basic_aua 
+		or 	$basic_aub 
+		or 	$basic_auc 
+		or 	$basic_aud 
+		or 	$basic_aue 
 		or  (
 		 (
 		$num_auf 
@@ -4291,20 +4291,20 @@ rule capa_encrypt_data_using_Camellia : CAPA DATA_MANIPULATION ENCRYPTION CAMELL
 		and $num_auq  
 	) 
 		or  (
-			$aur 
-		and 	$aus 
-		and 	$aut 
-		and 	$auu 
-		and 	$auv 
-		and 	$auw  
+			$basic_aur 
+		and 	$basic_aus 
+		and 	$basic_aut 
+		and 	$basic_auu 
+		and 	$basic_auv 
+		and 	$basic_auw  
 	) 
 		or  (
-			$re_aux 
-		and 	$str_auy 
-		and 	$re_auz 
-		and 	$re_ava 
-		and 	$re_avb 
-		and 	$re_avc  
+			$basic_re_aux 
+		and 	$basic_str_auy 
+		and 	$basic_re_auz 
+		and 	$basic_re_ava 
+		and 	$basic_re_avb 
+		and 	$basic_re_avc  
 	)  
 	)  
 	) 
@@ -4321,7 +4321,7 @@ rule capa_encrypt_data_using_RC6 : CAPA DATA_MANIPULATION ENCRYPTION RC6 FUNCTIO
 	mbc = "Cryptography::Encrypt Data::RC6 [C0027.010]"
 	hash = "D87BA0BFCE1CDB17FD243B8B1D247E88"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/rc6/encrypt-data-using-rc6.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4352,31 +4352,31 @@ rule capa_encrypt_data_using_twofish : CAPA DATA_MANIPULATION ENCRYPTION TWOFISH
 	mbc = "Cryptography::Encrypt Data::Twofish [C0027.005]"
 	hash = "0761142efbda6c4b1e801223de723578"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/twofish/encrypt-data-using-twofish.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$avg = { A9 67 B3 E8 04 FD A3 76 9A 92 80 78 E4 DD D1 38 0D C6 35 98 18 F7 EC 6C 43 75 37 26 FA 13 94 48 F2 D0 8B 30 84 54 DF 23 19 5B 3D 59 F3 AE A2 82 63 01 83 2E D9 51 9B 7C A6 EB A5 BE 16 0C E3 61 C0 8C 3A F5 73 2C 25 0B BB 4E 89 6B 53 6A B4 F1 E1 E6 BD 45 E2 F4 B6 66 CC 95 03 56 D4 1C 1E D7 FB C3 8E B5 E9 CF BF BA EA 77 39 AF 33 C9 62 71 81 79 09 AD 24 CD F9 D8 E5 C5 B9 4D 44 08 86 E7 A1 1D AA ED 06 70 B2 D2 41 7B A0 11 31 C2 27 90 20 F6 60 FF 96 5C B1 AB 9E 9C 52 1B 5F 93 0A EF 91 85 49 EE 2D 4F 8F 3B 47 87 6D } // Q0
-	$avh = { 75 F3 C6 F4 DB 7B FB C8 4A D3 E6 6B 45 7D E8 4B D6 32 D8 FD 37 71 F1 E1 30 0F F8 1B 87 FA 06 3F 5E BA AE 5B 8A 00 BC 9D 6D C1 B1 0E 80 5D D2 D5 A0 84 07 14 B5 90 2C A3 B2 73 4C 54 92 74 36 51 38 B0 BD 5A FC 60 62 96 6C 42 F7 10 7C 28 27 8C 13 95 9C C7 24 46 3B 70 CA E3 85 CB 11 D0 93 B8 A6 83 20 FF 9F 77 C3 CC 03 6F 08 BF 40 E7 2B E2 79 0C AA 82 41 3A EA B9 E4 9A A4 97 7E DA 7A 17 66 94 A1 1D 3D F0 DE B3 0B 72 A7 1C EF D1 53 3E 8F 33 26 5F EC 76 2A 49 81 88 EE 21 C4 1A EB D9 C5 39 99 CD AD 31 8B 01 18 23 DD } // Q1
-	$avi = { 75 32 BC BC F3 21 EC EC C6 43 20 20 F4 C9 B3 B3 DB 03 DA DA 7B 8B 02 02 FB 2B E2 E2 C8 FA 9E 9E 4A EC C9 C9 D3 09 D4 D4 E6 6B 18 18 6B 9F 1E 1E 45 0E 98 98 7D 38 B2 B2 E8 D2 A6 A6 4B B7 26 26 D6 57 3C 3C 32 8A 93 93 D8 EE 82 82 FD 98 52 52 37 D4 7B 7B 71 37 BB BB F1 97 5B 5B E1 83 47 47 30 3C 24 24 0F E2 51 51 F8 C6 BA BA 1B F3 4A 4A 87 48 BF BF FA 70 0D 0D 06 B3 B0 B0 3F DE 75 75 5E FD D2 D2 BA 20 7D 7D AE 31 66 66 5B A3 3A 3A 8A 1C 59 59 00 00 00 00 BC 93 CD CD 9D E0 1A 1A 6D 2C AE AE C1 AB 7F 7F B1 C7 2B } // MDS1
-	$avj = { 39 39 D9 A9 17 17 90 67 9C 9C 71 B3 A6 A6 D2 E8 07 07 05 04 52 52 98 FD 80 80 65 A3 E4 E4 DF 76 45 45 08 9A 4B 4B 02 92 E0 E0 A0 80 5A 5A 66 78 AF AF DD E4 6A 6A B0 DD 63 63 BF D1 2A 2A 36 38 E6 E6 54 0D 20 20 43 C6 CC CC 62 35 F2 F2 BE 98 12 12 1E 18 EB EB 24 F7 A1 A1 D7 EC 41 41 77 6C 28 28 BD 43 BC BC 32 75 7B 7B D4 37 88 88 9B 26 0D 0D 70 FA 44 44 F9 13 FB FB B1 94 7E 7E 5A 48 03 03 7A F2 8C 8C E4 D0 B6 B6 47 8B 24 24 3C 30 E7 E7 A5 84 6B 6B 41 54 DD DD 06 DF 60 60 C5 23 FD FD 45 19 3A 3A A3 5B C2 C2 68 } // MDS2
-	$avk = { 32 BC 75 BC 21 EC F3 EC 43 20 C6 20 C9 B3 F4 B3 03 DA DB DA 8B 02 7B 02 2B E2 FB E2 FA 9E C8 9E EC C9 4A C9 09 D4 D3 D4 6B 18 E6 18 9F 1E 6B 1E 0E 98 45 98 38 B2 7D B2 D2 A6 E8 A6 B7 26 4B 26 57 3C D6 3C 8A 93 32 93 EE 82 D8 82 98 52 FD 52 D4 7B 37 7B 37 BB 71 BB 97 5B F1 5B 83 47 E1 47 3C 24 30 24 E2 51 0F 51 C6 BA F8 BA F3 4A 1B 4A 48 BF 87 BF 70 0D FA 0D B3 B0 06 B0 DE 75 3F 75 FD D2 5E D2 20 7D BA 7D 31 66 AE 66 A3 3A 5B 3A 1C 59 8A 59 00 00 00 00 93 CD BC CD E0 1A 9D 1A 2C AE 6D AE AB 7F C1 7F C7 2B B1 } // MDS3
-	$avl = { D9 A9 39 D9 90 67 17 90 71 B3 9C 71 D2 E8 A6 D2 05 04 07 05 98 FD 52 98 65 A3 80 65 DF 76 E4 DF 08 9A 45 08 02 92 4B 02 A0 80 E0 A0 66 78 5A 66 DD E4 AF DD B0 DD 6A B0 BF D1 63 BF 36 38 2A 36 54 0D E6 54 43 C6 20 43 62 35 CC 62 BE 98 F2 BE 1E 18 12 1E 24 F7 EB 24 D7 EC A1 D7 77 6C 41 77 BD 43 28 BD 32 75 BC 32 D4 37 7B D4 9B 26 88 9B 70 FA 0D 70 F9 13 44 F9 B1 94 FB B1 5A 48 7E 5A 7A F2 03 7A E4 D0 8C E4 47 8B B6 47 3C 30 24 3C A5 84 E7 A5 41 54 6B 41 06 DF DD 06 C5 23 60 C5 45 19 FD 45 A3 5B 3A A3 68 3D C2 } // MDS4
-	$avm = { 01 02 04 08 10 20 40 80 4D 9A 79 F2 A9 1F 3E 7C F8 BD 37 6E DC F5 A7 03 06 0C 18 30 60 C0 CD D7 E3 8B 5B B6 21 42 84 45 8A 59 B2 29 52 A4 05 0A 14 28 50 A0 0D 1A 34 68 D0 ED 97 63 C6 C1 CF D3 EB 9B 7B F6 A1 0F 1E 3C 78 F0 AD 17 2E 5C B8 3D 7A F4 A5 07 0E 1C 38 70 E0 8D 57 AE 11 22 44 88 5D BA 39 72 E4 85 47 8E 51 A2 09 12 24 48 90 6D DA F9 BF 33 66 CC D5 E7 83 4B 96 61 C2 C9 DF F3 AB 1B 36 6C D8 FD B7 23 46 8C 55 AA 19 32 64 C8 DD F7 A3 0B 16 2C 58 B0 2D 5A B4 25 4A 94 65 CA D9 FF B3 2B 56 AC 15 2A 54 A8 1D } // EXP_TO_POLY
-	$avn = { A9 75 67 F3 B3 C6 E8 F4 04 DB FD 7B A3 FB 76 C8 9A 4A 92 D3 80 E6 78 6B E4 45 DD 7D D1 E8 38 4B 0D D6 C6 32 35 D8 98 FD 18 37 F7 71 EC F1 6C E1 43 30 75 0F 37 F8 26 1B FA 87 13 FA 94 06 48 3F F2 5E D0 BA 8B AE 30 5B 84 8A 54 00 DF BC 23 9D 19 6D 5B C1 3D B1 59 0E F3 80 AE 5D A2 D2 82 D5 63 A0 01 84 83 07 2E 14 D9 B5 51 90 9B 2C 7C A3 A6 B2 EB 73 A5 4C BE 54 16 92 0C 74 E3 36 61 51 C0 38 8C B0 3A BD F5 5A 73 FC 2C 60 25 62 0B 96 BB 6C 4E 42 89 F7 6B 10 53 7C 6A 28 B4 27 F1 8C E1 13 E6 95 BD 9C 45 C7 E2 24 F4 } // CALC_SB_TBL
+ 	$basic_avg = { A9 67 B3 E8 04 FD A3 76 9A 92 80 78 E4 DD D1 38 0D C6 35 98 18 F7 EC 6C 43 75 37 26 FA 13 94 48 F2 D0 8B 30 84 54 DF 23 19 5B 3D 59 F3 AE A2 82 63 01 83 2E D9 51 9B 7C A6 EB A5 BE 16 0C E3 61 C0 8C 3A F5 73 2C 25 0B BB 4E 89 6B 53 6A B4 F1 E1 E6 BD 45 E2 F4 B6 66 CC 95 03 56 D4 1C 1E D7 FB C3 8E B5 E9 CF BF BA EA 77 39 AF 33 C9 62 71 81 79 09 AD 24 CD F9 D8 E5 C5 B9 4D 44 08 86 E7 A1 1D AA ED 06 70 B2 D2 41 7B A0 11 31 C2 27 90 20 F6 60 FF 96 5C B1 AB 9E 9C 52 1B 5F 93 0A EF 91 85 49 EE 2D 4F 8F 3B 47 87 6D } // Q0
+	$basic_avh = { 75 F3 C6 F4 DB 7B FB C8 4A D3 E6 6B 45 7D E8 4B D6 32 D8 FD 37 71 F1 E1 30 0F F8 1B 87 FA 06 3F 5E BA AE 5B 8A 00 BC 9D 6D C1 B1 0E 80 5D D2 D5 A0 84 07 14 B5 90 2C A3 B2 73 4C 54 92 74 36 51 38 B0 BD 5A FC 60 62 96 6C 42 F7 10 7C 28 27 8C 13 95 9C C7 24 46 3B 70 CA E3 85 CB 11 D0 93 B8 A6 83 20 FF 9F 77 C3 CC 03 6F 08 BF 40 E7 2B E2 79 0C AA 82 41 3A EA B9 E4 9A A4 97 7E DA 7A 17 66 94 A1 1D 3D F0 DE B3 0B 72 A7 1C EF D1 53 3E 8F 33 26 5F EC 76 2A 49 81 88 EE 21 C4 1A EB D9 C5 39 99 CD AD 31 8B 01 18 23 DD } // Q1
+	$basic_avi = { 75 32 BC BC F3 21 EC EC C6 43 20 20 F4 C9 B3 B3 DB 03 DA DA 7B 8B 02 02 FB 2B E2 E2 C8 FA 9E 9E 4A EC C9 C9 D3 09 D4 D4 E6 6B 18 18 6B 9F 1E 1E 45 0E 98 98 7D 38 B2 B2 E8 D2 A6 A6 4B B7 26 26 D6 57 3C 3C 32 8A 93 93 D8 EE 82 82 FD 98 52 52 37 D4 7B 7B 71 37 BB BB F1 97 5B 5B E1 83 47 47 30 3C 24 24 0F E2 51 51 F8 C6 BA BA 1B F3 4A 4A 87 48 BF BF FA 70 0D 0D 06 B3 B0 B0 3F DE 75 75 5E FD D2 D2 BA 20 7D 7D AE 31 66 66 5B A3 3A 3A 8A 1C 59 59 00 00 00 00 BC 93 CD CD 9D E0 1A 1A 6D 2C AE AE C1 AB 7F 7F B1 C7 2B } // MDS1
+	$basic_avj = { 39 39 D9 A9 17 17 90 67 9C 9C 71 B3 A6 A6 D2 E8 07 07 05 04 52 52 98 FD 80 80 65 A3 E4 E4 DF 76 45 45 08 9A 4B 4B 02 92 E0 E0 A0 80 5A 5A 66 78 AF AF DD E4 6A 6A B0 DD 63 63 BF D1 2A 2A 36 38 E6 E6 54 0D 20 20 43 C6 CC CC 62 35 F2 F2 BE 98 12 12 1E 18 EB EB 24 F7 A1 A1 D7 EC 41 41 77 6C 28 28 BD 43 BC BC 32 75 7B 7B D4 37 88 88 9B 26 0D 0D 70 FA 44 44 F9 13 FB FB B1 94 7E 7E 5A 48 03 03 7A F2 8C 8C E4 D0 B6 B6 47 8B 24 24 3C 30 E7 E7 A5 84 6B 6B 41 54 DD DD 06 DF 60 60 C5 23 FD FD 45 19 3A 3A A3 5B C2 C2 68 } // MDS2
+	$basic_avk = { 32 BC 75 BC 21 EC F3 EC 43 20 C6 20 C9 B3 F4 B3 03 DA DB DA 8B 02 7B 02 2B E2 FB E2 FA 9E C8 9E EC C9 4A C9 09 D4 D3 D4 6B 18 E6 18 9F 1E 6B 1E 0E 98 45 98 38 B2 7D B2 D2 A6 E8 A6 B7 26 4B 26 57 3C D6 3C 8A 93 32 93 EE 82 D8 82 98 52 FD 52 D4 7B 37 7B 37 BB 71 BB 97 5B F1 5B 83 47 E1 47 3C 24 30 24 E2 51 0F 51 C6 BA F8 BA F3 4A 1B 4A 48 BF 87 BF 70 0D FA 0D B3 B0 06 B0 DE 75 3F 75 FD D2 5E D2 20 7D BA 7D 31 66 AE 66 A3 3A 5B 3A 1C 59 8A 59 00 00 00 00 93 CD BC CD E0 1A 9D 1A 2C AE 6D AE AB 7F C1 7F C7 2B B1 } // MDS3
+	$basic_avl = { D9 A9 39 D9 90 67 17 90 71 B3 9C 71 D2 E8 A6 D2 05 04 07 05 98 FD 52 98 65 A3 80 65 DF 76 E4 DF 08 9A 45 08 02 92 4B 02 A0 80 E0 A0 66 78 5A 66 DD E4 AF DD B0 DD 6A B0 BF D1 63 BF 36 38 2A 36 54 0D E6 54 43 C6 20 43 62 35 CC 62 BE 98 F2 BE 1E 18 12 1E 24 F7 EB 24 D7 EC A1 D7 77 6C 41 77 BD 43 28 BD 32 75 BC 32 D4 37 7B D4 9B 26 88 9B 70 FA 0D 70 F9 13 44 F9 B1 94 FB B1 5A 48 7E 5A 7A F2 03 7A E4 D0 8C E4 47 8B B6 47 3C 30 24 3C A5 84 E7 A5 41 54 6B 41 06 DF DD 06 C5 23 60 C5 45 19 FD 45 A3 5B 3A A3 68 3D C2 } // MDS4
+	$basic_avm = { 01 02 04 08 10 20 40 80 4D 9A 79 F2 A9 1F 3E 7C F8 BD 37 6E DC F5 A7 03 06 0C 18 30 60 C0 CD D7 E3 8B 5B B6 21 42 84 45 8A 59 B2 29 52 A4 05 0A 14 28 50 A0 0D 1A 34 68 D0 ED 97 63 C6 C1 CF D3 EB 9B 7B F6 A1 0F 1E 3C 78 F0 AD 17 2E 5C B8 3D 7A F4 A5 07 0E 1C 38 70 E0 8D 57 AE 11 22 44 88 5D BA 39 72 E4 85 47 8E 51 A2 09 12 24 48 90 6D DA F9 BF 33 66 CC D5 E7 83 4B 96 61 C2 C9 DF F3 AB 1B 36 6C D8 FD B7 23 46 8C 55 AA 19 32 64 C8 DD F7 A3 0B 16 2C 58 B0 2D 5A B4 25 4A 94 65 CA D9 FF B3 2B 56 AC 15 2A 54 A8 1D } // EXP_TO_POLY
+	$basic_avn = { A9 75 67 F3 B3 C6 E8 F4 04 DB FD 7B A3 FB 76 C8 9A 4A 92 D3 80 E6 78 6B E4 45 DD 7D D1 E8 38 4B 0D D6 C6 32 35 D8 98 FD 18 37 F7 71 EC F1 6C E1 43 30 75 0F 37 F8 26 1B FA 87 13 FA 94 06 48 3F F2 5E D0 BA 8B AE 30 5B 84 8A 54 00 DF BC 23 9D 19 6D 5B C1 3D B1 59 0E F3 80 AE 5D A2 D2 82 D5 63 A0 01 84 83 07 2E 14 D9 B5 51 90 9B 2C 7C A3 A6 B2 EB 73 A5 4C BE 54 16 92 0C 74 E3 36 61 51 C0 38 8C B0 3A BD F5 5A 73 FC 2C 60 25 62 0B 96 BB 6C 4E 42 89 F7 6B 10 53 7C 6A 28 B4 27 F1 8C E1 13 E6 95 BD 9C 45 C7 E2 24 F4 } // CALC_SB_TBL
  
   condition:
     capa_pe_file and
  (
-			$avg 
-		or 	$avh 
-		or 	$avi 
-		or 	$avj 
-		or 	$avk 
-		or 	$avl 
-		or 	$avm 
-		or 	$avn  
+			$basic_avg 
+		or 	$basic_avh 
+		or 	$basic_avi 
+		or 	$basic_avj 
+		or 	$basic_avk 
+		or 	$basic_avl 
+		or 	$basic_avm 
+		or 	$basic_avn  
 	) 
 }
 
@@ -4391,21 +4391,21 @@ rule capa_encrypt_data_using_AES_via__NET : CAPA DATA_MANIPULATION ENCRYPTION AE
 	mbc = "Cryptography::Encrypt Data::AES [C0027.001]"
 	hash = "b9f5bd514485fb06da39beff051b9fdc"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/aes/encrypt-data-using-aes-via-net.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_awg = "RijndaelManaged" ascii wide
-	$str_awh = "CryptoStream" ascii wide
-	$str_awi = "System.Security.Cryptography" ascii wide
+ 	$file_str_awg = "RijndaelManaged" ascii wide
+	$file_str_awh = "CryptoStream" ascii wide
+	$file_str_awi = "System.Security.Cryptography" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_awg 
-		and 	$str_awh 
-		and 	$str_awi  
+			$file_str_awg 
+		and 	$file_str_awh 
+		and 	$file_str_awi  
 	) 
 }
 
@@ -4420,17 +4420,17 @@ rule capa_encrypt_data_using_skipjack : CAPA DATA_MANIPULATION ENCRYPTION SKIPJA
 	mbc = "Cryptography::Encrypt Data::Skipjack [C0027.013]"
 	hash = "94d3c854aadbcfde46b2f82801015c31"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/skipjack/encrypt-data-using-skipjack.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$awj = { A3 D7 09 83 F8 48 F6 F4 B3 21 15 78 99 B1 AF F9 E7 2D 4D 8A CE 4C CA 2E 52 95 D9 1E 4E 38 44 28 0A DF 02 A0 17 F1 60 68 12 B7 7A C3 E9 FA 3D 53 96 84 6B BA F2 63 9A 19 7C AE E5 F5 F7 16 6A A2 39 B6 7B 0F C1 93 81 1B EE B4 1A EA D0 91 2F B8 55 B9 DA 85 3F 41 BF E0 5A 58 80 5F 66 0B D8 90 35 D5 C0 A7 33 06 65 69 45 00 94 56 6D 98 9B 76 97 FC B2 C2 B0 FE DB 20 E1 EB D6 E4 DD 47 4A 1D 42 ED 9E 6E 49 3C CD 43 27 D2 07 D4 DE C7 67 18 89 CB 30 1F 8D C6 8F AA C8 74 DC C9 5D 5C 31 A4 70 88 61 2C 9F 0D 2B 87 50 82 54 64 26 7D 03 40 34 4B 1C 73 D1 C4 FD 3B CC FB 7F AB E6 3E 5B A5 AD 04 23 9C 14 51 22 F0 29 79 71 7E FF 8C 0E E2 0C EF BC 72 75 6F 37 A1 EC D3 8E 62 8B 86 10 E8 08 77 11 BE 92 4F 24 C5 32 36 9D CF F3 A6 BB AC 5E 6C A9 13 57 25 B5 E3 BD A8 3A 01 05 59 2A 46 } // FTable
+ 	$basic_awj = { A3 D7 09 83 F8 48 F6 F4 B3 21 15 78 99 B1 AF F9 E7 2D 4D 8A CE 4C CA 2E 52 95 D9 1E 4E 38 44 28 0A DF 02 A0 17 F1 60 68 12 B7 7A C3 E9 FA 3D 53 96 84 6B BA F2 63 9A 19 7C AE E5 F5 F7 16 6A A2 39 B6 7B 0F C1 93 81 1B EE B4 1A EA D0 91 2F B8 55 B9 DA 85 3F 41 BF E0 5A 58 80 5F 66 0B D8 90 35 D5 C0 A7 33 06 65 69 45 00 94 56 6D 98 9B 76 97 FC B2 C2 B0 FE DB 20 E1 EB D6 E4 DD 47 4A 1D 42 ED 9E 6E 49 3C CD 43 27 D2 07 D4 DE C7 67 18 89 CB 30 1F 8D C6 8F AA C8 74 DC C9 5D 5C 31 A4 70 88 61 2C 9F 0D 2B 87 50 82 54 64 26 7D 03 40 34 4B 1C 73 D1 C4 FD 3B CC FB 7F AB E6 3E 5B A5 AD 04 23 9C 14 51 22 F0 29 79 71 7E FF 8C 0E E2 0C EF BC 72 75 6F 37 A1 EC D3 8E 62 8B 86 10 E8 08 77 11 BE 92 4F 24 C5 32 36 9D CF F3 A6 BB AC 5E 6C A9 13 57 25 B5 E3 BD A8 3A 01 05 59 2A 46 } // FTable
  
   condition:
     capa_pe_file and
  (
-			$awj  
+			$basic_awj  
 	) 
 }
 
@@ -4443,17 +4443,17 @@ rule capa_reference_public_RSA_key : CAPA DATA_MANIPULATION ENCRYPTION RSA FUNCT
 	mbc = "Cryptography::Encryption Key [C0028]"
 	hash = "b7b5e1253710d8927cbe07d52d2d2e10"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/rsa/reference-public-rsa-key.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$awk = { 06 02 00 00 00 A4 00 00 52 53 41 31 }
+ 	$func_awk = { 06 02 00 00 00 A4 00 00 52 53 41 31 }
  
   condition:
     capa_pe_file and
  (
-			$awk  
+			$func_awk  
 	) 
 }
 
@@ -4468,21 +4468,21 @@ rule capa_encrypt_data_using_vest : CAPA DATA_MANIPULATION ENCRYPTION VEST BASIC
 	mbc = "Cryptography::Encrypt Data [C0027]"
 	hash = "9a00ebe67d833edb70ed6dd0f4652592"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/vest/encrypt-data-using-vest.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$awl = { 07 56 D2 37 3A F7 0A 52 5D C6 2C 87 DA 05 C1 D7 F4 1F 8C 34 } // vest_sbox
-	$awm = { 41 4B 1B DD 0D 65 72 EE 09 E7 A1 93 3F 0E 55 9C 63 89 3F B2 AB 5A 0E CB 2F 13 E3 9A C7 09 C5 8D C9 09 0D D7 59 1F A2 D6 CB B0 61 E5 39 44 F8 C5 8B C6 E5 B2 BD E3 82 D2 AB 04 DD D6 1F 94 CA EC 73 43 E7 94 5D 52 66 86 4F 4B 05 D4 AD 0F 66 A3 F9 15 9C C6 C9 3E 3A B8 9D 31 65 F8 C7 9A CE E0 6D BD 18 8D 63 F5 0A CD 11 B4 B5 EE 9B 28 9C A5 93 78 5B D1 D3 B1 2B 84 17 AB F4 85 EF 22 E1 D1 } // rns_f
-	$awn = { 4F 70 46 DA E1 8D F6 41 59 E8 5D 26 1E CC 2F 89 26 6D 52 BA BC 11 6B A9 C6 47 E4 9C 1E B6 65 A2 B6 CD 90 47 1C DF F8 10 4B D2 7C C4 72 25 C6 97 25 5D C6 1D 4B 36 BC 38 36 33 F8 89 B4 4C 65 A7 96 CA 1B 63 C3 4B 6A 63 DC 85 4C 57 EE 2A 05 C7 0C E7 39 35 8A C1 BF 13 D9 52 51 3D 2E 41 F5 72 85 23 FE A1 AA 53 61 3B 25 5F 62 B4 36 EE 2A 51 AF 18 8E 9A C6 CF C4 07 4A 9B 25 9B 76 62 0E 3E 96 3A A7 64 23 6B B6 19 BC 2D 40 D7 36 3E E2 85 9A D1 22 9F BC 30 15 9F C2 5D F1 23 E6 3A 73 C0 A6 AD 71 B0 94 1C 9D B6 56 B6 2B } // vest_f
+ 	$basic_awl = { 07 56 D2 37 3A F7 0A 52 5D C6 2C 87 DA 05 C1 D7 F4 1F 8C 34 } // vest_sbox
+	$basic_awm = { 41 4B 1B DD 0D 65 72 EE 09 E7 A1 93 3F 0E 55 9C 63 89 3F B2 AB 5A 0E CB 2F 13 E3 9A C7 09 C5 8D C9 09 0D D7 59 1F A2 D6 CB B0 61 E5 39 44 F8 C5 8B C6 E5 B2 BD E3 82 D2 AB 04 DD D6 1F 94 CA EC 73 43 E7 94 5D 52 66 86 4F 4B 05 D4 AD 0F 66 A3 F9 15 9C C6 C9 3E 3A B8 9D 31 65 F8 C7 9A CE E0 6D BD 18 8D 63 F5 0A CD 11 B4 B5 EE 9B 28 9C A5 93 78 5B D1 D3 B1 2B 84 17 AB F4 85 EF 22 E1 D1 } // rns_f
+	$basic_awn = { 4F 70 46 DA E1 8D F6 41 59 E8 5D 26 1E CC 2F 89 26 6D 52 BA BC 11 6B A9 C6 47 E4 9C 1E B6 65 A2 B6 CD 90 47 1C DF F8 10 4B D2 7C C4 72 25 C6 97 25 5D C6 1D 4B 36 BC 38 36 33 F8 89 B4 4C 65 A7 96 CA 1B 63 C3 4B 6A 63 DC 85 4C 57 EE 2A 05 C7 0C E7 39 35 8A C1 BF 13 D9 52 51 3D 2E 41 F5 72 85 23 FE A1 AA 53 61 3B 25 5F 62 B4 36 EE 2A 51 AF 18 8E 9A C6 CF C4 07 4A 9B 25 9B 76 62 0E 3E 96 3A A7 64 23 6B B6 19 BC 2D 40 D7 36 3E E2 85 9A D1 22 9F BC 30 15 9F C2 5D F1 23 E6 3A 73 C0 A6 AD 71 B0 94 1C 9D B6 56 B6 2B } // vest_f
  
   condition:
     capa_pe_file and
  (
-			$awl 
-		or 	$awm 
-		or 	$awn  
+			$basic_awl 
+		or 	$basic_awm 
+		or 	$basic_awn  
 	) 
 }
 
@@ -4497,7 +4497,7 @@ rule capa_encrypt_data_using_blowfish : CAPA DATA_MANIPULATION ENCRYPTION BLOWFI
 	mbc = "Cryptography::Encrypt Data::Blowfish [C0027.002]"
 	hash = "0761142efbda6c4b1e801223de723578"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/blowfish/encrypt-data-using-blowfish.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4506,11 +4506,11 @@ rule capa_encrypt_data_using_blowfish : CAPA DATA_MANIPULATION ENCRYPTION BLOWFI
 	$num_awq = { 68 5A 3D E9 } // u32 ks2 sbox3
 	$num_awr = { E9 70 7A 4B } // u32 ks1 sbox2
 	$num_aws = { A6 0B 31 D1 } // u32 ks0 sbox1
-	$awt = { 88 6A 3F 24 D3 08 A3 85 2E 8A 19 13 44 73 70 03 22 38 09 A4 D0 31 9F 29 98 FA 2E 08 89 6C 4E EC E6 21 28 45 77 13 D0 38 CF 66 54 BE 6C 0C E9 34 B7 29 AC C0 DD 50 7C C9 B5 D5 84 3F 17 09 47 B5 D9 D5 16 92 1B FB 79 89 } // ps
-	$awu = { A6 0B 31 D1 AC B5 DF 98 DB 72 FD 2F B7 DF 1A D0 ED AF E1 B8 96 7E 26 6A 45 90 7C BA 99 7F 2C F1 47 99 A1 24 F7 6C 91 B3 E2 F2 01 08 16 FC 8E 85 D8 20 69 63 69 4E 57 71 A3 FE 58 A4 7E 3D 93 F4 8F 74 95 0D 58 B6 8E 72 58 CD 8B 71 EE 4A 15 82 1D A4 54 7B B5 59 5A C2 39 D5 30 9C 13 60 F2 2A 23 B0 D1 C5 F0 85 60 28 18 79 41 CA EF 38 DB B8 B0 DC 79 8E 0E 18 3A 60 8B 0E 9E 6C 3E 8A 1E B0 C1 77 15 D7 27 4B 31 BD DA 2F AF 78 60 5C 60 55 F3 25 55 E6 94 AB 55 AA 62 98 48 57 40 14 E8 63 6A 39 CA 55 B6 10 AB 2A 34 5C CC } // ks0 sbox1
-	$awv = { E9 70 7A 4B 44 29 B3 B5 2E 09 75 DB 23 26 19 C4 B0 A6 6E AD 7D DF A7 49 B8 60 EE 9C 66 B2 ED 8F 71 8C AA EC FF 17 9A 69 6C 52 64 56 E1 9E B1 C2 A5 02 36 19 29 4C 09 75 40 13 59 A0 3E 3A 18 E4 9A 98 54 3F 65 9D 42 5B D6 E4 8F 6B D6 3F F7 99 07 9C D2 A1 F5 30 E8 EF E6 38 2D 4D C1 5D 25 F0 86 20 DD 4C 26 EB 70 84 C6 E9 82 63 5E CC 1E 02 3F 6B 68 09 C9 EF BA 3E 14 18 97 3C A1 70 6A 6B 84 35 7F 68 86 E2 A0 52 05 53 9C B7 37 07 50 AA 1C 84 07 3E 5C AE DE 7F EC 44 7D 8E B8 F2 16 57 37 DA 3A B0 0D 0C 50 F0 04 1F 1C } // ks1 sbox2
-	$aww = { 68 5A 3D E9 F7 40 81 94 1C 26 4C F6 34 29 69 94 F7 20 15 41 F7 D4 02 76 2E 6B F4 BC 68 00 A2 D4 71 24 08 D4 6A F4 20 33 B7 D4 B7 43 AF 61 00 50 2E F6 39 1E 46 45 24 97 74 4F 21 14 40 88 8B BF 1D FC 95 4D AF 91 B5 96 D3 DD F4 70 45 2F A0 66 EC 09 BC BF 85 97 BD 03 D0 6D AC 7F 04 85 CB 31 B3 27 EB 96 41 39 FD 55 E6 47 25 DA 9A 0A CA AB 25 78 50 28 F4 29 04 53 DA 86 2C 0A FB 6D B6 E9 62 14 DC 68 00 69 48 D7 A4 C0 0E 68 EE 8D A1 27 A2 FE 3F 4F 8C AD 87 E8 06 E0 8C B5 B6 D6 F4 7A 7C 1E CE AA EC 5F 37 D3 99 A3 78 } // ks2 sbox3
-	$awx = { 37 CE 39 3A CF F5 FA D3 37 77 C2 AB 1B 2D C5 5A 9E 67 B0 5C 42 37 A3 4F 40 27 82 D3 BE 9B BC 99 9D 8E 11 D5 15 73 0F BF 7E 1C 2D D6 7B C4 00 C7 6B 1B 8C B7 45 90 A1 21 BE B1 6E B2 B4 6E 36 6A 2F AB 48 57 79 6E 94 BC D2 76 A3 C6 C8 C2 49 65 EE F8 0F 53 7D DE 8D 46 1D 0A 73 D5 C6 4D D0 4C DB BB 39 29 50 46 BA A9 E8 26 95 AC 04 E3 5E BE F0 D5 FA A1 9A 51 2D 6A E2 8C EF 63 22 EE 86 9A B8 C2 89 C0 F6 2E 24 43 AA 03 1E A5 A4 D0 F2 9C BA 61 C0 83 4D 6A E9 9B 50 15 E5 8F D6 5B 64 BA F9 A2 26 28 E1 3A 3A A7 86 95 A9 } // ks3 sbox4
+	$basic_awt = { 88 6A 3F 24 D3 08 A3 85 2E 8A 19 13 44 73 70 03 22 38 09 A4 D0 31 9F 29 98 FA 2E 08 89 6C 4E EC E6 21 28 45 77 13 D0 38 CF 66 54 BE 6C 0C E9 34 B7 29 AC C0 DD 50 7C C9 B5 D5 84 3F 17 09 47 B5 D9 D5 16 92 1B FB 79 89 } // ps
+	$basic_awu = { A6 0B 31 D1 AC B5 DF 98 DB 72 FD 2F B7 DF 1A D0 ED AF E1 B8 96 7E 26 6A 45 90 7C BA 99 7F 2C F1 47 99 A1 24 F7 6C 91 B3 E2 F2 01 08 16 FC 8E 85 D8 20 69 63 69 4E 57 71 A3 FE 58 A4 7E 3D 93 F4 8F 74 95 0D 58 B6 8E 72 58 CD 8B 71 EE 4A 15 82 1D A4 54 7B B5 59 5A C2 39 D5 30 9C 13 60 F2 2A 23 B0 D1 C5 F0 85 60 28 18 79 41 CA EF 38 DB B8 B0 DC 79 8E 0E 18 3A 60 8B 0E 9E 6C 3E 8A 1E B0 C1 77 15 D7 27 4B 31 BD DA 2F AF 78 60 5C 60 55 F3 25 55 E6 94 AB 55 AA 62 98 48 57 40 14 E8 63 6A 39 CA 55 B6 10 AB 2A 34 5C CC } // ks0 sbox1
+	$basic_awv = { E9 70 7A 4B 44 29 B3 B5 2E 09 75 DB 23 26 19 C4 B0 A6 6E AD 7D DF A7 49 B8 60 EE 9C 66 B2 ED 8F 71 8C AA EC FF 17 9A 69 6C 52 64 56 E1 9E B1 C2 A5 02 36 19 29 4C 09 75 40 13 59 A0 3E 3A 18 E4 9A 98 54 3F 65 9D 42 5B D6 E4 8F 6B D6 3F F7 99 07 9C D2 A1 F5 30 E8 EF E6 38 2D 4D C1 5D 25 F0 86 20 DD 4C 26 EB 70 84 C6 E9 82 63 5E CC 1E 02 3F 6B 68 09 C9 EF BA 3E 14 18 97 3C A1 70 6A 6B 84 35 7F 68 86 E2 A0 52 05 53 9C B7 37 07 50 AA 1C 84 07 3E 5C AE DE 7F EC 44 7D 8E B8 F2 16 57 37 DA 3A B0 0D 0C 50 F0 04 1F 1C } // ks1 sbox2
+	$basic_aww = { 68 5A 3D E9 F7 40 81 94 1C 26 4C F6 34 29 69 94 F7 20 15 41 F7 D4 02 76 2E 6B F4 BC 68 00 A2 D4 71 24 08 D4 6A F4 20 33 B7 D4 B7 43 AF 61 00 50 2E F6 39 1E 46 45 24 97 74 4F 21 14 40 88 8B BF 1D FC 95 4D AF 91 B5 96 D3 DD F4 70 45 2F A0 66 EC 09 BC BF 85 97 BD 03 D0 6D AC 7F 04 85 CB 31 B3 27 EB 96 41 39 FD 55 E6 47 25 DA 9A 0A CA AB 25 78 50 28 F4 29 04 53 DA 86 2C 0A FB 6D B6 E9 62 14 DC 68 00 69 48 D7 A4 C0 0E 68 EE 8D A1 27 A2 FE 3F 4F 8C AD 87 E8 06 E0 8C B5 B6 D6 F4 7A 7C 1E CE AA EC 5F 37 D3 99 A3 78 } // ks2 sbox3
+	$basic_awx = { 37 CE 39 3A CF F5 FA D3 37 77 C2 AB 1B 2D C5 5A 9E 67 B0 5C 42 37 A3 4F 40 27 82 D3 BE 9B BC 99 9D 8E 11 D5 15 73 0F BF 7E 1C 2D D6 7B C4 00 C7 6B 1B 8C B7 45 90 A1 21 BE B1 6E B2 B4 6E 36 6A 2F AB 48 57 79 6E 94 BC D2 76 A3 C6 C8 C2 49 65 EE F8 0F 53 7D DE 8D 46 1D 0A 73 D5 C6 4D D0 4C DB BB 39 29 50 46 BA A9 E8 26 95 AC 04 E3 5E BE F0 D5 FA A1 9A 51 2D 6A E2 8C EF 63 22 EE 86 9A B8 C2 89 C0 F6 2E 24 43 AA 03 1E A5 A4 D0 F2 9C BA 61 C0 83 4D 6A E9 9B 50 15 E5 8F D6 5B 64 BA F9 A2 26 28 E1 3A 3A A7 86 95 A9 } // ks3 sbox4
  
   condition:
     capa_pe_file and
@@ -4522,11 +4522,11 @@ rule capa_encrypt_data_using_blowfish : CAPA DATA_MANIPULATION ENCRYPTION BLOWFI
 		and $num_aws  
 	) 
 		or  (
-			$awt 
-		or 	$awu 
-		or 	$awv 
-		or 	$aww 
-		or 	$awx  
+			$basic_awt 
+		or 	$basic_awu 
+		or 	$basic_awv 
+		or 	$basic_aww 
+		or 	$basic_awx  
 	)  
 	) 
 }
@@ -4542,7 +4542,7 @@ rule capa_generate_random_numbers_via_WinAPI : CAPA DATA_MANIPULATION PRNG FUNCT
 	hash = "e59ffeaf7acb0c326e452fa30bb71a36"
 	hash = "1195d0d18be9362fb8dd9e1738404c9d"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/prng/generate-random-numbers-via-winapi.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4569,7 +4569,7 @@ rule capa_generate_random_numbers_using_a_Mersenne_Twister : CAPA DATA_MANIPULAT
 	mbc = "Cryptography::Generate Pseudo-random Sequence::Mersenne Twister [C0021.005]"
 	hash = "D9630C174B8FF5C0AA26168DF523E63E"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/prng/mersenne/generate-random-numbers-using-a-mersenne-twister.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4605,35 +4605,35 @@ rule capa_compress_data_via_WinAPI : CAPA DATA_MANIPULATION COMPRESSION FUNCTION
 	mbc = "Data::Compress Data [C0024]"
 	hash = "638dcc3d37b3a574044233c9637d7288"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/compression/compress-data-via-winapi.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
  	$api_axj = /\bRtlDecompressBuffer(A|W)?\b/ ascii wide
-	$str_axk = "RtlDecompressBuffer" ascii wide
+	$func_str_axk = "RtlDecompressBuffer" ascii wide
 	$api_axl = /\bRtlDecompressBufferEx(A|W)?\b/ ascii wide
-	$str_axm = "RtlDecompressBufferEx" ascii wide
+	$func_str_axm = "RtlDecompressBufferEx" ascii wide
 	$api_axn = /\bRtlDecompressBufferEx2(A|W)?\b/ ascii wide
-	$str_axo = "RtlDecompressBufferEx2" ascii wide
+	$func_str_axo = "RtlDecompressBufferEx2" ascii wide
 	$api_axp = /\bRtlCompressBuffer(A|W)?\b/ ascii wide
-	$str_axq = "RtlCompressBuffer" ascii wide
+	$func_str_axq = "RtlCompressBuffer" ascii wide
 	$api_axr = /\bRtlCompressBufferLZNT1(A|W)?\b/ ascii wide
-	$str_axs = "RtlCompressBufferLZNT1" ascii wide
+	$func_str_axs = "RtlCompressBufferLZNT1" ascii wide
  
   condition:
     capa_pe_file and
  (
 			$api_axj 
-		or 	$str_axk 
+		or 	$func_str_axk 
 		or 	$api_axl 
-		or 	$str_axm 
+		or 	$func_str_axm 
 		or 	$api_axn 
-		or 	$str_axo 
+		or 	$func_str_axo 
 		or 	$api_axp 
-		or 	$str_axq 
+		or 	$func_str_axq 
 		or 	$api_axr 
-		or 	$str_axs  
+		or 	$func_str_axs  
 	) 
 }
 
@@ -4646,7 +4646,7 @@ rule capa_hash_data_via_WinCrypt : CAPA DATA_MANIPULATION HASHING FUNCTION C0029
 	mbc = "Cryptography::Cryptographic Hash [C0029]"
 	hash = "03B236B23B1EC37C663527C1F53AF3FE"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/hashing/hash-data-via-wincrypt.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4667,7 +4667,7 @@ rule capa_hash_data_using_SHA256 : CAPA DATA_MANIPULATION HASHING SHA256 FUNCTIO
 	hash = "C0CFFCF211035A839E28D542DE300298"
 	hash = "6CC148363200798A12091B97A17181A1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/hashing/sha256/hash-data-using-sha256.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4704,7 +4704,7 @@ rule capa_hash_data_using_SHA224 : CAPA DATA_MANIPULATION HASHING SHA224 FUNCTIO
 	mbc = "Cryptography::Cryptographic Hash::SHA224 [C0029.004]"
 	hash = "6CC148363200798A12091B97A17181A1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/hashing/sha224/hash-data-using-sha224.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4741,14 +4741,14 @@ rule capa_schedule_task_via_command_line : CAPA PERSISTENCE SCHEDULED_TASKS FUNC
 	attack = "Persistence::Scheduled Task/Job::Scheduled Task [T1053.005]"
 	hash = "79cde1aa711e321b4939805d27e160be"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/persistence/scheduled-tasks/schedule-task-via-command-line.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_azh = /schtasks/ nocase ascii wide 
-	$re_azi = /\/create / nocase ascii wide 
-	$re_azj = /Register-ScheduledTask / nocase ascii wide 
+ 	$func_re_azh = /schtasks/ nocase ascii wide 
+	$func_re_azi = /\/create / nocase ascii wide 
+	$func_re_azj = /Register-ScheduledTask / nocase ascii wide 
  
   condition:
     capa_pe_file and
@@ -4757,10 +4757,10 @@ rule capa_schedule_task_via_command_line : CAPA PERSISTENCE SCHEDULED_TASKS FUNC
 
 		and  (
 		 (
-			$re_azh 
-		and 	$re_azi  
+			$func_re_azh 
+		and 	$func_re_azi  
 	) 
-		or 	$re_azj  
+		or 	$func_re_azj  
 	)  
 	) 
 }
@@ -4774,14 +4774,14 @@ rule capa_persist_via_Active_Setup_registry_key : CAPA PERSISTENCE REGISTRY FUNC
 	attack = "Persistence::Boot or Logon Autostart Execution::Active Setup [T1547.014]"
 	hash = "c335a9d41185a32ad918c5389ee54235"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/persistence/registry/persist-via-active-setup-registry-key.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
  	$num_azm = { 02 00 00 80 } // HKEY_LOCAL_MACHINE
-	$re_azn = /Software\\Microsoft\\Active Setup\\Installed Components/ nocase ascii wide 
-	$str_azo = "StubPath" ascii wide
+	$func_re_azn = /Software\\Microsoft\\Active Setup\\Installed Components/ nocase ascii wide 
+	$func_str_azo = "StubPath" ascii wide
  
   condition:
     capa_pe_file and
@@ -4791,8 +4791,8 @@ rule capa_persist_via_Active_Setup_registry_key : CAPA PERSISTENCE REGISTRY FUNC
 
 		or $num_azm  
 	) 
-		and 	$re_azn 
-		and 	$str_azo  
+		and 	$func_re_azn 
+		and 	$func_str_azo  
 	) 
 }
 
@@ -4805,14 +4805,14 @@ rule capa_persist_via_GinaDLL_registry_key : CAPA PERSISTENCE REGISTRY GINADLL F
 	attack = "Persistence::Event Triggered Execution [T1546]"
 	hash = "Practical Malware Analysis Lab 11-01.exe_:0x401000"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/persistence/registry/ginadll/persist-via-ginadll-registry-key.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
  	$num_azp = { 02 00 00 80 } // HKEY_LOCAL_MACHINE
-	$re_azq = /SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon/ nocase ascii wide 
-	$re_azr = /GinaDLL/ nocase ascii wide 
+	$func_re_azq = /SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon/ nocase ascii wide 
+	$func_re_azr = /GinaDLL/ nocase ascii wide 
  
   condition:
     capa_pe_file and
@@ -4822,8 +4822,8 @@ rule capa_persist_via_GinaDLL_registry_key : CAPA PERSISTENCE REGISTRY GINADLL F
 
 		or $num_azp  
 	) 
-		and 	$re_azq 
-		and 	$re_azr  
+		and 	$func_re_azq 
+		and 	$func_re_azr  
 	) 
 }
 
@@ -4836,15 +4836,15 @@ rule capa_persist_via_AppInit_DLLs_registry_key : CAPA PERSISTENCE REGISTRY APPI
 	attack = "Persistence::Event Triggered Execution::AppInit DLLs [T1546.010]"
 	hash = "Practical Malware Analysis Lab 11-02.dll_:0x1000158b"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/persistence/registry/appinitdlls/persist-via-appinit_dlls-registry-key.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
  	$num_azs = { 02 00 00 80 } // HKEY_LOCAL_MACHINE
-	$re_azt = /Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows/ nocase ascii wide 
-	$re_azu = /Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows/ nocase ascii wide 
-	$re_azv = /AppInit_DLLs/ nocase ascii wide 
+	$func_re_azt = /Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows/ nocase ascii wide 
+	$func_re_azu = /Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows/ nocase ascii wide 
+	$func_re_azv = /AppInit_DLLs/ nocase ascii wide 
  
   condition:
     capa_pe_file and
@@ -4855,10 +4855,10 @@ rule capa_persist_via_AppInit_DLLs_registry_key : CAPA PERSISTENCE REGISTRY APPI
 		or $num_azs  
 	) 
 		and  (
-			$re_azt 
-		or 	$re_azu  
+			$func_re_azt 
+		or 	$func_re_azu  
 	) 
-		and 	$re_azv  
+		and 	$func_re_azv  
 	) 
 }
 
@@ -4873,21 +4873,21 @@ rule capa_persist_via_Run_registry_key : CAPA PERSISTENCE REGISTRY RUN FUNCTION 
 	hash = "b87e9dd18a5533a09d3e48a7a1efbcf6"
 	hash = "9ff8e68343cc29c1036650fc153e69f7"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/persistence/registry/run/persist-via-run-registry-key.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
  	$num_azx = { 01 00 00 80 } // HKEY_CURRENT_USER
 	$num_azy = { 02 00 00 80 } // HKEY_LOCAL_MACHINE
-	$re_azz = /Software\\Microsoft\\Windows\\CurrentVersion/ nocase ascii wide 
-	$re_baa = /Run/ nocase ascii wide 
-	$re_bab = /Explorer\\Shell Folders/ nocase ascii wide 
-	$re_bac = /User Shell Folders/ nocase ascii wide 
-	$re_bad = /RunServices/ nocase ascii wide 
-	$re_bae = /Policies\\Explorer\\Run/ nocase ascii wide 
-	$re_baf = /Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows\\load/ nocase ascii wide 
-	$re_bag = /System\\CurrentControlSet\\Control\\Session Manager\\BootExecute/ nocase ascii wide 
+	$func_re_azz = /Software\\Microsoft\\Windows\\CurrentVersion/ nocase ascii wide 
+	$func_re_baa = /Run/ nocase ascii wide 
+	$func_re_bab = /Explorer\\Shell Folders/ nocase ascii wide 
+	$func_re_bac = /User Shell Folders/ nocase ascii wide 
+	$func_re_bad = /RunServices/ nocase ascii wide 
+	$func_re_bae = /Policies\\Explorer\\Run/ nocase ascii wide 
+	$func_re_baf = /Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows\\load/ nocase ascii wide 
+	$func_re_bag = /System\\CurrentControlSet\\Control\\Session Manager\\BootExecute/ nocase ascii wide 
  
   condition:
     capa_pe_file and
@@ -4900,17 +4900,17 @@ rule capa_persist_via_Run_registry_key : CAPA PERSISTENCE REGISTRY RUN FUNCTION 
 	) 
 		and  (
 		 (
-			$re_azz 
+			$func_re_azz 
 		and  (
-			$re_baa 
-		or 	$re_bab 
-		or 	$re_bac 
-		or 	$re_bad 
-		or 	$re_bae  
+			$func_re_baa 
+		or 	$func_re_bab 
+		or 	$func_re_bac 
+		or 	$func_re_bad 
+		or 	$func_re_bae  
 	)  
 	) 
-		or 	$re_baf 
-		or 	$re_bag  
+		or 	$func_re_baf 
+		or 	$func_re_bag  
 	)  
 	) 
 }
@@ -4924,17 +4924,17 @@ rule capa_persist_via_Winlogon_Helper_DLL_registry_key : CAPA PERSISTENCE REGIST
 	attack = "Persistence::Boot or Logon Autostart Execution::Winlogon Helper DLL [T1547.004]"
 	hash = "9ff8e68343cc29c1036650fc153e69f7"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/persistence/registry/winlogon-helper/persist-via-winlogon-helper-dll-registry-key.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
  	$num_bah = { 01 00 00 80 } // HKEY_CURRENT_USER
 	$num_bai = { 02 00 00 80 } // HKEY_LOCAL_MACHINE
-	$re_baj = /Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon/ nocase ascii wide 
-	$re_bak = /Notify/ nocase ascii wide 
-	$re_bal = /Userinit/ nocase ascii wide 
-	$re_bam = /Shell/ nocase ascii wide 
+	$func_re_baj = /Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon/ nocase ascii wide 
+	$func_re_bak = /Notify/ nocase ascii wide 
+	$func_re_bal = /Userinit/ nocase ascii wide 
+	$func_re_bam = /Shell/ nocase ascii wide 
  
   condition:
     capa_pe_file and
@@ -4945,11 +4945,11 @@ rule capa_persist_via_Winlogon_Helper_DLL_registry_key : CAPA PERSISTENCE REGIST
 		or $num_bah 
 		or $num_bai  
 	) 
-		and 	$re_baj 
+		and 	$func_re_baj 
 		and  (
-			$re_bak 
-		or 	$re_bal 
-		or 	$re_bam  
+			$func_re_bak 
+		or 	$func_re_bal 
+		or 	$func_re_bam  
 	)  
 	) 
 }
@@ -4962,7 +4962,7 @@ rule capa_compiled_to_the__NET_platform : CAPA RUNTIME DOTNET FILE  {
 	scope = "file"
 	hash = "b9f5bd514485fb06da39beff051b9fdc"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/runtime/dotnet/compiled-to-the-net-platform.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -4984,13 +4984,13 @@ rule capa_get_COMSPEC_environment_variable : CAPA HOST_INTERACTION ENVIRONMENT_V
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/get-comspec-environment-variable.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_ban = "COMSPEC" ascii wide
-	$str_bao = "%COMSPEC%" ascii wide
+ 	$func_str_ban = "COMSPEC" ascii wide
+	$func_str_bao = "%COMSPEC%" ascii wide
  
   condition:
     capa_pe_file and
@@ -4998,8 +4998,8 @@ rule capa_get_COMSPEC_environment_variable : CAPA HOST_INTERACTION ENVIRONMENT_V
 			capa_query_environment_variable
 
 		and  (
-			$str_ban 
-		or 	$str_bao  
+			$func_str_ban 
+		or 	$func_str_bao  
 	)  
 	) 
 }
@@ -5014,7 +5014,7 @@ rule capa_packed_with_MaskPE : CAPA ANTI_ANALYSIS PACKER MASKPE FILE T1027_002 F
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-maskpe.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5034,7 +5034,7 @@ rule capa_add_file_to_cabinet_file : CAPA HOST_INTERACTION FILE_SYSTEM FUNCTION 
 	references = "https://docs.microsoft.com/en-us/windows/win32/msi/cabinet-files"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/add-file-to-cabinet-file.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5053,19 +5053,19 @@ rule capa_reference_Quad9_DNS_server : CAPA COMMUNICATION DNS FUNCTION  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/reference-quad9-dns-server.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_baq = "9.9.9.9" ascii wide
-	$str_bar = "149.112.112.112" ascii wide
+ 	$func_str_baq = "9.9.9.9" ascii wide
+	$func_str_bar = "149.112.112.112" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_baq 
-		or 	$str_bar  
+			$func_str_baq 
+		or 	$func_str_bar  
 	) 
 }
 
@@ -5078,22 +5078,22 @@ rule capa_run_PowerShell_expression : CAPA LOAD_CODE POWERSHELL  FUNCTION T1059_
 	attack = "Execution::Command and Scripting Interpreter::PowerShell [T1059.001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/run-powershell-expression.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_bas = / iex\(/ nocase ascii wide 
-	$re_bat = / iex / nocase ascii wide 
-	$re_bau = /Invoke-Expression/ nocase ascii wide 
+ 	$func_re_bas = / iex\(/ nocase ascii wide 
+	$func_re_bat = / iex / nocase ascii wide 
+	$func_re_bau = /Invoke-Expression/ nocase ascii wide 
  
   condition:
     capa_pe_file and
  (
 		 (
-			$re_bas 
-		or 	$re_bat 
-		or 	$re_bau  
+			$func_re_bas 
+		or 	$func_re_bat 
+		or 	$func_re_bau  
 	)  
 	) 
 }
@@ -5107,7 +5107,7 @@ rule capa_get_file_size : CAPA HOST_INTERACTION FILE_SYSTEM META FUNCTION T1083 
 	attack = "Discovery::File and Directory Discovery [T1083]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/get-file-size.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5128,7 +5128,7 @@ rule capa_open_cabinet_file : CAPA HOST_INTERACTION FILE_SYSTEM FUNCTION  {
 	references = "https://docs.microsoft.com/en-us/windows/win32/msi/cabinet-files"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/open-cabinet-file.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5149,7 +5149,7 @@ rule capa_packed_with_Dragon_Armor : CAPA ANTI_ANALYSIS PACKER DRAGON_ARMOR FILE
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-dragon-armor.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5168,7 +5168,7 @@ rule capa_hooked_by_API_Override : CAPA EXECUTABLE HOOKED API_OVERRIDE FILE  {
 	scope = "file"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/hooked-by-api-override.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5187,7 +5187,7 @@ rule capa_get_service_handle : CAPA FUNCTION  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/get-service-handle.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5209,7 +5209,7 @@ rule capa_packed_with_Neolite : CAPA ANTI_ANALYSIS PACKER NEOLITE FILE T1027_002
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-neolite.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5230,19 +5230,19 @@ rule capa_encrypt_data_using_Salsa20_or_ChaCha : CAPA DATA_MANIPULATION ENCRYPTI
 	attack = "Defense Evasion::Obfuscated Files or Information [T1027]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/encrypt-data-using-salsa20-or-chacha.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
  	 // part of key setup
-	$str_baz = "expand 32-byte k = sigma" ascii wide
-	$str_bba = "expand 16-byte k = tau" ascii wide
-	$str_bbb = "expand 32-byte kexpand 16-byte k" ascii wide
-	$str_bbc = "expa" ascii wide
-	$str_bbd = "nd 3" ascii wide
-	$str_bbe = "2-by" ascii wide
-	$str_bbf = "te k" ascii wide
+	$func_str_baz = "expand 32-byte k = sigma" ascii wide
+	$func_str_bba = "expand 16-byte k = tau" ascii wide
+	$func_str_bbb = "expand 32-byte kexpand 16-byte k" ascii wide
+	$func_str_bbc = "expa" ascii wide
+	$func_str_bbd = "nd 3" ascii wide
+	$func_str_bbe = "2-by" ascii wide
+	$func_str_bbf = "te k" ascii wide
 	$num_bbg = { 65 78 70 61 } // "apxe"
 	$num_bbh = { 6E 64 20 33 } // "3 dn"
 	$num_bbi = { 32 2D 62 79 } // "yb-2"
@@ -5251,14 +5251,14 @@ rule capa_encrypt_data_using_Salsa20_or_ChaCha : CAPA DATA_MANIPULATION ENCRYPTI
   condition:
     capa_pe_file and
  (
-			$str_baz 
-		or 	$str_bba 
-		or 	$str_bbb 
+			$func_str_baz 
+		or 	$func_str_bba 
+		or 	$func_str_bbb 
 		or  (
-			$str_bbc 
-		and 	$str_bbd 
-		and 	$str_bbe 
-		and 	$str_bbf  
+			$func_str_bbc 
+		and 	$func_str_bbd 
+		and 	$func_str_bbe 
+		and 	$func_str_bbf  
 	) 
 		or  (
 		$num_bbg 
@@ -5277,7 +5277,7 @@ rule capa_listen_for_remote_procedure_calls : CAPA COMMUNICATION RPC SERVER BASI
 	scope = "basic block"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/listen-for-remote-procedure-calls.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5296,7 +5296,7 @@ rule capa_enumerate_internet_cache : CAPA HOST_INTERACTION INTERNET CACHE FUNCTI
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/enumerate-internet-cache.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5315,19 +5315,19 @@ rule capa_reference_Verisign_DNS_server : CAPA COMMUNICATION DNS FUNCTION  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/reference-verisign-dns-server.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bbm = "64.6.64.6" ascii wide
-	$str_bbn = "64.6.65.6" ascii wide
+ 	$func_str_bbm = "64.6.64.6" ascii wide
+	$func_str_bbn = "64.6.65.6" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_bbm 
-		or 	$str_bbn  
+			$func_str_bbm 
+		or 	$func_str_bbn  
 	) 
 }
 
@@ -5339,17 +5339,17 @@ rule capa_packaged_as_a_NSIS_installer : CAPA EXECUTABLE INSTALLER NSIS FILE  {
 	scope = "file"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packaged-as-a-nsis-installer.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_bbo = /http:\/\/nsis\.sf\.net/ ascii wide 
+ 	$file_re_bbo = /http:\/\/nsis\.sf\.net/ ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$re_bbo  
+			$file_re_bbo  
 	) 
 }
 
@@ -5361,23 +5361,23 @@ rule capa_reference_AliDNS_DNS_server : CAPA COMMUNICATION DNS FUNCTION  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/reference-alidns-dns-server.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bbp = "223.5.5.5" ascii wide
-	$str_bbq = "223.6.6.6" ascii wide
-	$str_bbr = "2400:3200::1" ascii wide
-	$str_bbs = "2400:3200:baba::1" ascii wide
+ 	$func_str_bbp = "223.5.5.5" ascii wide
+	$func_str_bbq = "223.6.6.6" ascii wide
+	$func_str_bbr = "2400:3200::1" ascii wide
+	$func_str_bbs = "2400:3200:baba::1" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_bbp 
-		or 	$str_bbq 
-		or 	$str_bbr 
-		or 	$str_bbs  
+			$func_str_bbp 
+		or 	$func_str_bbq 
+		or 	$func_str_bbr 
+		or 	$func_str_bbs  
 	) 
 }
 
@@ -5390,7 +5390,7 @@ rule capa_get_networking_parameters : CAPA HOST_INTERACTION NETWORK FUNCTION T10
 	attack = "Discovery::System Network Configuration Discovery [T1016]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/get-networking-parameters.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5411,7 +5411,7 @@ rule capa_packed_with_TSULoader : CAPA ANTI_ANALYSIS PACKER TSULOADER FILE T1027
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-tsuloader.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5431,7 +5431,7 @@ rule capa_packaged_as_a_WinZip_self_extracting_archive : CAPA EXECUTABLE INSTALL
 	scope = "file"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packaged-as-a-winzip-self-extracting-archive.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5451,7 +5451,7 @@ rule capa_get_file_version_info : CAPA HOST_INTERACTION FILE_SYSTEM META FUNCTIO
 	attack = "Discovery::File and Directory Discovery [T1083]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/get-file-version-info.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5475,7 +5475,7 @@ rule capa_packed_with_RPCrypt : CAPA ANTI_ANALYSIS PACKER RPCRYPT FILE T1027_002
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-rpcrypt.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5496,19 +5496,19 @@ rule capa_get_proxy : CAPA HOST_INTERACTION NETWORK PROXY FUNCTION T1016  {
 	attack = "Discovery::System Network Configuration Discovery [T1016]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/get-proxy.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bcf = "ProxyServer" ascii wide
+ 	$func_str_bcf = "ProxyServer" ascii wide
  
   condition:
     capa_pe_file and
  (
 			capa_create_or_open_registry_key
 
-		and 	$str_bcf  
+		and 	$func_str_bcf  
 	) 
 }
 
@@ -5521,141 +5521,141 @@ rule capa_reference_DNS_over_HTTPS_endpoints : CAPA COMMUNICATION DNS FILE  {
 	hash = "749e7becf00fccc6dff324a83976dc0d"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/reference-dns-over-https-endpoints.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_bcg = /https:\/\/doh.seby.io:8443\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bch = /https:\/\/family.cloudflare-dns.com\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bci = /https:\/\/free.bravedns.com\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bcj = /https:\/\/doh.familyshield.opendns.com\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bck = /https:\/\/doh-de.blahdns.com\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bcl = /https:\/\/adblock.mydns.network\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bcm = /https:\/\/bravedns.com\/configure.{,1000}/ nocase ascii wide 
-	$re_bcn = /https:\/\/cloudflare-dns.com\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bco = /https:\/\/commons.host.{,1000}/ nocase ascii wide 
-	$re_bcp = /https:\/\/dns.aa.net.uk\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bcq = /https:\/\/dns.alidns.com\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bcr = /https:\/\/dns-asia.wugui.zone\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bcs = /https:\/\/dns.containerpi.com\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bct = /https:\/\/dns.containerpi.com\/doh\/family-filter\/.{,1000}/ nocase ascii wide 
-	$re_bcu = /https:\/\/dns.containerpi.com\/doh\/secure-filter\/.{,1000}/ nocase ascii wide 
-	$re_bcv = /https:\/\/dns.digitale-gesellschaft.ch\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bcw = /https:\/\/dns.dnshome.de\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bcx = /https:\/\/dns.dns-over-https.com\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bcy = /https:\/\/dns.dnsoverhttps.net\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bcz = /https:\/\/dns.flatuslifir.is\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bda = /https:\/\/dnsforge.de\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bdb = /https:\/\/dns.google\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bdc = /https:\/\/dns.nextdns.io\/<config_id>.{,1000}/ nocase ascii wide 
-	$re_bdd = /https:\/\/dns.rubyfish.cn\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bde = /https:\/\/dns.switch.ch\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bdf = /https:\/\/dns.twnic.tw\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bdg = /https:\/\/dns.wugui.zone\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bdh = /https:\/\/doh-2.seby.io\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bdi = /https:\/\/doh.42l.fr\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bdj = /https:\/\/doh.applied-privacy.net\/query.{,1000}/ nocase ascii wide 
-	$re_bdk = /https:\/\/doh.armadillodns.net\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bdl = /https:\/\/doh.captnemo.in\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bdm = /https:\/\/doh.centraleu.pi-dns.com\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bdn = /https:\/\/doh.cleanbrowsing.org\/doh\/family-filter\/.{,1000}/ nocase ascii wide 
-	$re_bdo = /https:\/\/doh.crypto.sx\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bdp = /https:\/\/doh.dnslify.com\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bdq = /https:\/\/doh.dns.sb\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bdr = /https:\/\/dohdot.coxlab.net\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bds = /https:\/\/doh.eastas.pi-dns.com\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bdt = /https:\/\/doh.eastau.pi-dns.com\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bdu = /https:\/\/doh.eastus.pi-dns.com\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bdv = /https:\/\/doh.ffmuc.net\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bdw = /https:\/\/doh.libredns.gr\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bdx = /https:\/\/doh.li\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bdy = /https:\/\/doh.northeu.pi-dns.com\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bdz = /https:\/\/doh.pi-dns.com\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bea = /https:\/\/doh.powerdns.org.{,1000}/ nocase ascii wide 
-	$re_beb = /https:\/\/doh.tiarap.org\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bec = /https:\/\/doh.tiar.app\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bed = /https:\/\/doh.westus.pi-dns.com\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bee = /https:\/\/doh.xfinity.com\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bef = /https:\/\/example.doh.blockerdns.com\/dns-query.{,1000}/ nocase ascii wide 
-	$re_beg = /https:\/\/fi.doh.dns.snopyta.org\/dns-query.{,1000}/ nocase ascii wide 
-	$re_beh = /https:\/\/ibksturm.synology.me\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bei = /https:\/\/ibuki.cgnat.net\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bej = /https:\/\/jcdns.fun\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bek = /https:\/\/jp.tiarap.org\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bel = /https:\/\/jp.tiar.app\/dns-query.{,1000}/ nocase ascii wide 
-	$re_bem = /https:\/\/odvr.nic.cz\/doh.{,1000}/ nocase ascii wide 
-	$re_ben = /https:\/\/ordns.he.net\/dns-query.{,1000}/ nocase ascii wide 
-	$re_beo = /https:\/\/rdns.faelix.net\/.{,1000}/ nocase ascii wide 
-	$re_bep = /https:\/\/resolver-eu.lelux.fi\/dns-query.{,1000}/ nocase ascii wide 
-	$re_beq = /https:\/\/doh-jp.blahdns.com\/dns-query.{,1000}/ nocase ascii wide 
+ 	$file_re_bcg = /https:\/\/doh.seby.io:8443\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bch = /https:\/\/family.cloudflare-dns.com\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bci = /https:\/\/free.bravedns.com\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bcj = /https:\/\/doh.familyshield.opendns.com\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bck = /https:\/\/doh-de.blahdns.com\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bcl = /https:\/\/adblock.mydns.network\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bcm = /https:\/\/bravedns.com\/configure.{,1000}/ nocase ascii wide 
+	$file_re_bcn = /https:\/\/cloudflare-dns.com\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bco = /https:\/\/commons.host.{,1000}/ nocase ascii wide 
+	$file_re_bcp = /https:\/\/dns.aa.net.uk\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bcq = /https:\/\/dns.alidns.com\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bcr = /https:\/\/dns-asia.wugui.zone\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bcs = /https:\/\/dns.containerpi.com\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bct = /https:\/\/dns.containerpi.com\/doh\/family-filter\/.{,1000}/ nocase ascii wide 
+	$file_re_bcu = /https:\/\/dns.containerpi.com\/doh\/secure-filter\/.{,1000}/ nocase ascii wide 
+	$file_re_bcv = /https:\/\/dns.digitale-gesellschaft.ch\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bcw = /https:\/\/dns.dnshome.de\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bcx = /https:\/\/dns.dns-over-https.com\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bcy = /https:\/\/dns.dnsoverhttps.net\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bcz = /https:\/\/dns.flatuslifir.is\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bda = /https:\/\/dnsforge.de\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bdb = /https:\/\/dns.google\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bdc = /https:\/\/dns.nextdns.io\/<config_id>.{,1000}/ nocase ascii wide 
+	$file_re_bdd = /https:\/\/dns.rubyfish.cn\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bde = /https:\/\/dns.switch.ch\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bdf = /https:\/\/dns.twnic.tw\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bdg = /https:\/\/dns.wugui.zone\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bdh = /https:\/\/doh-2.seby.io\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bdi = /https:\/\/doh.42l.fr\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bdj = /https:\/\/doh.applied-privacy.net\/query.{,1000}/ nocase ascii wide 
+	$file_re_bdk = /https:\/\/doh.armadillodns.net\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bdl = /https:\/\/doh.captnemo.in\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bdm = /https:\/\/doh.centraleu.pi-dns.com\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bdn = /https:\/\/doh.cleanbrowsing.org\/doh\/family-filter\/.{,1000}/ nocase ascii wide 
+	$file_re_bdo = /https:\/\/doh.crypto.sx\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bdp = /https:\/\/doh.dnslify.com\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bdq = /https:\/\/doh.dns.sb\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bdr = /https:\/\/dohdot.coxlab.net\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bds = /https:\/\/doh.eastas.pi-dns.com\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bdt = /https:\/\/doh.eastau.pi-dns.com\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bdu = /https:\/\/doh.eastus.pi-dns.com\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bdv = /https:\/\/doh.ffmuc.net\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bdw = /https:\/\/doh.libredns.gr\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bdx = /https:\/\/doh.li\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bdy = /https:\/\/doh.northeu.pi-dns.com\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bdz = /https:\/\/doh.pi-dns.com\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bea = /https:\/\/doh.powerdns.org.{,1000}/ nocase ascii wide 
+	$file_re_beb = /https:\/\/doh.tiarap.org\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bec = /https:\/\/doh.tiar.app\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bed = /https:\/\/doh.westus.pi-dns.com\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bee = /https:\/\/doh.xfinity.com\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bef = /https:\/\/example.doh.blockerdns.com\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_beg = /https:\/\/fi.doh.dns.snopyta.org\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_beh = /https:\/\/ibksturm.synology.me\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bei = /https:\/\/ibuki.cgnat.net\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bej = /https:\/\/jcdns.fun\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bek = /https:\/\/jp.tiarap.org\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bel = /https:\/\/jp.tiar.app\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_bem = /https:\/\/odvr.nic.cz\/doh.{,1000}/ nocase ascii wide 
+	$file_re_ben = /https:\/\/ordns.he.net\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_beo = /https:\/\/rdns.faelix.net\/.{,1000}/ nocase ascii wide 
+	$file_re_bep = /https:\/\/resolver-eu.lelux.fi\/dns-query.{,1000}/ nocase ascii wide 
+	$file_re_beq = /https:\/\/doh-jp.blahdns.com\/dns-query.{,1000}/ nocase ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$re_bcg 
-		or 	$re_bch 
-		or 	$re_bci 
-		or 	$re_bcj 
-		or 	$re_bck 
-		or 	$re_bcl 
-		or 	$re_bcm 
-		or 	$re_bcn 
-		or 	$re_bco 
-		or 	$re_bcp 
-		or 	$re_bcq 
-		or 	$re_bcr 
-		or 	$re_bcs 
-		or 	$re_bct 
-		or 	$re_bcu 
-		or 	$re_bcv 
-		or 	$re_bcw 
-		or 	$re_bcx 
-		or 	$re_bcy 
-		or 	$re_bcz 
-		or 	$re_bda 
-		or 	$re_bdb 
-		or 	$re_bdc 
-		or 	$re_bdd 
-		or 	$re_bde 
-		or 	$re_bdf 
-		or 	$re_bdg 
-		or 	$re_bdh 
-		or 	$re_bdi 
-		or 	$re_bdj 
-		or 	$re_bdk 
-		or 	$re_bdl 
-		or 	$re_bdm 
-		or 	$re_bdn 
-		or 	$re_bdo 
-		or 	$re_bdp 
-		or 	$re_bdq 
-		or 	$re_bdr 
-		or 	$re_bds 
-		or 	$re_bdt 
-		or 	$re_bdu 
-		or 	$re_bdv 
-		or 	$re_bdw 
-		or 	$re_bdx 
-		or 	$re_bdy 
-		or 	$re_bdz 
-		or 	$re_bea 
-		or 	$re_beb 
-		or 	$re_bec 
-		or 	$re_bed 
-		or 	$re_bee 
-		or 	$re_bef 
-		or 	$re_beg 
-		or 	$re_beh 
-		or 	$re_bei 
-		or 	$re_bej 
-		or 	$re_bek 
-		or 	$re_bel 
-		or 	$re_bem 
-		or 	$re_ben 
-		or 	$re_beo 
-		or 	$re_bep 
-		or 	$re_beq  
+			$file_re_bcg 
+		or 	$file_re_bch 
+		or 	$file_re_bci 
+		or 	$file_re_bcj 
+		or 	$file_re_bck 
+		or 	$file_re_bcl 
+		or 	$file_re_bcm 
+		or 	$file_re_bcn 
+		or 	$file_re_bco 
+		or 	$file_re_bcp 
+		or 	$file_re_bcq 
+		or 	$file_re_bcr 
+		or 	$file_re_bcs 
+		or 	$file_re_bct 
+		or 	$file_re_bcu 
+		or 	$file_re_bcv 
+		or 	$file_re_bcw 
+		or 	$file_re_bcx 
+		or 	$file_re_bcy 
+		or 	$file_re_bcz 
+		or 	$file_re_bda 
+		or 	$file_re_bdb 
+		or 	$file_re_bdc 
+		or 	$file_re_bdd 
+		or 	$file_re_bde 
+		or 	$file_re_bdf 
+		or 	$file_re_bdg 
+		or 	$file_re_bdh 
+		or 	$file_re_bdi 
+		or 	$file_re_bdj 
+		or 	$file_re_bdk 
+		or 	$file_re_bdl 
+		or 	$file_re_bdm 
+		or 	$file_re_bdn 
+		or 	$file_re_bdo 
+		or 	$file_re_bdp 
+		or 	$file_re_bdq 
+		or 	$file_re_bdr 
+		or 	$file_re_bds 
+		or 	$file_re_bdt 
+		or 	$file_re_bdu 
+		or 	$file_re_bdv 
+		or 	$file_re_bdw 
+		or 	$file_re_bdx 
+		or 	$file_re_bdy 
+		or 	$file_re_bdz 
+		or 	$file_re_bea 
+		or 	$file_re_beb 
+		or 	$file_re_bec 
+		or 	$file_re_bed 
+		or 	$file_re_bee 
+		or 	$file_re_bef 
+		or 	$file_re_beg 
+		or 	$file_re_beh 
+		or 	$file_re_bei 
+		or 	$file_re_bej 
+		or 	$file_re_bek 
+		or 	$file_re_bel 
+		or 	$file_re_bem 
+		or 	$file_re_ben 
+		or 	$file_re_beo 
+		or 	$file_re_bep 
+		or 	$file_re_beq  
 	) 
 }
 
@@ -5669,7 +5669,7 @@ rule capa_packed_with_Crunch : CAPA ANTI_ANALYSIS PACKER CRUNCH FILE T1027_002 F
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-crunch.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5691,7 +5691,7 @@ rule capa_delete_registry_key_via_offline_registry_library : CAPA HOST_INTERACTI
 	mbc = "Operating System::Registry::Delete Registry Value [C0036.007]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/delete-registry-key-via-offline-registry-library.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5716,7 +5716,7 @@ rule capa_get_token_membership : CAPA HOST_INTERACTION SESSION FUNCTION T1033  {
 	attack = "Discovery::System Owner/User Discovery [T1033]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/get-token-membership.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5737,7 +5737,7 @@ rule capa_packed_with_PECompact : CAPA ANTI_ANALYSIS PACKER PECOMPACT FILE T1027
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-pecompact.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5765,7 +5765,7 @@ rule capa_packaged_as_a_CreateInstall_installer : CAPA EXECUTABLE INSTALLER CREA
 	scope = "file"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packaged-as-a-createinstall-installer.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5786,7 +5786,7 @@ rule capa_packed_with_Pepack : CAPA ANTI_ANALYSIS PACKER PEPACK FILE T1027_002 F
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-pepack.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5805,23 +5805,23 @@ rule capa_reference_Google_Public_DNS_server : CAPA COMMUNICATION DNS FUNCTION  
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/reference-google-public-dns-server.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bfn = "8.8.8.8" ascii wide
-	$str_bfo = "8.8.4.4" ascii wide
-	$str_bfp = "2001:4860:4860::8888" ascii wide
-	$str_bfq = "2001:4860:4860::8844" ascii wide
+ 	$func_str_bfn = "8.8.8.8" ascii wide
+	$func_str_bfo = "8.8.4.4" ascii wide
+	$func_str_bfp = "2001:4860:4860::8888" ascii wide
+	$func_str_bfq = "2001:4860:4860::8844" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_bfn 
-		or 	$str_bfo 
-		or 	$str_bfp 
-		or 	$str_bfq  
+			$func_str_bfn 
+		or 	$func_str_bfo 
+		or 	$func_str_bfp 
+		or 	$func_str_bfq  
 	) 
 }
 
@@ -5833,19 +5833,19 @@ rule capa_linked_against_C___regex_library : CAPA LINKING STATIC CPPREGEX FILE  
 	scope = "file"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/linked-against-c-regex-library.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bfr = "regex_error(error_syntax)" ascii wide // C++ STL regex library
-	$str_bfs = "regex_error(error_collate): The expression contained an invalid collating element name." ascii wide
+ 	$file_str_bfr = "regex_error(error_syntax)" ascii wide // C++ STL regex library
+	$file_str_bfs = "regex_error(error_collate): The expression contained an invalid collating element name." ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_bfr 
-		or 	$str_bfs  
+			$file_str_bfr 
+		or 	$file_str_bfs  
 	) 
 }
 
@@ -5859,7 +5859,7 @@ rule capa_packed_with_MEW : CAPA ANTI_ANALYSIS PACKER MEW FILE T1027_002 F0001  
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-mew.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5878,27 +5878,27 @@ rule capa_reference_114DNS_DNS_server : CAPA COMMUNICATION DNS FUNCTION  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/reference-114dns-dns-server.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bfy = "114.114.114.114" ascii wide
-	$str_bfz = "114.114.115.115" ascii wide
-	$str_bga = "114.114.114.119" ascii wide
-	$str_bgb = "114.114.115.119" ascii wide
-	$str_bgc = "114.114.114.110" ascii wide
-	$str_bgd = "114.114.115.110" ascii wide
+ 	$func_str_bfy = "114.114.114.114" ascii wide
+	$func_str_bfz = "114.114.115.115" ascii wide
+	$func_str_bga = "114.114.114.119" ascii wide
+	$func_str_bgb = "114.114.115.119" ascii wide
+	$func_str_bgc = "114.114.114.110" ascii wide
+	$func_str_bgd = "114.114.115.110" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_bfy 
-		or 	$str_bfz 
-		or 	$str_bga 
-		or 	$str_bgb 
-		or 	$str_bgc 
-		or 	$str_bgd  
+			$func_str_bfy 
+		or 	$func_str_bfz 
+		or 	$func_str_bga 
+		or 	$func_str_bgb 
+		or 	$func_str_bgc 
+		or 	$func_str_bgd  
 	) 
 }
 
@@ -5911,14 +5911,14 @@ rule capa_migrate_process_to_active_window_station : CAPA HOST_INTERACTION GUI W
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/migrate-process-to-active-window-station.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
  	$api_bgf = /\bOpenWindowStation(A|W)?\b/ ascii wide
-	$str_bgg = "winsta0" ascii wide
-	$str_bgh = "WinSta0" ascii wide
+	$func_str_bgg = "winsta0" ascii wide
+	$func_str_bgh = "WinSta0" ascii wide
 	$api_bgi = /\bSetProcessWindowStation(A|W)?\b/ ascii wide
 	$api_bgj = /\bOpenInputDesktop(A|W)?\b/ ascii wide
 	$api_bgk = /\bSetThreadDesktop(A|W)?\b/ ascii wide
@@ -5928,8 +5928,8 @@ rule capa_migrate_process_to_active_window_station : CAPA HOST_INTERACTION GUI W
  (
 			$api_bgf 
 		and  (
-			$str_bgg 
-		or 	$str_bgh  
+			$func_str_bgg 
+		or 	$func_str_bgh  
 	) 
 		and 	$api_bgi 
 		and 	$api_bgj 
@@ -5947,7 +5947,7 @@ rule capa_packed_with_Epack : CAPA ANTI_ANALYSIS PACKER EPACK FILE T1027_002 F00
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-epack.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5966,7 +5966,7 @@ rule capa_packaged_as_a_Pintool : CAPA EXECUTABLE PINTOOL FILE  {
 	scope = "file"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packaged-as-a-pintool.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -5986,7 +5986,7 @@ rule capa_get_thread_local_storage_value : CAPA HOST_INTERACTION PROCESS FUNCTIO
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/get-thread-local-storage-value.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6005,7 +6005,7 @@ rule capa_rebuilt_by_ImpRec : CAPA EXECUTABLE IMPREC FILE  {
 	scope = "file"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/rebuilt-by-imprec.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6024,7 +6024,7 @@ rule capa_enumerate_threads : CAPA HOST_INTERACTION THREAD LIST FUNCTION  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/enumerate-threads.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6044,19 +6044,19 @@ rule capa_reference_Comodo_Secure_DNS_server : CAPA COMMUNICATION DNS FUNCTION  
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/reference-comodo-secure-dns-server.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bgq = "8.26.56.26" ascii wide
-	$str_bgr = "8.20.247.20" ascii wide
+ 	$func_str_bgq = "8.26.56.26" ascii wide
+	$func_str_bgr = "8.20.247.20" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_bgq 
-		or 	$str_bgr  
+			$func_str_bgq 
+		or 	$func_str_bgr  
 	) 
 }
 
@@ -6069,7 +6069,7 @@ rule capa_decrypt_data_via_SSPI : CAPA DATA_MANIPULATION ENCRYPTION BASICBLOCK T
 	attack = "Defense Evasion::Deobfuscate/Decode Files or Information [T1140]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/decrypt-data-via-sspi.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6088,27 +6088,27 @@ rule capa_reference_L3_DNS_server : CAPA COMMUNICATION DNS FUNCTION  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/reference-l3-dns-server.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bgt = "4.2.2.1" ascii wide
-	$str_bgu = "4.2.2.2" ascii wide
-	$str_bgv = "4.2.2.3" ascii wide
-	$str_bgw = "4.2.2.4" ascii wide
-	$str_bgx = "4.2.2.5" ascii wide
-	$str_bgy = "4.2.2.6" ascii wide
+ 	$func_str_bgt = "4.2.2.1" ascii wide
+	$func_str_bgu = "4.2.2.2" ascii wide
+	$func_str_bgv = "4.2.2.3" ascii wide
+	$func_str_bgw = "4.2.2.4" ascii wide
+	$func_str_bgx = "4.2.2.5" ascii wide
+	$func_str_bgy = "4.2.2.6" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_bgt 
-		or 	$str_bgu 
-		or 	$str_bgv 
-		or 	$str_bgw 
-		or 	$str_bgx 
-		or 	$str_bgy  
+			$func_str_bgt 
+		or 	$func_str_bgu 
+		or 	$func_str_bgv 
+		or 	$func_str_bgw 
+		or 	$func_str_bgx 
+		or 	$func_str_bgy  
 	) 
 }
 
@@ -6120,19 +6120,19 @@ rule capa_packaged_as_a_Wise_installer : CAPA EXECUTABLE INSTALLER WISEINSTALL F
 	scope = "file"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packaged-as-a-wise-installer.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bgz = "WiseMain" ascii wide
-	$re_bha = /Wise Installation Wizard/ ascii wide 
+ 	$file_str_bgz = "WiseMain" ascii wide
+	$file_re_bha = /Wise Installation Wizard/ ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$str_bgz 
-		or 	$re_bha  
+			$file_str_bgz 
+		or 	$file_re_bha  
 	) 
 }
 
@@ -6145,17 +6145,17 @@ rule capa_acquire_debug_privileges : CAPA HOST_INTERACTION PROCESS MODIFY BASICB
 	attack = "Privilege Escalation::Access Token Manipulation [T1134]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/acquire-debug-privileges.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bhe = "SeDebugPrivilege" ascii wide
+ 	$basic_str_bhe = "SeDebugPrivilege" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_bhe  
+			$basic_str_bhe  
 	) 
 }
 
@@ -6167,7 +6167,7 @@ rule capa_empty_the_recycle_bin : CAPA HOST_INTERACTION RECYCLE_BIN FUNCTION  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/empty-the-recycle-bin.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6189,7 +6189,7 @@ rule capa_compare_security_identifiers : CAPA HOST_INTERACTION SID BASICBLOCK  {
 	scope = "basic block"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/compare-security-identifiers.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6208,7 +6208,7 @@ rule capa_query_remote_server_for_available_data : CAPA COMMUNICATION BASICBLOCK
 	scope = "basic block"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/query-remote-server-for-available-data.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6229,7 +6229,7 @@ rule capa_packed_with_enigma : CAPA ANTI_ANALYSIS PACKER ENIGMA FILE T1027_002 F
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-enigma.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6249,7 +6249,7 @@ rule capa_initialize_hashing_via_WinCrypt : CAPA DATA_MANIPULATION HASHING FUNCT
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/initialize-hashing-via-wincrypt.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6270,7 +6270,7 @@ rule capa_packed_with_StarForce : CAPA ANTI_ANALYSIS PACKER STARFORCE FILE T1027
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-starforce.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6290,7 +6290,7 @@ rule capa_encrypt_data_via_SSPI : CAPA DATA_MANIPULATION ENCRYPTION BASICBLOCK T
 	attack = "Defense Evasion::Obfuscated Files or Information [T1027]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/encrypt-data-via-sspi.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6311,7 +6311,7 @@ rule capa_packed_with_ProCrypt : CAPA ANTI_ANALYSIS PACKER PROCRYPT FILE T1027_0
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-procrypt.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6332,7 +6332,7 @@ rule capa_packed_with_WWPACK : CAPA ANTI_ANALYSIS PACKER WWPACK FILE T1027_002 F
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-wwpack.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6352,19 +6352,19 @@ rule capa_reference_Cloudflare_DNS_server : CAPA COMMUNICATION DNS FUNCTION  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/reference-cloudflare-dns-server.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bhm = "1.1.1.1" ascii wide
-	$str_bhn = "1.0.0.1" ascii wide
+ 	$func_str_bhm = "1.1.1.1" ascii wide
+	$func_str_bhn = "1.0.0.1" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_bhm 
-		or 	$str_bhn  
+			$func_str_bhm 
+		or 	$func_str_bhn  
 	) 
 }
 
@@ -6376,7 +6376,7 @@ rule capa_get_system_firmware_table : CAPA HOST_INTERACTION HARDWARE FIRMWARE FU
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/get-system-firmware-table.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6396,7 +6396,7 @@ rule capa_get_socket_information : CAPA COMMUNICATION SOCKET FUNCTION T1016  {
 	attack = "Discovery::System Network Configuration Discovery [T1016]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/get-socket-information.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6416,19 +6416,19 @@ rule capa_check_license_value : CAPA ANTI_ANALYSIS ANTI_VM VM_DETECTION FUNCTION
 	attack = "Defense Evasion::Virtualization/Sandbox Evasion::System Checks [T1497.001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/check-license-value.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
  	$api_bho = /\bNtQueryLicenseValue(A|W)?\b/ ascii wide
-	$str_bhp = "Kernel-VMDetection-Private" ascii wide
+	$func_str_bhp = "Kernel-VMDetection-Private" ascii wide
  
   condition:
     capa_pe_file and
  (
 			$api_bho 
-		and 	$str_bhp  
+		and 	$func_str_bhp  
 	) 
 }
 
@@ -6441,20 +6441,20 @@ rule capa_bypass_UAC_via_ICMLuaUtil : CAPA HOST_INTERACTION UAC BYPASS FUNCTION 
 	attack = "Defense Evasion::Abuse Elevation Control Mechanism::Bypass User Access Control [T1548.002]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/bypass-uac-via-icmluautil.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bhq = "{3E5FC7F9-9A51-4367-9063-A120244FBEC7}" ascii wide // T_CLSID_CMSTPLUA
-	$bhr = { F9 C7 5F 3E 51 9A 67 43 90 63 A1 20 24 4F BE C7 } // T_CLSID_CMSTPLUA
+ 	$func_str_bhq = "{3E5FC7F9-9A51-4367-9063-A120244FBEC7}" ascii wide // T_CLSID_CMSTPLUA
+	$func_bhr = { F9 C7 5F 3E 51 9A 67 43 90 63 A1 20 24 4F BE C7 } // T_CLSID_CMSTPLUA
  
   condition:
     capa_pe_file and
  (
 		 (
-			$str_bhq 
-		or 	$bhr  
+			$func_str_bhq 
+		or 	$func_bhr  
 	)  
 	) 
 }
@@ -6469,17 +6469,17 @@ rule capa_reference_screen_saver_executable : CAPA PERSISTENCE SCREENSAVER FUNCT
 	attack = "Persistence::Event Triggered Execution::Screensaver [T1546.002]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/reference-screen-saver-executable.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bhs = "SCRNSAVE.EXE" ascii wide
+ 	$func_str_bhs = "SCRNSAVE.EXE" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_bhs  
+			$func_str_bhs  
 	) 
 }
 
@@ -6493,7 +6493,7 @@ rule capa_create_Restart_Manager_session : CAPA HOST_INTERACTION PROCESS FUNCTIO
 	references = "https://www.carbonblack.com/blog/tau-threat-discovery-conti-ransomware/"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/create-restart-manager-session.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6512,17 +6512,17 @@ rule capa_reference_kornet_DNS_server : CAPA COMMUNICATION DNS FUNCTION  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/reference-kornet-dns-server.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bht = "168.126.63.1" ascii wide // kns.kornet.net
+ 	$func_str_bht = "168.126.63.1" ascii wide // kns.kornet.net
  
   condition:
     capa_pe_file and
  (
-			$str_bht  
+			$func_str_bht  
 	) 
 }
 
@@ -6536,7 +6536,7 @@ rule capa_packed_with_Themida : CAPA ANTI_ANALYSIS PACKER THEMIDA FILE T1027_002
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-themida.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6558,7 +6558,7 @@ rule capa_impersonate_user : CAPA HOST_INTERACTION USER FUNCTION T1134_001  {
 	attack = "Privilege Escalation::Access Token Manipulation::Token Impersonation/Theft [T1134.001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/impersonate-user.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6581,7 +6581,7 @@ rule capa_get_user_security_identifier : CAPA HOST_INTERACTION SID BASICBLOCK T1
 	attack = "Discovery::Account Discovery [T1087]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/get-user-security-identifier.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6602,19 +6602,19 @@ rule capa_read_raw_disk_data : CAPA HOST_INTERACTION FILE_SYSTEM FILE  {
 	scope = "file"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/read-raw-disk-data.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bhx = "\\\\.\\PhysicalDrive0" ascii wide
-	$str_bhy = "\\\\.\\C:" ascii wide
+ 	$file_str_bhx = "\\\\.\\PhysicalDrive0" ascii wide
+	$file_str_bhy = "\\\\.\\C:" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_bhx 
-		or 	$str_bhy  
+			$file_str_bhx 
+		or 	$file_str_bhy  
 	) 
 }
 
@@ -6627,19 +6627,19 @@ rule capa_bypass_UAC_via_scheduled_task_environment_variable : CAPA HOST_INTERAC
 	attack = "Defense Evasion::Abuse Elevation Control Mechanism::Bypass User Access Control [T1548.002]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/bypass-uac-via-scheduled-task-environment-variable.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bhz = "schtasks.exe" ascii wide
-	$re_bia = /Microsoft\\Windows\\DiskCleanup\\SilentCleanup/ nocase ascii wide 
+ 	$func_str_bhz = "schtasks.exe" ascii wide
+	$func_re_bia = /Microsoft\\Windows\\DiskCleanup\\SilentCleanup/ nocase ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$str_bhz 
-		and 	$re_bia 
+			$func_str_bhz 
+		and 	$func_re_bia 
 		and 	capa_create_process
  
 	) 
@@ -6654,21 +6654,21 @@ rule capa_reference_AES_constants : CAPA DATA_MANIPULATION ENCRYPTION AES FUNCTI
 	attack = "Defense Evasion::Obfuscated Files or Information [T1027]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/reference-aes-constants.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$big = { 50 A7 F4 51 53 65 41 7E } // d-0
-	$bih = { 63 7C 77 7B F2 6B 6F C5 } // s-box
-	$bii = { 52 09 6A D5 30 36 A5 38 } // inv-s-box
+ 	$func_big = { 50 A7 F4 51 53 65 41 7E } // d-0
+	$func_bih = { 63 7C 77 7B F2 6B 6F C5 } // s-box
+	$func_bii = { 52 09 6A D5 30 36 A5 38 } // inv-s-box
  
   condition:
     capa_pe_file and
  (
-			$big 
-		or 	$bih 
-		or 	$bii  
+			$func_big 
+		or 	$func_bih 
+		or 	$func_bii  
 	) 
 }
 
@@ -6680,31 +6680,31 @@ rule capa_compiled_with_Nim : CAPA COMPILER NIM FILE  {
 	scope = "file"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/compiled-with-nim.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_bij = /NimMain/ ascii wide 
-	$re_bik = /NimMainModule/ ascii wide 
-	$re_bil = /NimMainInner/ ascii wide 
-	$re_bim = /io\.nim$/ ascii wide 
-	$re_bin = /fatal\.nim$/ ascii wide 
-	$re_bio = /system\.nim$/ ascii wide 
-	$re_bip = /alloc\.nim$/ ascii wide 
-	$re_biq = /osalloc\.nim$/ ascii wide 
+ 	$file_re_bij = /NimMain/ ascii wide 
+	$file_re_bik = /NimMainModule/ ascii wide 
+	$file_re_bil = /NimMainInner/ ascii wide 
+	$file_re_bim = /io\.nim$/ ascii wide 
+	$file_re_bin = /fatal\.nim$/ ascii wide 
+	$file_re_bio = /system\.nim$/ ascii wide 
+	$file_re_bip = /alloc\.nim$/ ascii wide 
+	$file_re_biq = /osalloc\.nim$/ ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$re_bij 
-		or 	$re_bik 
-		or 	$re_bil 
-		or 	$re_bim 
-		or 	$re_bin 
-		or 	$re_bio 
-		or 	$re_bip 
-		or 	$re_biq  
+			$file_re_bij 
+		or 	$file_re_bik 
+		or 	$file_re_bil 
+		or 	$file_re_bim 
+		or 	$file_re_bin 
+		or 	$file_re_bio 
+		or 	$file_re_bip 
+		or 	$file_re_biq  
 	) 
 }
 
@@ -6715,7 +6715,7 @@ rule capa_hook_routines_via_microsoft_detours : CAPA FUNCTION  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/hook-routines-via-microsoft-detours.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6739,7 +6739,7 @@ rule capa_packed_with_SVKP : CAPA ANTI_ANALYSIS PACKER SVKP FILE T1027_002 F0001
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-svkp.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6759,7 +6759,7 @@ rule capa_flush_cabinet_file : CAPA HOST_INTERACTION FILE_SYSTEM FUNCTION  {
 	references = "https://docs.microsoft.com/en-us/windows/win32/msi/cabinet-files"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/flush-cabinet-file.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6779,7 +6779,7 @@ rule capa_enumerate_system_firmware_tables : CAPA HOST_INTERACTION HARDWARE FIRM
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/enumerate-system-firmware-tables.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6799,17 +6799,17 @@ rule capa_reference_startup_folder : CAPA PERSISTENCE STARTUP_FOLDER FILE T1547_
 	attack = "Persistence::Boot or Logon Autostart Execution::Registry Run Keys / Startup Folder [T1547.001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/reference-startup-folder.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_bit = /Start Menu\\Programs\\Startup/ nocase ascii wide 
+ 	$file_re_bit = /Start Menu\\Programs\\Startup/ nocase ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$re_bit  
+			$file_re_bit  
 	) 
 }
 
@@ -6824,7 +6824,7 @@ rule capa_encrypt_or_decrypt_data_via_BCrypt : CAPA DATA_MANIPULATION ENCRYPTION
 	mbc = "Cryptography::Encrypt Data [C0027]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/encrypt-or-decrypt-data-via-bcrypt.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6851,7 +6851,7 @@ rule capa_connect_network_resource : CAPA COMMUNICATION HTTP FUNCTION  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/connect-network-resource.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6876,7 +6876,7 @@ rule capa_packed_with_Shrinker : CAPA ANTI_ANALYSIS PACKER SHRINKER FILE T1027_0
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-shrinker.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6899,7 +6899,7 @@ rule capa_packed_with_VProtect : CAPA ANTI_ANALYSIS PACKER VPROTECT FILE T1027_0
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-vprotect.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6920,7 +6920,7 @@ rule capa_packed_with_CCG : CAPA ANTI_ANALYSIS PACKER CCG FILE T1027_002 F0001  
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-ccg.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6939,7 +6939,7 @@ rule capa_set_console_window_title : CAPA HOST_INTERACTION GUI CONSOLE FUNCTION 
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/set-console-window-title.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6959,7 +6959,7 @@ rule capa_get_routing_table : CAPA HOST_INTERACTION NETWORK ROUTING_TABLE FUNCTI
 	attack = "Discovery::System Network Configuration Discovery [T1016]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/get-routing-table.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -6979,25 +6979,25 @@ rule capa_reference_Hurricane_Electric_DNS_server : CAPA COMMUNICATION DNS FUNCT
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/reference-hurricane-electric-dns-server.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bjc = "216.218.130.2" ascii wide // ns1.he.net
-	$str_bjd = "216.218.131.2" ascii wide // ns2.he.net
-	$str_bje = "216.218.132.2" ascii wide // ns3.he.net
-	$str_bjf = "216.66.1.2" ascii wide // ns4.he.net
-	$str_bjg = "216.66.80.18" ascii wide // ns5.he.net
+ 	$func_str_bjc = "216.218.130.2" ascii wide // ns1.he.net
+	$func_str_bjd = "216.218.131.2" ascii wide // ns2.he.net
+	$func_str_bje = "216.218.132.2" ascii wide // ns3.he.net
+	$func_str_bjf = "216.66.1.2" ascii wide // ns4.he.net
+	$func_str_bjg = "216.66.80.18" ascii wide // ns5.he.net
  
   condition:
     capa_pe_file and
  (
-			$str_bjc 
-		or 	$str_bjd 
-		or 	$str_bje 
-		or 	$str_bjf 
-		or 	$str_bjg  
+			$func_str_bjc 
+		or 	$func_str_bjd 
+		or 	$func_str_bje 
+		or 	$func_str_bjf 
+		or 	$func_str_bjg  
 	) 
 }
 
@@ -7011,7 +7011,7 @@ rule capa_packed_with_Mpress : CAPA ANTI_ANALYSIS PACKER MPRESS FILE T1027_002 F
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-mpress.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7031,17 +7031,17 @@ rule capa_packaged_as_an_InstallShield_installer : CAPA EXECUTABLE INSTALLER INS
 	scope = "file"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packaged-as-an-installshield-installer.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bjj = "InstallShield" ascii wide
+ 	$file_str_bjj = "InstallShield" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_bjj  
+			$file_str_bjj  
 	) 
 }
 
@@ -7054,89 +7054,89 @@ rule capa_mine_cryptocurrency : CAPA IMPACT CRYPTOCURRENCY FILE T1496  {
 	attack = "Impact::Resource Hijacking [T1496]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/mine-cryptocurrency.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bjk = "stratum+tcp://" ascii wide
-	$str_bjl = "xmrig" ascii wide
-	$str_bjm = "xmr-stak" ascii wide
-	$str_bjn = "supportxmr.com:" ascii wide
-	$str_bjo = "dwarfpool.com:" ascii wide
-	$str_bjp = "minergate" ascii wide
-	$str_bjq = "xmr." ascii wide
-	$str_bjr = "monero." ascii wide
-	$str_bjs = "Bitcoin" ascii wide
-	$str_bjt = "Bitcoin" ascii wide
-	$str_bju = "BitcoinGold" ascii wide
-	$str_bjv = "BtcCash" ascii wide
-	$str_bjw = "Ethereum" ascii wide
-	$str_bjx = "BlackCoin" ascii wide
-	$str_bjy = "ByteCoin" ascii wide
-	$str_bjz = "EmerCoin" ascii wide
-	$str_bka = "ReddCoin" ascii wide
-	$str_bkb = "Peercoin" ascii wide
-	$str_bkc = "Ripple" ascii wide
-	$str_bkd = "Miota" ascii wide
-	$str_bke = "Cardano" ascii wide
-	$str_bkf = "Lisk" ascii wide
-	$str_bkg = "Stratis" ascii wide
-	$str_bkh = "Waves" ascii wide
-	$str_bki = "Qtum" ascii wide
-	$str_bkj = "Stellar" ascii wide
-	$str_bkk = "ViaCoin" ascii wide
-	$str_bkl = "Electroneum" ascii wide
-	$str_bkm = "Dash" ascii wide
-	$str_bkn = "Doge" ascii wide
-	$str_bko = "Monero" ascii wide
-	$str_bkp = "Graft" ascii wide
-	$str_bkq = "Zcash" ascii wide
-	$str_bkr = "Ya.money" ascii wide
-	$str_bks = "Ya.disc" ascii wide
-	$str_bkt = "Steam" ascii wide
-	$str_bku = "vk.cc" ascii wide
+ 	$file_str_bjk = "stratum+tcp://" ascii wide
+	$file_str_bjl = "xmrig" ascii wide
+	$file_str_bjm = "xmr-stak" ascii wide
+	$file_str_bjn = "supportxmr.com:" ascii wide
+	$file_str_bjo = "dwarfpool.com:" ascii wide
+	$file_str_bjp = "minergate" ascii wide
+	$file_str_bjq = "xmr." ascii wide
+	$file_str_bjr = "monero." ascii wide
+	$file_str_bjs = "Bitcoin" ascii wide
+	$file_str_bjt = "Bitcoin" ascii wide
+	$file_str_bju = "BitcoinGold" ascii wide
+	$file_str_bjv = "BtcCash" ascii wide
+	$file_str_bjw = "Ethereum" ascii wide
+	$file_str_bjx = "BlackCoin" ascii wide
+	$file_str_bjy = "ByteCoin" ascii wide
+	$file_str_bjz = "EmerCoin" ascii wide
+	$file_str_bka = "ReddCoin" ascii wide
+	$file_str_bkb = "Peercoin" ascii wide
+	$file_str_bkc = "Ripple" ascii wide
+	$file_str_bkd = "Miota" ascii wide
+	$file_str_bke = "Cardano" ascii wide
+	$file_str_bkf = "Lisk" ascii wide
+	$file_str_bkg = "Stratis" ascii wide
+	$file_str_bkh = "Waves" ascii wide
+	$file_str_bki = "Qtum" ascii wide
+	$file_str_bkj = "Stellar" ascii wide
+	$file_str_bkk = "ViaCoin" ascii wide
+	$file_str_bkl = "Electroneum" ascii wide
+	$file_str_bkm = "Dash" ascii wide
+	$file_str_bkn = "Doge" ascii wide
+	$file_str_bko = "Monero" ascii wide
+	$file_str_bkp = "Graft" ascii wide
+	$file_str_bkq = "Zcash" ascii wide
+	$file_str_bkr = "Ya.money" ascii wide
+	$file_str_bks = "Ya.disc" ascii wide
+	$file_str_bkt = "Steam" ascii wide
+	$file_str_bku = "vk.cc" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_bjk 
-		or 	$str_bjl 
-		or 	$str_bjm 
-		or 	$str_bjn 
-		or 	$str_bjo 
-		or 	$str_bjp 
-		or 	$str_bjq 
-		or 	$str_bjr 
-		or 	$str_bjs 
-		or 	$str_bjt 
-		or 	$str_bju 
-		or 	$str_bjv 
-		or 	$str_bjw 
-		or 	$str_bjx 
-		or 	$str_bjy 
-		or 	$str_bjz 
-		or 	$str_bka 
-		or 	$str_bkb 
-		or 	$str_bkc 
-		or 	$str_bkd 
-		or 	$str_bke 
-		or 	$str_bkf 
-		or 	$str_bkg 
-		or 	$str_bkh 
-		or 	$str_bki 
-		or 	$str_bkj 
-		or 	$str_bkk 
-		or 	$str_bkl 
-		or 	$str_bkm 
-		or 	$str_bkn 
-		or 	$str_bko 
-		or 	$str_bkp 
-		or 	$str_bkq 
-		or 	$str_bkr 
-		or 	$str_bks 
-		or 	$str_bkt 
-		or 	$str_bku  
+			$file_str_bjk 
+		or 	$file_str_bjl 
+		or 	$file_str_bjm 
+		or 	$file_str_bjn 
+		or 	$file_str_bjo 
+		or 	$file_str_bjp 
+		or 	$file_str_bjq 
+		or 	$file_str_bjr 
+		or 	$file_str_bjs 
+		or 	$file_str_bjt 
+		or 	$file_str_bju 
+		or 	$file_str_bjv 
+		or 	$file_str_bjw 
+		or 	$file_str_bjx 
+		or 	$file_str_bjy 
+		or 	$file_str_bjz 
+		or 	$file_str_bka 
+		or 	$file_str_bkb 
+		or 	$file_str_bkc 
+		or 	$file_str_bkd 
+		or 	$file_str_bke 
+		or 	$file_str_bkf 
+		or 	$file_str_bkg 
+		or 	$file_str_bkh 
+		or 	$file_str_bki 
+		or 	$file_str_bkj 
+		or 	$file_str_bkk 
+		or 	$file_str_bkl 
+		or 	$file_str_bkm 
+		or 	$file_str_bkn 
+		or 	$file_str_bko 
+		or 	$file_str_bkp 
+		or 	$file_str_bkq 
+		or 	$file_str_bkr 
+		or 	$file_str_bks 
+		or 	$file_str_bkt 
+		or 	$file_str_bku  
 	) 
 }
 
@@ -7150,7 +7150,7 @@ rule capa_packed_with_SeauSFX : CAPA ANTI_ANALYSIS PACKER SEAUSFX FILE T1027_002
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-seausfx.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7169,19 +7169,19 @@ rule capa_debug_build : CAPA EXECUTABLE PE DEBUG FILE  {
 	scope = "file"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/debug-build.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bkw = "Assertion failed!" ascii wide
-	$str_bkx = "Assertion failed:" ascii wide
+ 	$file_str_bkw = "Assertion failed!" ascii wide
+	$file_str_bkx = "Assertion failed:" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_bkw 
-		or 	$str_bkx  
+			$file_str_bkw 
+		or 	$file_str_bkx  
 	) 
 }
 
@@ -7195,7 +7195,7 @@ rule capa_packed_with_Simple_Pack : CAPA ANTI_ANALYSIS PACKER SIMPLE_PACK FILE T
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-simple-pack.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7215,7 +7215,7 @@ rule capa_resolve_function_by_hash : CAPA LINKING RUNTIME_LINKING FUNCTION T1027
 	attack = "Defense Evasion::Obfuscated Files or Information::Indicator Removal from Tools [T1027.005]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/resolve-function-by-hash.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7253,7 +7253,7 @@ rule capa_hash_data_via_BCrypt : CAPA DATA_MANIPULATION HASHING FUNCTION T1027 C
 	mbc = "Cryptography::Cryptographic Hash [C0029]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/hash-data-via-bcrypt.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7281,7 +7281,7 @@ rule capa_delete_internet_cache : CAPA HOST_INTERACTION INTERNET CACHE FUNCTION 
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/delete-internet-cache.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7302,19 +7302,19 @@ rule capa_reference_OpenDNS_DNS_server : CAPA COMMUNICATION DNS FUNCTION  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/reference-opendns-dns-server.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_blk = "208.67.222.222" ascii wide
-	$str_bll = "208.67.220.220" ascii wide
+ 	$func_str_blk = "208.67.222.222" ascii wide
+	$func_str_bll = "208.67.220.220" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_blk 
-		or 	$str_bll  
+			$func_str_blk 
+		or 	$func_str_bll  
 	) 
 }
 
@@ -7325,7 +7325,7 @@ rule capa_read_process_memory : CAPA HOST_INTERACTION PROCESS FUNCTION  {
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/read-process-memory.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7345,51 +7345,51 @@ rule capa_linked_against_XZip : CAPA LINKING STATIC XZIP FILE C0060  {
 	mbc = "Data::Compression Library [C0060]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/linked-against-xzip.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_blm = "ct_init: length != 256" ascii wide
-	$str_bln = "ct_init: dist != 256" ascii wide
-	$str_blo = "ct_init: 256+dist != 512" ascii wide
-	$str_blp = "bit length overflow" ascii wide
-	$str_blq = "code %d bits %d->%d" ascii wide
-	$str_blr = "inconsistent bit counts" ascii wide
-	$str_bls = "gen_codes: max_code %d " ascii wide
-	$str_blt = "dyn trees: dyn %ld, stat %ld" ascii wide
-	$str_blu = "bad pack level" ascii wide
-	$str_blv = "Code too clever" ascii wide
-	$str_blw = "unknown zip result code" ascii wide
-	$str_blx = "Culdn't duplicate handle" ascii wide
-	$str_bly = "File not found in the zipfile" ascii wide
-	$str_blz = "Still more data to unzip" ascii wide
-	$str_bma = "Caller: the file had already been partially unzipped" ascii wide
-	$str_bmb = "Caller: can only get memory of a memory zipfile" ascii wide
-	$str_bmc = "Zip-bug: internal initialisation not completed" ascii wide
-	$str_bmd = "Zip-bug: an internal error during flation" ascii wide
+ 	$file_str_blm = "ct_init: length != 256" ascii wide
+	$file_str_bln = "ct_init: dist != 256" ascii wide
+	$file_str_blo = "ct_init: 256+dist != 512" ascii wide
+	$file_str_blp = "bit length overflow" ascii wide
+	$file_str_blq = "code %d bits %d->%d" ascii wide
+	$file_str_blr = "inconsistent bit counts" ascii wide
+	$file_str_bls = "gen_codes: max_code %d " ascii wide
+	$file_str_blt = "dyn trees: dyn %ld, stat %ld" ascii wide
+	$file_str_blu = "bad pack level" ascii wide
+	$file_str_blv = "Code too clever" ascii wide
+	$file_str_blw = "unknown zip result code" ascii wide
+	$file_str_blx = "Culdn't duplicate handle" ascii wide
+	$file_str_bly = "File not found in the zipfile" ascii wide
+	$file_str_blz = "Still more data to unzip" ascii wide
+	$file_str_bma = "Caller: the file had already been partially unzipped" ascii wide
+	$file_str_bmb = "Caller: can only get memory of a memory zipfile" ascii wide
+	$file_str_bmc = "Zip-bug: internal initialisation not completed" ascii wide
+	$file_str_bmd = "Zip-bug: an internal error during flation" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_blm 
-		or 	$str_bln 
-		or 	$str_blo 
-		or 	$str_blp 
-		or 	$str_blq 
-		or 	$str_blr 
-		or 	$str_bls 
-		or 	$str_blt 
-		or 	$str_blu 
-		or 	$str_blv 
-		or 	$str_blw 
-		or 	$str_blx 
-		or 	$str_bly 
-		or 	$str_blz 
-		or 	$str_bma 
-		or 	$str_bmb 
-		or 	$str_bmc 
-		or 	$str_bmd  
+			$file_str_blm 
+		or 	$file_str_bln 
+		or 	$file_str_blo 
+		or 	$file_str_blp 
+		or 	$file_str_blq 
+		or 	$file_str_blr 
+		or 	$file_str_bls 
+		or 	$file_str_blt 
+		or 	$file_str_blu 
+		or 	$file_str_blv 
+		or 	$file_str_blw 
+		or 	$file_str_blx 
+		or 	$file_str_bly 
+		or 	$file_str_blz 
+		or 	$file_str_bma 
+		or 	$file_str_bmb 
+		or 	$file_str_bmc 
+		or 	$file_str_bmd  
 	) 
 }
 
@@ -7401,25 +7401,25 @@ rule capa_compiled_from_EPL : CAPA COMPILER EPL FILE  {
 	scope = "file"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/compiled-from-epl.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bme = "GetNewSock" ascii wide
-	$str_bmf = "Software\\FlySky\\E\\Install" ascii wide
-	$str_bmg = "Not found the kernel library or the kernel library is invalid!" ascii wide
-	$str_bmh = "Failed to allocate memory!" ascii wide
-	$str_bmi = "/ MADE BY E COMPILER – WUTAO" ascii wide
+ 	$file_str_bme = "GetNewSock" ascii wide
+	$file_str_bmf = "Software\\FlySky\\E\\Install" ascii wide
+	$file_str_bmg = "Not found the kernel library or the kernel library is invalid!" ascii wide
+	$file_str_bmh = "Failed to allocate memory!" ascii wide
+	$file_str_bmi = "/ MADE BY E COMPILER – WUTAO" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_bme 
-		or 	$str_bmf 
-		or 	$str_bmg 
-		or 	$str_bmh 
-		or 	$str_bmi 
+			$file_str_bme 
+		or 	$file_str_bmf 
+		or 	$file_str_bmg 
+		or 	$file_str_bmh 
+		or 	$file_str_bmi 
 		or 	for any bmj in pe.sections : ( bmj.name == ".ecode" ) 
 		or 	for any bmk in pe.sections : ( bmk.name == ".edata" ) 
 		or 	pe.imports(/krnln/i, /fne/) 
@@ -7438,7 +7438,7 @@ rule capa_get_session_information : CAPA HOST_INTERACTION SESSION FUNCTION T1033
 	attack = "Discovery::System Owner/User Discovery [T1033]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/get-session-information.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7459,7 +7459,7 @@ rule capa_packed_with_Perplex : CAPA ANTI_ANALYSIS PACKER PERPLEX FILE T1027_002
 	mbc = "Anti-Static Analysis::Software Packing [F0001]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/packed-with-perplex.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7478,21 +7478,21 @@ rule capa_compiled_with_Go : CAPA COMPILER GO FILE  {
 	scope = "file"
 	hash = "49a34cfbeed733c24392c9217ef46bb6"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/compiler/go/compiled-with-go.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bmm = "Go build ID:" ascii wide
-	$str_bmn = "go.buildid" ascii wide
-	$str_bmo = "Go buildinf:" ascii wide
+ 	$file_str_bmm = "Go build ID:" ascii wide
+	$file_str_bmn = "go.buildid" ascii wide
+	$file_str_bmo = "Go buildinf:" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_bmm 
-		or 	$str_bmn 
-		or 	$str_bmo  
+			$file_str_bmm 
+		or 	$file_str_bmn 
+		or 	$file_str_bmo  
 	) 
 }
 
@@ -7504,23 +7504,23 @@ rule capa_compiled_with_ps2exe : CAPA COMPILER PS2EXE FILE  {
 	scope = "file"
 	hash = "8775ed26068788279726e08ff9665aab"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/compiler/ps2exe/compiled-with-ps2exe.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bmp = "PS2EXEApp" ascii wide
-	$str_bmq = "PS2EXE" ascii wide
-	$str_bmr = "PS2EXE_Host" ascii wide
+ 	$file_str_bmp = "PS2EXEApp" ascii wide
+	$file_str_bmq = "PS2EXE" ascii wide
+	$file_str_bmr = "PS2EXE_Host" ascii wide
  
   condition:
     capa_pe_file and
  (
 			capa_compiled_to_the__NET_platform
 
-		and 	$str_bmp 
-		and 	$str_bmq 
-		and 	$str_bmr  
+		and 	$file_str_bmp 
+		and 	$file_str_bmq 
+		and 	$file_str_bmr  
 	) 
 }
 
@@ -7532,19 +7532,19 @@ rule capa_compiled_with_MinGW_for_Windows : CAPA COMPILER MINGW FILE  {
 	scope = "file"
 	hash = "5b3968b47eb16a1cb88525e3b565eab1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/compiler/mingw/compiled-with-mingw-for-windows.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bms = "Mingw runtime failure:" ascii wide
-	$str_bmt = "_Jv_RegisterClasses" ascii wide // from GCC
+ 	$file_str_bms = "Mingw runtime failure:" ascii wide
+	$file_str_bmt = "_Jv_RegisterClasses" ascii wide // from GCC
  
   condition:
     capa_pe_file and
  (
-			$str_bms 
-		and 	$str_bmt  
+			$file_str_bms 
+		and 	$file_str_bmt  
 	) 
 }
 
@@ -7556,17 +7556,17 @@ rule capa_compiled_from_Visual_Basic : CAPA COMPILER VB FILE  {
 	scope = "file"
 	hash = "9bca6b99e7981208af4c7925b96fb9cf"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/compiler/vb/compiled-from-visual-basic.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_bmu = /VB5!.{,1000}/ ascii wide 
+ 	$file_re_bmu = /VB5!.{,1000}/ ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$re_bmu 
+			$file_re_bmu 
 		and 	pe.imports(/msvbvm60/i, /ThunRTMain/)  
 	) 
 }
@@ -7580,23 +7580,23 @@ rule capa_compiled_with_pyarmor : CAPA COMPILER PYARMOR FILE T1059_006  {
 	attack = "Execution::Command and Scripting Interpreter::Python [T1059.006]"
 	hash = "a0fb20bc9aa944c3a0a6c4545c195818"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/compiler/pyarmor/compiled-with-pyarmor.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bmy = "pyarmor_runtimesh" ascii wide
-	$str_bmz = "PYARMOR" ascii wide
-	$str_bna = "__pyarmor__" ascii wide
-	$str_bnb = "PYARMOR_SIGNATURE" ascii wide
+ 	$file_str_bmy = "pyarmor_runtimesh" ascii wide
+	$file_str_bmz = "PYARMOR" ascii wide
+	$file_str_bna = "__pyarmor__" ascii wide
+	$file_str_bnb = "PYARMOR_SIGNATURE" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_bmy 
-		or 	$str_bmz 
-		or 	$str_bna 
-		or 	$str_bnb  
+			$file_str_bmy 
+		or 	$file_str_bmz 
+		or 	$file_str_bna 
+		or 	$file_str_bnb  
 	) 
 }
 
@@ -7608,39 +7608,39 @@ rule capa_compiled_with_exe4j : CAPA COMPILER EXE4J FILE  {
 	scope = "file"
 	hash = "6b25f1e754ef486bbb28a66d46bababe"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/compiler/exe4j/compiled-with-exe4j.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bnc = "exe4j_log" ascii wide
-	$str_bnd = "install4j_log" ascii wide
-	$str_bne = "exe4j_java_home" ascii wide
-	$str_bnf = "install4j" ascii wide
-	$str_bng = "exe4j.isinstall4j" ascii wide
-	$re_bnh = /com\/exe4j\/runtime\/exe4jcontroller/ nocase ascii wide 
-	$re_bni = /com\/exe4j\/runtime\/winlauncher/ nocase ascii wide 
-	$str_bnj = "EXE4J_LOG" ascii wide
-	$str_bnk = "INSTALL4J_LOG" ascii wide
-	$str_bnl = "EXE4J_JAVA_HOME" ascii wide
-	$str_bnm = "INSTALL4J" ascii wide
-	$str_bnn = "EXE4J.ISINSTALL4J" ascii wide
+ 	$file_str_bnc = "exe4j_log" ascii wide
+	$file_str_bnd = "install4j_log" ascii wide
+	$file_str_bne = "exe4j_java_home" ascii wide
+	$file_str_bnf = "install4j" ascii wide
+	$file_str_bng = "exe4j.isinstall4j" ascii wide
+	$file_re_bnh = /com\/exe4j\/runtime\/exe4jcontroller/ nocase ascii wide 
+	$file_re_bni = /com\/exe4j\/runtime\/winlauncher/ nocase ascii wide 
+	$file_str_bnj = "EXE4J_LOG" ascii wide
+	$file_str_bnk = "INSTALL4J_LOG" ascii wide
+	$file_str_bnl = "EXE4J_JAVA_HOME" ascii wide
+	$file_str_bnm = "INSTALL4J" ascii wide
+	$file_str_bnn = "EXE4J.ISINSTALL4J" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_bnc 
-		or 	$str_bnd 
-		or 	$str_bne 
-		or 	$str_bnf 
-		or 	$str_bng 
-		or 	$re_bnh 
-		or 	$re_bni 
-		or 	$str_bnj 
-		or 	$str_bnk 
-		or 	$str_bnl 
-		or 	$str_bnm 
-		or 	$str_bnn  
+			$file_str_bnc 
+		or 	$file_str_bnd 
+		or 	$file_str_bne 
+		or 	$file_str_bnf 
+		or 	$file_str_bng 
+		or 	$file_re_bnh 
+		or 	$file_re_bni 
+		or 	$file_str_bnj 
+		or 	$file_str_bnk 
+		or 	$file_str_bnl 
+		or 	$file_str_bnm 
+		or 	$file_str_bnn  
 	) 
 }
 
@@ -7653,27 +7653,27 @@ rule capa_compiled_with_AutoIt : CAPA COMPILER AUTOIT FILE T1059  {
 	attack = "Execution::Command and Scripting Interpreter [T1059]"
 	hash = "55D77AB16377A8A314982F723FCC6FAE"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/compiler/autoit/compiled-with-autoit.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bno = "AutoIt has detected the stack has become corrupt.\n\nStack corruption typically occurs when either the wrong calling convention is used or when the function is called with the wrong number of arguments.\n\nAutoIt supports the __stdcall (WINAPI) and __cdecl calling conventions.  The __stdcall (WINAPI) convention is used by default but __cdecl can be used instead.  See the DllCall() documentation for details on changing the calling convention." ascii wide
-	$str_bnp = "AutoIt Error" ascii wide
-	$re_bnq = />>>AUTOIT SCRIPT<<</ ascii wide 
-	$str_bnr = ">>>AUTOIT NO CMDEXECUTE<<<" ascii wide
-	$str_bns = "#requireadmin" ascii wide
-	$str_bnt = "#OnAutoItStartRegister" ascii wide
+ 	$file_str_bno = "AutoIt has detected the stack has become corrupt.\n\nStack corruption typically occurs when either the wrong calling convention is used or when the function is called with the wrong number of arguments.\n\nAutoIt supports the __stdcall (WINAPI) and __cdecl calling conventions.  The __stdcall (WINAPI) convention is used by default but __cdecl can be used instead.  See the DllCall() documentation for details on changing the calling convention." ascii wide
+	$file_str_bnp = "AutoIt Error" ascii wide
+	$file_re_bnq = />>>AUTOIT SCRIPT<<</ ascii wide 
+	$file_str_bnr = ">>>AUTOIT NO CMDEXECUTE<<<" ascii wide
+	$file_str_bns = "#requireadmin" ascii wide
+	$file_str_bnt = "#OnAutoItStartRegister" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_bno 
-		or 	$str_bnp 
-		or 	$re_bnq 
-		or 	$str_bnr 
-		or 	$str_bns 
-		or 	$str_bnt  
+			$file_str_bno 
+		or 	$file_str_bnp 
+		or 	$file_re_bnq 
+		or 	$file_str_bnr 
+		or 	$file_str_bns 
+		or 	$file_str_bnt  
 	) 
 }
 
@@ -7685,23 +7685,23 @@ rule capa_compiled_with_Borland_Delphi : CAPA COMPILER DELPHI FILE  {
 	scope = "file"
 	hash = "4BDD67FF852C221112337FECD0681EAC"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/compiler/delphi/compiled-with-borland-delphi.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bnu = "Borland C++ - Copyright 2002 Borland Corporation" ascii wide
-	$re_bnv = /SOFTWARE\\Borland\\Delphi\\RTL/ ascii wide 
-	$str_bnw = "Sysutils::Exception" ascii wide
-	$str_bnx = "TForm1" ascii wide
+ 	$file_str_bnu = "Borland C++ - Copyright 2002 Borland Corporation" ascii wide
+	$file_re_bnv = /SOFTWARE\\Borland\\Delphi\\RTL/ ascii wide 
+	$file_str_bnw = "Sysutils::Exception" ascii wide
+	$file_str_bnx = "TForm1" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_bnu 
-		or 	$re_bnv 
-		or 	$str_bnw 
-		or 	$str_bnx 
+			$file_str_bnu 
+		or 	$file_re_bnv 
+		or 	$file_str_bnw 
+		or 	$file_str_bnx 
 		or 	pe.imports(/BORLNDMM/i, /DLL/)  
 	) 
 }
@@ -7714,7 +7714,7 @@ rule capa_compiled_with_dmd : CAPA COMPILER D FILE  {
 	scope = "file"
 	hash = "321338196a46b600ea330fc5d98d0699"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/compiler/d/compiled-with-dmd.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -7736,18 +7736,18 @@ rule capa_compiled_with_py2exe : CAPA COMPILER PY2EXE BASICBLOCK  {
 	scope = "basic block"
 	hash = "ed888dc2f04f5eac83d6d14088d002de"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/compiler/py2exe/compiled-with-py2exe.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_boc = "PY2EXE_VERBOSE" ascii wide
+ 	$basic_str_boc = "PY2EXE_VERBOSE" ascii wide
 	$api_bod = /\bgetenv(A|W)?\b/ ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_boc 
+			$basic_str_boc 
 		and 	$api_bod  
 	) 
 }
@@ -7761,21 +7761,21 @@ rule capa_identify_ATM_dispenser_service_provider : CAPA TARGETING AUTOMATED_TEL
 	hash = "b2ad4409323147b63e370745e5209996"
 	hash = "1f094dd65be477d15d871e72f0fdce5e"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/targeting/automated-teller-machine/identify-atm-dispenser-service-provider.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_boe = "CurrencyDispenser1" ascii wide // NCR
-	$str_bof = "CDM30" ascii wide // Wincor
-	$str_bog = "DBD_AdvFuncDisp" ascii wide // Diebold
+ 	$file_str_boe = "CurrencyDispenser1" ascii wide // NCR
+	$file_str_bof = "CDM30" ascii wide // Wincor
+	$file_str_bog = "DBD_AdvFuncDisp" ascii wide // Diebold
  
   condition:
     capa_pe_file and
  (
-			$str_boe 
-		or 	$str_bof 
-		or 	$str_bog  
+			$file_str_boe 
+		or 	$file_str_bof 
+		or 	$file_str_bog  
 	) 
 }
 
@@ -7792,20 +7792,20 @@ rule capa_load_NCR_ATM_library : CAPA TARGETING AUTOMATED_TELLER_MACHINE NCR FIL
 	hash = "5b3968b47eb16a1cb88525e3b565eab1"
 	hash = "dc4dc746d8a14060fb5fc7edd4ef5282"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/targeting/automated-teller-machine/ncr/load-ncr-atm-library.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_boh = "MSXFS.dll" ascii wide
-	$str_boi = "msxfs.dll" ascii wide
+ 	$file_str_boh = "MSXFS.dll" ascii wide
+	$file_str_boi = "msxfs.dll" ascii wide
  
   condition:
     capa_pe_file and
  (
 			pe.imports(/msxfs/i, /dll/) 
-		or 	$str_boh 
-		or 	$str_boi  
+		or 	$file_str_boh 
+		or 	$file_str_boi  
 	) 
 }
 
@@ -7817,47 +7817,47 @@ rule capa_reference_NCR_ATM_library_routines : CAPA TARGETING AUTOMATED_TELLER_M
 	scope = "function"
 	hash = "84a1212f4a91066babcf594d87a85894"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/targeting/automated-teller-machine/ncr/reference-ncr-atm-library-routines.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_boj = "msxfs.dll" ascii wide
-	$str_bok = "WFSCleanUp" ascii wide
-	$str_bol = "WFSClose" ascii wide
-	$str_bom = "WFSExecute" ascii wide
-	$str_bon = "WFSFreeResult" ascii wide
-	$str_boo = "WFSGetInfo" ascii wide
-	$str_bop = "WFSLock" ascii wide
-	$str_boq = "WFSOpen" ascii wide
-	$str_bor = "WFSRegister" ascii wide
-	$str_bos = "WFSStartUp" ascii wide
-	$str_bot = "WFSUnlock" ascii wide
+ 	$func_str_boj = "msxfs.dll" ascii wide
+	$func_str_bok = "WFSCleanUp" ascii wide
+	$func_str_bol = "WFSClose" ascii wide
+	$func_str_bom = "WFSExecute" ascii wide
+	$func_str_bon = "WFSFreeResult" ascii wide
+	$func_str_boo = "WFSGetInfo" ascii wide
+	$func_str_bop = "WFSLock" ascii wide
+	$func_str_boq = "WFSOpen" ascii wide
+	$func_str_bor = "WFSRegister" ascii wide
+	$func_str_bos = "WFSStartUp" ascii wide
+	$func_str_bot = "WFSUnlock" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_boj 
+			$func_str_boj 
 		or 	pe.imports(/msxfs/i, /WFSCleanUp/) 
-		or 	$str_bok 
+		or 	$func_str_bok 
 		or 	pe.imports(/msxfs/i, /WFSClose/) 
-		or 	$str_bol 
+		or 	$func_str_bol 
 		or 	pe.imports(/msxfs/i, /WFSExecute/) 
-		or 	$str_bom 
+		or 	$func_str_bom 
 		or 	pe.imports(/msxfs/i, /WFSFreeResult/) 
-		or 	$str_bon 
+		or 	$func_str_bon 
 		or 	pe.imports(/msxfs/i, /WFSGetInfo/) 
-		or 	$str_boo 
+		or 	$func_str_boo 
 		or 	pe.imports(/msxfs/i, /WFSLock/) 
-		or 	$str_bop 
+		or 	$func_str_bop 
 		or 	pe.imports(/msxfs/i, /WFSOpen/) 
-		or 	$str_boq 
+		or 	$func_str_boq 
 		or 	pe.imports(/msxfs/i, /WFSRegister/) 
-		or 	$str_bor 
+		or 	$func_str_bor 
 		or 	pe.imports(/msxfs/i, /WFSStartUp/) 
-		or 	$str_bos 
+		or 	$func_str_bos 
 		or 	pe.imports(/msxfs/i, /WFSUnlock/) 
-		or 	$str_bot  
+		or 	$func_str_bot  
 	) 
 }
 
@@ -7869,19 +7869,19 @@ rule capa_reference_Diebold_ATM_routines : CAPA TARGETING AUTOMATED_TELLER_MACHI
 	scope = "file"
 	hash = "b2ad4409323147b63e370745e5209996"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/targeting/automated-teller-machine/diebold-nixdorf/reference-diebold-atm-routines.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bou = "DBD_AdvFuncDisp" ascii wide // dispenser function
-	$str_bov = "DBD_EPP4" ascii wide // pin pad function
+ 	$file_str_bou = "DBD_AdvFuncDisp" ascii wide // dispenser function
+	$file_str_bov = "DBD_EPP4" ascii wide // pin pad function
  
   condition:
     capa_pe_file and
  (
-			$str_bou 
-		or 	$str_bov  
+			$file_str_bou 
+		or 	$file_str_bov  
 	) 
 }
 
@@ -7895,45 +7895,45 @@ rule capa_load_Diebold_Nixdorf_ATM_library : CAPA TARGETING AUTOMATED_TELLER_MAC
 	hash = "8683c43f1e22363ce98f0a89ca4ed389"
 	hash = "953bc3e68f0a49c6ade30b52a2bfaaab"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/targeting/automated-teller-machine/diebold-nixdorf/load-diebold-nixdorf-atm-library.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bow = "CSCWCNG.dll" ascii wide
-	$str_box = "CscCngStatusWrite" ascii wide
-	$str_boy = "CscCngCasRefInit" ascii wide
-	$str_boz = "CscCngEncryption" ascii wide
-	$str_bpa = "CscCngRecovery" ascii wide
-	$str_bpb = "CscCngService" ascii wide
-	$str_bpc = "CscCngOpen" ascii wide
-	$str_bpd = "CscCngReset" ascii wide
-	$str_bpe = "CscCngClose" ascii wide
-	$str_bpf = "CscCngDispense" ascii wide
-	$str_bpg = "CscCngTransport" ascii wide
-	$str_bph = "CscCngStatusRead" ascii wide
-	$str_bpi = "CscCngInit" ascii wide
-	$str_bpj = "CscCngGetRelease" ascii wide
-	$str_bpk = "CscCngLock" ascii wide
-	$str_bpl = "CscCngUnlock" ascii wide
-	$str_bpm = "CscCngShutter" ascii wide
-	$str_bpn = "CscCngPowerOff" ascii wide
-	$str_bpo = "CscCngSelStatus" ascii wide
-	$str_bpp = "CscCngBim" ascii wide
-	$str_bpq = "CscCngConfigure" ascii wide
-	$str_bpr = "CscCngStatistics" ascii wide
-	$str_bps = "CscCngControl" ascii wide
-	$str_bpt = "CscCngPsm" ascii wide
-	$str_bpu = "CscCngGetTrace" ascii wide
-	$str_bpv = "CscCngOptimization" ascii wide
-	$str_bpw = "CscCngSelftest" ascii wide
-	$str_bpx = "CscCngEco" ascii wide
+ 	$file_str_bow = "CSCWCNG.dll" ascii wide
+	$file_str_box = "CscCngStatusWrite" ascii wide
+	$file_str_boy = "CscCngCasRefInit" ascii wide
+	$file_str_boz = "CscCngEncryption" ascii wide
+	$file_str_bpa = "CscCngRecovery" ascii wide
+	$file_str_bpb = "CscCngService" ascii wide
+	$file_str_bpc = "CscCngOpen" ascii wide
+	$file_str_bpd = "CscCngReset" ascii wide
+	$file_str_bpe = "CscCngClose" ascii wide
+	$file_str_bpf = "CscCngDispense" ascii wide
+	$file_str_bpg = "CscCngTransport" ascii wide
+	$file_str_bph = "CscCngStatusRead" ascii wide
+	$file_str_bpi = "CscCngInit" ascii wide
+	$file_str_bpj = "CscCngGetRelease" ascii wide
+	$file_str_bpk = "CscCngLock" ascii wide
+	$file_str_bpl = "CscCngUnlock" ascii wide
+	$file_str_bpm = "CscCngShutter" ascii wide
+	$file_str_bpn = "CscCngPowerOff" ascii wide
+	$file_str_bpo = "CscCngSelStatus" ascii wide
+	$file_str_bpp = "CscCngBim" ascii wide
+	$file_str_bpq = "CscCngConfigure" ascii wide
+	$file_str_bpr = "CscCngStatistics" ascii wide
+	$file_str_bps = "CscCngControl" ascii wide
+	$file_str_bpt = "CscCngPsm" ascii wide
+	$file_str_bpu = "CscCngGetTrace" ascii wide
+	$file_str_bpv = "CscCngOptimization" ascii wide
+	$file_str_bpw = "CscCngSelftest" ascii wide
+	$file_str_bpx = "CscCngEco" ascii wide
  
   condition:
     capa_pe_file and
  (
 			pe.imports(/cscwcng/i, /dll/) 
-		or 	$str_bow 
+		or 	$file_str_bow 
 		or 	pe.imports(/cscwcng/i, /CscCngStatusWrite/) 
 		or 	pe.imports(/cscwcng/i, /CscCngCasRefInit/) 
 		or 	pe.imports(/cscwcng/i, /CscCngEncryption/) 
@@ -7961,33 +7961,33 @@ rule capa_load_Diebold_Nixdorf_ATM_library : CAPA TARGETING AUTOMATED_TELLER_MAC
 		or 	pe.imports(/cscwcng/i, /CscCngOptimization/) 
 		or 	pe.imports(/cscwcng/i, /CscCngSelftest/) 
 		or 	pe.imports(/cscwcng/i, /CscCngEco/) 
-		or 	$str_box 
-		or 	$str_boy 
-		or 	$str_boz 
-		or 	$str_bpa 
-		or 	$str_bpb 
-		or 	$str_bpc 
-		or 	$str_bpd 
-		or 	$str_bpe 
-		or 	$str_bpf 
-		or 	$str_bpg 
-		or 	$str_bph 
-		or 	$str_bpi 
-		or 	$str_bpj 
-		or 	$str_bpk 
-		or 	$str_bpl 
-		or 	$str_bpm 
-		or 	$str_bpn 
-		or 	$str_bpo 
-		or 	$str_bpp 
-		or 	$str_bpq 
-		or 	$str_bpr 
-		or 	$str_bps 
-		or 	$str_bpt 
-		or 	$str_bpu 
-		or 	$str_bpv 
-		or 	$str_bpw 
-		or 	$str_bpx  
+		or 	$file_str_box 
+		or 	$file_str_boy 
+		or 	$file_str_boz 
+		or 	$file_str_bpa 
+		or 	$file_str_bpb 
+		or 	$file_str_bpc 
+		or 	$file_str_bpd 
+		or 	$file_str_bpe 
+		or 	$file_str_bpf 
+		or 	$file_str_bpg 
+		or 	$file_str_bph 
+		or 	$file_str_bpi 
+		or 	$file_str_bpj 
+		or 	$file_str_bpk 
+		or 	$file_str_bpl 
+		or 	$file_str_bpm 
+		or 	$file_str_bpn 
+		or 	$file_str_bpo 
+		or 	$file_str_bpp 
+		or 	$file_str_bpq 
+		or 	$file_str_bpr 
+		or 	$file_str_bps 
+		or 	$file_str_bpt 
+		or 	$file_str_bpu 
+		or 	$file_str_bpv 
+		or 	$file_str_bpw 
+		or 	$file_str_bpx  
 	) 
 }
 
@@ -8000,7 +8000,7 @@ rule capa_initialize_WinHTTP_library : CAPA COMMUNICATION HTTP FUNCTION C0002_00
 	mbc = "Communication::HTTP Communication::WinHTTP [C0002.008]"
 	hash = "6A352C3E55E8AE5ED39DC1BE7FB964B1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/http/initialize-winhttp-library.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8020,7 +8020,7 @@ rule capa_set_HTTP_header : CAPA COMMUNICATION HTTP FUNCTION C0002_013  {
 	mbc = "Communication::HTTP Communication::Set Header [C0002.013]"
 	hash = "6A352C3E55E8AE5ED39DC1BE7FB964B1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/http/set-http-header.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8040,20 +8040,20 @@ rule capa_initialize_IWebBrowser2 : CAPA COMMUNICATION HTTP BASICBLOCK C0002_010
 	mbc = "Communication::HTTP Communication::IWebBrowser [C0002.010]"
 	hash = "395EB0DDD99D2C9E37B6D0B73485EE9C"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/http/initialize-iwebbrowser2.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$bpy = { 01 DF 02 00 00 00 00 00 C0 00 00 00 00 00 00 46 } // CLSID_InternetExplorer
-	$bpz = { 61 16 0C D3 AF CD D0 11 8A 3E 00 C0 4F C9 E2 6E } // IID_IWebBrowser2
+ 	$basic_bpy = { 01 DF 02 00 00 00 00 00 C0 00 00 00 00 00 00 46 } // CLSID_InternetExplorer
+	$basic_bpz = { 61 16 0C D3 AF CD D0 11 8A 3E 00 C0 4F C9 E2 6E } // IID_IWebBrowser2
  
   condition:
     capa_pe_file and
  (
 			pe.imports(/ole32/i, /CoCreateInstance/) 
-		and 	$bpy 
-		and 	$bpz  
+		and 	$basic_bpy 
+		and 	$basic_bpz  
 	) 
 }
 
@@ -8066,7 +8066,7 @@ rule capa_read_HTTP_header : CAPA COMMUNICATION HTTP FUNCTION C0002_014  {
 	mbc = "Communication::HTTP Communication::Read Header [C0002.014]"
 	hash = "6A352C3E55E8AE5ED39DC1BE7FB964B1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/http/read-http-header.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8086,7 +8086,7 @@ rule capa_send_HTTP_response : CAPA COMMUNICATION HTTP SERVER FUNCTION C0002_016
 	mbc = "Communication::HTTP Communication::Send Response [C0002.016]"
 	hash = "6A352C3E55E8AE5ED39DC1BE7FB964B1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/http/server/send-http-response.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8106,7 +8106,7 @@ rule capa_start_HTTP_server : CAPA COMMUNICATION HTTP SERVER FUNCTION C0002_018 
 	mbc = "Communication::HTTP Communication::Start Server [C0002.018]"
 	hash = "6A352C3E55E8AE5ED39DC1BE7FB964B1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/http/server/start-http-server.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8126,7 +8126,7 @@ rule capa_receive_HTTP_response : CAPA COMMUNICATION HTTP CLIENT FUNCTION C0002_
 	mbc = "Communication::HTTP Communication::Get Response [C0002.017]"
 	hash = "6A352C3E55E8AE5ED39DC1BE7FB964B1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/http/client/receive-http-response.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8149,7 +8149,7 @@ rule capa_create_HTTP_request : CAPA COMMUNICATION HTTP CLIENT FUNCTION C0002_01
 	mbc = "Communication::HTTP Communication::Create Request [C0002.012]"
 	hash = "6f99a2c8944cb02ff28c6f9ced59b161"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/http/client/create-http-request.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8169,7 +8169,7 @@ rule capa_connect_to_URL : CAPA COMMUNICATION HTTP CLIENT FUNCTION C0002_004  {
 	mbc = "Communication::HTTP Communication::Open URL [C0002.004]"
 	hash = "6f99a2c8944cb02ff28c6f9ced59b161"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/http/client/connect-to-url.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8189,7 +8189,7 @@ rule capa_send_file_via_HTTP : CAPA COMMUNICATION HTTP CLIENT BASICBLOCK C0002_0
 	mbc = "Communication::HTTP Communication::Send Data [C0002.005]"
 	hash = "EAAD7DFC78304B977D3844CC63577152"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/http/client/send-file-via-http.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8210,7 +8210,7 @@ rule capa_download_URL_to_file : CAPA COMMUNICATION HTTP CLIENT FUNCTION C0002_0
 	hash = "F5C93AC768C8206E87544DDD76B3277C"
 	hash = "Practical Malware Analysis Lab 20-01.exe_:0x401040"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/http/client/download-url-to-file.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8231,7 +8231,7 @@ rule capa_prepare_HTTP_request : CAPA COMMUNICATION HTTP CLIENT FUNCTION C0002_0
 	mbc = "Communication::HTTP Communication::Create Request [C0002.012]"
 	hash = "6A352C3E55E8AE5ED39DC1BE7FB964B1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/http/client/prepare-http-request.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8251,7 +8251,7 @@ rule capa_read_data_from_Internet : CAPA COMMUNICATION HTTP CLIENT FUNCTION C000
 	mbc = "Communication::HTTP Communication::Get Response [C0002.017]"
 	hash = "6f99a2c8944cb02ff28c6f9ced59b161"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/http/client/read-data-from-internet.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8274,7 +8274,7 @@ rule capa_connect_to_HTTP_server : CAPA COMMUNICATION HTTP CLIENT FUNCTION C0002
 	mbc = "Communication::HTTP Communication::Connect to Server [C0002.009]"
 	hash = "6f99a2c8944cb02ff28c6f9ced59b161"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/http/client/connect-to-http-server.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8295,7 +8295,7 @@ rule capa_send_file_using_FTP_via_wininet : CAPA COMMUNICATION FTP SEND FUNCTION
 	mbc = "Communication::FTP Communication::WinINet [C0004.002]"
 	hash = "Practical Malware Analysis Lab 20-02.exe_:0x401380"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/ftp/send/send-file-using-ftp-via-wininet.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8315,7 +8315,7 @@ rule capa_send_ICMP_echo_request : CAPA COMMUNICATION ICMP FUNCTION C0014_002  {
 	mbc = "Communication::ICMP Communication::Echo Request [C0014.002]"
 	hash = "al-khaser_x86.exe_:0x449510"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/icmp/send-icmp-echo-request.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8346,7 +8346,7 @@ rule capa_initialize_Winsock_library : CAPA COMMUNICATION SOCKET FUNCTION C0001_
 	mbc = "Communication::Socket Communication::Initialize Winsock Library [C0001.009]"
 	hash = "6A352C3E55E8AE5ED39DC1BE7FB964B1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/socket/initialize-winsock-library.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8367,7 +8367,7 @@ rule capa_get_socket_status : CAPA COMMUNICATION SOCKET FUNCTION T1016 C0001_012
 	mbc = "Communication::Socket Communication::Get Socket Status [C0001.012]"
 	hash = "6A352C3E55E8AE5ED39DC1BE7FB964B1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/socket/get-socket-status.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8387,7 +8387,7 @@ rule capa_set_socket_configuration : CAPA COMMUNICATION SOCKET FUNCTION C0001_00
 	mbc = "Communication::Socket Communication::Set Socket Config [C0001.001]"
 	hash = "6A352C3E55E8AE5ED39DC1BE7FB964B1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/socket/set-socket-configuration.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8408,7 +8408,7 @@ rule capa_receive_data_on_socket : CAPA COMMUNICATION SOCKET RECEIVE FUNCTION C0
 	mbc = "Communication::Socket Communication::Receive Data [C0001.006]"
 	hash = "Practical Malware Analysis Lab 01-01.dll_:0x10001010"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/socket/receive/receive-data-on-socket.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8434,7 +8434,7 @@ rule capa_send_data_on_socket : CAPA COMMUNICATION SOCKET SEND FUNCTION C0001_00
 	mbc = "Communication::Socket Communication::Send Data [C0001.007]"
 	hash = "Practical Malware Analysis Lab 01-01.dll_:0x10001010"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/socket/send/send-data-on-socket.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8458,7 +8458,7 @@ rule capa_create_pipe : CAPA COMMUNICATION NAMED_PIPE CREATE FUNCTION C0003_001 
 	mbc = "Communication::Interprocess Communication::Create Pipe [C0003.001]"
 	hash = "Practical Malware Analysis Lab 03-02.dll_:0x10003a13"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/named-pipe/create/create-pipe.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8478,7 +8478,7 @@ rule capa_connect_pipe : CAPA COMMUNICATION NAMED_PIPE CONNECT FUNCTION C0003_00
 	mbc = "Communication::Interprocess Communication::Connect Pipe [C0003.002]"
 	hash = "152d4c9f63efb332ccb134c6953c0104"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/named-pipe/connect/connect-pipe.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8499,7 +8499,7 @@ rule capa_read_pipe : CAPA COMMUNICATION NAMED_PIPE READ FUNCTION C0003_003  {
 	mbc = "Communication::Interprocess Communication::Read Pipe [C0003.003]"
 	hash = "Practical Malware Analysis Lab 14-02.exe_:0x4014C0"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/named-pipe/read/read-pipe.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8524,7 +8524,7 @@ rule capa_access_PE_header : CAPA LOAD_CODE PE FUNCTION T1129  {
 	attack = "Execution::Shared Modules [T1129]"
 	hash = "563653399B82CD443F120ECEFF836EA3678D4CF11D9B351BB737573C2D856299"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/load-code/pe/access-pe-header.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8548,33 +8548,33 @@ rule capa_acquire_credentials_from_Windows_Credential_Manager : CAPA COLLECTION 
 	attack = "Credential Access::Credentials from Password Stores::Windows Credential Manager [T1555.004]"
 	hash = "c56af5561e3f20bed435fb4355cffc29"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/acquire-credentials-from-windows-credential-manager.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bqh = ".vcrd" ascii wide
-	$str_bqi = "*.vcrd" ascii wide
-	$str_bqj = "Policy.vpol" ascii wide
-	$re_bqk = /AppData\\Local\\Microsoft\\(Vault|Credentials)/ ascii wide 
+ 	$func_str_bqh = ".vcrd" ascii wide
+	$func_str_bqi = "*.vcrd" ascii wide
+	$func_str_bqj = "Policy.vpol" ascii wide
+	$func_re_bqk = /AppData\\Local\\Microsoft\\(Vault|Credentials)/ ascii wide 
 	$api_bql = /\bCredEnumerate(A|W)?\b/ ascii wide
-	$re_bqm = /vaultcmd(\.exe)?/ ascii wide 
-	$re_bqn = /\/listcreds:/ ascii wide 
-	$re_bqo = /"Windows Credentials"/ ascii wide 
+	$func_re_bqm = /vaultcmd(\.exe)?/ ascii wide 
+	$func_re_bqn = /\/listcreds:/ ascii wide 
+	$func_re_bqo = /"Windows Credentials"/ ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$str_bqh 
-		or 	$str_bqi 
-		or 	$str_bqj 
-		or 	$re_bqk 
+			$func_str_bqh 
+		or 	$func_str_bqi 
+		or 	$func_str_bqj 
+		or 	$func_re_bqk 
 		or 	$api_bql 
 		or  (
 		 (
-			$re_bqm 
-		or 	$re_bqn 
-		or 	$re_bqo  
+			$func_re_bqm 
+		or 	$func_re_bqn 
+		or 	$func_re_bqo  
 	)  
 	)  
 	) 
@@ -8589,45 +8589,45 @@ rule capa_get_geographical_location : CAPA COLLECTION FUNCTION T1614  {
 	attack = "Discovery::System Location Discovery [T1614]"
 	hash = "9879D201DC5ACA863F357184CD1F170E"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/get-geographical-location.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
  	$api_bqp = /\bGetLocaleInfo(A|W)?\b/ ascii wide
 	$api_bqq = /\bGetLocaleInfoEx(A|W)?\b/ ascii wide
-	$re_bqr = /geolocation/ nocase ascii wide 
-	$re_bqs = /geo-location/ nocase ascii wide 
-	$re_bqt = /\x00city/ nocase ascii wide 
-	$re_bqu = /region_code/ nocase ascii wide 
-	$re_bqv = /region_name/ nocase ascii wide 
-	$re_bqw = /\x00country/ nocase ascii wide 
-	$re_bqx = /country_code/ nocase ascii wide 
-	$re_bqy = /countrycode/ nocase ascii wide 
-	$re_bqz = /country_name/ nocase ascii wide 
-	$re_bra = /continent_code/ nocase ascii wide 
-	$re_brb = /continent_name/ nocase ascii wide 
-	$re_brc = /\x00latitude/ nocase ascii wide 
-	$re_brd = /\x00longitude/ nocase ascii wide 
+	$func_re_bqr = /geolocation/ nocase ascii wide 
+	$func_re_bqs = /geo-location/ nocase ascii wide 
+	$func_re_bqt = /\x00city/ nocase ascii wide 
+	$func_re_bqu = /region_code/ nocase ascii wide 
+	$func_re_bqv = /region_name/ nocase ascii wide 
+	$func_re_bqw = /\x00country/ nocase ascii wide 
+	$func_re_bqx = /country_code/ nocase ascii wide 
+	$func_re_bqy = /countrycode/ nocase ascii wide 
+	$func_re_bqz = /country_name/ nocase ascii wide 
+	$func_re_bra = /continent_code/ nocase ascii wide 
+	$func_re_brb = /continent_name/ nocase ascii wide 
+	$func_re_brc = /\x00latitude/ nocase ascii wide 
+	$func_re_brd = /\x00longitude/ nocase ascii wide 
  
   condition:
     capa_pe_file and
  (
 			$api_bqp 
 		or 	$api_bqq 
-		or 	$re_bqr 
-		or 	$re_bqs 
-		or 	$re_bqt 
-		or 	$re_bqu 
-		or 	$re_bqv 
-		or 	$re_bqw 
-		or 	$re_bqx 
-		or 	$re_bqy 
-		or 	$re_bqz 
-		or 	$re_bra 
-		or 	$re_brb 
-		or 	$re_brc 
-		or 	$re_brd  
+		or 	$func_re_bqr 
+		or 	$func_re_bqs 
+		or 	$func_re_bqt 
+		or 	$func_re_bqu 
+		or 	$func_re_bqv 
+		or 	$func_re_bqw 
+		or 	$func_re_bqx 
+		or 	$func_re_bqy 
+		or 	$func_re_bqz 
+		or 	$func_re_bra 
+		or 	$func_re_brb 
+		or 	$func_re_brc 
+		or 	$func_re_brd  
 	) 
 }
 
@@ -8641,7 +8641,7 @@ rule capa_log_keystrokes_via_polling : CAPA COLLECTION KEYLOG FUNCTION T1056_001
 	mbc = "Collection::Keylogging::Polling [F0002.002]"
 	hash = "Practical Malware Analysis Lab 11-03.dll_:0x10001030"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/keylog/log-keystrokes-via-polling.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8666,7 +8666,7 @@ rule capa_log_keystrokes : CAPA COLLECTION KEYLOG FUNCTION T1056_001  {
 	attack = "Collection::Input Capture::Keylogging [T1056.001]"
 	hash = "C91887D861D9BD4A5872249B641BC9F9"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/keylog/log-keystrokes.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8709,23 +8709,23 @@ rule capa_capture_microphone_audio : CAPA COLLECTION MICROPHONE FUNCTION T1123  
 	attack = "Collection::Audio Capture [T1123]"
 	hash = "a70052c45e907820187c7e6bcdc7ecca"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/microphone/capture-microphone-audio.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
  	$api_brk = /\bmciSendString(A|W)?\b/ ascii wide
-	$re_brl = /\x00open/ nocase ascii wide 
-	$re_brm = /waveaudio/ nocase ascii wide 
-	$re_brn = /\x00record/ nocase ascii wide 
+	$func_re_brl = /\x00open/ nocase ascii wide 
+	$func_re_brm = /waveaudio/ nocase ascii wide 
+	$func_re_brn = /\x00record/ nocase ascii wide 
  
   condition:
     capa_pe_file and
  (
 			$api_brk 
-		and 	$re_brl 
-		and 	$re_brm 
-		and 	$re_brn  
+		and 	$func_re_brl 
+		and 	$func_re_brm 
+		and 	$func_re_brn  
 	) 
 }
 
@@ -8739,26 +8739,26 @@ rule capa_get_domain_trust_relationships : CAPA COLLECTION NETWORK FUNCTION T148
 	hash = "0796f1c1ea0a142fc1eb7109a44c86cb"
 	hash = "0731679c5f99e8ee65d8b29a3cabfc6b"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/network/get-domain-trust-relationships.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_bro = /nltest/ nocase ascii wide 
-	$re_brp = /\/domain_trusts/ nocase ascii wide 
-	$re_brq = /\/dclist/ nocase ascii wide 
-	$re_brr = /\/all_trusts/ nocase ascii wide 
+ 	$func_re_bro = /nltest/ nocase ascii wide 
+	$func_re_brp = /\/domain_trusts/ nocase ascii wide 
+	$func_re_brq = /\/dclist/ nocase ascii wide 
+	$func_re_brr = /\/all_trusts/ nocase ascii wide 
 	$api_brs = /\bDsEnumerateDomainTrusts(A|W)?\b/ ascii wide
  
   condition:
     capa_pe_file and
  (
 		 (
-			$re_bro 
+			$func_re_bro 
 		and  (
-			$re_brp 
-		or 	$re_brq 
-		or 	$re_brr  
+			$func_re_brp 
+		or 	$func_re_brq 
+		or 	$func_re_brr  
 	)  
 	) 
 		or 	$api_brs  
@@ -8774,17 +8774,17 @@ rule capa_capture_network_configuration_via_ipconfig : CAPA COLLECTION NETWORK B
 	attack = "Discovery::System Network Configuration Discovery [T1016]"
 	hash = "7204e3efc2434012e13ca939db0d0b02"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/network/capture-network-configuration-via-ipconfig.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_brt = /ipconfig(\.exe)?/ nocase ascii wide 
+ 	$basic_re_brt = /ipconfig(\.exe)?/ nocase ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$re_brt 
+			$basic_re_brt 
 		and 	pe.imports(/msvcr100/i, /system/)  
 	) 
 }
@@ -8798,7 +8798,7 @@ rule capa_capture_public_ip : CAPA COLLECTION NETWORK FUNCTION T1016  {
 	attack = "Discovery::System Network Configuration Discovery [T1016]"
 	hash = "84f1b049fa8962b215a77f51af6714b3"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/network/capture-public-ip.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -8806,17 +8806,17 @@ rule capa_capture_public_ip : CAPA COLLECTION NETWORK FUNCTION T1016  {
  	$api_bru = /\bInternetOpen(A|W)?\b/ ascii wide
 	$api_brv = /\bInternetOpenUrl(A|W)?\b/ ascii wide
 	$api_brw = /\bInternetReadFile(A|W)?\b/ ascii wide
-	$re_brx = /bot\.whatismyipaddress\.com/ ascii wide 
-	$re_bry = /ipinfo\.io\/ip/ ascii wide 
-	$re_brz = /checkip\.dyndns\.org/ ascii wide 
-	$re_bsa = /ifconfig\.me/ ascii wide 
-	$re_bsb = /ipecho\.net\/plain/ ascii wide 
-	$re_bsc = /api\.ipify\.org/ ascii wide 
-	$re_bsd = /checkip\.amazonaws\.com/ ascii wide 
-	$re_bse = /icanhazip\.com/ ascii wide 
-	$re_bsf = /wtfismyip\.com\/text/ ascii wide 
-	$re_bsg = /api\.myip\.com/ ascii wide 
-	$re_bsh = /ip\-api\.com\/line/ ascii wide 
+	$func_re_brx = /bot\.whatismyipaddress\.com/ ascii wide 
+	$func_re_bry = /ipinfo\.io\/ip/ ascii wide 
+	$func_re_brz = /checkip\.dyndns\.org/ ascii wide 
+	$func_re_bsa = /ifconfig\.me/ ascii wide 
+	$func_re_bsb = /ipecho\.net\/plain/ ascii wide 
+	$func_re_bsc = /api\.ipify\.org/ ascii wide 
+	$func_re_bsd = /checkip\.amazonaws\.com/ ascii wide 
+	$func_re_bse = /icanhazip\.com/ ascii wide 
+	$func_re_bsf = /wtfismyip\.com\/text/ ascii wide 
+	$func_re_bsg = /api\.myip\.com/ ascii wide 
+	$func_re_bsh = /ip\-api\.com\/line/ ascii wide 
  
   condition:
     capa_pe_file and
@@ -8825,17 +8825,17 @@ rule capa_capture_public_ip : CAPA COLLECTION NETWORK FUNCTION T1016  {
 		and 	$api_brv 
 		and 	$api_brw 
 		and  (
-			$re_brx 
-		or 	$re_bry 
-		or 	$re_brz 
-		or 	$re_bsa 
-		or 	$re_bsb 
-		or 	$re_bsc 
-		or 	$re_bsd 
-		or 	$re_bse 
-		or 	$re_bsf 
-		or 	$re_bsg 
-		or 	$re_bsh  
+			$func_re_brx 
+		or 	$func_re_bry 
+		or 	$func_re_brz 
+		or 	$func_re_bsa 
+		or 	$func_re_bsb 
+		or 	$func_re_bsc 
+		or 	$func_re_bsd 
+		or 	$func_re_bse 
+		or 	$func_re_bsf 
+		or 	$func_re_bsg 
+		or 	$func_re_bsh  
 	)  
 	) 
 }
@@ -8849,24 +8849,24 @@ rule capa_gather_cuteftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-cuteftp-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_bsi = /\\sm\.dat/ ascii wide 
-	$re_bsj = /\\GlobalSCAPE\\CuteFTP/ nocase ascii wide 
-	$re_bsk = /\\GlobalSCAPE\\CuteFTP Pro/ nocase ascii wide 
-	$re_bsl = /\\CuteFTP/ ascii wide 
+ 	$func_re_bsi = /\\sm\.dat/ ascii wide 
+	$func_re_bsj = /\\GlobalSCAPE\\CuteFTP/ nocase ascii wide 
+	$func_re_bsk = /\\GlobalSCAPE\\CuteFTP Pro/ nocase ascii wide 
+	$func_re_bsl = /\\CuteFTP/ ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$re_bsi 
+			$func_re_bsi 
 		and  (
-			$re_bsj 
-		or 	$re_bsk 
-		or 	$re_bsl  
+			$func_re_bsj 
+		or 	$func_re_bsk 
+		or 	$func_re_bsl  
 	)  
 	) 
 }
@@ -8880,19 +8880,19 @@ rule capa_gather_ftprush_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-ftprush-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_bsm = /\\FTPRush/ ascii wide 
-	$re_bsn = /RushSite\.xml/ ascii wide 
+ 	$func_re_bsm = /\\FTPRush/ ascii wide 
+	$func_re_bsn = /RushSite\.xml/ ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$re_bsm 
-		and 	$re_bsn  
+			$func_re_bsm 
+		and 	$func_re_bsn  
 	) 
 }
 
@@ -8905,24 +8905,24 @@ rule capa_gather_smart_ftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION 
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-smart-ftp-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_bso = /\\SmartFTP/ ascii wide 
-	$str_bsp = ".xml" ascii wide
-	$re_bsq = /Favorites\.dat/ nocase ascii wide 
-	$re_bsr = /History\.dat/ nocase ascii wide 
+ 	$func_re_bso = /\\SmartFTP/ ascii wide 
+	$func_str_bsp = ".xml" ascii wide
+	$func_re_bsq = /Favorites\.dat/ nocase ascii wide 
+	$func_re_bsr = /History\.dat/ nocase ascii wide 
  
   condition:
     capa_pe_file and
  (
 		 (
-			$re_bso 
-		and 	$str_bsp 
-		and 	$re_bsq 
-		and 	$re_bsr  
+			$func_re_bso 
+		and 	$func_str_bsp 
+		and 	$func_re_bsq 
+		and 	$func_re_bsr  
 	)  
 	) 
 }
@@ -8936,22 +8936,22 @@ rule capa_gather_cyberduck_information : CAPA COLLECTION FILE_MANAGERS FUNCTION 
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-cyberduck-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_bss = /\\Cyberduck/ ascii wide 
-	$str_bst = "user.config" ascii wide
-	$str_bsu = ".duck" ascii wide
+ 	$func_re_bss = /\\Cyberduck/ ascii wide 
+	$func_str_bst = "user.config" ascii wide
+	$func_str_bsu = ".duck" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$re_bss 
+			$func_re_bss 
 		and  (
-			$str_bst 
-		or 	$str_bsu  
+			$func_str_bst 
+		or 	$func_str_bsu  
 	)  
 	) 
 }
@@ -8965,21 +8965,21 @@ rule capa_gather_ws_ftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T15
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-ws-ftp-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_bsv = /\\Ipswitch\\WS_FTP/ ascii wide 
-	$re_bsw = /\\win\.ini/ ascii wide 
-	$re_bsx = /WS_FTP/ ascii wide 
+ 	$func_re_bsv = /\\Ipswitch\\WS_FTP/ ascii wide 
+	$func_re_bsw = /\\win\.ini/ ascii wide 
+	$func_re_bsx = /WS_FTP/ ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$re_bsv 
-		and 	$re_bsw 
-		and 	$re_bsx  
+			$func_re_bsv 
+		and 	$func_re_bsw 
+		and 	$func_re_bsx  
 	) 
 }
 
@@ -8992,28 +8992,28 @@ rule capa_gather_fling_ftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION 
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-fling-ftp-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_bsy = /SOFTWARE\\NCH Software\\Fling\\Accounts/ ascii wide 
-	$str_bsz = "FtpPassword" ascii wide
-	$str_bta = "_FtpPassword" ascii wide
-	$str_btb = "FtpServer" ascii wide
-	$str_btc = "FtpUserName" ascii wide
-	$str_btd = "FtpDirectory" ascii wide
+ 	$func_re_bsy = /SOFTWARE\\NCH Software\\Fling\\Accounts/ ascii wide 
+	$func_str_bsz = "FtpPassword" ascii wide
+	$func_str_bta = "_FtpPassword" ascii wide
+	$func_str_btb = "FtpServer" ascii wide
+	$func_str_btc = "FtpUserName" ascii wide
+	$func_str_btd = "FtpDirectory" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$re_bsy 
+			$func_re_bsy 
 		or  (
-			$str_bsz 
-		and 	$str_bta 
-		and 	$str_btb 
-		and 	$str_btc 
-		and 	$str_btd  
+			$func_str_bsz 
+		and 	$func_str_bta 
+		and 	$func_str_btb 
+		and 	$func_str_btc 
+		and 	$func_str_btd  
 	)  
 	) 
 }
@@ -9027,23 +9027,23 @@ rule capa_gather_directory_opus_information : CAPA COLLECTION FILE_MANAGERS FUNC
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-directory-opus-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_bte = /\\GPSoftware\\Directory Opus/ ascii wide 
-	$str_btf = ".oxc" ascii wide
-	$str_btg = ".oll" ascii wide
-	$str_bth = "ftplast.osd" ascii wide
+ 	$func_re_bte = /\\GPSoftware\\Directory Opus/ ascii wide 
+	$func_str_btf = ".oxc" ascii wide
+	$func_str_btg = ".oll" ascii wide
+	$func_str_bth = "ftplast.osd" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$re_bte 
-		and 	$str_btf 
-		and 	$str_btg 
-		and 	$str_bth  
+			$func_re_bte 
+		and 	$func_str_btf 
+		and 	$func_str_btg 
+		and 	$func_str_bth  
 	) 
 }
 
@@ -9056,26 +9056,26 @@ rule capa_gather_coreftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-coreftp-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_bti = /Software\\FTPWare\\COREFTP\\Sites/ ascii wide 
-	$str_btj = "Host" ascii wide
-	$str_btk = "User" ascii wide
-	$str_btl = "Port" ascii wide
-	$str_btm = "PthR" ascii wide
+ 	$func_re_bti = /Software\\FTPWare\\COREFTP\\Sites/ ascii wide 
+	$func_str_btj = "Host" ascii wide
+	$func_str_btk = "User" ascii wide
+	$func_str_btl = "Port" ascii wide
+	$func_str_btm = "PthR" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$re_bti 
+			$func_re_bti 
 		or  (
-			$str_btj 
-		and 	$str_btk 
-		and 	$str_btl 
-		and 	$str_btm  
+			$func_str_btj 
+		and 	$func_str_btk 
+		and 	$func_str_btl 
+		and 	$func_str_btm  
 	)  
 	) 
 }
@@ -9089,31 +9089,31 @@ rule capa_gather_wise_ftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-wise-ftp-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_btn = "wiseftpsrvs.ini" ascii wide
-	$str_bto = "wiseftp.ini" ascii wide
-	$str_btp = "wiseftpsrvs.bin" ascii wide
-	$str_btq = "wiseftpsrvs.bin" ascii wide
-	$re_btr = /\\AceBIT/ ascii wide 
-	$re_bts = /Software\\AceBIT/ ascii wide 
+ 	$func_str_btn = "wiseftpsrvs.ini" ascii wide
+	$func_str_bto = "wiseftp.ini" ascii wide
+	$func_str_btp = "wiseftpsrvs.bin" ascii wide
+	$func_str_btq = "wiseftpsrvs.bin" ascii wide
+	$func_re_btr = /\\AceBIT/ ascii wide 
+	$func_re_bts = /Software\\AceBIT/ ascii wide 
  
   condition:
     capa_pe_file and
  (
 		 (
-			$str_btn 
-		and 	$str_bto 
-		and 	$str_btp  
+			$func_str_btn 
+		and 	$func_str_bto 
+		and 	$func_str_btp  
 	) 
 		or  (
-			$str_btq 
+			$func_str_btq 
 		and  (
-			$re_btr 
-		or 	$re_bts  
+			$func_re_btr 
+		or 	$func_re_bts  
 	)  
 	)  
 	) 
@@ -9128,32 +9128,32 @@ rule capa_gather_winzip_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T15
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-winzip-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_btt = /Software\\Nico Mak Computing\\WinZip\\FTP/ ascii wide 
-	$re_btu = /Software\\Nico Mak Computing\\WinZip\\mru\\jobs/ ascii wide 
-	$str_btv = "Site" ascii wide
-	$str_btw = "UserID" ascii wide
-	$str_btx = "xflags" ascii wide
-	$str_bty = "Port" ascii wide
-	$str_btz = "Folder" ascii wide
+ 	$func_re_btt = /Software\\Nico Mak Computing\\WinZip\\FTP/ ascii wide 
+	$func_re_btu = /Software\\Nico Mak Computing\\WinZip\\mru\\jobs/ ascii wide 
+	$func_str_btv = "Site" ascii wide
+	$func_str_btw = "UserID" ascii wide
+	$func_str_btx = "xflags" ascii wide
+	$func_str_bty = "Port" ascii wide
+	$func_str_btz = "Folder" ascii wide
  
   condition:
     capa_pe_file and
  (
 		 (
-			$re_btt 
-		and 	$re_btu  
+			$func_re_btt 
+		and 	$func_re_btu  
 	) 
 		or  (
-			$str_btv 
-		and 	$str_btw 
-		and 	$str_btx 
-		and 	$str_bty 
-		and 	$str_btz  
+			$func_str_btv 
+		and 	$func_str_btw 
+		and 	$func_str_btx 
+		and 	$func_str_bty 
+		and 	$func_str_btz  
 	)  
 	) 
 }
@@ -9167,28 +9167,28 @@ rule capa_gather_southriver_webdrive_information : CAPA COLLECTION FILE_MANAGERS
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-southriver-webdrive-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_bua = /Software\\South River Technologies\\WebDrive\\Connections/ ascii wide 
-	$str_bub = "PassWord" ascii wide
-	$str_buc = "UserName" ascii wide
-	$str_bud = "RootDirectory" ascii wide
-	$str_bue = "Port" ascii wide
-	$str_buf = "ServerType" ascii wide
+ 	$func_re_bua = /Software\\South River Technologies\\WebDrive\\Connections/ ascii wide 
+	$func_str_bub = "PassWord" ascii wide
+	$func_str_buc = "UserName" ascii wide
+	$func_str_bud = "RootDirectory" ascii wide
+	$func_str_bue = "Port" ascii wide
+	$func_str_buf = "ServerType" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$re_bua 
+			$func_re_bua 
 		or  (
-			$str_bub 
-		and 	$str_buc 
-		and 	$str_bud 
-		and 	$str_bue 
-		and 	$str_buf  
+			$func_str_bub 
+		and 	$func_str_buc 
+		and 	$func_str_bud 
+		and 	$func_str_bue 
+		and 	$func_str_buf  
 	)  
 	) 
 }
@@ -9202,19 +9202,19 @@ rule capa_gather_freshftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-freshftp-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bug = "FreshFTP" ascii wide
-	$str_buh = ".SMF" ascii wide
+ 	$func_str_bug = "FreshFTP" ascii wide
+	$func_str_buh = ".SMF" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_bug 
-		and 	$str_buh  
+			$func_str_bug 
+		and 	$func_str_buh  
 	) 
 }
 
@@ -9227,20 +9227,20 @@ rule capa_gather_fasttrack_ftp_information : CAPA COLLECTION FILE_MANAGERS FUNCT
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-fasttrack-ftp-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bui = "FastTrack" ascii wide
-	$str_buj = "ftplist.txt" ascii wide
+ 	$func_str_bui = "FastTrack" ascii wide
+	$func_str_buj = "ftplist.txt" ascii wide
  
   condition:
     capa_pe_file and
  (
 		 (
-			$str_bui 
-		and 	$str_buj  
+			$func_str_bui 
+		and 	$func_str_buj  
 	)  
 	) 
 }
@@ -9254,17 +9254,17 @@ rule capa_gather_classicftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-classicftp-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_buk = /Software\\NCH Software\\ClassicFTP\\FTPAccounts/ ascii wide 
+ 	$func_re_buk = /Software\\NCH Software\\ClassicFTP\\FTPAccounts/ ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$re_buk  
+			$func_re_buk  
 	) 
 }
 
@@ -9277,19 +9277,19 @@ rule capa_gather_softx_ftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION 
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-softx-ftp-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_bul = /Software\\FTPClient\\Sites/ ascii wide 
-	$re_bum = /Software\\SoftX.org\\FTPClient\\Sites/ ascii wide 
+ 	$func_re_bul = /Software\\FTPClient\\Sites/ ascii wide 
+	$func_re_bum = /Software\\SoftX.org\\FTPClient\\Sites/ ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$re_bul 
-		or 	$re_bum  
+			$func_re_bul 
+		or 	$func_re_bum  
 	) 
 }
 
@@ -9302,40 +9302,40 @@ rule capa_gather_ffftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T155
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-ffftp-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_bun = /Software\\Sota\\FFFTP\\Options/ ascii wide 
-	$re_buo = /Software\\Sota\\FFFTP/ ascii wide 
-	$re_bup = /CredentialSalt/ ascii wide 
-	$re_buq = /CredentialCheck/ ascii wide 
-	$str_bur = "Password" ascii wide
-	$str_bus = "UserName" ascii wide
-	$str_but = "HostAdrs" ascii wide
-	$str_buu = "RemoteDir" ascii wide
-	$str_buv = "Port" ascii wide
+ 	$func_re_bun = /Software\\Sota\\FFFTP\\Options/ ascii wide 
+	$func_re_buo = /Software\\Sota\\FFFTP/ ascii wide 
+	$func_re_bup = /CredentialSalt/ ascii wide 
+	$func_re_buq = /CredentialCheck/ ascii wide 
+	$func_str_bur = "Password" ascii wide
+	$func_str_bus = "UserName" ascii wide
+	$func_str_but = "HostAdrs" ascii wide
+	$func_str_buu = "RemoteDir" ascii wide
+	$func_str_buv = "Port" ascii wide
  
   condition:
     capa_pe_file and
  (
 		 (
 		 (
-			$re_bun 
-		or 	$re_buo  
+			$func_re_bun 
+		or 	$func_re_buo  
 	) 
 		and  (
-			$re_bup 
-		or 	$re_buq  
+			$func_re_bup 
+		or 	$func_re_buq  
 	)  
 	) 
 		or  (
-			$str_bur 
-		and 	$str_bus 
-		and 	$str_but 
-		and 	$str_buu 
-		and 	$str_buv  
+			$func_str_bur 
+		and 	$func_str_bus 
+		and 	$func_str_but 
+		and 	$func_str_buu 
+		and 	$func_str_buv  
 	)  
 	) 
 }
@@ -9349,19 +9349,19 @@ rule capa_gather_ftpshell_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-ftpshell-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_buw = "FTPShell" ascii wide
-	$str_bux = "ftpshell.fsi" ascii wide
+ 	$func_str_buw = "FTPShell" ascii wide
+	$func_str_bux = "ftpshell.fsi" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_buw 
-		and 	$str_bux  
+			$func_str_buw 
+		and 	$func_str_bux  
 	) 
 }
 
@@ -9374,27 +9374,27 @@ rule capa_gather_winscp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T15
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-winscp-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_buy = "Password" ascii wide
-	$str_buz = "HostName" ascii wide
-	$str_bva = "UserName" ascii wide
-	$str_bvb = "RemoteDirectory" ascii wide
-	$str_bvc = "PortNumber" ascii wide
-	$str_bvd = "FSProtocol" ascii wide
+ 	$func_str_buy = "Password" ascii wide
+	$func_str_buz = "HostName" ascii wide
+	$func_str_bva = "UserName" ascii wide
+	$func_str_bvb = "RemoteDirectory" ascii wide
+	$func_str_bvc = "PortNumber" ascii wide
+	$func_str_bvd = "FSProtocol" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_buy 
-		and 	$str_buz 
-		and 	$str_bva 
-		and 	$str_bvb 
-		and 	$str_bvc 
-		and 	$str_bvd  
+			$func_str_buy 
+		and 	$func_str_buz 
+		and 	$func_str_bva 
+		and 	$func_str_bvb 
+		and 	$func_str_bvc 
+		and 	$func_str_bvd  
 	) 
 }
 
@@ -9407,19 +9407,19 @@ rule capa_gather_frigate3_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-frigate3-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_bve = /FtpSite\.xml/ ascii wide 
-	$re_bvf = /\\Frigate3/ ascii wide 
+ 	$func_re_bve = /FtpSite\.xml/ ascii wide 
+	$func_re_bvf = /\\Frigate3/ ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$re_bve 
-		and 	$re_bvf  
+			$func_re_bve 
+		and 	$func_re_bvf  
 	) 
 }
 
@@ -9432,19 +9432,19 @@ rule capa_gather_staff_ftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION 
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-staff-ftp-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bvg = "Staff-FTP" ascii wide
-	$str_bvh = "sites.ini" ascii wide
+ 	$func_str_bvg = "Staff-FTP" ascii wide
+	$func_str_bvh = "sites.ini" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_bvg 
-		and 	$str_bvh  
+			$func_str_bvg 
+		and 	$func_str_bvh  
 	) 
 }
 
@@ -9457,19 +9457,19 @@ rule capa_gather_xftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1555
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-xftp-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bvi = ".xfp" ascii wide
-	$re_bvj = /\\NetSarang/ ascii wide 
+ 	$func_str_bvi = ".xfp" ascii wide
+	$func_re_bvj = /\\NetSarang/ ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$str_bvi 
-		and 	$re_bvj  
+			$func_str_bvi 
+		and 	$func_re_bvj  
 	) 
 }
 
@@ -9482,21 +9482,21 @@ rule capa_gather_ftpnow_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T15
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-ftpnow-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bvq = "FTPNow" ascii wide
-	$str_bvr = "FTP Now" ascii wide
-	$str_bvs = "sites.xml" ascii wide
+ 	$func_str_bvq = "FTPNow" ascii wide
+	$func_str_bvr = "FTP Now" ascii wide
+	$func_str_bvs = "sites.xml" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_bvq 
-		and 	$str_bvr 
-		and 	$str_bvs  
+			$func_str_bvq 
+		and 	$func_str_bvr 
+		and 	$func_str_bvs  
 	) 
 }
 
@@ -9509,19 +9509,19 @@ rule capa_gather_ftpgetter_information : CAPA COLLECTION FILE_MANAGERS FUNCTION 
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-ftpgetter-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bvt = "servers.xml" ascii wide
-	$re_bvu = /\\FTPGetter/ ascii wide 
+ 	$func_str_bvt = "servers.xml" ascii wide
+	$func_re_bvu = /\\FTPGetter/ ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$str_bvt 
-		and 	$re_bvu  
+			$func_str_bvt 
+		and 	$func_re_bvu  
 	) 
 }
 
@@ -9534,20 +9534,20 @@ rule capa_gather_nova_ftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-nova-ftp-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bvv = "NovaFTP.db" ascii wide
-	$re_bvw = /\\INSoftware\\NovaFTP/ ascii wide 
+ 	$func_str_bvv = "NovaFTP.db" ascii wide
+	$func_re_bvw = /\\INSoftware\\NovaFTP/ ascii wide 
  
   condition:
     capa_pe_file and
  (
 		 (
-			$str_bvv 
-		and 	$re_bvw  
+			$func_str_bvv 
+		and 	$func_re_bvw  
 	)  
 	) 
 }
@@ -9561,40 +9561,40 @@ rule capa_gather_ftp_explorer_information : CAPA COLLECTION FILE_MANAGERS FUNCTI
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-ftp-explorer-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_bvx = /profiles\.xml/ ascii wide 
-	$re_bvy = /Software\\FTP Explorer\\FTP Explorer\\Workspace\\MFCToolBar-224/ ascii wide 
-	$re_bvz = /Software\\FTP Explorer\\Profiles/ ascii wide 
-	$re_bwa = /\\FTP Explorer/ ascii wide 
-	$str_bwb = "Password" ascii wide
-	$str_bwc = "Host" ascii wide
-	$str_bwd = "Login" ascii wide
-	$str_bwe = "InitialPath" ascii wide
-	$str_bwf = "PasswordType" ascii wide
-	$str_bwg = "Port" ascii wide
+ 	$func_re_bvx = /profiles\.xml/ ascii wide 
+	$func_re_bvy = /Software\\FTP Explorer\\FTP Explorer\\Workspace\\MFCToolBar-224/ ascii wide 
+	$func_re_bvz = /Software\\FTP Explorer\\Profiles/ ascii wide 
+	$func_re_bwa = /\\FTP Explorer/ ascii wide 
+	$func_str_bwb = "Password" ascii wide
+	$func_str_bwc = "Host" ascii wide
+	$func_str_bwd = "Login" ascii wide
+	$func_str_bwe = "InitialPath" ascii wide
+	$func_str_bwf = "PasswordType" ascii wide
+	$func_str_bwg = "Port" ascii wide
  
   condition:
     capa_pe_file and
  (
 		 (
-			$re_bvx 
+			$func_re_bvx 
 		and  (
-			$re_bvy 
-		or 	$re_bvz 
-		or 	$re_bwa  
+			$func_re_bvy 
+		or 	$func_re_bvz 
+		or 	$func_re_bwa  
 	)  
 	) 
 		or  (
-			$str_bwb 
-		and 	$str_bwc 
-		and 	$str_bwd 
-		and 	$str_bwe 
-		and 	$str_bwf 
-		and 	$str_bwg  
+			$func_str_bwb 
+		and 	$func_str_bwc 
+		and 	$func_str_bwd 
+		and 	$func_str_bwe 
+		and 	$func_str_bwf 
+		and 	$func_str_bwg  
 	)  
 	) 
 }
@@ -9608,19 +9608,19 @@ rule capa_gather_bitkinex_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-bitkinex-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_bwh = /bitkinex\.ds/ ascii wide 
-	$re_bwi = /\\BitKinex/ ascii wide 
+ 	$func_re_bwh = /bitkinex\.ds/ ascii wide 
+	$func_re_bwi = /\\BitKinex/ ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$re_bwh 
-		and 	$re_bwi  
+			$func_re_bwh 
+		and 	$func_re_bwi  
 	) 
 }
 
@@ -9633,29 +9633,29 @@ rule capa_gather_turbo_ftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION 
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-turbo-ftp-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bwj = "addrbk.dat" ascii wide
-	$str_bwk = "quick.dat" ascii wide
-	$re_bwl = /installpath/ ascii wide 
-	$re_bwm = /Software\\TurboFTP/ ascii wide 
-	$re_bwn = /\\TurboFTP/ ascii wide 
+ 	$func_str_bwj = "addrbk.dat" ascii wide
+	$func_str_bwk = "quick.dat" ascii wide
+	$func_re_bwl = /installpath/ ascii wide 
+	$func_re_bwm = /Software\\TurboFTP/ ascii wide 
+	$func_re_bwn = /\\TurboFTP/ ascii wide 
  
   condition:
     capa_pe_file and
  (
 		 (
-			$str_bwj 
-		and 	$str_bwk  
+			$func_str_bwj 
+		and 	$func_str_bwk  
 	) 
 		or  (
-			$re_bwl 
+			$func_re_bwl 
 		and  (
-			$re_bwm 
-		or 	$re_bwn  
+			$func_re_bwm 
+		or 	$func_re_bwn  
 	)  
 	)  
 	) 
@@ -9670,19 +9670,19 @@ rule capa_gather_nexusfile_information : CAPA COLLECTION FILE_MANAGERS FUNCTION 
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-nexusfile-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bwo = "NexusFile" ascii wide
-	$str_bwp = "ftpsite.ini" ascii wide
+ 	$func_str_bwo = "NexusFile" ascii wide
+	$func_str_bwp = "ftpsite.ini" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_bwo 
-		and 	$str_bwp  
+			$func_str_bwo 
+		and 	$func_str_bwp  
 	) 
 }
 
@@ -9695,21 +9695,21 @@ rule capa_gather_ftp_voyager_information : CAPA COLLECTION FILE_MANAGERS FUNCTIO
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-ftp-voyager-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_bwq = /\\RhinoSoft.com/ ascii wide 
-	$str_bwr = "FTPVoyager.ftp" ascii wide
-	$str_bws = "FTPVoyager.qc" ascii wide
+ 	$func_re_bwq = /\\RhinoSoft.com/ ascii wide 
+	$func_str_bwr = "FTPVoyager.ftp" ascii wide
+	$func_str_bws = "FTPVoyager.qc" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$re_bwq 
-		and 	$str_bwr 
-		and 	$str_bws  
+			$func_re_bwq 
+		and 	$func_str_bwr 
+		and 	$func_str_bws  
 	) 
 }
 
@@ -9722,30 +9722,30 @@ rule capa_gather_blazeftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-blazeftp-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bwt = "BlazeFtp" ascii wide
-	$str_bwu = "site.dat" ascii wide
-	$str_bwv = "LastPassword" ascii wide
-	$str_bww = "LastAddress" ascii wide
-	$str_bwx = "LastUser" ascii wide
-	$str_bwy = "LastPort" ascii wide
-	$re_bwz = /Software\\FlashPeak\\BlazeFtp\\Settings/ ascii wide 
+ 	$func_str_bwt = "BlazeFtp" ascii wide
+	$func_str_bwu = "site.dat" ascii wide
+	$func_str_bwv = "LastPassword" ascii wide
+	$func_str_bww = "LastAddress" ascii wide
+	$func_str_bwx = "LastUser" ascii wide
+	$func_str_bwy = "LastPort" ascii wide
+	$func_re_bwz = /Software\\FlashPeak\\BlazeFtp\\Settings/ ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$str_bwt 
-		and 	$str_bwu 
+			$func_str_bwt 
+		and 	$func_str_bwu 
 		and  (
-			$str_bwv 
-		or 	$str_bww 
-		or 	$str_bwx 
-		or 	$str_bwy 
-		or 	$re_bwz  
+			$func_str_bwv 
+		or 	$func_str_bww 
+		or 	$func_str_bwx 
+		or 	$func_str_bwy 
+		or 	$func_re_bwz  
 	)  
 	) 
 }
@@ -9759,24 +9759,24 @@ rule capa_gather_ftp_commander_information : CAPA COLLECTION FILE_MANAGERS FUNCT
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-ftp-commander-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_bxa = /FTP Navigator/ ascii wide 
-	$re_bxb = /FTP Commander/ ascii wide 
-	$str_bxc = "ftplist.txt" ascii wide
+ 	$func_re_bxa = /FTP Navigator/ ascii wide 
+	$func_re_bxb = /FTP Commander/ ascii wide 
+	$func_str_bxc = "ftplist.txt" ascii wide
  
   condition:
     capa_pe_file and
  (
 		 (
-			$re_bxa 
-		or 	$re_bxb  
+			$func_re_bxa 
+		or 	$func_re_bxb  
 	) 
 		and  (
-			$str_bxc  
+			$func_str_bxc  
 	)  
 	) 
 }
@@ -9790,30 +9790,30 @@ rule capa_gather_filezilla_information : CAPA COLLECTION FILE_MANAGERS FUNCTION 
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-filezilla-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_bxd = /\\sitemanager\.xml/ ascii wide 
-	$re_bxe = /\\recentservers\.xml/ ascii wide 
-	$re_bxf = /\\filezilla.xml/ ascii wide 
-	$re_bxg = /Software\\FileZilla/ ascii wide 
-	$str_bxh = "Install_Dir" ascii wide
-	$re_bxi = /Software\\FileZilla Client/ ascii wide 
+ 	$func_re_bxd = /\\sitemanager\.xml/ ascii wide 
+	$func_re_bxe = /\\recentservers\.xml/ ascii wide 
+	$func_re_bxf = /\\filezilla.xml/ ascii wide 
+	$func_re_bxg = /Software\\FileZilla/ ascii wide 
+	$func_str_bxh = "Install_Dir" ascii wide
+	$func_re_bxi = /Software\\FileZilla Client/ ascii wide 
  
   condition:
     capa_pe_file and
  (
 		 (
-			$re_bxd 
-		and 	$re_bxe 
-		and 	$re_bxf  
+			$func_re_bxd 
+		and 	$func_re_bxe 
+		and 	$func_re_bxf  
 	) 
 		or  (
-			$re_bxg 
-		and 	$str_bxh 
-		and 	$re_bxi  
+			$func_re_bxg 
+		and 	$func_str_bxh 
+		and 	$func_re_bxi  
 	)  
 	) 
 }
@@ -9827,19 +9827,19 @@ rule capa_gather_global_downloader_information : CAPA COLLECTION FILE_MANAGERS F
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-global-downloader-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_bxj = /\\Global Downloader/ ascii wide 
-	$str_bxk = "SM.arch" ascii wide
+ 	$func_re_bxj = /\\Global Downloader/ ascii wide 
+	$func_str_bxk = "SM.arch" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$re_bxj 
-		and 	$str_bxk  
+			$func_re_bxj 
+		and 	$func_str_bxk  
 	) 
 }
 
@@ -9852,44 +9852,44 @@ rule capa_gather_direct_ftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-direct-ftp-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_bxl = /Software\\CoffeeCup Software\\Internet\\Profiles/ ascii wide 
-	$re_bxm = /\\CoffeeCup Software/ ascii wide 
-	$str_bxn = "Password" ascii wide
-	$str_bxo = "HostName" ascii wide
-	$str_bxp = "Port" ascii wide
-	$str_bxq = "Username" ascii wide
-	$str_bxr = "HostDirName" ascii wide
-	$str_bxs = "FTP destination server" ascii wide
-	$str_bxt = "FTP destination user" ascii wide
-	$str_bxu = "FTP destination password" ascii wide
-	$str_bxv = "FTP destination port" ascii wide
-	$str_bxw = "FTP destination catalog" ascii wide
-	$str_bxx = "FTP profiles" ascii wide
+ 	$func_re_bxl = /Software\\CoffeeCup Software\\Internet\\Profiles/ ascii wide 
+	$func_re_bxm = /\\CoffeeCup Software/ ascii wide 
+	$func_str_bxn = "Password" ascii wide
+	$func_str_bxo = "HostName" ascii wide
+	$func_str_bxp = "Port" ascii wide
+	$func_str_bxq = "Username" ascii wide
+	$func_str_bxr = "HostDirName" ascii wide
+	$func_str_bxs = "FTP destination server" ascii wide
+	$func_str_bxt = "FTP destination user" ascii wide
+	$func_str_bxu = "FTP destination password" ascii wide
+	$func_str_bxv = "FTP destination port" ascii wide
+	$func_str_bxw = "FTP destination catalog" ascii wide
+	$func_str_bxx = "FTP profiles" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$re_bxl 
-		or 	$re_bxm 
+			$func_re_bxl 
+		or 	$func_re_bxm 
 		or  (
-			$str_bxn 
-		and 	$str_bxo 
-		and 	$str_bxp 
-		and 	$str_bxq 
-		and 	$str_bxr  
+			$func_str_bxn 
+		and 	$func_str_bxo 
+		and 	$func_str_bxp 
+		and 	$func_str_bxq 
+		and 	$func_str_bxr  
 	) 
 		or  (
-			$str_bxs 
-		and 	$str_bxt 
-		and 	$str_bxu 
-		and 	$str_bxv 
-		and 	$str_bxw 
-		and 	$str_bxx  
+			$func_str_bxs 
+		and 	$func_str_bxt 
+		and 	$func_str_bxu 
+		and 	$func_str_bxv 
+		and 	$func_str_bxw 
+		and 	$func_str_bxx  
 	)  
 	) 
 }
@@ -9903,19 +9903,19 @@ rule capa_gather_faststone_browser_information : CAPA COLLECTION FILE_MANAGERS F
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-faststone-browser-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_bxy = /FastStone Browser/ ascii wide 
-	$str_bxz = "FTPList.db" ascii wide
+ 	$func_re_bxy = /FastStone Browser/ ascii wide 
+	$func_str_bxz = "FTPList.db" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$re_bxy 
-		and 	$str_bxz  
+			$func_re_bxy 
+		and 	$func_str_bxz  
 	) 
 }
 
@@ -9928,19 +9928,19 @@ rule capa_gather_ultrafxp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-ultrafxp-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_bya = /UltraFXP/ ascii wide 
-	$re_byb = /\\sites\.xml/ ascii wide 
+ 	$func_re_bya = /UltraFXP/ ascii wide 
+	$func_re_byb = /\\sites\.xml/ ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$re_bya 
-		and 	$re_byb  
+			$func_re_bya 
+		and 	$func_re_byb  
 	) 
 }
 
@@ -9953,19 +9953,19 @@ rule capa_gather_netdrive_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-netdrive-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_byc = "NDSites.ini" ascii wide
-	$re_byd = /\\NetDrive/ ascii wide 
+ 	$func_str_byc = "NDSites.ini" ascii wide
+	$func_re_byd = /\\NetDrive/ ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$str_byc 
-		and 	$re_byd  
+			$func_str_byc 
+		and 	$func_re_byd  
 	) 
 }
 
@@ -9978,30 +9978,30 @@ rule capa_gather_total_commander_information : CAPA COLLECTION FILE_MANAGERS FUN
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-total-commander-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_bye = /Software\\Ghisler\\Total Commander/ ascii wide 
-	$re_byf = /Software\\Ghisler\\Windows Commander/ ascii wide 
-	$str_byg = "FtpIniName" ascii wide
-	$str_byh = "wcx_ftp.ini" ascii wide
-	$re_byi = /\\GHISLER/ ascii wide 
-	$str_byj = "InstallDir" ascii wide
+ 	$func_re_bye = /Software\\Ghisler\\Total Commander/ ascii wide 
+	$func_re_byf = /Software\\Ghisler\\Windows Commander/ ascii wide 
+	$func_str_byg = "FtpIniName" ascii wide
+	$func_str_byh = "wcx_ftp.ini" ascii wide
+	$func_re_byi = /\\GHISLER/ ascii wide 
+	$func_str_byj = "InstallDir" ascii wide
  
   condition:
     capa_pe_file and
  (
 		 (
-			$re_bye 
-		or 	$re_byf  
+			$func_re_bye 
+		or 	$func_re_byf  
 	) 
 		and  (
-			$str_byg 
-		or 	$str_byh 
-		or 	$re_byi 
-		or 	$str_byj  
+			$func_str_byg 
+		or 	$func_str_byh 
+		or 	$func_re_byi 
+		or 	$func_str_byj  
 	)  
 	) 
 }
@@ -10015,24 +10015,24 @@ rule capa_gather_ftpinfo_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-ftpinfo-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_byk = "ServerList.xml" ascii wide
-	$str_byl = "DataDir" ascii wide
-	$re_bym = /Software\\MAS-Soft\\FTPInfo\\Setup/ ascii wide 
-	$re_byn = /FTPInfo/ ascii wide 
+ 	$func_str_byk = "ServerList.xml" ascii wide
+	$func_str_byl = "DataDir" ascii wide
+	$func_re_bym = /Software\\MAS-Soft\\FTPInfo\\Setup/ ascii wide 
+	$func_re_byn = /FTPInfo/ ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$str_byk 
-		and 	$str_byl 
+			$func_str_byk 
+		and 	$func_str_byl 
 		and  (
-			$re_bym 
-		or 	$re_byn  
+			$func_re_bym 
+		or 	$func_re_byn  
 	)  
 	) 
 }
@@ -10046,30 +10046,30 @@ rule capa_gather_flashfxp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-flashfxp-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_byo = /Software\\FlashFXP/ ascii wide 
-	$re_byp = /DataFolder/ ascii wide 
-	$re_byq = /Install Path/ ascii wide 
-	$re_byr = /\\Sites.dat/ ascii wide 
-	$re_bys = /\\Quick.dat/ ascii wide 
-	$re_byt = /\\History.dat/ ascii wide 
+ 	$func_re_byo = /Software\\FlashFXP/ ascii wide 
+	$func_re_byp = /DataFolder/ ascii wide 
+	$func_re_byq = /Install Path/ ascii wide 
+	$func_re_byr = /\\Sites.dat/ ascii wide 
+	$func_re_bys = /\\Quick.dat/ ascii wide 
+	$func_re_byt = /\\History.dat/ ascii wide 
  
   condition:
     capa_pe_file and
  (
 		 (
-			$re_byo 
-		and 	$re_byp 
-		and 	$re_byq  
+			$func_re_byo 
+		and 	$func_re_byp 
+		and 	$func_re_byq  
 	) 
 		or  (
-			$re_byr 
-		and 	$re_bys 
-		and 	$re_byt  
+			$func_re_byr 
+		and 	$func_re_bys 
+		and 	$func_re_byt  
 	)  
 	) 
 }
@@ -10083,26 +10083,26 @@ rule capa_gather_securefx_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-securefx-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_byu = /\\Sessions/ ascii wide 
-	$str_byv = ".ini" ascii wide
-	$re_byw = /Config Path/ ascii wide 
-	$re_byx = /_VanDyke\\Config\\Sessions/ ascii wide 
-	$re_byy = /Software\\VanDyke\\SecureFX/ ascii wide 
+ 	$func_re_byu = /\\Sessions/ ascii wide 
+	$func_str_byv = ".ini" ascii wide
+	$func_re_byw = /Config Path/ ascii wide 
+	$func_re_byx = /_VanDyke\\Config\\Sessions/ ascii wide 
+	$func_re_byy = /Software\\VanDyke\\SecureFX/ ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$re_byu 
-		and 	$str_byv 
-		and 	$re_byw 
+			$func_re_byu 
+		and 	$func_str_byv 
+		and 	$func_re_byw 
 		and  (
-			$re_byx 
-		or 	$re_byy  
+			$func_re_byx 
+		or 	$func_re_byy  
 	)  
 	) 
 }
@@ -10116,40 +10116,40 @@ rule capa_gather_robo_ftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-robo-ftp-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_byz = /SOFTWARE\\Robo-FTP/ ascii wide 
-	$re_bza = /\\FTPServers/ ascii wide 
-	$re_bzb = /FTP File/ ascii wide 
-	$str_bzc = "FTP Count" ascii wide
-	$str_bzd = "Password" ascii wide
-	$str_bze = "ServerName" ascii wide
-	$str_bzf = "UserID" ascii wide
-	$str_bzg = "PortNumber" ascii wide
-	$str_bzh = "InitialDirectory" ascii wide
-	$str_bzi = "ServerType" ascii wide
+ 	$func_re_byz = /SOFTWARE\\Robo-FTP/ ascii wide 
+	$func_re_bza = /\\FTPServers/ ascii wide 
+	$func_re_bzb = /FTP File/ ascii wide 
+	$func_str_bzc = "FTP Count" ascii wide
+	$func_str_bzd = "Password" ascii wide
+	$func_str_bze = "ServerName" ascii wide
+	$func_str_bzf = "UserID" ascii wide
+	$func_str_bzg = "PortNumber" ascii wide
+	$func_str_bzh = "InitialDirectory" ascii wide
+	$func_str_bzi = "ServerType" ascii wide
  
   condition:
     capa_pe_file and
  (
 		 (
-			$re_byz 
+			$func_re_byz 
 		and  (
-			$re_bza 
-		or 	$re_bzb 
-		or 	$str_bzc  
+			$func_re_bza 
+		or 	$func_re_bzb 
+		or 	$func_str_bzc  
 	)  
 	) 
 		or  (
-			$str_bzd 
-		and 	$str_bze 
-		and 	$str_bzf 
-		and 	$str_bzg 
-		and 	$str_bzh 
-		and 	$str_bzi  
+			$func_str_bzd 
+		and 	$func_str_bze 
+		and 	$func_str_bzf 
+		and 	$func_str_bzg 
+		and 	$func_str_bzh 
+		and 	$func_str_bzi  
 	)  
 	) 
 }
@@ -10163,39 +10163,39 @@ rule capa_gather_bulletproof_ftp_information : CAPA COLLECTION FILE_MANAGERS FUN
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-bulletproof-ftp-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bzj = ".dat" ascii wide
-	$str_bzk = ".bps" ascii wide
-	$re_bzl = /Software\\BPFTP\\Bullet Proof FTP\\Main/ ascii wide 
-	$re_bzm = /Software\\BulletProof Software\\BulletProof FTP Client\\Main/ ascii wide 
-	$re_bzn = /Software\\BulletProof Software\\BulletProof FTP Client\\Options/ ascii wide 
-	$re_bzo = /Software\\BPFTP\\Bullet Proof FTP\\Options/ ascii wide 
-	$re_bzp = /Software\\BPFTP/ ascii wide 
-	$str_bzq = "LastSessionFile" ascii wide
-	$str_bzr = "SitesDir" ascii wide
+ 	$func_str_bzj = ".dat" ascii wide
+	$func_str_bzk = ".bps" ascii wide
+	$func_re_bzl = /Software\\BPFTP\\Bullet Proof FTP\\Main/ ascii wide 
+	$func_re_bzm = /Software\\BulletProof Software\\BulletProof FTP Client\\Main/ ascii wide 
+	$func_re_bzn = /Software\\BulletProof Software\\BulletProof FTP Client\\Options/ ascii wide 
+	$func_re_bzo = /Software\\BPFTP\\Bullet Proof FTP\\Options/ ascii wide 
+	$func_re_bzp = /Software\\BPFTP/ ascii wide 
+	$func_str_bzq = "LastSessionFile" ascii wide
+	$func_str_bzr = "SitesDir" ascii wide
  
   condition:
     capa_pe_file and
  (
 		 (
-			$str_bzj 
-		and 	$str_bzk  
+			$func_str_bzj 
+		and 	$func_str_bzk  
 	) 
 		or  (
 		 (
-			$re_bzl 
-		or 	$re_bzm 
-		or 	$re_bzn 
-		or 	$re_bzo 
-		or 	$re_bzp  
+			$func_re_bzl 
+		or 	$func_re_bzm 
+		or 	$func_re_bzn 
+		or 	$func_re_bzo 
+		or 	$func_re_bzp  
 	) 
 		and  (
-			$str_bzq 
-		or 	$str_bzr  
+			$func_str_bzq 
+		or 	$func_str_bzr  
 	)  
 	)  
 	) 
@@ -10210,21 +10210,21 @@ rule capa_gather_alftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T155
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-alftp-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bzs = "ESTdb2.dat" ascii wide
-	$str_bzt = "QData.dat" ascii wide
-	$re_bzu = /\\Estsoft\\ALFTP/ ascii wide 
+ 	$func_str_bzs = "ESTdb2.dat" ascii wide
+	$func_str_bzt = "QData.dat" ascii wide
+	$func_re_bzu = /\\Estsoft\\ALFTP/ ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$str_bzs 
-		and 	$str_bzt 
-		and 	$re_bzu  
+			$func_str_bzs 
+		and 	$func_str_bzt 
+		and 	$func_re_bzu  
 	) 
 }
 
@@ -10237,26 +10237,26 @@ rule capa_gather_expandrive_information : CAPA COLLECTION FILE_MANAGERS FUNCTION
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-expandrive-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_bzv = /Software\\ExpanDrive\\Sessions/ ascii wide 
-	$re_bzw = /Software\\ExpanDrive/ ascii wide 
-	$re_bzx = /ExpanDrive_Home/ ascii wide 
-	$re_bzy = /\\drives\.js/ ascii wide 
+ 	$func_re_bzv = /Software\\ExpanDrive\\Sessions/ ascii wide 
+	$func_re_bzw = /Software\\ExpanDrive/ ascii wide 
+	$func_re_bzx = /ExpanDrive_Home/ ascii wide 
+	$func_re_bzy = /\\drives\.js/ ascii wide 
  
   condition:
     capa_pe_file and
  (
 		 (
-			$re_bzv 
-		or 	$re_bzw  
+			$func_re_bzv 
+		or 	$func_re_bzw  
 	) 
 		and  (
-			$re_bzx 
-		or 	$re_bzy  
+			$func_re_bzx 
+		or 	$func_re_bzy  
 	)  
 	) 
 }
@@ -10270,19 +10270,19 @@ rule capa_gather_goftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T155
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-goftp-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_bzz = "GoFTP" ascii wide
-	$str_caa = "Connections.txt" ascii wide
+ 	$func_str_bzz = "GoFTP" ascii wide
+	$func_str_caa = "Connections.txt" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_bzz 
-		and 	$str_caa  
+			$func_str_bzz 
+		and 	$func_str_caa  
 	) 
 }
 
@@ -10295,19 +10295,19 @@ rule capa_gather_3d_ftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T15
 	attack = "Credential Access::Credentials from Password Stores [T1555]"
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-3d-ftp-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_cab = "3D-FTP" ascii wide
-	$str_cac = "sites.ini" ascii wide
+ 	$func_str_cab = "3D-FTP" ascii wide
+	$func_str_cac = "sites.ini" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_cab 
-		and 	$str_cac  
+			$func_str_cab 
+		and 	$func_str_cac  
 	) 
 }
 
@@ -10320,17 +10320,17 @@ rule capa_reference_SQL_statements : CAPA COLLECTION DATABASE SQL FUNCTION T1213
 	attack = "Collection::Data from Information Repositories [T1213]"
 	hash = "5F66B82558CA92E54E77F216EF4C066C"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/database/sql/reference-sql-statements.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_cai = /SELECT.{,1000}FROM.{,1000}WHERE/ ascii wide 
+ 	$func_re_cai = /SELECT.{,1000}FROM.{,1000}WHERE/ ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$re_cai  
+			$func_re_cai  
 	) 
 }
 
@@ -10343,21 +10343,21 @@ rule capa_reference_WMI_statements : CAPA COLLECTION DATABASE WMI FUNCTION T1213
 	attack = "Collection::Data from Information Repositories [T1213]"
 	hash = "al-khaser_x86.exe_:0x433490"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/database/wmi/reference-wmi-statements.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_caj = /SELECT\s+\*\s+FROM\s+CIM_./ ascii wide 
-	$re_cak = /SELECT\s+\*\s+FROM\s+Win32_./ ascii wide 
-	$re_cal = /SELECT\s+\*\s+FROM\s+MSAcpi_./ ascii wide 
+ 	$func_re_caj = /SELECT\s+\*\s+FROM\s+CIM_./ ascii wide 
+	$func_re_cak = /SELECT\s+\*\s+FROM\s+Win32_./ ascii wide 
+	$func_re_cal = /SELECT\s+\*\s+FROM\s+MSAcpi_./ ascii wide 
  
   condition:
     capa_pe_file and
  (
-			$re_caj 
-		or 	$re_cak 
-		or 	$re_cal  
+			$func_re_caj 
+		or 	$func_re_cak 
+		or 	$func_re_cal  
 	) 
 }
 
@@ -10372,7 +10372,7 @@ rule capa_write_and_execute_a_file : CAPA C2 FILE_TRANSFER FUNCTION B0023  {
 	hash = "9324D1A8AE37A36AE560C37448C9705A"
 	hash = "Practical Malware Analysis Lab 01-04.exe_:0x4011FC"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/c2/file-transfer/write-and-execute-a-file.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10396,12 +10396,12 @@ rule capa_self_delete_via_COMSPEC_environment_variable : CAPA ANTI_ANALYSIS ANTI
 	mbc = "Defense Evasion::Self Deletion::COMSPEC Environment Variable [F0007.001]"
 	hash = "Practical Malware Analysis Lab 14-02.exe_:0x401880"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-forensic/self-deletion/self-delete-via-comspec-environment-variable.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_can = /\/c\s*del\s*/ ascii wide  // /c del
+ 	$func_re_can = /\/c\s*del\s*/ ascii wide  // /c del
  
   condition:
     capa_pe_file and
@@ -10410,7 +10410,7 @@ rule capa_self_delete_via_COMSPEC_environment_variable : CAPA ANTI_ANALYSIS ANTI
 
 		and 	capa_create_process
 
-		and 	$re_can  
+		and 	$func_re_can  
 	) 
 }
 
@@ -10424,19 +10424,19 @@ rule capa_check_for_windows_sandbox_via_process_name : CAPA ANTI_ANALYSIS ANTI_V
 	mbc = "Anti-Behavioral Analysis::Virtual Machine Detection [B0009]"
 	hash = "773290480d5445f11d3dc1b800728966"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/anti-analysis/anti-vm/vm-detection/check-for-windows-sandbox-via-process-name.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_caq = "CExecSvc.exe" ascii wide
+ 	$func_str_caq = "CExecSvc.exe" ascii wide
  
   condition:
     capa_pe_file and
  (
 			capa_enumerate_processes
 
-		and 	$str_caq  
+		and 	$func_str_caq  
 	) 
 }
 
@@ -10449,19 +10449,19 @@ rule capa_get_CPU_information : CAPA HOST_INTERACTION HARDWARE CPU FUNCTION T108
 	attack = "Discovery::System Information Discovery [T1082]"
 	hash = "BFB9B5391A13D0AFD787E87AB90F14F5"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/hardware/cpu/get-cpu-information.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_cbf = /Hardware\\Description\\System\\CentralProcessor/ nocase ascii wide 
+ 	$func_re_cbf = /Hardware\\Description\\System\\CentralProcessor/ nocase ascii wide 
  
   condition:
     capa_pe_file and
  (
 			capa_query_or_enumerate_registry_value
 
-		and 	$re_cbf  
+		and 	$func_re_cbf  
 	) 
 }
 
@@ -10474,19 +10474,19 @@ rule capa_disable_code_signing : CAPA HOST_INTERACTION BOOTLOADER FUNCTION T1553
 	attack = "Defense Evasion::Subvert Trust Controls::Code Signing Policy Modification [T1553.006]"
 	hash = "0596C4EA5AA8DEF47F22C85D75AACA95"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/bootloader/disable-code-signing.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_cbj = /\x00bcdedit(\.exe)? -set TESTSIGNING ON/ nocase ascii wide 
+ 	$func_re_cbj = /\x00bcdedit(\.exe)? -set TESTSIGNING ON/ nocase ascii wide 
  
   condition:
     capa_pe_file and
  (
 			capa_create_process
 
-		and 	$re_cbj  
+		and 	$func_re_cbj  
 	) 
 }
 
@@ -10499,17 +10499,17 @@ rule capa_find_taskbar : CAPA HOST_INTERACTION GUI TASKBAR FIND FUNCTION B0043  
 	mbc = "Discovery::Taskbar Discovery [B0043]"
 	hash = "B7841B9D5DC1F511A93CC7576672EC0C"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/gui/taskbar/find/find-taskbar.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_cbk = "Shell_TrayWnd" ascii wide
+ 	$func_str_cbk = "Shell_TrayWnd" ascii wide
  
   condition:
     capa_pe_file and
  (
-			$str_cbk 
+			$func_str_cbk 
 		and 	capa_find_graphical_window
  
 	) 
@@ -10524,7 +10524,7 @@ rule capa_check_mutex : CAPA HOST_INTERACTION MUTEX BASICBLOCK C0043  {
 	mbc = "Process::Check Mutex [C0043]"
 	hash = "Practical Malware Analysis Lab 01-01.dll_:0x10001010"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/mutex/check-mutex.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10549,13 +10549,13 @@ rule capa_linked_against_Go_process_enumeration_library : CAPA HOST_INTERACTION 
 	attack = "Discovery::Software Discovery [T1518]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/linked-against-go-process-enumeration-library.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_cdv = "github.com/mitchellh/go-ps.FindProcess" ascii wide
-	$str_cdw = "github.com/mitchellh/go-ps.Processes" ascii wide
+ 	$file_str_cdv = "github.com/mitchellh/go-ps.FindProcess" ascii wide
+	$file_str_cdw = "github.com/mitchellh/go-ps.Processes" ascii wide
  
   condition:
     capa_pe_file and
@@ -10563,8 +10563,8 @@ rule capa_linked_against_Go_process_enumeration_library : CAPA HOST_INTERACTION 
 			capa_compiled_with_Go
 
 		and  (
-			$str_cdv 
-		or 	$str_cdw  
+			$file_str_cdv 
+		or 	$file_str_cdw  
 	)  
 	) 
 }
@@ -10578,13 +10578,13 @@ rule capa_linked_against_Go_WMI_library : CAPA COLLECTION DATABASE WMI FILE T121
 	attack = "Collection::Data from Information Repositories [T1213]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/linked-against-go-wmi-library.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_cek = "github.com/StackExchange/wmi.CreateQuery" ascii wide
-	$str_cel = "github.com/StackExchange/wmi.Query" ascii wide
+ 	$file_str_cek = "github.com/StackExchange/wmi.CreateQuery" ascii wide
+	$file_str_cel = "github.com/StackExchange/wmi.Query" ascii wide
  
   condition:
     capa_pe_file and
@@ -10592,8 +10592,8 @@ rule capa_linked_against_Go_WMI_library : CAPA COLLECTION DATABASE WMI FILE T121
 			capa_compiled_with_Go
 
 		and  (
-			$str_cek 
-		or 	$str_cel  
+			$file_str_cek 
+		or 	$file_str_cel  
 	)  
 	) 
 }
@@ -10608,19 +10608,19 @@ rule capa_check_for_windows_sandbox_via_mutex : CAPA ANTI_ANALYSIS ANTI_VM VM_DE
 	mbc = "Anti-Behavioral Analysis::Virtual Machine Detection [B0009]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/check-for-windows-sandbox-via-mutex.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_ceq = "WindowsSandboxMutex" ascii wide
+ 	$func_str_ceq = "WindowsSandboxMutex" ascii wide
  
   condition:
     capa_pe_file and
  (
 			capa_check_mutex
 
-		and 	$str_ceq  
+		and 	$func_str_ceq  
 	) 
 }
 
@@ -10632,13 +10632,13 @@ rule capa_linked_against_Go_registry_library : CAPA HOST_INTERACTION REGISTRY FI
 	scope = "file"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/linked-against-go-registry-library.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_cer = "golang.org/x/sys/windows/registry.Key.Close" ascii wide
-	$str_ces = "github.com/golang/sys/windows/registry.Key.Close" ascii wide
+ 	$file_str_cer = "golang.org/x/sys/windows/registry.Key.Close" ascii wide
+	$file_str_ces = "github.com/golang/sys/windows/registry.Key.Close" ascii wide
  
   condition:
     capa_pe_file and
@@ -10646,8 +10646,8 @@ rule capa_linked_against_Go_registry_library : CAPA HOST_INTERACTION REGISTRY FI
 			capa_compiled_with_Go
 
 		and  (
-			$str_cer 
-		or 	$str_ces  
+			$file_str_cer 
+		or 	$file_str_ces  
 	)  
 	) 
 }
@@ -10662,19 +10662,19 @@ rule capa_capture_screenshot_in_Go : CAPA COLLECTION SCREENSHOT FILE T1113 E1113
 	mbc = "Collection::Screen Capture::WinAPI [E1113.m01]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/capture-screenshot-in-go.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_cey = "syscall.NewLazyDLL" ascii wide // Dynamic loading of DLLs
-	$re_cez = /user32.dll/ ascii wide 
-	$re_cfa = /GetWindowDC/ ascii wide 
-	$re_cfb = /GetDC/ ascii wide 
-	$re_cfc = /gdi32.dll/ ascii wide 
-	$re_cfd = /BitBlt/ ascii wide 
-	$re_cfe = /GetDIBits/ ascii wide 
-	$re_cff = /CreateCompatibleDC/ ascii wide 
+ 	$file_str_cey = "syscall.NewLazyDLL" ascii wide // Dynamic loading of DLLs
+	$file_re_cez = /user32.dll/ ascii wide 
+	$file_re_cfa = /GetWindowDC/ ascii wide 
+	$file_re_cfb = /GetDC/ ascii wide 
+	$file_re_cfc = /gdi32.dll/ ascii wide 
+	$file_re_cfd = /BitBlt/ ascii wide 
+	$file_re_cfe = /GetDIBits/ ascii wide 
+	$file_re_cff = /CreateCompatibleDC/ ascii wide 
  
   condition:
     capa_pe_file and
@@ -10682,24 +10682,24 @@ rule capa_capture_screenshot_in_Go : CAPA COLLECTION SCREENSHOT FILE T1113 E1113
 			capa_compiled_with_Go
 
 		and  (
-			$str_cey 
+			$file_str_cey 
 		and  (
 		 (
-			$re_cez 
+			$file_re_cez 
 		and  (
-			$re_cfa 
-		or 	$re_cfb  
+			$file_re_cfa 
+		or 	$file_re_cfb  
 	)  
 	) 
 		or  (
-			$re_cfc 
+			$file_re_cfc 
 		and  (
-			$re_cfd 
-		or 	$re_cfe  
+			$file_re_cfd 
+		or 	$file_re_cfe  
 	)  
 	)  
 	) 
-		and 	$re_cff  
+		and 	$file_re_cff  
 	)  
 	) 
 }
@@ -10712,26 +10712,26 @@ rule capa_linked_against_Go_static_asset_library : CAPA EXECUTABLE RESOURCE FILE
 	scope = "file"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/linked-against-go-static-asset-library.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_cfh = "github.com/rakyll/statik/fs.IsDefaultNamespace" ascii wide
-	$str_cfi = "github.com/rakyll/statik/fs.RegisterWithNamespace" ascii wide
-	$str_cfj = "github.com/rakyll/statik/fs.NewWithNamespace" ascii wide
-	$str_cfk = "github.com/rakyll/statik/fs.Register" ascii wide
-	$str_cfl = "github.com/gobuffalo/packr.NewBox" ascii wide
-	$str_cfm = "github.com/markbates/pkger.Open" ascii wide
-	$str_cfn = "github.com/markbates/pkger.Include" ascii wide
-	$str_cfo = "github.com/markbates/pkger.Parse" ascii wide
-	$str_cfp = "github.com/GeertJohan/go.rice.FindBox" ascii wide
-	$str_cfq = "github.com/GeertJohan/go.rice.MustFindBox" ascii wide
-	$re_cfr = /\/bindata\.go/ ascii wide  // go-bindata
-	$re_cfs = /\.Asset/ ascii wide 
-	$str_cft = "github.com/lu4p/binclude.Include" ascii wide
-	$str_cfu = "github.com/omeid/go-resources" ascii wide
-	$str_cfv = "github.com/pyros2097/go-embed" ascii wide
+ 	$file_str_cfh = "github.com/rakyll/statik/fs.IsDefaultNamespace" ascii wide
+	$file_str_cfi = "github.com/rakyll/statik/fs.RegisterWithNamespace" ascii wide
+	$file_str_cfj = "github.com/rakyll/statik/fs.NewWithNamespace" ascii wide
+	$file_str_cfk = "github.com/rakyll/statik/fs.Register" ascii wide
+	$file_str_cfl = "github.com/gobuffalo/packr.NewBox" ascii wide
+	$file_str_cfm = "github.com/markbates/pkger.Open" ascii wide
+	$file_str_cfn = "github.com/markbates/pkger.Include" ascii wide
+	$file_str_cfo = "github.com/markbates/pkger.Parse" ascii wide
+	$file_str_cfp = "github.com/GeertJohan/go.rice.FindBox" ascii wide
+	$file_str_cfq = "github.com/GeertJohan/go.rice.MustFindBox" ascii wide
+	$file_re_cfr = /\/bindata\.go/ ascii wide  // go-bindata
+	$file_re_cfs = /\.Asset/ ascii wide 
+	$file_str_cft = "github.com/lu4p/binclude.Include" ascii wide
+	$file_str_cfu = "github.com/omeid/go-resources" ascii wide
+	$file_str_cfv = "github.com/pyros2097/go-embed" ascii wide
  
   condition:
     capa_pe_file and
@@ -10740,35 +10740,35 @@ rule capa_linked_against_Go_static_asset_library : CAPA EXECUTABLE RESOURCE FILE
 
 		and  (
 		 (
-			$str_cfh 
-		or 	$str_cfi 
-		or 	$str_cfj 
-		or 	$str_cfk  
+			$file_str_cfh 
+		or 	$file_str_cfi 
+		or 	$file_str_cfj 
+		or 	$file_str_cfk  
 	) 
 		or  (
-			$str_cfl  
+			$file_str_cfl  
 	) 
 		or  (
-			$str_cfm 
-		or 	$str_cfn 
-		or 	$str_cfo  
+			$file_str_cfm 
+		or 	$file_str_cfn 
+		or 	$file_str_cfo  
 	) 
 		or  (
-			$str_cfp 
-		or 	$str_cfq  
+			$file_str_cfp 
+		or 	$file_str_cfq  
 	) 
 		or  (
-			$re_cfr 
-		and 	$re_cfs  
+			$file_re_cfr 
+		and 	$file_re_cfs  
 	) 
 		or  (
-			$str_cft  
+			$file_str_cft  
 	) 
 		or  (
-			$str_cfu  
+			$file_str_cfu  
 	) 
 		or  (
-			$str_cfv  
+			$file_str_cfv  
 	)  
 	)  
 	) 
@@ -10784,7 +10784,7 @@ rule capa_receive_data : CAPA COMMUNICATION FUNCTION B0030_002  {
 	mbc = "Command and Control::C2 Communication::Receive Data [B0030.002]"
 	hash = "BFB9B5391A13D0AFD787E87AB90F14F5"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/receive-data.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10810,12 +10810,12 @@ rule capa_send_HTTP_request : CAPA COMMUNICATION HTTP CLIENT FUNCTION C0002_003 
 	hash = "BFB9B5391A13D0AFD787E87AB90F14F5"
 	hash = "6A352C3E55E8AE5ED39DC1BE7FB964B1"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/http/client/send-http-request.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_cgb = /HTTP/ nocase ascii wide 
+ 	$func_re_cgb = /HTTP/ nocase ascii wide 
  
   condition:
     capa_pe_file and
@@ -10837,7 +10837,7 @@ rule capa_send_HTTP_request : CAPA COMMUNICATION HTTP CLIENT FUNCTION C0002_003 
 		or  (
 			capa_send_data_on_socket
 
-		and 	$re_cgb  
+		and 	$func_re_cgb  
 	)  
 	) 
 }
@@ -10850,7 +10850,7 @@ rule capa_write_pipe : CAPA COMMUNICATION NAMED_PIPE WRITE FUNCTION C0003_004  {
 	mbc = "Communication::Interprocess Communication::Write Pipe [C0003.004]"
 	hash = "C91887D861D9BD4A5872249B641BC9F9"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/named-pipe/write/write-pipe.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10882,7 +10882,7 @@ rule capa_download_and_write_a_file : CAPA C2 FILE_TRANSFER FUNCTION T1105 B0030
 	mbc = "Command and Control::C2 Communication::Server to Client File Transfer [B0030.003]"
 	hash = "5D7C34B6854D48D3DA4F96B71550A221"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/c2/file-transfer/download-and-write-a-file.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10905,30 +10905,30 @@ rule capa_create_container : CAPA HOST_INTERACTION CONTAINER DOCKER FUNCTION T16
 	attack = "Execution::Deploy Container [T1610]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/create-container.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_cjk = /\x00docker(\.exe)? create/ ascii wide 
-	$re_cjl = /\x00docker(\.exe)? start/ ascii wide 
-	$re_cjm = /\/v1\.[0-9]{1,2}\/containers\/create/ ascii wide  // docker API endpoint, e.g., /v1.24/containers/create
-	$re_cjn = /\/v1\.[0-9]{1,2}\/containers\/[0-9a-fA-F]+\/start/ ascii wide  // docker API endpoint, e.g., /v1.24/containers/e90e34656806/start
+ 	$func_re_cjk = /\x00docker(\.exe)? create/ ascii wide 
+	$func_re_cjl = /\x00docker(\.exe)? start/ ascii wide 
+	$func_re_cjm = /\/v1\.[0-9]{1,2}\/containers\/create/ ascii wide  // docker API endpoint, e.g., /v1.24/containers/create
+	$func_re_cjn = /\/v1\.[0-9]{1,2}\/containers\/[0-9a-fA-F]+\/start/ ascii wide  // docker API endpoint, e.g., /v1.24/containers/e90e34656806/start
  
   condition:
     capa_pe_file and
  (
-			$re_cjk 
-		or 	$re_cjl 
+			$func_re_cjk 
+		or 	$func_re_cjl 
 		or  (
 			capa_send_HTTP_request
 
-		and 	$re_cjm  
+		and 	$func_re_cjm  
 	) 
 		or  (
 			capa_send_HTTP_request
 
-		and 	$re_cjn  
+		and 	$func_re_cjn  
 	)  
 	) 
 }
@@ -10942,22 +10942,22 @@ rule capa_list_containers : CAPA HOST_INTERACTION CONTAINER DOCKER FUNCTION T161
 	attack = "Discovery::Container and Resource Discovery [T1613]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/list-containers.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_cjs = /\x00docker(\.exe)? ps/ ascii wide 
-	$re_cjt = /\/v1\.[0-9]{1,2}\/containers\/json/ ascii wide  // docker API endpoint, e.g., /v1.24/containers/json?all=1&before=8dfafdbc3a40&size=1
+ 	$func_re_cjs = /\x00docker(\.exe)? ps/ ascii wide 
+	$func_re_cjt = /\/v1\.[0-9]{1,2}\/containers\/json/ ascii wide  // docker API endpoint, e.g., /v1.24/containers/json?all=1&before=8dfafdbc3a40&size=1
  
   condition:
     capa_pe_file and
  (
-			$re_cjs 
+			$func_re_cjs 
 		or  (
 			capa_send_HTTP_request
 
-		and 	$re_cjt  
+		and 	$func_re_cjt  
 	)  
 	) 
 }
@@ -10970,7 +10970,7 @@ rule capa_receive_and_write_data_from_server_to_client : CAPA C2 FILE_TRANSFER F
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/receive-and-write-data-from-server-to-client.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -10993,22 +10993,22 @@ rule capa_build_Docker_image : CAPA HOST_INTERACTION CONTAINER DOCKER FUNCTION T
 	attack = "Defense Evasion::Build Image on Host [T1612]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/build-docker-image.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_ckj = /\x00docker(\.exe)? build/ ascii wide 
-	$re_ckk = /\/v1\.[0-9]{1,2}\/build/ ascii wide  // docker API endpoint, e.g., /v1.24/build
+ 	$func_re_ckj = /\x00docker(\.exe)? build/ ascii wide 
+	$func_re_ckk = /\/v1\.[0-9]{1,2}\/build/ ascii wide  // docker API endpoint, e.g., /v1.24/build
  
   condition:
     capa_pe_file and
  (
-			$re_ckj 
+			$func_re_ckj 
 		or  (
 			capa_send_HTTP_request
 
-		and 	$re_ckk  
+		and 	$func_re_ckk  
 	)  
 	) 
 }
@@ -11022,32 +11022,32 @@ rule capa_run_in_container : CAPA HOST_INTERACTION CONTAINER DOCKER FUNCTION T16
 	attack = "Execution::Container Administration Command [T1609]"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/run-in-container.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_ckl = /\x00docker(\.exe)? exec/ ascii wide 
-	$re_ckm = /\x00kubectl(\.exe)? exec/ ascii wide 
-	$re_ckn = /\x00kubectl(\.exe)? run/ ascii wide 
-	$re_cko = /\/v1\.[0-9]{1,2}\/containers\/[0-9a-fA-F]+\/exec/ ascii wide  // docker API endpoint, e.g., /v1.24/containers/e90e34656806/exec
-	$re_ckp = /\/v1\.[0-9]{1,2}\/exec\/[0-9a-fA-F]+\/start/ ascii wide  // docker API endpoint, e.g., /v1.24/exec/e90e34656806/start
+ 	$func_re_ckl = /\x00docker(\.exe)? exec/ ascii wide 
+	$func_re_ckm = /\x00kubectl(\.exe)? exec/ ascii wide 
+	$func_re_ckn = /\x00kubectl(\.exe)? run/ ascii wide 
+	$func_re_cko = /\/v1\.[0-9]{1,2}\/containers\/[0-9a-fA-F]+\/exec/ ascii wide  // docker API endpoint, e.g., /v1.24/containers/e90e34656806/exec
+	$func_re_ckp = /\/v1\.[0-9]{1,2}\/exec\/[0-9a-fA-F]+\/start/ ascii wide  // docker API endpoint, e.g., /v1.24/exec/e90e34656806/start
  
   condition:
     capa_pe_file and
  (
-			$re_ckl 
-		or 	$re_ckm 
-		or 	$re_ckn 
+			$func_re_ckl 
+		or 	$func_re_ckm 
+		or 	$func_re_ckn 
 		or  (
 			capa_send_HTTP_request
 
-		and 	$re_cko  
+		and 	$func_re_cko  
 	) 
 		or  (
 			capa_send_HTTP_request
 
-		and 	$re_ckp  
+		and 	$func_re_ckp  
 	)  
 	) 
 }
@@ -11060,19 +11060,19 @@ rule capa_send_HTTP_request_with_Host_header : CAPA COMMUNICATION HTTP FUNCTION 
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/send-http-request-with-host-header.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_ckq = /Host:/ nocase ascii wide 
+ 	$func_re_ckq = /Host:/ nocase ascii wide 
  
   condition:
     capa_pe_file and
  (
 			capa_send_HTTP_request
 
-		and 	$re_ckq  
+		and 	$func_re_ckq  
 	) 
 }
 
@@ -11084,19 +11084,19 @@ rule capa_make_an_HTTP_request_with_a_Cookie : CAPA COMMUNICATION HTTP CLIENT FU
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/make-an-http-request-with-a-cookie.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_ckx = /Cookie:/ nocase ascii wide 
+ 	$func_re_ckx = /Cookie:/ nocase ascii wide 
  
   condition:
     capa_pe_file and
  (
 			capa_send_HTTP_request
 
-		and 	$re_ckx  
+		and 	$func_re_ckx  
 	) 
 }
 
@@ -11110,7 +11110,7 @@ rule capa_send_data : CAPA COMMUNICATION FUNCTION B0030_001  {
 	mbc = "Command and Control::C2 Communication::Send Data [B0030.001]"
 	hash = "BFB9B5391A13D0AFD787E87AB90F14F5"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/communication/send-data.yml"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11134,7 +11134,7 @@ rule capa_read_and_send_data_from_client_to_server : CAPA C2 FILE_TRANSFER FUNCT
 	scope = "function"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/read-and-send-data-from-client-to-server.yml"
 	capa_nursery = "True"
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11159,7 +11159,7 @@ rule capa_create_reverse_shell : CAPA C2 SHELL FUNCTION T1059_003 B0022_001 INCO
 	hash = "C91887D861D9BD4A5872249B641BC9F9"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/c2/shell/create-reverse-shell.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11197,7 +11197,7 @@ rule capa_delete_file : CAPA HOST_INTERACTION FILE_SYSTEM DELETE FUNCTION C0047 
 	hash = "563653399B82CD443F120ECEFF836EA3678D4CF11D9B351BB737573C2D856299"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/delete/delete-file.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11230,7 +11230,7 @@ rule capa_check_if_file_exists : CAPA HOST_INTERACTION FILE_SYSTEM EXISTS FUNCTI
 	hash = "31600AD0D1A7EA615690DF111AE36C73"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/exists/check-if-file-exists.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11251,7 +11251,7 @@ rule capa_copy_file : CAPA HOST_INTERACTION FILE_SYSTEM COPY FUNCTION C0045 INCO
 	hash = "Practical Malware Analysis Lab 01-01.exe_:0x401440"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/file-system/copy/copy-file.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11278,7 +11278,7 @@ rule capa_run_as_service : CAPA HOST_INTERACTION SERVICE FILE E1480_m07 INCOMPLE
 	hash = "Practical Malware Analysis Lab 03-02.dll_"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/service/run-as-service.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11300,14 +11300,14 @@ rule capa_get_disk_size : CAPA HOST_INTERACTION HARDWARE STORAGE FUNCTION T1082 
 	hash = "al-khaser_x86.exe_:0x434010"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/hardware/storage/get-disk-size.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_cqt = /SELECT\s+\*\s+FROM\s+Win32_LogicalDisk/ nocase ascii wide 
-	$re_cqu = /SELECT\s+\*\s+FROM\s+Win32_DiskDrive\s+WHERE\s+\(SerialNumber\s+IS\s+NOT\s+NULL\)\s+AND\s+\(MediaType\s+LIKE\s+\'Fixed\s+hard\s+disk\%\'\)/ nocase ascii wide 
-	$str_cqv = "Size" ascii wide
+ 	$func_re_cqt = /SELECT\s+\*\s+FROM\s+Win32_LogicalDisk/ nocase ascii wide 
+	$func_re_cqu = /SELECT\s+\*\s+FROM\s+Win32_DiskDrive\s+WHERE\s+\(SerialNumber\s+IS\s+NOT\s+NULL\)\s+AND\s+\(MediaType\s+LIKE\s+\'Fixed\s+hard\s+disk\%\'\)/ nocase ascii wide 
+	$func_str_cqv = "Size" ascii wide
  
   condition:
     capa_pe_file and
@@ -11316,10 +11316,10 @@ rule capa_get_disk_size : CAPA HOST_INTERACTION HARDWARE STORAGE FUNCTION T1082 
 		or 	pe.imports(/kernel32/i, /GetDiskFreeSpaceEx/) 
 		or  (
 		 (
-			$re_cqt 
-		or 	$re_cqu  
+			$func_re_cqt 
+		or 	$func_re_cqu  
 	) 
-		and 	$str_cqv  
+		and 	$func_str_cqv  
 	)  
 	) 
 }
@@ -11335,7 +11335,7 @@ rule capa_interact_with_driver_via_control_codes : CAPA HOST_INTERACTION DRIVER 
 	hash = "9412A66BC81F51A1FA916AC47C77E02AC1A7C9DFF543233ED70AA265EF6A1E76"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/driver/interact-with-driver-via-control-codes.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11364,7 +11364,7 @@ rule capa_get_local_IPv4_addresses : CAPA HOST_INTERACTION NETWORK ADDRESS FUNCT
 	hash = "4C0553285D724DCAF5909924B4E3E90A"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/network/address/get-local-ipv4-addresses.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11391,7 +11391,7 @@ rule capa_get_session_user_name : CAPA HOST_INTERACTION SESSION FUNCTION T1033 T
 	hash = "Practical Malware Analysis Lab 14-01.exe_:0x401285"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/host-interaction/session/get-session-user-name.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11416,23 +11416,23 @@ rule capa_encrypt_data_using_Sosemanuk : CAPA DATA_MANIPULATION ENCRYPTION SOSEM
 	hash = "ea7bb99e03606702c1cbe543bb32b27e"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/sosemanuk/encrypt-data-using-sosemanuk.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$crf = { 00 00 00 00 E1 9F CF 13 6B 97 37 26 8A 08 F8 35 D6 87 6E 4C 37 18 A1 5F BD 10 59 6A 5C 8F 96 79 05 A7 DC 98 E4 38 13 8B 6E 30 EB BE 8F AF 24 AD D3 20 B2 D4 32 BF 7D C7 B8 B7 85 F2 59 28 4A E1 0A E7 11 99 EB 78 DE 8A 61 70 26 BF 80 EF E9 AC DC 60 7F D5 3D FF B0 C6 B7 F7 48 F3 56 68 87 E0 0F 40 CD 01 EE DF 02 12 64 D7 FA 27 85 48 35 34 D9 C7 A3 4D 38 58 6C 5E B2 50 94 6B 53 CF 5B 78 } // mul_a
-	$crg = { 00 00 00 00 13 CF 9F E1 26 37 97 6B 35 F8 08 8A 4C 6E 87 D6 5F A1 18 37 6A 59 10 BD 79 96 8F 5C 98 DC A7 05 8B 13 38 E4 BE EB 30 6E AD 24 AF 8F D4 B2 20 D3 C7 7D BF 32 F2 85 B7 B8 E1 4A 28 59 99 11 E7 0A 8A DE 78 EB BF 26 70 61 AC E9 EF 80 D5 7F 60 DC C6 B0 FF 3D F3 48 F7 B7 E0 87 68 56 01 CD 40 0F 12 02 DF EE 27 FA D7 64 34 35 48 85 4D A3 C7 D9 5E 6C 58 38 6B 94 50 B2 78 5B CF 53 } // mul_a_4byte_array_le
-	$crh = { 00 00 00 00 18 0F 40 CD 30 1E 80 33 28 11 C0 FE 60 3C A9 66 78 33 E9 AB 50 22 29 55 48 2D 69 98 C0 78 FB CC D8 77 BB 01 F0 66 7B FF E8 69 3B 32 A0 44 52 AA B8 4B 12 67 90 5A D2 99 88 55 92 54 29 F0 5F 31 31 FF 1F FC 19 EE DF 02 01 E1 9F CF 49 CC F6 57 51 C3 B6 9A 79 D2 76 64 61 DD 36 A9 E9 88 A4 FD F1 87 E4 30 D9 96 24 CE C1 99 64 03 89 B4 0D 9B 91 BB 4D 56 B9 AA 8D A8 A1 A5 CD 65 } // mul_ia
-	$cri = { 00 00 00 00 CD 40 0F 18 33 80 1E 30 FE C0 11 28 66 A9 3C 60 AB E9 33 78 55 29 22 50 98 69 2D 48 CC FB 78 C0 01 BB 77 D8 FF 7B 66 F0 32 3B 69 E8 AA 52 44 A0 67 12 4B B8 99 D2 5A 90 54 92 55 88 31 5F F0 29 FC 1F FF 31 02 DF EE 19 CF 9F E1 01 57 F6 CC 49 9A B6 C3 51 64 76 D2 79 A9 36 DD 61 FD A4 88 E9 30 E4 87 F1 CE 24 96 D9 03 64 99 C1 9B 0D B4 89 56 4D BB 91 A8 8D AA B9 65 CD A5 A1 } // mul_ia_4byte_array_le
+ 	$basic_crf = { 00 00 00 00 E1 9F CF 13 6B 97 37 26 8A 08 F8 35 D6 87 6E 4C 37 18 A1 5F BD 10 59 6A 5C 8F 96 79 05 A7 DC 98 E4 38 13 8B 6E 30 EB BE 8F AF 24 AD D3 20 B2 D4 32 BF 7D C7 B8 B7 85 F2 59 28 4A E1 0A E7 11 99 EB 78 DE 8A 61 70 26 BF 80 EF E9 AC DC 60 7F D5 3D FF B0 C6 B7 F7 48 F3 56 68 87 E0 0F 40 CD 01 EE DF 02 12 64 D7 FA 27 85 48 35 34 D9 C7 A3 4D 38 58 6C 5E B2 50 94 6B 53 CF 5B 78 } // mul_a
+	$basic_crg = { 00 00 00 00 13 CF 9F E1 26 37 97 6B 35 F8 08 8A 4C 6E 87 D6 5F A1 18 37 6A 59 10 BD 79 96 8F 5C 98 DC A7 05 8B 13 38 E4 BE EB 30 6E AD 24 AF 8F D4 B2 20 D3 C7 7D BF 32 F2 85 B7 B8 E1 4A 28 59 99 11 E7 0A 8A DE 78 EB BF 26 70 61 AC E9 EF 80 D5 7F 60 DC C6 B0 FF 3D F3 48 F7 B7 E0 87 68 56 01 CD 40 0F 12 02 DF EE 27 FA D7 64 34 35 48 85 4D A3 C7 D9 5E 6C 58 38 6B 94 50 B2 78 5B CF 53 } // mul_a_4byte_array_le
+	$basic_crh = { 00 00 00 00 18 0F 40 CD 30 1E 80 33 28 11 C0 FE 60 3C A9 66 78 33 E9 AB 50 22 29 55 48 2D 69 98 C0 78 FB CC D8 77 BB 01 F0 66 7B FF E8 69 3B 32 A0 44 52 AA B8 4B 12 67 90 5A D2 99 88 55 92 54 29 F0 5F 31 31 FF 1F FC 19 EE DF 02 01 E1 9F CF 49 CC F6 57 51 C3 B6 9A 79 D2 76 64 61 DD 36 A9 E9 88 A4 FD F1 87 E4 30 D9 96 24 CE C1 99 64 03 89 B4 0D 9B 91 BB 4D 56 B9 AA 8D A8 A1 A5 CD 65 } // mul_ia
+	$basic_cri = { 00 00 00 00 CD 40 0F 18 33 80 1E 30 FE C0 11 28 66 A9 3C 60 AB E9 33 78 55 29 22 50 98 69 2D 48 CC FB 78 C0 01 BB 77 D8 FF 7B 66 F0 32 3B 69 E8 AA 52 44 A0 67 12 4B B8 99 D2 5A 90 54 92 55 88 31 5F F0 29 FC 1F FF 31 02 DF EE 19 CF 9F E1 01 57 F6 CC 49 9A B6 C3 51 64 76 D2 79 A9 36 DD 61 FD A4 88 E9 30 E4 87 F1 CE 24 96 D9 03 64 99 C1 9B 0D B4 89 56 4D BB 91 A8 8D AA B9 65 CD A5 A1 } // mul_ia_4byte_array_le
  
   condition:
     capa_pe_file and
  (
-			$crf 
-		or 	$crg 
-		or 	$crh 
-		or 	$cri  
+			$basic_crf 
+		or 	$basic_crg 
+		or 	$basic_crh 
+		or 	$basic_cri  
 	) 
 }
 
@@ -11448,43 +11448,43 @@ rule capa_encrypt_data_using_DES : CAPA DATA_MANIPULATION ENCRYPTION DES BASICBL
 	hash = "91a12a4cf437589ba70b1687f5acad19"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/encryption/des/encrypt-data-using-des.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$crj = { 0E 04 0D 01 02 0F 0B 08 03 0A 06 0C 05 09 00 07 00 0F 07 04 0E 02 0D 01 0A 06 0C 0B 09 05 03 08 04 01 0E 08 0D 06 02 0B 0F 0C 09 07 03 0A 05 00 0F 0C 08 02 04 09 01 07 05 0B 03 0E 0A 00 06 0D } // SBOX S1
-	$crk = { 0F 01 08 0E 06 0B 03 04 09 07 02 0D 0C 00 05 0A 03 0D 04 07 0F 02 08 0E 0C 00 01 0A 06 09 0B 05 00 0E 07 0B 0A 04 0D 01 05 08 0C 06 09 03 02 0F 0D 08 0A 01 03 0F 04 02 0B 06 07 0C 00 05 0E 09 } // SBOX S2
-	$crl = { 0A 00 09 0E 06 03 0F 05 01 0D 0C 07 0B 04 02 08 0D 07 00 09 03 04 06 0A 02 08 05 0E 0C 0B 0F 01 0D 06 04 09 08 0F 03 00 0B 01 02 0C 05 0A 0E 07 01 0A 0D 00 06 09 08 07 04 0F 0E 03 0B 05 02 0C } // SBOX S3
-	$crm = { 07 0D 0E 03 00 06 09 0A 01 02 08 05 0B 0C 04 0F 0D 08 0B 05 06 0F 00 03 04 07 02 0C 01 0A 0E 09 0A 06 09 00 0C 0B 07 0D 0F 01 03 0E 05 02 08 04 03 0F 00 06 0A 01 0D 08 09 04 05 0B 0C 07 02 0E } // SBOX S4
-	$crn = { 02 0C 04 01 07 0A 0B 06 08 05 03 0F 0D 00 0E 09 0E 0B 02 0C 04 07 0D 01 05 00 0F 0A 03 09 08 06 04 02 01 0B 0A 0D 07 08 0F 09 0C 05 06 03 00 0E 0B 08 0C 07 01 0E 02 0D 06 0F 00 09 0A 04 05 03 } // SBOX S5
-	$cro = { 0C 01 0A 0F 09 02 06 08 00 0D 03 04 0E 07 05 0B 0A 0F 04 02 07 0C 09 05 06 01 0D 0E 00 0B 03 08 09 0E 0F 05 02 08 0C 03 07 00 04 0A 01 0D 0B 06 04 03 02 0C 09 05 0F 0A 0B 0E 01 07 06 00 08 0D } // SBOX S6
-	$crp = { 04 0B 02 0E 0F 00 08 0D 03 0C 09 07 05 0A 06 01 0D 00 0B 07 04 09 01 0A 0E 03 05 0C 02 0F 08 06 01 04 0B 0D 0C 03 07 0E 0A 0F 06 08 00 05 09 02 06 0B 0D 08 01 04 0A 07 09 05 00 0F 0E 02 03 0C } // SBOX S7
-	$crq = { 0D 02 08 04 06 0F 0B 01 0A 09 03 0E 05 00 0C 07 01 0F 0D 08 0A 03 07 04 0C 05 06 0B 00 0E 09 02 07 0B 04 01 09 0C 0E 02 00 06 0A 0D 0F 03 05 08 02 01 0E 07 04 0A 08 0D 0F 0C 09 00 03 05 06 0B } // SBOX S8
-	$crr = { 39 31 29 21 19 11 09 01 3A 32 2A 22 1A 12 0A 02 3B 33 2B 23 1B 13 0B 03 3C 34 2C 24 3F 37 2F 27 1F 17 0F 07 3E 36 2E 26 1E 16 0E 06 3D 35 2D 25 1D 15 0D 05 1C 14 0C 04 } // PC1
-	$crs = { 0E 11 0B 18 01 05 03 1C 0F 06 15 0A 17 13 0C 04 1A 08 10 07 1B 14 0D 02 29 34 1F 25 2F 37 1E 28 33 2D 21 30 2C 31 27 38 22 35 2E 2A 32 24 1D 20 } // PC2
-	$crt = { 3A 32 2A 22 1A 12 0A 02 3C 34 2C 24 1C 14 0C 04 3E 36 2E 26 1E 16 0E 06 40 38 30 28 20 18 10 08 39 31 29 21 19 11 09 01 3B 33 2B 23 1B 13 0B 03 3D 35 2D 25 1D 15 0D 05 3F 37 2F 27 1F 17 0F 07 } // Initial Permutation
-	$cru = { 28 08 30 10 38 18 40 20 27 07 2F 0F 37 17 3F 1F 26 06 2E 0E 36 16 3E 1E 25 05 2D 0D 35 15 3D 1D 24 04 2C 0C 34 14 3C 1C 23 03 2B 0B 33 13 3B 1B 22 02 2A 0A 32 12 3A 1A 21 01 29 09 31 11 39 19 } // Final Permutation
-	$crv = { 20 01 02 03 04 05 04 05 06 07 08 09 08 09 0A 0B 0C 0D 0C 0D 0E 0F 10 11 10 11 12 13 14 15 14 15 16 17 18 19 18 19 1A 1B 1C 1D 1C 1D 1E 1F 20 01 } // DES Expansion
-	$crw = { 10 07 14 15 1D 0C 1C 11 01 0F 17 1A 05 12 1F 0A 02 08 18 0E 20 1B 03 09 13 0D 1E 06 16 0B 04 19 } // PBOX
+ 	$basic_crj = { 0E 04 0D 01 02 0F 0B 08 03 0A 06 0C 05 09 00 07 00 0F 07 04 0E 02 0D 01 0A 06 0C 0B 09 05 03 08 04 01 0E 08 0D 06 02 0B 0F 0C 09 07 03 0A 05 00 0F 0C 08 02 04 09 01 07 05 0B 03 0E 0A 00 06 0D } // SBOX S1
+	$basic_crk = { 0F 01 08 0E 06 0B 03 04 09 07 02 0D 0C 00 05 0A 03 0D 04 07 0F 02 08 0E 0C 00 01 0A 06 09 0B 05 00 0E 07 0B 0A 04 0D 01 05 08 0C 06 09 03 02 0F 0D 08 0A 01 03 0F 04 02 0B 06 07 0C 00 05 0E 09 } // SBOX S2
+	$basic_crl = { 0A 00 09 0E 06 03 0F 05 01 0D 0C 07 0B 04 02 08 0D 07 00 09 03 04 06 0A 02 08 05 0E 0C 0B 0F 01 0D 06 04 09 08 0F 03 00 0B 01 02 0C 05 0A 0E 07 01 0A 0D 00 06 09 08 07 04 0F 0E 03 0B 05 02 0C } // SBOX S3
+	$basic_crm = { 07 0D 0E 03 00 06 09 0A 01 02 08 05 0B 0C 04 0F 0D 08 0B 05 06 0F 00 03 04 07 02 0C 01 0A 0E 09 0A 06 09 00 0C 0B 07 0D 0F 01 03 0E 05 02 08 04 03 0F 00 06 0A 01 0D 08 09 04 05 0B 0C 07 02 0E } // SBOX S4
+	$basic_crn = { 02 0C 04 01 07 0A 0B 06 08 05 03 0F 0D 00 0E 09 0E 0B 02 0C 04 07 0D 01 05 00 0F 0A 03 09 08 06 04 02 01 0B 0A 0D 07 08 0F 09 0C 05 06 03 00 0E 0B 08 0C 07 01 0E 02 0D 06 0F 00 09 0A 04 05 03 } // SBOX S5
+	$basic_cro = { 0C 01 0A 0F 09 02 06 08 00 0D 03 04 0E 07 05 0B 0A 0F 04 02 07 0C 09 05 06 01 0D 0E 00 0B 03 08 09 0E 0F 05 02 08 0C 03 07 00 04 0A 01 0D 0B 06 04 03 02 0C 09 05 0F 0A 0B 0E 01 07 06 00 08 0D } // SBOX S6
+	$basic_crp = { 04 0B 02 0E 0F 00 08 0D 03 0C 09 07 05 0A 06 01 0D 00 0B 07 04 09 01 0A 0E 03 05 0C 02 0F 08 06 01 04 0B 0D 0C 03 07 0E 0A 0F 06 08 00 05 09 02 06 0B 0D 08 01 04 0A 07 09 05 00 0F 0E 02 03 0C } // SBOX S7
+	$basic_crq = { 0D 02 08 04 06 0F 0B 01 0A 09 03 0E 05 00 0C 07 01 0F 0D 08 0A 03 07 04 0C 05 06 0B 00 0E 09 02 07 0B 04 01 09 0C 0E 02 00 06 0A 0D 0F 03 05 08 02 01 0E 07 04 0A 08 0D 0F 0C 09 00 03 05 06 0B } // SBOX S8
+	$basic_crr = { 39 31 29 21 19 11 09 01 3A 32 2A 22 1A 12 0A 02 3B 33 2B 23 1B 13 0B 03 3C 34 2C 24 3F 37 2F 27 1F 17 0F 07 3E 36 2E 26 1E 16 0E 06 3D 35 2D 25 1D 15 0D 05 1C 14 0C 04 } // PC1
+	$basic_crs = { 0E 11 0B 18 01 05 03 1C 0F 06 15 0A 17 13 0C 04 1A 08 10 07 1B 14 0D 02 29 34 1F 25 2F 37 1E 28 33 2D 21 30 2C 31 27 38 22 35 2E 2A 32 24 1D 20 } // PC2
+	$basic_crt = { 3A 32 2A 22 1A 12 0A 02 3C 34 2C 24 1C 14 0C 04 3E 36 2E 26 1E 16 0E 06 40 38 30 28 20 18 10 08 39 31 29 21 19 11 09 01 3B 33 2B 23 1B 13 0B 03 3D 35 2D 25 1D 15 0D 05 3F 37 2F 27 1F 17 0F 07 } // Initial Permutation
+	$basic_cru = { 28 08 30 10 38 18 40 20 27 07 2F 0F 37 17 3F 1F 26 06 2E 0E 36 16 3E 1E 25 05 2D 0D 35 15 3D 1D 24 04 2C 0C 34 14 3C 1C 23 03 2B 0B 33 13 3B 1B 22 02 2A 0A 32 12 3A 1A 21 01 29 09 31 11 39 19 } // Final Permutation
+	$basic_crv = { 20 01 02 03 04 05 04 05 06 07 08 09 08 09 0A 0B 0C 0D 0C 0D 0E 0F 10 11 10 11 12 13 14 15 14 15 16 17 18 19 18 19 1A 1B 1C 1D 1C 1D 1E 1F 20 01 } // DES Expansion
+	$basic_crw = { 10 07 14 15 1D 0C 1C 11 01 0F 17 1A 05 12 1F 0A 02 08 18 0E 20 1B 03 09 13 0D 1E 06 16 0B 04 19 } // PBOX
  
   condition:
     capa_pe_file and
  (
-			$crj 
-		or 	$crk 
-		or 	$crl 
-		or 	$crm 
-		or 	$crn 
-		or 	$cro 
-		or 	$crp 
-		or 	$crq 
-		or 	$crr 
-		or 	$crs 
-		or 	$crt 
-		or 	$cru 
-		or 	$crv 
-		or 	$crw  
+			$basic_crj 
+		or 	$basic_crk 
+		or 	$basic_crl 
+		or 	$basic_crm 
+		or 	$basic_crn 
+		or 	$basic_cro 
+		or 	$basic_crp 
+		or 	$basic_crq 
+		or 	$basic_crr 
+		or 	$basic_crs 
+		or 	$basic_crt 
+		or 	$basic_cru 
+		or 	$basic_crv 
+		or 	$basic_crw  
 	) 
 }
 
@@ -11500,7 +11500,7 @@ rule capa_hash_data_with_CRC32 : CAPA DATA_MANIPULATION CHECKSUM CRC32 FUNCTION 
 	hash = "7EFF498DE13CC734262F87E6B3EF38AB"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/checksum/crc32/hash-data-with-crc32.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11524,7 +11524,7 @@ rule capa_hash_data_using_SHA1 : CAPA DATA_MANIPULATION HASHING SHA1 FUNCTION C0
 	hash = "D063B1804E8D2BB26BD2E097141C1BBC"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/hashing/sha1/hash-data-using-sha1.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11559,23 +11559,23 @@ rule capa_hash_data_using_tiger : CAPA DATA_MANIPULATION HASHING TIGER BASICBLOC
 	hash = "0761142efbda6c4b1e801223de723578"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/hashing/tiger/hash-data-using-tiger.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$csi = { 5E 0C E9 F7 7C B1 AA 02 EC A8 43 E2 03 4B 42 AC D3 FC D5 0D E3 5B CD 72 3A 7F F9 F6 93 9B 01 6D 93 91 1F D2 FF 78 99 CD E2 29 80 70 C9 A1 73 75 C3 83 2A 92 6B 32 64 B1 70 58 91 04 EE 3E 88 46 E6 EC 03 71 05 E3 AC EA 5C 53 A3 08 B8 69 41 C5 7C C4 DE 8D 91 54 E7 4C 0C F4 0D DC DF F4 A2 0A FA BE 4D A7 18 6F B7 10 6A AB D1 5A 23 B6 CC C6 FF E2 2F 57 21 61 72 13 1E 92 9D 19 6F 8C 48 1A CA 07 00 DA F4 F9 C9 4B C7 41 52 E8 F6 E6 F5 26 B6 47 59 EA DB 79 90 85 92 8C 9E C9 C5 85 18 4F 4B 86 6F A9 1E 76 8E D7 7D C1 B5 } // sbox1
-	$csj = { 38 21 A1 05 5A BE A6 E6 98 7C F8 B4 A5 22 A1 B5 90 69 0B 14 89 60 3C 56 D5 5D 1F 39 2E CB 46 4C 34 94 B7 C9 DB AD 32 D9 F5 AF 15 20 E4 70 EA 08 F1 8C 47 3E 67 A6 65 D7 99 8D 27 AB 7E 75 FB C4 92 06 6E 2D 86 C6 11 DF 16 3B 7F 0D F1 84 EB DD 04 EA 65 A6 04 F6 2E 6F B3 DF E0 F0 0F 0F 8E 4A 51 BA BC 3D F8 EE ED A5 1E 37 A4 0E 2A 0A 4F FC 29 84 B3 5C A8 1D 3E E8 E2 1C 1B BA 82 F8 8F DC 0D E8 53 83 5E 50 45 CD 17 07 DB D4 00 9A D1 18 01 81 F3 A5 ED CF A0 34 F2 CA 87 88 51 7E E7 0B 36 51 C4 B3 38 14 34 1E F9 CC 89 } // sbox2
-	$csk = { 9B F3 DA F1 2F CC 9F F4 81 92 F2 6F C6 D5 7F 48 3F A8 DC FC 67 06 A3 E8 63 CE FC D2 E3 4B 9B 2C C2 BB FB 93 4B F7 3F DA 66 BA 70 FE D2 65 A1 2F D4 93 0E 97 79 E2 03 A1 71 5E E4 B0 77 EC CD BE 97 E4 85 39 72 1E B4 CF 17 50 F7 5E 02 AA 0A B7 E0 B8 40 38 F0 09 23 D4 79 85 89 35 D0 1A FC 8E C5 AB B2 E2 0B 92 C6 96 72 91 5A 37 63 41 AF 66 FB 27 71 CA DC AB 74 21 41 FF 72 4A A6 CE 3C B3 A5 66 30 08 33 49 4A F0 F5 9A 28 D7 CD 0A 97 8D 5E C2 C8 31 E0 E8 96 8F 47 5D 87 76 22 C0 FE F3 DD 90 61 05 10 F3 7B EC 91 14 0F } // sbox3
-	$csl = { 55 3C 32 26 85 60 0E 5B F5 59 1B FA A9 C1 46 1A FA 8F 4C 7C A1 45 E2 A9 D7 55 29 DB 59 51 CA 65 C2 AF 35 CE 76 0A DB 05 45 3D 11 A9 7E C7 EA 81 0D 0A AC B6 8A F8 8E 52 FF E3 7B 59 53 A2 9E A0 56 CD 48 AC B3 DF 0D 43 6F E4 5C F4 7A A6 B3 C4 5E D0 E2 FB D8 CF CE 4E F0 35 99 B3 10 6F F5 3E C6 19 D6 9C 82 D6 22 0B 69 20 DF 74 0A 46 FD 17 40 ED 10 85 8E CC F8 6C A7 CA 6E 3A BF 24 C8 D6 49 70 81 1A 58 3D 24 61 A2 63 C1 BB B6 AC 8B 04 32 CC 44 7D C2 8A A3 D9 AB 10 F4 AA 5B FF DD 7F 4B 82 04 A8 5A 49 6D AD 94 9F 8C } // sbox4
+ 	$basic_csi = { 5E 0C E9 F7 7C B1 AA 02 EC A8 43 E2 03 4B 42 AC D3 FC D5 0D E3 5B CD 72 3A 7F F9 F6 93 9B 01 6D 93 91 1F D2 FF 78 99 CD E2 29 80 70 C9 A1 73 75 C3 83 2A 92 6B 32 64 B1 70 58 91 04 EE 3E 88 46 E6 EC 03 71 05 E3 AC EA 5C 53 A3 08 B8 69 41 C5 7C C4 DE 8D 91 54 E7 4C 0C F4 0D DC DF F4 A2 0A FA BE 4D A7 18 6F B7 10 6A AB D1 5A 23 B6 CC C6 FF E2 2F 57 21 61 72 13 1E 92 9D 19 6F 8C 48 1A CA 07 00 DA F4 F9 C9 4B C7 41 52 E8 F6 E6 F5 26 B6 47 59 EA DB 79 90 85 92 8C 9E C9 C5 85 18 4F 4B 86 6F A9 1E 76 8E D7 7D C1 B5 } // sbox1
+	$basic_csj = { 38 21 A1 05 5A BE A6 E6 98 7C F8 B4 A5 22 A1 B5 90 69 0B 14 89 60 3C 56 D5 5D 1F 39 2E CB 46 4C 34 94 B7 C9 DB AD 32 D9 F5 AF 15 20 E4 70 EA 08 F1 8C 47 3E 67 A6 65 D7 99 8D 27 AB 7E 75 FB C4 92 06 6E 2D 86 C6 11 DF 16 3B 7F 0D F1 84 EB DD 04 EA 65 A6 04 F6 2E 6F B3 DF E0 F0 0F 0F 8E 4A 51 BA BC 3D F8 EE ED A5 1E 37 A4 0E 2A 0A 4F FC 29 84 B3 5C A8 1D 3E E8 E2 1C 1B BA 82 F8 8F DC 0D E8 53 83 5E 50 45 CD 17 07 DB D4 00 9A D1 18 01 81 F3 A5 ED CF A0 34 F2 CA 87 88 51 7E E7 0B 36 51 C4 B3 38 14 34 1E F9 CC 89 } // sbox2
+	$basic_csk = { 9B F3 DA F1 2F CC 9F F4 81 92 F2 6F C6 D5 7F 48 3F A8 DC FC 67 06 A3 E8 63 CE FC D2 E3 4B 9B 2C C2 BB FB 93 4B F7 3F DA 66 BA 70 FE D2 65 A1 2F D4 93 0E 97 79 E2 03 A1 71 5E E4 B0 77 EC CD BE 97 E4 85 39 72 1E B4 CF 17 50 F7 5E 02 AA 0A B7 E0 B8 40 38 F0 09 23 D4 79 85 89 35 D0 1A FC 8E C5 AB B2 E2 0B 92 C6 96 72 91 5A 37 63 41 AF 66 FB 27 71 CA DC AB 74 21 41 FF 72 4A A6 CE 3C B3 A5 66 30 08 33 49 4A F0 F5 9A 28 D7 CD 0A 97 8D 5E C2 C8 31 E0 E8 96 8F 47 5D 87 76 22 C0 FE F3 DD 90 61 05 10 F3 7B EC 91 14 0F } // sbox3
+	$basic_csl = { 55 3C 32 26 85 60 0E 5B F5 59 1B FA A9 C1 46 1A FA 8F 4C 7C A1 45 E2 A9 D7 55 29 DB 59 51 CA 65 C2 AF 35 CE 76 0A DB 05 45 3D 11 A9 7E C7 EA 81 0D 0A AC B6 8A F8 8E 52 FF E3 7B 59 53 A2 9E A0 56 CD 48 AC B3 DF 0D 43 6F E4 5C F4 7A A6 B3 C4 5E D0 E2 FB D8 CF CE 4E F0 35 99 B3 10 6F F5 3E C6 19 D6 9C 82 D6 22 0B 69 20 DF 74 0A 46 FD 17 40 ED 10 85 8E CC F8 6C A7 CA 6E 3A BF 24 C8 D6 49 70 81 1A 58 3D 24 61 A2 63 C1 BB B6 AC 8B 04 32 CC 44 7D C2 8A A3 D9 AB 10 F4 AA 5B FF DD 7F 4B 82 04 A8 5A 49 6D AD 94 9F 8C } // sbox4
  
   condition:
     capa_pe_file and
  (
-			$csi 
-		or 	$csj 
-		or 	$csk 
-		or 	$csl  
+			$basic_csi 
+		or 	$basic_csj 
+		or 	$basic_csk 
+		or 	$basic_csl  
 	) 
 }
 
@@ -11589,7 +11589,7 @@ rule capa_hash_data_using_murmur3 : CAPA DATA_MANIPULATION HASHING MURMUR FUNCTI
 	hash = "c66172b12971a329f8d5ff01665f204b"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/data-manipulation/hashing/murmur/hash-data-using-murmur3.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11646,15 +11646,15 @@ rule capa_persist_via_Windows_service : CAPA PERSISTENCE SERVICE FUNCTION T1543_
 	hash = "Practical Malware Analysis Lab 03-02.dll_:0x10004706"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/persistence/service/persist-via-windows-service.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$re_ctc = /\x00sc(\.exe)?$/ nocase ascii wide 
-	$re_ctd = /create / nocase ascii wide 
-	$re_cte = /\x00sc(\.exe)? create/ nocase ascii wide 
-	$re_ctf = /New-Service / nocase ascii wide 
+ 	$func_re_ctc = /\x00sc(\.exe)?$/ nocase ascii wide 
+	$func_re_ctd = /create / nocase ascii wide 
+	$func_re_cte = /\x00sc(\.exe)? create/ nocase ascii wide 
+	$func_re_ctf = /New-Service / nocase ascii wide 
  
   condition:
     capa_pe_file and
@@ -11664,11 +11664,11 @@ rule capa_persist_via_Windows_service : CAPA PERSISTENCE SERVICE FUNCTION T1543_
 
 		and  (
 		 (
-			$re_ctc 
-		and 	$re_ctd  
+			$func_re_ctc 
+		and 	$func_re_ctd  
 	) 
-		or 	$re_cte 
-		or 	$re_ctf  
+		or 	$func_re_cte 
+		or 	$func_re_ctf  
 	)  
 	)  
 	) 
@@ -11683,7 +11683,7 @@ rule capa_move_file : CAPA HOST_INTERACTION FILE_SYSTEM MOVE FUNCTION INCOMPLETE
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/move-file.yml"
 	capa_nursery = "True"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11714,7 +11714,7 @@ rule capa_hash_data_with_MD5 : CAPA DATA_MANIPULATION HASHING MD5 FUNCTION INCOM
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/nursery/hash-data-with-md5.yml"
 	capa_nursery = "True"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
@@ -11750,12 +11750,12 @@ rule capa_capture_screenshot : CAPA COLLECTION SCREENSHOT FUNCTION T1113 E1113_m
 	hash = "50D5EE1CE2CA5E30C6B1019EE64EEEC2"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/screenshot/capture-screenshot.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_cum = "DISPLAY" ascii wide
+ 	$func_str_cum = "DISPLAY" ascii wide
  
   condition:
     capa_pe_file and
@@ -11766,7 +11766,7 @@ rule capa_capture_screenshot : CAPA COLLECTION SCREENSHOT FUNCTION T1113 E1113_m
 		or 	pe.imports(/user32/i, /GetDC/) 
 		or  (
 			pe.imports(/gdi32/i, /CreateDCA/) 
-		and 	$str_cum  
+		and 	$func_str_cum  
 	)  
 	) 
 		and  (
@@ -11789,24 +11789,24 @@ rule capa_gather_leapftp_information : CAPA COLLECTION FILE_MANAGERS FUNCTION T1
 	hash = "5a2f620f29ca2f44fc22df67b674198f"
 	reference = "This YARA rule converted from capa rule: https://github.com/fireeye/capa-rules/blob/master/collection/file-managers/gather-leapftp-information.yml"
 	comment = "This rule is incomplete because a branch inside an Or-statement had an unsupported feature and was skipped => coverage is reduced compared to the original capa rule. "
-	date = "2021-05-24"
+	date = "2021-05-25"
 	minimum_yara = "3.8"
 	license = "Apache-2.0 License"
 
   strings: 
- 	$str_cun = "InstallPath" ascii wide
-	$str_cuo = "DataDir" ascii wide
-	$str_cup = "sites.dat" ascii wide
-	$str_cuq = "sites.ini" ascii wide
+ 	$func_str_cun = "InstallPath" ascii wide
+	$func_str_cuo = "DataDir" ascii wide
+	$func_str_cup = "sites.dat" ascii wide
+	$func_str_cuq = "sites.ini" ascii wide
  
   condition:
     capa_pe_file and
  (
 		 (
-			$str_cun 
-		and 	$str_cuo 
-		and 	$str_cup 
-		and 	$str_cuq  
+			$func_str_cun 
+		and 	$func_str_cuo 
+		and 	$func_str_cup 
+		and 	$func_str_cuq  
 	)  
 	) 
 }
