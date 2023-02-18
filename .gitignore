@@ -130,3 +130,14 @@ dmypy.json
 
 tmp/
 *.swp
+vuln/
+*test*
+x
+xx
+xxx
+y
+yy
+*delme*
+*.txt
+TO*
+*.old
