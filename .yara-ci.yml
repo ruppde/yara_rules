@@ -4,7 +4,7 @@ branches:
 
 branches:
   ignore:
-  - "capa2yara**"
+  - "capa2yara/**"
 
 files:
   accept:
