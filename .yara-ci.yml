@@ -2,11 +2,9 @@ branches:
   accept:
   - "**"
 
-branches:
-  ignore:
-  - "capa2yara/**"
-
 files:
   accept:
   - "**.yar"
   - "**.yara"
+  ignore:
+  - "capa2yara/**"
