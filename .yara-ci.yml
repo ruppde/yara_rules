@@ -8,3 +8,5 @@ files:
   - "**.yara"
   ignore:
   - "capa2yara/**"
+  - "*hunting*"
+  - "webshell/**"
